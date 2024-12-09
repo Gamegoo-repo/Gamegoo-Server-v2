@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +43,15 @@ public class BlockController {
     public ApiResponse<BlockListResponse> getBlockList(@ValidPage @RequestParam(name = "page") Integer page,
             @AuthMember Member member) {
         return ApiResponse.ok(blockFacadeService.getBlockList(member, page));
+    }
+
+    @Operation(summary = "회원 차단 해제 API", description = "해당 회원에 대한 차단을 해제하는 API 입니다.")
+    @Parameter(name = "memberId", description = "차단을 해제할 대상 회원의 id 입니다.")
+    @DeleteMapping("/{memberId}")
+    public ApiResponse<String> unblockMember(@PathVariable(name = "memberId") Long targetMemberId,
+            @AuthMember Member member) {
+        blockFacadeService.unBlockMember(member, targetMemberId);
+        return ApiResponse.ok("회원 차단 해제 성공");
     }
 
 }

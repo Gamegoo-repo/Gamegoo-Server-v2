@@ -45,4 +45,16 @@ public class BlockFacadeService {
         return BlockListResponse.of(members);
     }
 
+    /**
+     * 회원 차단 해제 Facade 메소드
+     *
+     * @param member
+     * @param targetMemberId
+     */
+    @Transactional
+    public void unBlockMember(Member member, Long targetMemberId) {
+        Member targetMember = memberService.findMember(targetMemberId);
+        blockService.unBlockMember(member, targetMember);
+    }
+
 }

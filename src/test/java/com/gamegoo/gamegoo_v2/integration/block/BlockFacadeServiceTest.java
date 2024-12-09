@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -78,7 +80,7 @@ class BlockFacadeServiceTest {
 
         // then
         // 차단이 정상적으로 처리되었는지 검증
-        assertThat(blockRepository.existsByBlockerMemberAndBlockedMember(member, targetMember)).isTrue();
+        assertTrue(blockRepository.existsByBlockerMemberAndBlockedMember(member, targetMember));
 
         // 채팅방에서 퇴장 처리 되었는지 검증
 
@@ -131,6 +133,18 @@ class BlockFacadeServiceTest {
                 .hasMessage(ErrorCode.TARGET_MEMBER_DEACTIVATED.getMessage());
     }
 
+    @DisplayName("회원 차단 실패: 차단 대상 회원을 찾을 수 없는 경우 예외가 발생한다.")
+    @Test
+    void blockMember_shouldThrowWhenTargetMemberNotFound() {
+        // given
+        Member member = createMember(MEMBER_EMAIL, MEMBER_GAMENAME);
+
+        // when // then
+        assertThatThrownBy(() -> blockFacadeService.blockMember(member, 100L))
+                .isInstanceOf(MemberException.class)
+                .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+    }
+
     /*   차단한 회원 목록 조회   */
     @DisplayName("차단한 회원 목록 조회 성공: 차단한 회원이 존재하는 경우")
     @Test
@@ -166,6 +180,69 @@ class BlockFacadeServiceTest {
         // then
         assertThat(blockList.getListSize()).isEqualTo(0);
         assertThat(blockList.getBlockedMemberList()).isEmpty();
+    }
+
+    /*   회원 차단 해제   */
+    @DisplayName("회원 차단 해제 성공")
+    @Test
+    void unBlockMemberSucceeds() {
+        // given
+        Member member = createMember(MEMBER_EMAIL, MEMBER_GAMENAME);
+        Member targetMember = createMember("target@naver.com", "target");
+
+        // 회원 차단 처리
+        blockFacadeService.blockMember(member, targetMember.getId());
+
+        // when
+        blockFacadeService.unBlockMember(member, targetMember.getId());
+
+        // then
+        // 차단 기록이 정상적으로 삭제되었는지 검증
+        assertFalse(blockRepository.existsByBlockerMemberAndBlockedMember(member, targetMember));
+    }
+
+    @DisplayName("회원 차단 해제 실패: 대상 회원이 탈퇴한 경우 예외가 발생한다.")
+    @Test
+    void unBlockMember_shouldThrowWhenTargetMemberIsBlind() {
+        // given
+        Member member = createMember(MEMBER_EMAIL, MEMBER_GAMENAME);
+        Member targetMember = createMember("target@naver.com", "target");
+
+        // 회원 차단 처리
+        blockFacadeService.blockMember(member, targetMember.getId());
+
+        // 대상 회원을 탈퇴 처리
+        targetMember.updateBlind(true);
+
+        // when // then
+        assertThatThrownBy(() -> blockFacadeService.unBlockMember(member, targetMember.getId()))
+                .isInstanceOf(MemberException.class)
+                .hasMessage(ErrorCode.TARGET_MEMBER_DEACTIVATED.getMessage());
+    }
+
+    @DisplayName("회원 차단 해제 실패: 대상 회원을 차단하지 않은 상태인 경우 예외가 발생한다.")
+    @Test
+    void unBlockMember_shouldThrowWhenTargetMemberIsNotBlocked() {
+        // given
+        Member member = createMember(MEMBER_EMAIL, MEMBER_GAMENAME);
+        Member targetMember = createMember("target@naver.com", "target");
+
+        // when // then
+        assertThatThrownBy(() -> blockFacadeService.unBlockMember(member, targetMember.getId()))
+                .isInstanceOf(BlockException.class)
+                .hasMessage(ErrorCode.TARGET_MEMBER_NOT_BLOCKED.getMessage());
+    }
+
+    @DisplayName("회원 차단 해제 실패: 대상 회원을 찾을 수 없는 경우 예외가 발생한다.")
+    @Test
+    void unBlockMember_shouldThrowWhenTargetMemberNotFound() {
+        // given
+        Member member = createMember(MEMBER_EMAIL, MEMBER_GAMENAME);
+
+        // when // then
+        assertThatThrownBy(() -> blockFacadeService.unBlockMember(member, 100L))
+                .isInstanceOf(MemberException.class)
+                .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
     }
 
     private Member createMember(String email, String gameName) {
