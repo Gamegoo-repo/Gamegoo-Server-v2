@@ -1,10 +1,10 @@
 package com.gamegoo.gamegoo_v2.notification.controller;
 
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidCursor;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.notification.dto.NotificationCursorListResponse;
 import com.gamegoo.gamegoo_v2.notification.dto.NotificationPageListResponse;
 import com.gamegoo.gamegoo_v2.notification.dto.ReadNotificationResponse;
@@ -33,7 +33,7 @@ public class NotificationController {
     @Operation(summary = "알림 읽음 처리 API", description = "특정 알림을 읽음 처리하는 API 입니다.")
     @Parameter(name = "notificationId", description = "읽음 처리할 알림의 id 입니다.")
     @PatchMapping("/{notificationId}")
-    public ApiResponse<ReadNotificationResponse> getTotalNotificationList(
+    public ApiResponse<ReadNotificationResponse> readNotification(
             @PathVariable(name = "notificationId") Long notificationId, @AuthMember Member member) {
         return ApiResponse.ok(notificationFacadeService.readNotification(member, notificationId));
     }
