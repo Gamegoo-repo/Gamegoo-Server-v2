@@ -55,7 +55,7 @@ public class EmailService {
     /**
      * 랜덤 코드 이메일 전송
      *
-     * @param email 이메일 주소
+     * @param email 이메일
      */
     @Transactional
     public void sendEmailVerificationCode(String email) {
@@ -64,7 +64,6 @@ public class EmailService {
 
         // 랜덤 코드 생성하기
         String certificationNumber = RandomCodeGeneratorUtil.generateEmailRandomCode();
-
 
         // Placeholder 값 정의
         Map<String, String> placeholders = new HashMap<>();

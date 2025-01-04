@@ -145,7 +145,7 @@ public class MemberServiceFacadeTest {
         assertThat(response.getGameName()).isEqualTo(targetMember.getGameName());
         assertThat(response.getTag()).isEqualTo(targetMember.getTag());
         assertThat(response.getTier()).isEqualTo(targetMember.getTier());
-        assertThat(response.getRank()).isEqualTo(targetMember.getGameRank());
+        assertThat(response.getGameRank()).isEqualTo(targetMember.getGameRank());
         assertThat(response.getMannerLevel()).isEqualTo(targetMember.getMannerLevel());
         assertThat(response.getMainP()).isEqualTo(targetMember.getMainPosition());
         assertThat(response.getSubP()).isEqualTo(targetMember.getSubPosition());
