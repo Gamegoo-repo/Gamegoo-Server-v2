@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -56,7 +58,7 @@ public class BoardController {
             @Parameter(name = "mike", description = "(선택) 마이크 여부를 선택해주세요.")
     })
     public ApiResponse<BoardResponse> boardList(
-            @RequestParam(defaultValue = "1") int pageIdx,
+            @ValidPage @RequestParam(name = "page") Integer page,
             @RequestParam(required = false) Integer mode,
             @RequestParam(required = false) Tier tier,
             @RequestParam(required = false) Integer mainPosition,
@@ -67,9 +69,9 @@ public class BoardController {
             mainPosition = null;
         }
 
-        BoardResponse response = boardFacadeService.getBoardList(mode, tier, mainPosition, mike, pageIdx);
-        return ApiResponse.ok(response);
-    }
+        return ApiResponse.ok(boardFacadeService.getBoardList(mode, tier, mainPosition, mike, page));
 
+
+    }
 
 }

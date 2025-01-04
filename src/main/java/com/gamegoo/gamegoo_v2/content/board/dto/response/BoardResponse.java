@@ -13,4 +13,12 @@ public class BoardResponse {
     Integer totalCount;
     List<BoardListResponse> boards;
 
+    public static BoardResponse of(Integer totalPage, Integer totalCount, List<BoardListResponse> boards) {
+        return BoardResponse.builder()
+                .totalPage(totalPage)
+                .totalCount(totalCount)
+                .boards(boards)
+                .build();
+    }
+
 }

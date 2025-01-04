@@ -9,7 +9,9 @@ import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +52,12 @@ public class BoardService {
         return boardRepository.findByFilters(mode, tier, mainPosition, mike, pageable);
     }
 
-
+    public Page<Board> getBoardsWithPagination(Integer mode, Tier tier, Integer mainPosition, Boolean mike,
+                                               int pageIdx) {
+        Pageable pageable = PageRequest.of(pageIdx - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return findBoards(mode, tier, mainPosition, mike, pageable);
+    }
+    
     /**
      * 게시글 엔티티 조회
      */
