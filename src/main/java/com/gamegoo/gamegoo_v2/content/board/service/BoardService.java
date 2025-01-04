@@ -52,12 +52,16 @@ public class BoardService {
         return boardRepository.findByFilters(mode, tier, mainPosition, mike, pageable);
     }
 
+    /**
+     * 게시글 목록 조회 (페이징 처리)
+     */
+
     public Page<Board> getBoardsWithPagination(Integer mode, Tier tier, Integer mainPosition, Boolean mike,
                                                int pageIdx) {
         Pageable pageable = PageRequest.of(pageIdx - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
         return findBoards(mode, tier, mainPosition, mike, pageable);
     }
-    
+
     /**
      * 게시글 엔티티 조회
      */

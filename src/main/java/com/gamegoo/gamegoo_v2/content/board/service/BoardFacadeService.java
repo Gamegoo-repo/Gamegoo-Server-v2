@@ -46,6 +46,11 @@ public class BoardFacadeService {
     public BoardResponse getBoardList(Integer mode, Tier tier, Integer mainPosition, Boolean mike,
                                       @ValidPage int pageIdx) {
 
+        // <포지션 정보> 전체: 0, 탑: 1, 정글: 2, 미드: 3, 바텀: 4, 서포터: 5
+        if (mainPosition != null && mainPosition == 0) {
+            mainPosition = null;
+        }
+
         Page<Board> boardPage = boardService.getBoardsWithPagination(mode, tier, mainPosition, mike, pageIdx);
 
         // 전체 페이지, 전체 개수 구하기
