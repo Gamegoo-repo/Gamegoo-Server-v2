@@ -73,6 +73,7 @@ public class AuthFacadeService {
      * @param request 이메일,비밀번호
      * @return 사용자 정보
      */
+    @Transactional
     public LoginResponse login(LoginRequest request) {
         // email 검증
         Member member = memberService.findMemberByEmail(request.getEmail());
