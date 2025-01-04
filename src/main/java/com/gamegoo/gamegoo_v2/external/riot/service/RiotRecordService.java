@@ -42,9 +42,9 @@ public class RiotRecordService {
     /**
      * Riot API: 최근 선호 챔피언 3개 리스트 조회
      *
-     * @param gameName 게임 이름
-     * @param puuid    Riot PUUID
-     * @return 선호 챔피언 ID 리스트
+     * @param gameName  게임 이름
+     * @param puuid     Riot PUUID
+     * @return          선호 챔피언 ID 리스트
      */
     public List<Long> getPreferChampionfromMatch(String gameName, String puuid) {
         // 1. 최근 플레이한 챔피언 ID 리스트 가져오기
@@ -62,9 +62,9 @@ public class RiotRecordService {
     /**
      * 최근 플레이한 챔피언 ID 리스트를 Riot API에서 가져오는 메서드
      *
-     * @param gameName 게임 이름
-     * @param puuid    Riot PUUID
-     * @return 챔피언 ID 리스트
+     * @param gameName  게임 이름
+     * @param puuid     Riot PUUID
+     * @return          챔피언 ID 리스트
      */
     private List<Long> fetchRecentChampionIds(String gameName, String puuid) {
         List<Long> championIds = new ArrayList<>();
@@ -80,7 +80,6 @@ public class RiotRecordService {
                 count += MATCH_INCREMENT;
             }
         }
-
         return championIds;
     }
 
@@ -89,7 +88,7 @@ public class RiotRecordService {
      *
      * @param puuid Riot PUUID
      * @param count 가져올 매칭 개수
-     * @return 매칭 ID 리스트
+     * @return      매칭 ID 리스트
      */
     private List<String> fetchMatchIds(String puuid, int count) {
         String url = String.format(MATCH_IDS_URL_TEMPLATE, puuid, count, riotAPIKey);
@@ -106,9 +105,9 @@ public class RiotRecordService {
     /**
      * 매칭 ID 리스트를 기반으로 특정 게임 이름에 해당하는 챔피언 ID를 추출
      *
-     * @param matchIds 매칭 ID 리스트
-     * @param gameName 게임 이름
-     * @return 챔피언 ID 리스트
+     * @param matchIds  매칭 ID 리스트
+     * @param gameName  게임 이름
+     * @return          챔피언 ID 리스트
      */
     private List<Long> extractChampionIdsFromMatches(List<String> matchIds, String gameName) {
         return matchIds.stream()
@@ -121,9 +120,9 @@ public class RiotRecordService {
     /**
      * Riot API를 호출하여 매칭 ID로부터 특정 사용자의 챔피언 ID를 가져오는 메서드
      *
-     * @param matchId  매칭 ID
-     * @param gameName 게임 이름
-     * @return 챔피언 ID
+     * @param matchId   매칭 ID
+     * @param gameName  소환사명
+     * @return          챔피언 ID
      */
     private Long fetchChampionIdFromMatch(String matchId, String gameName) {
         String url = String.format(MATCH_INFO_URL_TEMPLATE, matchId, riotAPIKey);
@@ -152,15 +151,15 @@ public class RiotRecordService {
     /**
      * 주어진 챔피언 ID 리스트에서 가장 많이 사용된 챔피언 상위 N개를 계산
      *
-     * @param championIds 챔피언 ID 리스트
-     * @param topN        가져올 상위 챔피언 개수
-     * @return 많이 사용된 상위 챔피언 ID 리스트
+     * @param championIds   챔피언 ID 리스트
+     * @param topN          가져올 상위 챔피언 개수
+     * @return              많이 사용된 상위 챔피언 ID 리스트
      */
     private List<Long> findTopChampions(List<Long> championIds, int topN) {
         return championIds.stream()
                 .collect(Collectors.groupingBy(championId -> championId, Collectors.counting()))
                 .entrySet().stream()
-                .sorted(Map.Entry.<Long, Long>comparingByValue(Comparator.reverseOrder()))
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(topN)
                 .map(Map.Entry::getKey)
                 .toList();

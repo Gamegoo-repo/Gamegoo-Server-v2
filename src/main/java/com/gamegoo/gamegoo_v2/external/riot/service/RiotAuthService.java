@@ -28,9 +28,9 @@ public class RiotAuthService {
     /**
      * puuid 얻기
      *
-     * @param gameName 소환사명
-     * @param tag      태그
-     * @return puuid
+     * @param gameName  소환사명
+     * @param tag       태그
+     * @return          puuid
      */
     public String getPuuid(String gameName, String tag) {
         String url = String.format(RIOT_ACCOUNT_API_URL_TEMPLATE, gameName, tag, riotAPIKey);
@@ -51,7 +51,7 @@ public class RiotAuthService {
      * 소환사아이디 얻기
      *
      * @param puuid puuid
-     * @return summonerId
+     * @return      summonerId
      */
     public String getSummonerId(String puuid) {
         String url = String.format(RIOT_SUMMONER_API_URL_TEMPLATE, puuid, riotAPIKey);

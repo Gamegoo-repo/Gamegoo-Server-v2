@@ -70,8 +70,8 @@ public class AuthFacadeService {
     /**
      * 로그인
      *
-     * @param request 이메일,비밀번호
-     * @return 사용자 정보
+     * @param request   이메일,비밀번호
+     * @return          사용자 정보
      */
     @Transactional
     public LoginResponse login(LoginRequest request) {
@@ -94,8 +94,8 @@ public class AuthFacadeService {
     /**
      * 로그아웃
      *
-     * @param member 사용자
-     * @return 메세지
+     * @param member    사용자
+     * @return          메세지
      */
     @Transactional
     public String logout(Member member) {
@@ -105,8 +105,8 @@ public class AuthFacadeService {
 
     /**
      * 리프레시 토큰으로 토큰 업데이트
-     * @param request 리프레시 토큰
-     * @return 사용자 정보
+     * @param request   리프레시 토큰
+     * @return          사용자 정보
      */
     @Transactional
     public RefreshTokenResponse updateToken(RefreshTokenRequest request) {

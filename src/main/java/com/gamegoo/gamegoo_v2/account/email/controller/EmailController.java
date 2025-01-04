@@ -25,26 +25,21 @@ public class EmailController {
 
     @PostMapping("/send/join")
     @Operation(summary = "회원가입용 이메일 인증코드 전송 API 입니다. 중복확인 포함", description = "API for sending email for join")
-    public ApiResponse<String> sendEmailwithCheckDuplication(
+    public ApiResponse<String> sendEmailWithCheckDuplication(
             @Valid @RequestBody EmailRequest request) {
-        emailFacadeService.sendEmailVerificationCodeCheckDuplication(request);
-
-        return ApiResponse.ok("인증 이메일을 발송했습니다.");
+        return ApiResponse.ok(emailFacadeService.sendEmailVerificationCodeCheckDuplication(request));
     }
 
     @PostMapping("/send/pwd")
     @Operation(summary = "비밀번호 찾기용 이메일 인증코드 전송 API 입니다.", description = "API for sending email for finding password")
     public ApiResponse<String> sendEmail(@Valid @RequestBody EmailRequest request) {
-        emailFacadeService.sendEmailVerificationCodeCheckExistence(request);
-        return ApiResponse.ok("인증 이메일을 발송했습니다.");
+        return ApiResponse.ok(emailFacadeService.sendEmailVerificationCodeCheckExistence(request));
     }
 
     @PostMapping("/verify")
     @Operation(summary = "이메일 인증코드 검증 API 입니다.", description = "API for verifying email")
     public ApiResponse<String> verifyEmail(@Valid @RequestBody EmailCodeRequest request) {
-        emailFacadeService.verifyEmailCode(request);
-        return ApiResponse.ok("인증이 완료되었습니다.");
+        return ApiResponse.ok(emailFacadeService.verifyEmailCode(request));
     }
-
 
 }

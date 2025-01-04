@@ -14,7 +14,7 @@ public class RandomCodeGeneratorUtil {
     /**
      * 랜덤 코드 만드는 유틸
      *
-     * @return RandomCode
+     * @return 랜덤코드
      */
     public static String generateEmailRandomCode() {
         StringBuilder code = new StringBuilder(EMAIL_CODE_LENGTH);
@@ -30,7 +30,12 @@ public class RandomCodeGeneratorUtil {
         return shuffleString(code.toString());
     }
 
-    // 문자열 내의 인덱스 순서를 섞는 함수
+    /**
+     * 문자열 내 순서 섞는 매서드
+     *
+     * @param input 문자열
+     * @return      순서가 뒤바뀐 문자열
+     */
     private static String shuffleString(String input) {
         char[] characters = input.toCharArray();
 

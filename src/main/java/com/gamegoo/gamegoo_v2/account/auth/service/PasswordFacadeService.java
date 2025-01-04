@@ -20,6 +20,11 @@ public class PasswordFacadeService {
     private final EmailService emailService;
     private final MemberService memberService;
 
+    /**
+     * 비밀번호 변경 & 이메일 인증
+     * @param request   이메일,인증코드,새로운 비밀번호
+     * @return          성공 메세지
+     */
     @Transactional
     public String changePasswordWithVerify(PasswordResetWithVerifyRequest request) {
         // 이메일, 코드 검증
@@ -31,6 +36,12 @@ public class PasswordFacadeService {
         return "비밀번호 변경이 완료되었습니다.";
     }
 
+    /**
+     * 비밀번호 변경
+     * @param member    사용자
+     * @param request   새로운 비밀번호
+     * @return          성공 메세지
+     */
     @Transactional
     public String changePassword(Member member, PasswordResetRequest request) {
         // 새로운 비밀번호 설정
@@ -38,6 +49,12 @@ public class PasswordFacadeService {
         return "비밀번호 변경이 완료되었습니다.";
     }
 
+    /**
+     * 비밀번호 확인
+     * @param member    사용자
+     * @param request   비밀번호
+     * @return          일치 여부
+     */
     public PasswordCheckResponse checkPassword(Member member, PasswordCheckRequest request) {
         return PasswordCheckResponse.of(passwordService.checkPassword(member, request.getPassword()));
     }

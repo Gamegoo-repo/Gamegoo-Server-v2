@@ -25,9 +25,7 @@ public class RiotController {
     @PostMapping("/verify")
     @Operation(summary = "실제 존재하는 Riot 계정인지 검증하는 API", description = "API for verifying account by riot API")
     public ApiResponse<String> VerifyRiot(@RequestBody @Valid RiotVerifyExistUserRequest request) {
-        riotFacadeService.verifyRiotAccount(request);
-
-        return ApiResponse.ok("해당 Riot 계정은 존재합니다.");
+        return ApiResponse.ok(riotFacadeService.verifyRiotAccount(request));
     }
 
 }

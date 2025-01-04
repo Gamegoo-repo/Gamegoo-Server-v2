@@ -166,6 +166,12 @@ public class MemberService {
                 });
     }
 
+    /**
+     * 새로운 GameStyle 추가
+     * @param member                    사용자
+     * @param requestedGameStyles       변경 후 게임스타일
+     * @param currentMemberGameStyles   변경 전 게임스타일
+     */
     @Transactional
     public void addNewGameStyles(Member member, List<GameStyle> requestedGameStyles,
                                  List<MemberGameStyle> currentMemberGameStyles) {

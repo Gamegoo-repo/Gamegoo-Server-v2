@@ -19,7 +19,7 @@ public class OtherProfileResponse {
     String gameName;
     String tag;
     Tier tier;
-    Integer rank;
+    Integer gameRank;
     Integer mannerLevel;
     Double mannerRank;
     Long mannerRatingCount;  // 매너 평가를 한 사람의 수
@@ -54,7 +54,7 @@ public class OtherProfileResponse {
                 .gameName(targetMember.getGameName())
                 .tag(targetMember.getTag())
                 .tier(targetMember.getTier())
-                .rank(targetMember.getGameRank())
+                .gameRank(targetMember.getGameRank())
                 .profileImg(targetMember.getProfileImage())
                 .mannerLevel(targetMember.getMannerLevel())
                 .mannerRank(managerRank)
