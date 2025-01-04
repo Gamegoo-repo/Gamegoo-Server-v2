@@ -5,16 +5,12 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardListResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,17 +49,7 @@ public class BoardFacadeService {
 
         Page<Board> boardPage = boardService.getBoardsWithPagination(mode, tier, mainPosition, mike, pageIdx);
 
-        // 전체 페이지, 전체 개수 구하기
-        int totalCount = (int) boardPage.getTotalElements();
-        int totalPage = boardPage.getTotalPages() == 0 ? 1 : boardPage.getTotalPages();
-
-        // Board 엔티티 -> BoardListResponse로 변환
-        List<BoardListResponse> boardList = boardPage.getContent().stream()
-                .map(BoardListResponse::of)
-                .collect(Collectors.toList());
-
-        // BoardResponse DTO 생성
-        return BoardResponse.of(totalPage, totalCount, boardList);
+        return BoardResponse.of(boardPage);
     }
 
 }
