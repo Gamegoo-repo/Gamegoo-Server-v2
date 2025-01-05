@@ -159,4 +159,7 @@ public class Member extends BaseDateTimeEntity {
         this.password = password;
     }
 
+    public void deactiveMember() {
+        this.blind = true;
+    }
 }
