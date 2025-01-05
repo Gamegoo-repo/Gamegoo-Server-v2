@@ -43,6 +43,7 @@ class FriendControllerTest extends ControllerTestSupport {
     private FriendFacadeService friendFacadeService;
 
     private static final String API_URL_PREFIX = "/api/v2/friend";
+    private static final Long MEMBER_ID = 1L;
     private static final Long TARGET_MEMBER_ID = 2L;
 
     @Nested
@@ -448,27 +449,6 @@ class FriendControllerTest extends ControllerTestSupport {
             mockMvc.perform(delete(API_URL_PREFIX + "/{memberId}", TARGET_MEMBER_ID))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message").value(ErrorCode.MEMBERS_NOT_FRIEND.getMessage()));
-        }
-
-    }
-
-    @Nested
-    @DisplayName("모든 친구 id 조회")
-    class GetFriendIdListTest {
-
-        @DisplayName("모든 친구 id 조회 성공")
-        @Test
-        void getFriendIdListSucceeds() throws Exception {
-            // given
-            List<Long> response = new ArrayList<>();
-
-            given(friendFacadeService.getFriendIdList(any(Member.class))).willReturn(response);
-
-            // when // then
-            mockMvc.perform(get(API_URL_PREFIX + "/ids"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message").value("OK"))
-                    .andExpect(jsonPath("$.data").isArray());
         }
 
     }

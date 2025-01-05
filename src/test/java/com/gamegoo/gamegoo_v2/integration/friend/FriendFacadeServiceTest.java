@@ -1,9 +1,13 @@
 package com.gamegoo.gamegoo_v2.integration.friend;
 
-import com.gamegoo.gamegoo_v2.social.block.repository.BlockRepository;
+import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.FriendException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.social.block.repository.BlockRepository;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
 import com.gamegoo.gamegoo_v2.social.friend.dto.DeleteFriendResponse;
 import com.gamegoo.gamegoo_v2.social.friend.dto.FriendInfoResponse;
@@ -11,10 +15,6 @@ import com.gamegoo.gamegoo_v2.social.friend.dto.FriendListResponse;
 import com.gamegoo.gamegoo_v2.social.friend.dto.StarFriendResponse;
 import com.gamegoo.gamegoo_v2.social.friend.repository.FriendRepository;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendFacadeService;
-import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -220,7 +220,7 @@ class FriendFacadeServiceTest {
             }
 
             // when
-            List<Long> friendIdList = friendFacadeService.getFriendIdList(member);
+            List<Long> friendIdList = friendFacadeService.getFriendIdList(member.getId());
 
             // then
             assertThat(friendIdList).hasSize(5);
@@ -230,7 +230,7 @@ class FriendFacadeServiceTest {
         @Test
         void getFriendIdListSucceedsWhenNoFriend() {
             // when
-            List<Long> friendIdList = friendFacadeService.getFriendIdList(member);
+            List<Long> friendIdList = friendFacadeService.getFriendIdList(member.getId());
 
             // then
             assertThat(friendIdList).hasSize(0);

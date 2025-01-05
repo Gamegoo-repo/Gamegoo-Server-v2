@@ -96,7 +96,7 @@ public class ChatFacadeService {
         }
 
         // 채팅방에 입장 처리
-        MemberChatroom memberChatroom = chatCommandService.enterExistingChatroom(member, targetMember, chatroom);
+        chatCommandService.enterExistingChatroom(member, targetMember, chatroom);
 
         // 최근 메시지 내역 조회
         Slice<Chat> chatSlice = chatQueryService.getRecentChatSlice(member, chatroom);
@@ -170,7 +170,7 @@ public class ChatFacadeService {
         blockValidator.throwIfBlocked(member, targetMember, ChatException.class, CHAT_START_FAILED_TARGET_IS_BLOCKED);
 
         // 채팅방에 입장 처리
-        MemberChatroom memberChatroom = chatCommandService.enterExistingChatroom(member, targetMember, chatroom);
+        chatCommandService.enterExistingChatroom(member, targetMember, chatroom);
 
         // 최근 메시지 내역 조회
         Slice<Chat> chatSlice = chatQueryService.getRecentChatSlice(member, chatroom);
@@ -185,13 +185,16 @@ public class ChatFacadeService {
     /**
      * uuid에 해당하는 채팅방에 새로운 채팅 등록 Facade 메소드
      *
-     * @param request 채팅 등록 요청
-     * @param member  회원
-     * @param uuid    채팅방 uuid
+     * @param request  채팅 등록 요청
+     * @param memberId 회원 id
+     * @param uuid     채팅방 uuid
      * @return ChatCreateResponse
      */
     @Transactional
-    public ChatCreateResponse createChat(ChatCreateRequest request, Member member, String uuid) {
+    public ChatCreateResponse createChat(ChatCreateRequest request, Long memberId, String uuid) {
+        // member 엔티티 조회
+        Member member = memberService.findMemberById(memberId);
+
         // chatroom 엔티티 조회
         Chatroom chatroom = chatQueryService.getChatroomByUuid(uuid);
 
@@ -399,6 +402,21 @@ public class ChatFacadeService {
                 }).toList();
 
         return chatResponseFactory.toChatroomListResponse(chatroomResponses);
+    }
+
+    /**
+     * 해당 회원의 모든 채팅방 uuid 조회 Facade 메소드
+     *
+     * @param memberId 회원 id
+     * @return 채팅방 uuid list
+     */
+    public List<String> getChatroomUuids(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+        List<Chatroom> chatrooms = chatQueryService.getActiveChatrooms(member);
+
+        return chatrooms.stream()
+                .map(Chatroom::getUuid)
+                .toList();
     }
 
     /**

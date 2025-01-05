@@ -83,13 +83,6 @@ public class FriendController {
         return ApiResponse.ok(friendFacadeService.deleteFriend(member, targetMemberId));
     }
 
-    @Operation(summary = "모든 친구 id 조회 API", description = "해당 회원의 모든 친구 id 목록을 조회하는 API 입니다. " +
-            "정렬 기능 없음, socket서버용 API입니다.")
-    @GetMapping("/ids")
-    public ApiResponse<List<Long>> getFriendIds(@AuthMember Member member) {
-        return ApiResponse.ok(friendFacadeService.getFriendIdList(member));
-    }
-
     @Operation(summary = "친구 목록 조회 API", description = "해당 회원의 친구 목록을 조회하는 API 입니다. 이름 오름차순(한글-영문-숫자 순)으로 정렬해 제공합니다."
             + "cursor를 보내지 않으면 상위 10개 친구 목록을 조회합니다.")
     @Parameter(name = "cursor", description = "페이징을 위한 커서, 이전 친구 목록 조회에서 응답받은 nextCursor를 보내주세요.")

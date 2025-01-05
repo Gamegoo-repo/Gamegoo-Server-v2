@@ -116,10 +116,12 @@ public class FriendFacadeService {
     /**
      * 모든 친구 id 목록 조회 Facade 메소드
      *
-     * @param member 회원
+     * @param memberId 회원 id
      * @return 친구 회원의 id list
      */
-    public List<Long> getFriendIdList(Member member) {
+    public List<Long> getFriendIdList(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+
         return friendService.getFriendIdList(member);
     }
 
