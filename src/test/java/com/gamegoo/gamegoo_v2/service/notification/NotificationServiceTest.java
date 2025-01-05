@@ -1,7 +1,5 @@
 package com.gamegoo.gamegoo_v2.service.notification;
 
-import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
-import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
@@ -12,6 +10,8 @@ import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
 import com.gamegoo.gamegoo_v2.notification.service.NotificationService;
+import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
+import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -91,7 +91,8 @@ class NotificationServiceTest {
         Notification notification = notificationService.createReceivedFriendRequestNotification(sourceMember, member);
 
         // then
-        assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.FRIEND_REQUEST_RECEIVED);
+        assertThat(notification.getNotificationType().getTitle()).isEqualTo(
+                NotificationTypeTitle.FRIEND_REQUEST_RECEIVED);
         assertThat(notification.isRead()).isFalse();
         assertThat(notification.getMember().getId()).isEqualTo(sourceMember.getId());
         assertThat(notification.getSourceMember().getId()).isEqualTo(member.getId());
@@ -109,7 +110,8 @@ class NotificationServiceTest {
         Notification notification = notificationService.createAcceptFriendRequestNotification(targetMember, member);
 
         // then
-        assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.FRIEND_REQUEST_ACCEPTED);
+        assertThat(notification.getNotificationType().getTitle()).isEqualTo(
+                NotificationTypeTitle.FRIEND_REQUEST_ACCEPTED);
         assertThat(notification.isRead()).isFalse();
         assertThat(notification.getMember().getId()).isEqualTo(targetMember.getId());
         assertThat(notification.getSourceMember().getId()).isEqualTo(member.getId());
@@ -127,7 +129,8 @@ class NotificationServiceTest {
         Notification notification = notificationService.createRejectFriendRequestNotification(targetMember, member);
 
         // then
-        assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.FRIEND_REQUEST_REJECTED);
+        assertThat(notification.getNotificationType().getTitle()).isEqualTo(
+                NotificationTypeTitle.FRIEND_REQUEST_REJECTED);
         assertThat(notification.isRead()).isFalse();
         assertThat(notification.getMember().getId()).isEqualTo(targetMember.getId());
         assertThat(notification.getSourceMember().getId()).isEqualTo(member.getId());
@@ -184,8 +187,10 @@ class NotificationServiceTest {
         mannerKeywordList.add(mannerKeywordRepository.save(MannerKeyword.create("1인분 이상은 해요", true)));
         mannerKeywordList.add(mannerKeywordRepository.save(MannerKeyword.create("욕 안해요", true)));
 
+        List<Long> mannerKeywordIdList = mannerKeywordList.stream().map(MannerKeyword::getId).toList();
+
         // when
-        Notification notification = notificationService.createMannerRatingNotification(mannerKeywordList, member);
+        Notification notification = notificationService.createMannerRatingNotification(mannerKeywordIdList, member);
 
         // then
         assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.MANNER_KEYWORD_RATED);
@@ -204,8 +209,10 @@ class NotificationServiceTest {
         List<MannerKeyword> mannerKeywordList = new ArrayList<>();
         mannerKeywordList.add(mannerKeywordRepository.save(MannerKeyword.create("캐리했어요", true)));
 
+        List<Long> mannerKeywordIdList = mannerKeywordList.stream().map(MannerKeyword::getId).toList();
+
         // when
-        Notification notification = notificationService.createMannerRatingNotification(mannerKeywordList, member);
+        Notification notification = notificationService.createMannerRatingNotification(mannerKeywordIdList, member);
 
         // then
         assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.MANNER_KEYWORD_RATED);
