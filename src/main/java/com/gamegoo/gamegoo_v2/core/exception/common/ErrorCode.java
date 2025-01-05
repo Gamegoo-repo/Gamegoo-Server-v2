@@ -127,6 +127,7 @@ public enum ErrorCode {
     BOARD_GAME_STYLE_BAD_REQUEST(BAD_REQUEST, "BOARD_405", "게임 스타일 최대 개수를 초과했습니다."),
     BOARD_GAME_STYLE_NOT_FOUND(NOT_FOUND, "BOARD_406", "게임 스타일을 찾을 수 없습니다."),
     BOARD_GAME_MODE_BAD_REQUEST(BAD_REQUEST, "BOARD_406", "게임모드 값은 1~4만 가능합니다."),
+    BOARD_PAGE_BAD_REQUEST(BAD_REQUEST, "BOARD_407", "페이지 값은 0 이상만 가능합니다."),
 
 
     /**
