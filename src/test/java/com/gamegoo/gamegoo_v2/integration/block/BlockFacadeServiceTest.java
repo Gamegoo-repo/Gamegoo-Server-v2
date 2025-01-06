@@ -1,21 +1,21 @@
 package com.gamegoo.gamegoo_v2.integration.block;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
+import com.gamegoo.gamegoo_v2.core.exception.BlockException;
+import com.gamegoo.gamegoo_v2.core.exception.MemberException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.social.block.domain.Block;
 import com.gamegoo.gamegoo_v2.social.block.dto.BlockListResponse;
 import com.gamegoo.gamegoo_v2.social.block.repository.BlockRepository;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockFacadeService;
-import com.gamegoo.gamegoo_v2.core.exception.BlockException;
-import com.gamegoo.gamegoo_v2.core.exception.MemberException;
-import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
 import com.gamegoo.gamegoo_v2.social.friend.domain.FriendRequest;
 import com.gamegoo.gamegoo_v2.social.friend.domain.FriendRequestStatus;
 import com.gamegoo.gamegoo_v2.social.friend.repository.FriendRepository;
 import com.gamegoo.gamegoo_v2.social.friend.repository.FriendRequestRepository;
-import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -108,7 +108,8 @@ class BlockFacadeServiceTest {
 
             // then
             // 차단이 정상적으로 처리되었는지 검증
-            assertThat(blockRepository.existsByBlockerMemberAndBlockedMemberAndDeleted(member, targetMember, false)).isTrue();
+            assertThat(blockRepository.existsByBlockerMemberAndBlockedMemberAndDeleted(member, targetMember,
+                    false)).isTrue();
 
             // 채팅방에서 퇴장 처리 되었는지 검증
 

@@ -6,6 +6,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
+import com.gamegoo.gamegoo_v2.core.exception.NotificationException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationType;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;

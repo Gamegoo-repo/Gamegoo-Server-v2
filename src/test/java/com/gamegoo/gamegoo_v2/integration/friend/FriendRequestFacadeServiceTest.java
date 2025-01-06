@@ -1,11 +1,17 @@
 package com.gamegoo.gamegoo_v2.integration.friend;
 
-import com.gamegoo.gamegoo_v2.social.block.domain.Block;
-import com.gamegoo.gamegoo_v2.social.block.repository.BlockRepository;
+import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.config.AsyncConfig;
 import com.gamegoo.gamegoo_v2.core.exception.FriendException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.notification.domain.Notification;
+import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
+import com.gamegoo.gamegoo_v2.social.block.domain.Block;
+import com.gamegoo.gamegoo_v2.social.block.repository.BlockRepository;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
 import com.gamegoo.gamegoo_v2.social.friend.domain.FriendRequest;
 import com.gamegoo.gamegoo_v2.social.friend.domain.FriendRequestStatus;
@@ -13,15 +19,6 @@ import com.gamegoo.gamegoo_v2.social.friend.dto.FriendRequestResponse;
 import com.gamegoo.gamegoo_v2.social.friend.repository.FriendRepository;
 import com.gamegoo.gamegoo_v2.social.friend.repository.FriendRequestRepository;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendFacadeService;
-import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
-import com.gamegoo.gamegoo_v2.notification.domain.Notification;
-import com.gamegoo.gamegoo_v2.notification.domain.NotificationType;
-import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
-import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
-import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -64,10 +61,7 @@ class FriendRequestFacadeServiceTest {
 
     @MockitoSpyBean
     private NotificationRepository notificationRepository;
-
-    @Autowired
-    private NotificationTypeRepository notificationTypeRepository;
-
+    
     private static final String TARGET_EMAIL = "target@naver.com";
     private static final String TARGET_GAMENAME = "target";
 
@@ -84,18 +78,12 @@ class FriendRequestFacadeServiceTest {
         friendRequestRepository.deleteAllInBatch();
         blockRepository.deleteAllInBatch();
         notificationRepository.deleteAllInBatch();
-        notificationTypeRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
     }
 
     @Nested
     @DisplayName("친구 요청 전송")
     class SendFriendRequestTest {
-
-        @BeforeEach
-        void setUp() {
-            initNotificationType();
-        }
 
         @DisplayName("친구 요청 전송 성공")
         @Test
@@ -229,11 +217,6 @@ class FriendRequestFacadeServiceTest {
     @DisplayName("친구 요청 수락")
     class AcceptFriendRequestTest {
 
-        @BeforeEach
-        void setUp() {
-            initNotificationType();
-        }
-
         @DisplayName("친구 요청 수락 성공")
         @Test
         void acceptFriendRequestSucceeds() {
@@ -291,11 +274,6 @@ class FriendRequestFacadeServiceTest {
     @Nested
     @DisplayName("친구 요청 거절")
     class RejectFriendRequestTest {
-
-        @BeforeEach
-        void setUp() {
-            initNotificationType();
-        }
 
         @DisplayName("친구 요청 거절 성공")
         @Test
@@ -410,16 +388,6 @@ class FriendRequestFacadeServiceTest {
                 .gameCount(0)
                 .isAgree(true)
                 .build());
-    }
-
-    private void initNotificationType() {
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.FRIEND_REQUEST_SEND));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.FRIEND_REQUEST_RECEIVED));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.FRIEND_REQUEST_ACCEPTED));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.FRIEND_REQUEST_REJECTED));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.MANNER_LEVEL_UP));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.MANNER_LEVEL_DOWN));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.MANNER_KEYWORD_RATED));
     }
 
 }

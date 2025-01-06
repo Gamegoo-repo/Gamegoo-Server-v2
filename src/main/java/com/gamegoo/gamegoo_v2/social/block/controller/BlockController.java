@@ -1,12 +1,12 @@
 package com.gamegoo.gamegoo_v2.social.block.controller;
 
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
 import com.gamegoo.gamegoo_v2.social.block.dto.BlockListResponse;
 import com.gamegoo.gamegoo_v2.social.block.dto.BlockResponse;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockFacadeService;
-import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
-import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,7 @@ public class BlockController {
     @Parameter(name = "memberId", description = "차단할 대상 회원의 id 입니다.")
     @PostMapping("/{memberId}")
     public ApiResponse<BlockResponse> blockMember(@PathVariable(name = "memberId") Long targetMemberId,
-            @AuthMember Member member) {
+                                                  @AuthMember Member member) {
         return ApiResponse.ok(blockFacadeService.blockMember(member, targetMemberId));
     }
 
@@ -41,7 +41,7 @@ public class BlockController {
     @Parameter(name = "page", description = "페이지 번호, 1 이상의 숫자를 입력해 주세요.")
     @GetMapping
     public ApiResponse<BlockListResponse> getBlockList(@ValidPage @RequestParam(name = "page") Integer page,
-            @AuthMember Member member) {
+                                                       @AuthMember Member member) {
         return ApiResponse.ok(blockFacadeService.getBlockList(member, page));
     }
 
@@ -49,7 +49,7 @@ public class BlockController {
     @Parameter(name = "memberId", description = "차단을 해제할 대상 회원의 id 입니다.")
     @DeleteMapping("/{memberId}")
     public ApiResponse<BlockResponse> unblockMember(@PathVariable(name = "memberId") Long targetMemberId,
-            @AuthMember Member member) {
+                                                    @AuthMember Member member) {
         return ApiResponse.ok(blockFacadeService.unBlockMember(member, targetMemberId));
     }
 
@@ -57,7 +57,7 @@ public class BlockController {
     @Parameter(name = "memberId", description = "목록에서 삭제할 대상 회원의 id 입니다.")
     @DeleteMapping("/delete/{memberId}")
     public ApiResponse<BlockResponse> deleteBlockMember(@PathVariable(name = "memberId") Long targetMemberId,
-            @AuthMember Member member) {
+                                                        @AuthMember Member member) {
         return ApiResponse.ok(blockFacadeService.deleteBlock(member, targetMemberId));
     }
 

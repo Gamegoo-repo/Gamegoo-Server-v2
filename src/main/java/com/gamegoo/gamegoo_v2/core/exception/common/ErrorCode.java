@@ -129,6 +129,12 @@ public enum ErrorCode {
     BOARD_GAME_MODE_BAD_REQUEST(BAD_REQUEST, "BOARD_406", "게임모드 값은 1~4만 가능합니다."),
     BOARD_PAGE_BAD_REQUEST(BAD_REQUEST, "BOARD_407", "페이지 값은 0 이상만 가능합니다."),
 
+    /**
+     * 매너평가 관련 에러
+     */
+    MANNER_KEYWORD_INVALID(BAD_REQUEST, "MANNER_401", "잘못된 매너 키워드 값입니다."),
+    MANNER_KEYWORD_NOT_FOUND(NOT_FOUND, "MANNER_402", "매너 키워드를 찾을 수 없습니다."),
+    MANNER_RATING_EXISTS(BAD_REQUEST, "MANNER_403", "매너/비매너 평가는 최초 1회만 가능합니다."),
 
     /**
      * socket 서버 관련 에러
