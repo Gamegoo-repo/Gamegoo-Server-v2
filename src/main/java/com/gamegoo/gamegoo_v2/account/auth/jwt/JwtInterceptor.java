@@ -19,7 +19,12 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-            Object handler) throws Exception {
+                             Object handler) throws Exception {
+        // OPTIONS 메서드이면 토큰 검증하지 않음
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         try {
             // request에서 access token 추출
             String accessToken = jwtProvider.resolveToken(request);
@@ -41,7 +46,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     }
 
     private void sendErrorResponse(HttpServletResponse response, JwtAuthException exception,
-            String requestUrl) throws IOException {
+                                   String requestUrl) throws IOException {
         // 응답 Content-Type 설정
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(exception.getStatus().value());

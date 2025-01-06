@@ -1,12 +1,14 @@
 name: Gamegoo v2 API CI/CD Pipeline
 
 on:
-  pull_request:
-    types: [ closed ]
+  #  pull_request:
+  #    types: [ closed ]
+  #    branches:
+  #      - develop
+  #  workflow_dispatch: # 수동 실행 가능
+  push:
     branches:
-      - develop
-  workflow_dispatch: # 수동 실행 가능
-
+      - fix/135
 
 jobs:
   build-and-deploy: # Job 이름
