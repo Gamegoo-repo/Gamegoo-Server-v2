@@ -32,16 +32,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class AuthFacadeServiceTest {
+class AuthFacadeServiceTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
-    RefreshTokenRepository refreshTokenRepository;
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    JwtProvider jwtProvider;
+    private JwtProvider jwtProvider;
 
     private Member member;
 
@@ -150,6 +150,7 @@ public class AuthFacadeServiceTest {
     @Nested
     @DisplayName("리프레시 토큰 테스트")
     class RefreshTokenTest {
+
         @DisplayName("리프레시 토큰으로 다른 토큰 업데이트 성공")
         @Test
         void updateToken() {
@@ -190,13 +191,15 @@ public class AuthFacadeServiceTest {
                     .build();
             refreshTokenRepository.save(refreshToken);
 
-            RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder().refreshToken(INVALID_REFRESH_TOKEN).build();
+            RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder().refreshToken(
+                    INVALID_REFRESH_TOKEN).build();
 
             // when
-            assertThatThrownBy(()->authFacadeService.updateToken(refreshTokenRequest))
+            assertThatThrownBy(() -> authFacadeService.updateToken(refreshTokenRequest))
                     .isInstanceOf(JwtAuthException.class)
                     .hasMessage(ErrorCode.INVALID_REFRESH_TOKEN.getMessage());
         }
+
     }
 
     private Member createMember(String email, String gameName, String password) {

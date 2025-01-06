@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class MemberServiceFacadeTest {
+class MemberServiceFacadeTest {
 
     @Autowired
     MemberFacadeService memberFacadeService;

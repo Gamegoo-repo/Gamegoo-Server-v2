@@ -5,10 +5,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
-import com.gamegoo.gamegoo_v2.notification.domain.NotificationType;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
-import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
 import com.gamegoo.gamegoo_v2.notification.service.NotificationService;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
@@ -36,9 +34,6 @@ class NotificationServiceTest {
     private MemberRepository memberRepository;
 
     @Autowired
-    private NotificationTypeRepository notificationTypeRepository;
-
-    @Autowired
     private NotificationRepository notificationRepository;
 
     @Autowired
@@ -52,13 +47,11 @@ class NotificationServiceTest {
     @BeforeEach
     void setUp() {
         member = createMember("test@gmail.com", "member");
-        initNotificationType();
     }
 
     @AfterEach
     void tearDown() {
         notificationRepository.deleteAllInBatch();
-        notificationTypeRepository.deleteAllInBatch();
         mannerKeywordRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
     }
@@ -238,16 +231,6 @@ class NotificationServiceTest {
                 .gameCount(0)
                 .isAgree(true)
                 .build());
-    }
-
-    private void initNotificationType() {
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.FRIEND_REQUEST_SEND));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.FRIEND_REQUEST_RECEIVED));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.FRIEND_REQUEST_ACCEPTED));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.FRIEND_REQUEST_REJECTED));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.MANNER_LEVEL_UP));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.MANNER_LEVEL_DOWN));
-        notificationTypeRepository.save(NotificationType.create(NotificationTypeTitle.MANNER_KEYWORD_RATED));
     }
 
 }
