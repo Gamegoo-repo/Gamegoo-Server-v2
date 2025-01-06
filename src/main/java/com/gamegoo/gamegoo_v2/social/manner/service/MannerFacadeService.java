@@ -35,7 +35,7 @@ public class MannerFacadeService {
                 request.getMannerKeywordIdList(), true);
 
         // 매너 점수 및 레벨 업데이트
-        mannerService.updateMannerScoreAndLevel(member, request.getMannerKeywordIdList().size());
+        mannerService.updateMannerScoreAndLevel(targetMember, request.getMannerKeywordIdList().size());
 
         return MannerInsertResponse.of(mannerRating, request.getMannerKeywordIdList());
     }
