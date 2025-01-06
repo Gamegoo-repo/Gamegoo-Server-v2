@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class MannerInsertRequest {
 
-    @NotEmpty
+    @NotEmpty(message = "매너 키워드 리스트는 비워둘 수 없습니다.")
     List<Long> mannerKeywordIdList;
 
 }
