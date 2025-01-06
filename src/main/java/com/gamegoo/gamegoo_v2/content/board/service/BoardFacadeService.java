@@ -2,11 +2,15 @@ package com.gamegoo.gamegoo_v2.content.board.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
+import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
+import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,9 @@ public class BoardFacadeService {
 
     private final BoardService boardService;
     private final BoardGameStyleService boardGameStyleService;
+    private final MemberService memberService;
+    private final FriendService friendService;
+    private final BlockService blockService;
 
     /**
      * 게시글 생성 (파사드)
@@ -50,6 +57,21 @@ public class BoardFacadeService {
         Page<Board> boardPage = boardService.getBoardsWithPagination(mode, tier, mainPosition, mike, pageIdx);
 
         return BoardResponse.of(boardPage);
+    }
+
+    /**
+     * 회원 게시판 글 단건 조회 (파사드)
+     * - “회원 전용” 조회 로직
+     */
+    public BoardByIdResponseForMember getBoardByIdForMember(Long boardId, Member viewer) {
+
+        Board board = boardService.findBoard(boardId);
+
+        boolean isBlocked = blockService.isBlocked(viewer, board.getMember());
+        boolean isFriend = friendService.isFriend(viewer, board.getMember());
+        Long friendRequestMemberId = friendService.getFriendRequestMemberId(viewer, board.getMember());
+
+        return BoardByIdResponseForMember.of(board, isBlocked, isFriend, friendRequestMemberId);
     }
 
 }

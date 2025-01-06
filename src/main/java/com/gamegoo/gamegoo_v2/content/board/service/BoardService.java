@@ -66,7 +66,7 @@ public class BoardService {
      * 게시글 엔티티 조회
      */
     public Board findBoard(Long boardId) {
-        return boardRepository.findById(boardId).orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+        return boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
     }
 
 }

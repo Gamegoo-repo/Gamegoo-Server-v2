@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +71,14 @@ public class BoardController {
         return ApiResponse.ok(boardFacadeService.getBoardList(mode, tier, mainPosition, mike, page));
 
 
+    }
+
+    @GetMapping("/member/list/{boardId}")
+    @Operation(summary = "회원용 게시판 글 조회 API", description = "게시판에서 글을 조회하는 API 입니다.")
+    @Parameter(name = "boardId", description = "조회할 게시판 글 id 입니다.")
+    public ApiResponse<BoardByIdResponseForMember> getBoardByIdForMember(@PathVariable Long boardId,
+                                                                         @AuthMember Member member) {
+        return ApiResponse.ok(boardFacadeService.getBoardByIdForMember(boardId, member));
     }
 
 }

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query("SELECT b From Board b JOIN b.member m WHERE" +
@@ -21,5 +23,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
                               @Param("mainPosition") Integer mainPosition,
                               @Param("mike") Boolean mike,
                               Pageable pageable);
+
+
+    Optional<Board> findByIdAndDeleted(Long boardId, boolean b);
 
 }
