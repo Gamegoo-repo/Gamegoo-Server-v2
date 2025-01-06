@@ -63,6 +63,34 @@ public class MannerControllerTest extends ControllerTestSupport {
                     .andExpect(jsonPath("$.message").value("매너 키워드 리스트는 비워둘 수 없습니다."));
         }
 
+        @DisplayName("실패: 매너 키워드 리스트에 중복 값이 있는 경우 에러 응답을 반환한다.")
+        @Test
+        void addPositiveMannerRatingFailedWhenKeywordListIsDuplicated() throws Exception {
+            // given
+            List<Long> mannerKeywordIds = List.of(1L, 1L);
+
+            MannerInsertRequest request = MannerInsertRequest.builder()
+                    .mannerKeywordIdList(mannerKeywordIds)
+                    .build();
+
+            MannerInsertResponse response = MannerInsertResponse.builder()
+                    .targetMemberId(TARGET_MEMBER_ID)
+                    .mannerRatingId(1L)
+                    .mannerKeywordIdList(mannerKeywordIds)
+                    .build();
+
+            given(mannerFacadeService.insertPositiveMannerRating(any(Member.class), eq(TARGET_MEMBER_ID),
+                    any(MannerInsertRequest.class))).willReturn(response);
+
+            // when // then
+            mockMvc.perform(post(API_URL_PREFIX + "/positive/{memberId}", TARGET_MEMBER_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("VALID_ERROR"))
+                    .andExpect(jsonPath("$.message").value("중복된 값을 포함할 수 없습니다."));
+        }
+
         @DisplayName("성공")
         @Test
         void addPositiveMannerRatingSucceeds() throws Exception {
