@@ -35,4 +35,14 @@ public class MannerController {
         return ApiResponse.ok(mannerFacadeService.insertPositiveMannerRating(member, targetMemberId, request));
     }
 
+    @Operation(summary = "비매너 평가 등록 API", description = "비매너 평가를 등록하는 API 입니다.")
+    @Parameter(name = "memberId", description = "비매너 평가를 등록할 대상 회원의 id 입니다.")
+    @PostMapping("/negative/{memberId}")
+    public ApiResponse<MannerInsertResponse> addNegativeMannerRating(
+            @PathVariable(name = "memberId") Long targetMemberId,
+            @Valid @RequestBody MannerInsertRequest request,
+            @AuthMember Member member) {
+        return ApiResponse.ok(mannerFacadeService.insertNegativeMannerRating(member, targetMemberId, request));
+    }
+
 }

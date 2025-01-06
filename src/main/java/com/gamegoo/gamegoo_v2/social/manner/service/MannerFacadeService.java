@@ -40,5 +40,29 @@ public class MannerFacadeService {
         return MannerInsertResponse.of(mannerRating, request.getMannerKeywordIdList());
     }
 
+    /**
+     * 비매너 평가 등록 facade 메소드
+     *
+     * @param member         회원
+     * @param targetMemberId 상대 회원 id
+     * @param request        매너 평가 요청
+     * @return MannerInsertResponse
+     */
+    @Transactional
+    public MannerInsertResponse insertNegativeMannerRating(Member member, Long targetMemberId,
+                                                           MannerInsertRequest request) {
+        Member targetMember = memberService.findMemberById(targetMemberId);
+
+        // 비매너 평가 등록
+        MannerRating mannerRating = mannerService.insertMannerRating(member, targetMember,
+                request.getMannerKeywordIdList(), false);
+
+        // 매너 점수 및 레벨 업데이트
+        int score = -2 * request.getMannerKeywordIdList().size();
+        mannerService.updateMannerScoreAndLevel(targetMember, score);
+
+        return MannerInsertResponse.of(mannerRating, request.getMannerKeywordIdList());
+    }
+
 
 }

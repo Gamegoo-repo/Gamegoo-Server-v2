@@ -56,13 +56,13 @@ public class MannerService {
         memberValidator.throwIfBlind(targetMember);
 
         // 매너 평가 최초 여부 검증
-        validateMannerRatingNotExists(member, targetMember, true);
+        validateMannerRatingNotExists(member, targetMember, isPositive);
 
         // 매너 키워드 엔티티 조회
         List<MannerKeyword> mannerKeywordList = getMannerKeywordList(mannerKeywordIdList);
 
         // MannerRating 엔티티 생성 및 저장
-        MannerRating mannerRating = MannerRating.create(member, targetMember, true);
+        MannerRating mannerRating = MannerRating.create(member, targetMember, isPositive);
         mannerRatingRepository.save(mannerRating);
 
         // MannerRatingKeyword 엔티티 생성 및 저장
