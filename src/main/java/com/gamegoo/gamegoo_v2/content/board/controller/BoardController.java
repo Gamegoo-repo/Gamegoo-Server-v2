@@ -78,8 +78,7 @@ public class BoardController {
     @Parameter(name = "boardId", description = "조회할 게시판 글 id 입니다.")
     public ApiResponse<BoardByIdResponseForMember> getBoardByIdForMember(@PathVariable Long boardId,
                                                                          @AuthMember Member member) {
-        Long memberId = member.getId();
-        return ApiResponse.ok(boardFacadeService.getBoardByIdForMember(boardId, memberId));
+        return ApiResponse.ok(boardFacadeService.getBoardByIdForMember(boardId, member));
     }
 
 }

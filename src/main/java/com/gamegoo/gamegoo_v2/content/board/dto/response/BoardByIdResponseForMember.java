@@ -43,7 +43,6 @@ public class BoardByIdResponseForMember {
 
     public static BoardByIdResponseForMember of(
             Board board,
-            Member viewer,       // 또는 viewerId
             boolean isBlocked,
             boolean isFriend,
             Long friendRequestMemberId
@@ -82,9 +81,7 @@ public class BoardByIdResponseForMember {
                 .wantPosition(board.getWantPosition())
                 .recentGameCount(poster.getGameCount())
                 .winRate(poster.getWinRate())
-                .gameStyles(board.getBoardGameStyles().stream()
-                        .map(bgs -> bgs.getGameStyle().getId())
-                        .toList())
+                .gameStyles(gameStyleIds)
                 .contents(board.getContent())
                 .build();
     }

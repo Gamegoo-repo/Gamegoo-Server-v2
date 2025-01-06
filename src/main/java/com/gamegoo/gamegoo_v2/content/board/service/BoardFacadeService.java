@@ -9,8 +9,6 @@ import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMem
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
-import com.gamegoo.gamegoo_v2.core.exception.BoardException;
-import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
@@ -65,21 +63,15 @@ public class BoardFacadeService {
      * 회원 게시판 글 단건 조회 (파사드)
      * - “회원 전용” 조회 로직
      */
-    public BoardByIdResponseForMember getBoardByIdForMember(Long boardId, Long memberId) {
+    public BoardByIdResponseForMember getBoardByIdForMember(Long boardId, Member viewer) {
 
         Board board = boardService.findBoard(boardId);
 
-        if (board.isDeleted()) {
-            throw new BoardException(ErrorCode.BOARD_NOT_FOUND);
-        }
-
-        Member viewer = memberService.findMemberById(memberId);
-        
         boolean isBlocked = blockService.isBlocked(viewer, board.getMember());
         boolean isFriend = friendService.isFriend(viewer, board.getMember());
         Long friendRequestMemberId = friendService.getFriendRequestMemberId(viewer, board.getMember());
 
-        return BoardByIdResponseForMember.of(board, viewer, isBlocked, isFriend, friendRequestMemberId);
+        return BoardByIdResponseForMember.of(board, isBlocked, isFriend, friendRequestMemberId);
     }
 
 }
