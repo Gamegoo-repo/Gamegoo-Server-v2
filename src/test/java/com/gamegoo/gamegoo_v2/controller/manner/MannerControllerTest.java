@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.social.manner.controller.MannerController;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerFacadeService;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -306,10 +308,48 @@ public class MannerControllerTest extends ControllerTestSupport {
                     .andExpect(jsonPath("$.data.targetMemberId").value(TARGET_MEMBER_ID))
                     .andExpect(jsonPath("$.data.mannerRatingId").value(1L))
                     .andExpect(jsonPath("$.data.mannerKeywordIdList").isArray());
-
         }
 
     }
 
+    @DisplayName("특정 회원에 대한 나의 매너 평가 조회")
+    @Test
+    void getPositiveMannerRatingInfoSucceeds() throws Exception {
+        // given
+        MannerRatingResponse response = MannerRatingResponse.builder()
+                .mannerRatingId(1L)
+                .mannerKeywordIdList(List.of(1L, 2L, 3L))
+                .build();
+
+        given(mannerFacadeService.getMannerRating(any(Member.class), eq(TARGET_MEMBER_ID), eq(true)))
+                .willReturn(response);
+
+        // when // then
+        mockMvc.perform(get(API_URL_PREFIX + "/positive/{memberId}", TARGET_MEMBER_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data.mannerRatingId").value(1L))
+                .andExpect(jsonPath("$.data.mannerKeywordIdList").isArray());
+    }
+
+    @DisplayName("특정 회원에 대한 나의 비매너 평가 조회")
+    @Test
+    void getNegativeMannerRatingInfoSucceeds() throws Exception {
+        // given
+        MannerRatingResponse response = MannerRatingResponse.builder()
+                .mannerRatingId(1L)
+                .mannerKeywordIdList(List.of(7L, 8L, 9L))
+                .build();
+
+        given(mannerFacadeService.getMannerRating(any(Member.class), eq(TARGET_MEMBER_ID), eq(false)))
+                .willReturn(response);
+
+        // when // then
+        mockMvc.perform(get(API_URL_PREFIX + "/negative/{memberId}", TARGET_MEMBER_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data.mannerRatingId").value(1L))
+                .andExpect(jsonPath("$.data.mannerKeywordIdList").isArray());
+    }
 
 }
