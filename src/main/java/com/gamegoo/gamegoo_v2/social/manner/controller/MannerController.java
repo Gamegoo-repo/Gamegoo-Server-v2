@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,6 +58,15 @@ public class MannerController {
             @Valid @RequestBody MannerUpdateRequest request,
             @AuthMember Member member) {
         return ApiResponse.ok(mannerFacadeService.updateMannerRating(member, mannerId, request));
+    }
+
+    @Operation(summary = "특정 회원에 대한 나의 매너 평가 조회 API", description = "특정 회원에 대해 내가 실시한 매너 평가를 조회하는 API 입니다.")
+    @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
+    @GetMapping("/positive/{memberId}")
+    public ApiResponse<MannerRatingResponse> getPositiveMannerRatingInfo(
+            @PathVariable(name = "memberId") Long targetMemberId,
+            @AuthMember Member member) {
+        return ApiResponse.ok(mannerFacadeService.getMannerRating(member, targetMemberId, true));
     }
 
 }

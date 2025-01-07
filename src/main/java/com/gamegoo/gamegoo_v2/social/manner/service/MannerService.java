@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -142,6 +143,19 @@ public class MannerService {
     public MannerRating getMannerRatingById(Long id) {
         return mannerRatingRepository.findById(id)
                 .orElseThrow(() -> new MannerException(ErrorCode.MANNER_RATING_NOT_FOUND));
+    }
+
+    /**
+     * 회원이 상대 회원에게 남긴 매너/비매너 평가 엔티티 조회
+     *
+     * @param member       회원
+     * @param targetMember 상대 회원
+     * @param positive     매너/비매너 평가 여부
+     * @return MannerRating
+     */
+    public Optional<MannerRating> getMannerRatingByMember(Member member, Member targetMember, boolean positive) {
+        return mannerRatingRepository.findByFromMemberIdAndToMemberIdAndPositive(member.getId(), targetMember.getId(),
+                positive);
     }
 
     /**

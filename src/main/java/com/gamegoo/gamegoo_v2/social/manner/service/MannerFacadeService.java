@@ -6,10 +6,13 @@ import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRating;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -94,6 +97,21 @@ public class MannerFacadeService {
         mannerService.updateMannerScoreAndLevel(mannerRating.getToMember(), score);
 
         return MannerUpdateResponse.of(updatedMannerRating, request.getMannerKeywordIdList());
+    }
+
+    /**
+     * 상대에게 남긴 매너 평가 정보 조회 facade 메소드
+     *
+     * @param member         회원
+     * @param targetMemberId 대상 회원 id
+     * @param positive       매너/비매너 평가 여부
+     * @return MannerRatingResponse
+     */
+    public MannerRatingResponse getMannerRating(Member member, Long targetMemberId, boolean positive) {
+        Member targetMember = memberService.findMemberById(targetMemberId);
+        Optional<MannerRating> mannerRating = mannerService.getMannerRatingByMember(member, targetMember, positive);
+
+        return MannerRatingResponse.of(mannerRating);
     }
 
 }
