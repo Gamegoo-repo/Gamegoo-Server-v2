@@ -4,7 +4,9 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
 import com.gamegoo.gamegoo_v2.social.manner.controller.MannerController;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
+import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerFacadeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -211,6 +214,99 @@ public class MannerControllerTest extends ControllerTestSupport {
                     .andExpect(jsonPath("$.data.targetMemberId").value(TARGET_MEMBER_ID))
                     .andExpect(jsonPath("$.data.mannerRatingId").value(1L))
                     .andExpect(jsonPath("$.data.mannerKeywordIdList").isArray());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("매너/비매너 평가 수정")
+    class UpdateMannerRatingTest {
+
+        @DisplayName("실패: 매너 키워드 리스트가 빈 리스트인 경우 에러 응답을 반환한다.")
+        @Test
+        void updateMannerRatingFailedWhenKeywordListIsEmpty() throws Exception {
+            // given
+            List<Long> mannerKeywordIds = List.of();
+
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(mannerKeywordIds)
+                    .build();
+
+            MannerUpdateResponse response = MannerUpdateResponse.builder()
+                    .targetMemberId(TARGET_MEMBER_ID)
+                    .mannerRatingId(1L)
+                    .mannerKeywordIdList(mannerKeywordIds)
+                    .build();
+
+            given(mannerFacadeService.updateMannerRating(any(Member.class), eq(1L),
+                    any(MannerUpdateRequest.class))).willReturn(response);
+
+            // when // then
+            mockMvc.perform(put(API_URL_PREFIX + "/{mannerId}", 1L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("VALID_ERROR"))
+                    .andExpect(jsonPath("$.message").value("매너 키워드 리스트는 비워둘 수 없습니다."));
+        }
+
+        @DisplayName("실패: 매너 키워드 리스트에 중복 값이 있는 경우 에러 응답을 반환한다.")
+        @Test
+        void updateMannerRatingFailedWhenKeywordListIsDuplicated() throws Exception {
+            // given
+            List<Long> mannerKeywordIds = List.of(1L, 1L);
+
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(mannerKeywordIds)
+                    .build();
+
+            MannerUpdateResponse response = MannerUpdateResponse.builder()
+                    .targetMemberId(TARGET_MEMBER_ID)
+                    .mannerRatingId(1L)
+                    .mannerKeywordIdList(mannerKeywordIds)
+                    .build();
+
+            given(mannerFacadeService.updateMannerRating(any(Member.class), eq(1L),
+                    any(MannerUpdateRequest.class))).willReturn(response);
+
+            // when // then
+            mockMvc.perform(put(API_URL_PREFIX + "/{mannerId}", 1L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("VALID_ERROR"))
+                    .andExpect(jsonPath("$.message").value("중복된 값을 포함할 수 없습니다."));
+        }
+
+        @DisplayName("성공")
+        @Test
+        void updateMannerRatingSucceeds() throws Exception {
+            // given
+            List<Long> mannerKeywordIds = List.of(1L, 2L, 3L);
+
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(mannerKeywordIds)
+                    .build();
+
+            MannerUpdateResponse response = MannerUpdateResponse.builder()
+                    .targetMemberId(TARGET_MEMBER_ID)
+                    .mannerRatingId(1L)
+                    .mannerKeywordIdList(mannerKeywordIds)
+                    .build();
+
+            given(mannerFacadeService.updateMannerRating(any(Member.class), eq(1L),
+                    any(MannerUpdateRequest.class))).willReturn(response);
+
+            // when // then
+            mockMvc.perform(put(API_URL_PREFIX + "/{mannerId}", 1L)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("OK"))
+                    .andExpect(jsonPath("$.data.targetMemberId").value(TARGET_MEMBER_ID))
+                    .andExpect(jsonPath("$.data.mannerRatingId").value(1L))
+                    .andExpect(jsonPath("$.data.mannerKeywordIdList").isArray());
+
         }
 
     }

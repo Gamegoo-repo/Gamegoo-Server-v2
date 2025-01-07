@@ -50,7 +50,7 @@ public class MannerController {
 
     @Operation(summary = "매너/비매너 평가 수정 API", description = "매너/비매너 평가를 수정하는 API 입니다.")
     @Parameter(name = "mannerId", description = "수정하고자 하는 매너/비매너 평가 id 입니다.")
-    @PutMapping
+    @PutMapping("/{mannerId}")
     public ApiResponse<MannerUpdateResponse> updateMannerRating(
             @PathVariable(name = "mannerId") Long mannerId,
             @Valid @RequestBody MannerUpdateRequest request,
