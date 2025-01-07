@@ -17,6 +17,7 @@ import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRatingKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerRatingKeywordRepository;
@@ -801,6 +802,84 @@ class MannerFacadeServiceTest {
             await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
                 verify(notificationService, times(0)).createMannerLevelNotification(any(), any(Member.class), any());
             });
+        }
+    }
+
+    @Nested
+    @DisplayName("특정 회원에 대한 매너/비매너 평가 조회")
+    class GetMannerRatingTest {
+
+        @DisplayName("실패: 대상 회원을 찾을 수 없는 경우 예외가 발생한다.")
+        @Test
+        void getMannerRating_shouldThrownWhenTargetIsNotFound() {
+            // when // then
+            assertThatThrownBy(() -> mannerFacadeService.getMannerRating(member, 200L, true))
+                    .isInstanceOf(MemberException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("성공: 매너 평가 내역이 존재하는 경우")
+        @Test
+        void getMannerRatingSucceedsWhenPositiveExist() {
+            // given
+            List<Long> mannerKeywordIds = List.of(1L, 2L, 3L);
+            MannerRating mannerRating = createMannerRating(mannerKeywordIds, member, targetMember, true);
+
+            // when
+            MannerRatingResponse response = mannerFacadeService.getMannerRating(member, targetMember.getId(), true);
+
+            // then
+            assertThat(response.getMannerRatingId()).isEqualTo(mannerRating.getId());
+            assertThat(response.getMannerKeywordIdList()).hasSize(3);
+            response.getMannerKeywordIdList().forEach(mannerKeywordId ->
+                    assertThat(mannerKeywordId).isIn(mannerKeywordIds));
+        }
+
+        @DisplayName("성공: 매너 평가 내역이 존재하지 않는 경우")
+        @Test
+        void getMannerRatingSucceedsWhenPositiveNotExist() {
+            //given
+            List<Long> mannerKeywordIds = List.of(7L, 8L, 9L);
+            createMannerRating(mannerKeywordIds, member, targetMember, false);
+
+            // when
+            MannerRatingResponse response = mannerFacadeService.getMannerRating(member, targetMember.getId(), true);
+
+            // then
+            assertThat(response.getMannerRatingId()).isNull();
+            assertThat(response.getMannerKeywordIdList()).isEmpty();
+        }
+
+        @DisplayName("성공: 비매너 평가 내역이 존재하는 경우")
+        @Test
+        void getMannerRatingSucceedsWhenNegativeExist() {
+            // given
+            List<Long> mannerKeywordIds = List.of(7L, 8L, 9L);
+            MannerRating mannerRating = createMannerRating(mannerKeywordIds, member, targetMember, false);
+
+            // when
+            MannerRatingResponse response = mannerFacadeService.getMannerRating(member, targetMember.getId(), false);
+
+            // then
+            assertThat(response.getMannerRatingId()).isEqualTo(mannerRating.getId());
+            assertThat(response.getMannerKeywordIdList()).hasSize(3);
+            response.getMannerKeywordIdList().forEach(mannerKeywordId ->
+                    assertThat(mannerKeywordId).isIn(mannerKeywordIds));
+        }
+
+        @DisplayName("성공: 비매너 평가 내역이 존재하지 않는 경우")
+        @Test
+        void getMannerRatingSucceedsWhenNegativeNotExist() {
+            //given
+            List<Long> mannerKeywordIds = List.of(1L);
+            createMannerRating(mannerKeywordIds, member, targetMember, true);
+
+            // when
+            MannerRatingResponse response = mannerFacadeService.getMannerRating(member, targetMember.getId(), false);
+
+            // then
+            assertThat(response.getMannerRatingId()).isNull();
+            assertThat(response.getMannerKeywordIdList()).isEmpty();
         }
     }
 
