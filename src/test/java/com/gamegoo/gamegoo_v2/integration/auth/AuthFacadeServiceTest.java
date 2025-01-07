@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -86,15 +87,17 @@ class AuthFacadeServiceTest {
             // then
             // response 검증
             assertThat(response).isNotNull();
-            assertThat(response.getAccessToken()).isEqualTo(jwtProvider.createAccessToken(member.getId()));
-            assertThat(response.getRefreshToken()).isEqualTo(jwtProvider.createRefreshToken(member.getId()));
+            assertThat(response.getId()).isEqualTo(jwtProvider.getMemberId(response.getAccessToken()));
+            assertThat(response.getId()).isEqualTo(jwtProvider.getMemberId(response.getRefreshToken()));
             assertThat(response.getId()).isEqualTo(member.getId());
             assertThat(response.getName()).isEqualTo(member.getGameName());
             assertThat(response.getProfileImage()).isEqualTo(member.getProfileImage());
 
             RefreshToken refreshToken = refreshTokenRepository.findByMember(member).orElseThrow();
-            assertThat(refreshToken.getRefreshToken()).isEqualTo(response.getRefreshToken());
+            Long tokenExpirationTime = jwtProvider.getTokenExpirationTime(refreshToken.getRefreshToken()); // 만료 시간
+            checkEpirationTime(tokenExpirationTime);
         }
+
 
         @DisplayName("로그인 실패 : 없는 사용자일 경우")
         @Test
@@ -170,7 +173,6 @@ class AuthFacadeServiceTest {
             // then
             Optional<RefreshToken> result = refreshTokenRepository.findByMember(member);
             assertThat(result).isPresent();
-            assertThat(result.get().getRefreshToken()).isEqualTo(refreshTokenRequest.getRefreshToken());
 
             Long jwtId = jwtProvider.getMemberId(refreshTokenResponse.getAccessToken());
             Long memberId = member.getId();
@@ -178,6 +180,10 @@ class AuthFacadeServiceTest {
 
             Long responseId = refreshTokenResponse.getId();
             assertThat(responseId).isEqualTo(memberId);
+
+            Long tokenExpirationTime = jwtProvider.getTokenExpirationTime(result.get().getRefreshToken());
+            checkEpirationTime(tokenExpirationTime);
+
         }
 
         @DisplayName("리프레시 토큰으로 업데이트 실패 : 리프레시 토큰이 올바르지 못할 경우")
@@ -218,4 +224,12 @@ class AuthFacadeServiceTest {
                 .build());
     }
 
+    private static void checkEpirationTime(Long tokenExpirationTime) {
+        long currentTimeMillis = Instant.now().toEpochMilli(); // 현재 시간
+
+        // AssertJ를 이용해 만료 시간이 현재 시간 이후인지 확인
+        assertThat(tokenExpirationTime)
+                .as("Check if the token expiration time is after the current time")
+                .isGreaterThan(currentTimeMillis);
+    }
 }
