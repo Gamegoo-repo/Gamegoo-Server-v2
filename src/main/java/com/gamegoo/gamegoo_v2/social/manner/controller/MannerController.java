@@ -69,4 +69,12 @@ public class MannerController {
         return ApiResponse.ok(mannerFacadeService.getMannerRating(member, targetMemberId, true));
     }
 
+    @Operation(summary = "특정 회원에 대한 나의 비매너 평가 조회 API", description = "특정 회원에 대해 내가 실시한 비매너 평가를 조회하는 API 입니다.")
+    @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
+    @GetMapping("/negative/{memberId}")
+    public ApiResponse<MannerRatingResponse> getNegativeMannerRatingInfo(
+            @PathVariable(name = "memberId") Long targetMemberId,
+            @AuthMember Member member) {
+        return ApiResponse.ok(mannerFacadeService.getMannerRating(member, targetMemberId, false));
+    }
 }
