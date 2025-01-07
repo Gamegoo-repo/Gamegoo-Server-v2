@@ -11,10 +11,14 @@ import com.gamegoo.gamegoo_v2.core.exception.common.GlobalException;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
 import com.gamegoo.gamegoo_v2.notification.service.NotificationService;
+import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRating;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRatingKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
+import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
+import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerRatingKeywordRepository;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerRatingRepository;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerFacadeService;
@@ -54,6 +58,9 @@ class MannerFacadeServiceTest {
 
     @Autowired
     private MannerRatingKeywordRepository mannerRatingKeywordRepository;
+
+    @Autowired
+    private MannerKeywordRepository mannerKeywordRepository;
 
     @Autowired
     private NotificationRepository notificationRepository;
@@ -434,6 +441,368 @@ class MannerFacadeServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("매너/비매너 평가 수정")
+    class UpdateMannerRatingTest {
+
+        @DisplayName("실패: mannerId에 해당하는 매너 평가를 찾을 수 없는 경우 예외가 발생한다.")
+        @Test
+        void updateMannerRating_shouldThrownWhenMannerRatingNotFound() {
+            // given
+            List<Long> newMannerKeywordIds = List.of(1L, 2L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            // when // then
+            assertThatThrownBy(() -> mannerFacadeService.updateMannerRating(member, 1000L, request))
+                    .isInstanceOf(MannerException.class)
+                    .hasMessage(ErrorCode.MANNER_RATING_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("실패: 해당 매너 평가의 작성자가 본인이 아닌 경우 예외가 발생한다.")
+        @Test
+        void updateMannerRating_shouldThrownWhenNotMannerRatingOwner() {
+            // given
+            // 기존 매너 평가 등록
+            MannerRating mannerRating = createMannerRating(List.of(1L, 2L, 3L), targetMember, member, true);
+
+            List<Long> newMannerKeywordIds = List.of(1L, 2L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            // when // then
+            assertThatThrownBy(() -> mannerFacadeService.updateMannerRating(member, mannerRating.getId(), request))
+                    .isInstanceOf(MannerException.class)
+                    .hasMessage(ErrorCode.MANNER_RATING_ACCESS_DENIED.getMessage());
+        }
+
+        @DisplayName("실패: 매너 평가 수정 요청으로 비매너 키워드 id를 요청한 경우 예외가 발생한다.")
+        @Test
+        void updateMannerRating_shouldThrownWhenPositiveMannerKeywordNotValid() {
+            // given
+            // 기존 매너 평가 등록
+            MannerRating mannerRating = createMannerRating(List.of(1L, 2L, 3L), member, targetMember, true);
+
+            List<Long> newMannerKeywordIds = List.of(7L, 8L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            // when // then
+            assertThatThrownBy(() -> mannerFacadeService.updateMannerRating(member, mannerRating.getId(), request))
+                    .isInstanceOf(MannerException.class)
+                    .hasMessage(ErrorCode.MANNER_KEYWORD_INVALID.getMessage());
+        }
+
+        @DisplayName("실패: 비매너 평가 수정 요청으로 매너 키워드 id를 요청한 경우 예외가 발생한다.")
+        @Test
+        void updateMannerRating_shouldThrownWhenNegativeMannerKeywordNotValid() {
+            // given
+            // 기존 매너 평가 등록
+            MannerRating mannerRating = createMannerRating(List.of(7L, 8L, 9L), member, targetMember, false);
+
+            List<Long> newMannerKeywordIds = List.of(1L, 2L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            // when // then
+            assertThatThrownBy(() -> mannerFacadeService.updateMannerRating(member, mannerRating.getId(), request))
+                    .isInstanceOf(MannerException.class)
+                    .hasMessage(ErrorCode.MANNER_KEYWORD_INVALID.getMessage());
+        }
+
+        @DisplayName("실패: 상대가 탈퇴한 경우 예외가 발생한다")
+        @Test
+        void updateMannerRating_shouldThrownWhenTargetIsBlind() {
+            // given
+            MannerRating mannerRating = createMannerRating(List.of(1L, 2L, 3L), member, targetMember, true);
+
+            List<Long> newMannerKeywordIds = List.of(1L, 2L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            // 대상 회원 탈퇴 처리
+            targetMember.updateBlind(true);
+            memberRepository.save(targetMember);
+
+            // when // then
+            assertThatThrownBy(() -> mannerFacadeService.updateMannerRating(member, mannerRating.getId(), request))
+                    .isInstanceOf(MemberException.class)
+                    .hasMessage(ErrorCode.TARGET_MEMBER_DEACTIVATED.getMessage());
+        }
+
+        @DisplayName("성공: 매너 평가 키워드 개수가 줄어든 경우")
+        @Test
+        void updateMannerRatingSucceedsWhenPositiveKeywordDecrease() {
+            // given
+            // 기존 매너 평가 등록
+            MannerRating mannerRating = createMannerRating(List.of(1L, 2L, 3L), member, targetMember, true);
+
+            List<Long> newMannerKeywordIds = List.of(1L, 2L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            targetMember.updateMannerScore(10);
+            targetMember.updateMannerLevel(2);
+            memberRepository.save(targetMember);
+
+            // when
+            MannerUpdateResponse response = mannerFacadeService.updateMannerRating(member, mannerRating.getId(),
+                    request);
+
+            // then
+            assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getMannerKeywordIdList()).hasSize(newMannerKeywordIds.size());
+            assertThat(response.getMannerRatingId()).isEqualTo(mannerRating.getId());
+
+            // mannerRatingKeyword 엔티티 검증
+            List<MannerRatingKeyword> mannerRatingKeywords = mannerRatingKeywordRepository.findByMannerRatingId(
+                    mannerRating.getId());
+            assertThat(mannerRatingKeywords).hasSize(newMannerKeywordIds.size());
+            mannerRatingKeywords.forEach(mrk -> {
+                assertThat(mrk.getMannerKeyword().getId()).isIn(newMannerKeywordIds);
+            });
+
+            // 매너 점수 및 레벨 업데이트 검증
+            Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
+            assertThat(updatedMember.getMannerScore()).isEqualTo(9);
+            assertThat(updatedMember.getMannerLevel()).isEqualTo(1);
+
+            // event로 인해 알림 1개가 저장되었는지 검증
+            await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+                verify(notificationService, times(1)).createMannerLevelNotification(
+                        eq(NotificationTypeTitle.MANNER_LEVEL_DOWN), any(Member.class), eq(1));
+            });
+        }
+
+        @DisplayName("성공: 매너 평가 키워드 개수가 늘어난 경우")
+        @Test
+        void updateMannerRatingSucceedsWhenPositiveKeywordIncrease() {
+            // given
+            // 기존 매너 평가 등록
+            MannerRating mannerRating = createMannerRating(List.of(1L, 2L, 3L), member, targetMember, true);
+
+            List<Long> newMannerKeywordIds = List.of(1L, 2L, 3L, 4L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            targetMember.updateMannerScore(9);
+            targetMember.updateMannerLevel(1);
+            memberRepository.save(targetMember);
+
+            // when
+            MannerUpdateResponse response = mannerFacadeService.updateMannerRating(member, mannerRating.getId(),
+                    request);
+
+            // then
+            assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getMannerKeywordIdList()).hasSize(newMannerKeywordIds.size());
+            assertThat(response.getMannerRatingId()).isEqualTo(mannerRating.getId());
+
+            // mannerRatingKeyword 엔티티 검증
+            List<MannerRatingKeyword> mannerRatingKeywords = mannerRatingKeywordRepository.findByMannerRatingId(
+                    mannerRating.getId());
+            assertThat(mannerRatingKeywords).hasSize(newMannerKeywordIds.size());
+            mannerRatingKeywords.forEach(mrk -> {
+                assertThat(mrk.getMannerKeyword().getId()).isIn(newMannerKeywordIds);
+            });
+
+            // 매너 점수 및 레벨 업데이트 검증
+            Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
+            assertThat(updatedMember.getMannerScore()).isEqualTo(10);
+            assertThat(updatedMember.getMannerLevel()).isEqualTo(2);
+
+            // event로 인해 알림 1개가 저장되었는지 검증
+            await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+                verify(notificationService, times(1)).createMannerLevelNotification(
+                        eq(NotificationTypeTitle.MANNER_LEVEL_UP), any(Member.class), eq(2));
+            });
+        }
+
+        @DisplayName("성공: 매너 평가 키워드 개수는 같지만 id가 전부 달라진 경우")
+        @Test
+        void updateMannerRatingSucceedsWhenPositiveKeyword() {
+            // given
+            // 기존 매너 평가 등록
+            MannerRating mannerRating = createMannerRating(List.of(1L, 2L, 3L), member, targetMember, true);
+
+            List<Long> newMannerKeywordIds = List.of(4L, 5L, 6L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            targetMember.updateMannerScore(3);
+            targetMember.updateMannerLevel(1);
+            memberRepository.save(targetMember);
+
+            // when
+            MannerUpdateResponse response = mannerFacadeService.updateMannerRating(member, mannerRating.getId(),
+                    request);
+
+            // then
+            assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getMannerKeywordIdList()).hasSize(newMannerKeywordIds.size());
+            assertThat(response.getMannerRatingId()).isEqualTo(mannerRating.getId());
+
+            // mannerRatingKeyword 엔티티 검증
+            List<MannerRatingKeyword> mannerRatingKeywords = mannerRatingKeywordRepository.findByMannerRatingId(
+                    mannerRating.getId());
+            assertThat(mannerRatingKeywords).hasSize(newMannerKeywordIds.size());
+            mannerRatingKeywords.forEach(mrk -> {
+                assertThat(mrk.getMannerKeyword().getId()).isIn(newMannerKeywordIds);
+            });
+
+            // 매너 점수 및 레벨 업데이트 검증
+            Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
+            assertThat(updatedMember.getMannerScore()).isEqualTo(3);
+            assertThat(updatedMember.getMannerLevel()).isEqualTo(1);
+
+            // 알림 event 발생 안함 검증
+            await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+                verify(notificationService, times(0)).createMannerLevelNotification(any(), any(Member.class), any());
+            });
+        }
+
+        @DisplayName("성공: 비매너 평가 키워드 개수가 줄어든 경우")
+        @Test
+        void updateMannerRatingSucceedsWhenNegativeKeywordDecrease() {
+            // given
+            // 기존 매너 평가 등록
+            MannerRating mannerRating = createMannerRating(List.of(7L, 8L, 9L), member, targetMember, false);
+
+            List<Long> newMannerKeywordIds = List.of(7L, 8L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            targetMember.updateMannerScore(9);
+            targetMember.updateMannerLevel(1);
+            memberRepository.save(targetMember);
+
+            // when
+            MannerUpdateResponse response = mannerFacadeService.updateMannerRating(member, mannerRating.getId(),
+                    request);
+
+            // then
+            assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getMannerKeywordIdList()).hasSize(newMannerKeywordIds.size());
+            assertThat(response.getMannerRatingId()).isEqualTo(mannerRating.getId());
+
+            // mannerRatingKeyword 엔티티 검증
+            List<MannerRatingKeyword> mannerRatingKeywords = mannerRatingKeywordRepository.findByMannerRatingId(
+                    mannerRating.getId());
+            assertThat(mannerRatingKeywords).hasSize(newMannerKeywordIds.size());
+            mannerRatingKeywords.forEach(mrk -> {
+                assertThat(mrk.getMannerKeyword().getId()).isIn(newMannerKeywordIds);
+            });
+
+            // 매너 점수 및 레벨 업데이트 검증
+            Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
+            assertThat(updatedMember.getMannerScore()).isEqualTo(10);
+            assertThat(updatedMember.getMannerLevel()).isEqualTo(2);
+
+            // event로 인해 알림 1개가 저장되었는지 검증
+            await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+                verify(notificationService, times(1)).createMannerLevelNotification(
+                        eq(NotificationTypeTitle.MANNER_LEVEL_UP), any(Member.class), eq(2));
+            });
+        }
+
+        @DisplayName("성공: 비매너 평가 키워드 개수가 늘어난 경우")
+        @Test
+        void updateMannerRatingSucceedsWhenNegativeKeywordIncrease() {
+            // given
+            // 기존 매너 평가 등록
+            MannerRating mannerRating = createMannerRating(List.of(7L, 8L), member, targetMember, false);
+
+            List<Long> newMannerKeywordIds = List.of(9L, 10L, 11L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            targetMember.updateMannerScore(10);
+            targetMember.updateMannerLevel(2);
+            memberRepository.save(targetMember);
+
+            // when
+            MannerUpdateResponse response = mannerFacadeService.updateMannerRating(member, mannerRating.getId(),
+                    request);
+
+            // then
+            assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getMannerKeywordIdList()).hasSize(newMannerKeywordIds.size());
+            assertThat(response.getMannerRatingId()).isEqualTo(mannerRating.getId());
+
+            // mannerRatingKeyword 엔티티 검증
+            List<MannerRatingKeyword> mannerRatingKeywords = mannerRatingKeywordRepository.findByMannerRatingId(
+                    mannerRating.getId());
+            assertThat(mannerRatingKeywords).hasSize(newMannerKeywordIds.size());
+            mannerRatingKeywords.forEach(mrk -> {
+                assertThat(mrk.getMannerKeyword().getId()).isIn(newMannerKeywordIds);
+            });
+
+            // 매너 점수 및 레벨 업데이트 검증
+            Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
+            assertThat(updatedMember.getMannerScore()).isEqualTo(9);
+            assertThat(updatedMember.getMannerLevel()).isEqualTo(1);
+
+            // event로 인해 알림 1개가 저장되었는지 검증
+            await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+                verify(notificationService, times(1)).createMannerLevelNotification(
+                        eq(NotificationTypeTitle.MANNER_LEVEL_DOWN), any(Member.class), eq(1));
+            });
+        }
+
+        @DisplayName("성공: 비매너 평가 키워드 개수는 같지만 id가 전부 달라진 경우")
+        @Test
+        void updateMannerRatingSucceedsWhenNegativeKeyword() {
+            // given
+            // 기존 매너 평가 등록
+            MannerRating mannerRating = createMannerRating(List.of(7L, 8L, 9L), member, targetMember, false);
+
+            List<Long> newMannerKeywordIds = List.of(10L, 11L, 12L);
+            MannerUpdateRequest request = MannerUpdateRequest.builder()
+                    .mannerKeywordIdList(newMannerKeywordIds)
+                    .build();
+
+            targetMember.updateMannerScore(-6);
+            targetMember.updateMannerLevel(1);
+            memberRepository.save(targetMember);
+
+            // when
+            MannerUpdateResponse response = mannerFacadeService.updateMannerRating(member, mannerRating.getId(),
+                    request);
+
+            // then
+            assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getMannerKeywordIdList()).hasSize(newMannerKeywordIds.size());
+            assertThat(response.getMannerRatingId()).isEqualTo(mannerRating.getId());
+
+            // mannerRatingKeyword 엔티티 검증
+            List<MannerRatingKeyword> mannerRatingKeywords = mannerRatingKeywordRepository.findByMannerRatingId(
+                    mannerRating.getId());
+            assertThat(mannerRatingKeywords).hasSize(newMannerKeywordIds.size());
+            mannerRatingKeywords.forEach(mrk -> {
+                assertThat(mrk.getMannerKeyword().getId()).isIn(newMannerKeywordIds);
+            });
+
+            // 매너 점수 및 레벨 업데이트 검증
+            Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
+            assertThat(updatedMember.getMannerScore()).isEqualTo(-6);
+            assertThat(updatedMember.getMannerLevel()).isEqualTo(1);
+
+            // 알림 event 발생 안함 검증
+            await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
+                verify(notificationService, times(0)).createMannerLevelNotification(any(), any(Member.class), any());
+            });
+        }
+    }
 
     private Member createMember(String email, String gameName) {
         return memberRepository.save(Member.builder()
@@ -449,6 +818,23 @@ class MannerFacadeServiceTest {
                 .gameCount(0)
                 .isAgree(true)
                 .build());
+    }
+
+    private MannerRating createMannerRating(List<Long> mannerKeywordIds, Member member, Member targetMember,
+                                            boolean positive) {
+        // 매너 키워드 엔티티 조회
+        List<MannerKeyword> mannerKeywordList = mannerKeywordRepository.findAllById(mannerKeywordIds);
+
+        // MannerRating 엔티티 생성 및 저장
+        MannerRating mannerRating = mannerRatingRepository.save(MannerRating.create(member, targetMember, positive));
+
+        // MannerRatingKeyword 엔티티 생성 및 저장
+        List<MannerRatingKeyword> mannerRatingKeywordList = mannerKeywordList.stream()
+                .map(mannerKeyword -> MannerRatingKeyword.create(mannerRating, mannerKeyword))
+                .toList();
+        mannerRatingKeywordRepository.saveAll(mannerRatingKeywordList);
+
+        return mannerRating;
     }
 
 }

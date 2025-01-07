@@ -4,7 +4,9 @@ import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
+import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +46,16 @@ public class MannerController {
             @Valid @RequestBody MannerInsertRequest request,
             @AuthMember Member member) {
         return ApiResponse.ok(mannerFacadeService.insertNegativeMannerRating(member, targetMemberId, request));
+    }
+
+    @Operation(summary = "매너/비매너 평가 수정 API", description = "매너/비매너 평가를 수정하는 API 입니다.")
+    @Parameter(name = "mannerId", description = "수정하고자 하는 매너/비매너 평가 id 입니다.")
+    @PutMapping("/{mannerId}")
+    public ApiResponse<MannerUpdateResponse> updateMannerRating(
+            @PathVariable(name = "mannerId") Long mannerId,
+            @Valid @RequestBody MannerUpdateRequest request,
+            @AuthMember Member member) {
+        return ApiResponse.ok(mannerFacadeService.updateMannerRating(member, mannerId, request));
     }
 
 }
