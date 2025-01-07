@@ -18,7 +18,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,6 +82,34 @@ public class MannerService {
     }
 
     /**
+     * 매너 평가 수정 메소드
+     *
+     * @param member              회원
+     * @param mannerRating        수정할 매너 평가 엔티티
+     * @param mannerKeywordIdList 수정할 매너 키워드 id list
+     * @return MannerRating
+     */
+    @Transactional
+    public MannerRating updateMannerRating(Member member, MannerRating mannerRating, List<Long> mannerKeywordIdList) {
+        // 해당 매너 평가의 작성자가 맞는지 검증
+        validateMannerRatingOwner(member, mannerRating);
+
+        // 매너 키워드 id 값 검증
+        validateMannerInsertRequest(mannerKeywordIdList, mannerRating.isPositive());
+
+        // 상대방의 탈퇴 여부 검증
+        memberValidator.throwIfBlind(mannerRating.getToMember());
+
+        // 요청 list에 없는 매너 키워드 데이터 삭제
+        removeOldMannerKeywords(mannerRating, mannerKeywordIdList);
+
+        // 요청 list에 있는 매너 키워드 데이터 추가
+        addNewMannerKeywords(mannerRating, mannerKeywordIdList);
+
+        return mannerRating;
+    }
+
+    /**
      * 회원의 매너 점수 및 매너 레벨 업데이트
      *
      * @param member 회원
@@ -102,6 +134,17 @@ public class MannerService {
     }
 
     /**
+     * id로 매너 평가 엔티티 조회
+     *
+     * @param id 매너 평가 id
+     * @return MannerRating
+     */
+    public MannerRating getMannerRatingById(Long id) {
+        return mannerRatingRepository.findById(id)
+                .orElseThrow(() -> new MannerException(ErrorCode.MANNER_RATING_NOT_FOUND));
+    }
+
+    /**
      * id에 해당하는 매너 키워드 list 조회
      *
      * @param mannerKeywordIdList 매너 키워드 id list
@@ -112,6 +155,58 @@ public class MannerService {
                 .map(mannerKeywordId -> mannerKeywordRepository.findById(mannerKeywordId)
                         .orElseThrow(() -> new MannerException(ErrorCode.MANNER_KEYWORD_NOT_FOUND))
                 ).toList();
+    }
+
+    /**
+     * 해당 매너 평가에서 newMannerKeywordIds에 존재하지 않는 매너 키워드 데이터 삭제
+     *
+     * @param mannerRating        매너 평가
+     * @param newMannerKeywordIds 남겨 둘 mannerKeyword id list
+     */
+    private void removeOldMannerKeywords(MannerRating mannerRating, List<Long> newMannerKeywordIds) {
+        List<MannerRatingKeyword> oldMannerRatingKeywords = mannerRating.getMannerRatingKeywordList();
+
+        // 삭제 대상 임시 저장
+        List<MannerRatingKeyword> toRemove = new ArrayList<>();
+        for (MannerRatingKeyword mrk : oldMannerRatingKeywords) {
+            Long keywordId = mrk.getMannerKeyword().getId();
+            if (!newMannerKeywordIds.contains(keywordId)) {
+                toRemove.add(mrk);
+            }
+        }
+
+        // 연관관계 제거 및 db 삭제
+        for (MannerRatingKeyword mrk : toRemove) {
+            mrk.removeMannerRating();
+            mannerRatingKeywordRepository.delete(mrk);
+        }
+    }
+
+    /**
+     * 해당 매너 평가에서 mannerKeywordIdList에 존재하지 않는 매너 키워드 데이터 생성
+     *
+     * @param mannerRating        매너 평가
+     * @param mannerKeywordIdList 추가할 mannerKeyword id list
+     */
+    private void addNewMannerKeywords(MannerRating mannerRating, List<Long> mannerKeywordIdList) {
+        // 기존 매너키워드 id 집합
+        Set<Long> oldMannerKeywordIds = mannerRating.getMannerRatingKeywordList().stream()
+                .map(mannerRatingKeyword -> mannerRatingKeyword.getMannerKeyword().getId())
+                .collect(Collectors.toSet());
+
+        // 새로운 매너 키워드 id 집합
+        Set<Long> newMannerKeywordIds = new HashSet<>(mannerKeywordIdList);
+
+        // 새로운 매너 평가 키워드 매핑 저장
+        newMannerKeywordIds.removeAll(oldMannerKeywordIds);
+
+        if (!newMannerKeywordIds.isEmpty()) {
+            List<MannerKeyword> mannerKeywordsToAdd = mannerKeywordRepository.findAllById(newMannerKeywordIds);
+            List<MannerRatingKeyword> mannerRatingKeywordList = mannerKeywordsToAdd.stream()
+                    .map(mannerKeyword -> MannerRatingKeyword.create(mannerRating, mannerKeyword))
+                    .toList();
+            mannerRatingKeywordRepository.saveAll(mannerRatingKeywordList);
+        }
     }
 
     /**
@@ -146,6 +241,18 @@ public class MannerService {
                 targetMember.getId(), isPositive);
         if (exists) {
             throw new MannerException(ErrorCode.MANNER_RATING_EXISTS);
+        }
+    }
+
+    /**
+     * 매너 평가가 해당 회원이 작성한 것이 맞는지 검증
+     *
+     * @param member       회원
+     * @param mannerRating 매너 평가
+     */
+    private void validateMannerRatingOwner(Member member, MannerRating mannerRating) {
+        if (!mannerRating.getFromMember().getId().equals(member.getId())) {
+            throw new MannerException(ErrorCode.MANNER_RATING_ACCESS_DENIED);
         }
     }
 

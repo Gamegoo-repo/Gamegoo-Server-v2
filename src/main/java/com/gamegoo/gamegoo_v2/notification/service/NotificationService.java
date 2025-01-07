@@ -106,7 +106,7 @@ public class NotificationService {
      */
     @Transactional
     public Notification createMannerLevelNotification(NotificationTypeTitle notificationTypeTitle, Member member,
-                                                      int mannerLevel) {
+                                                      Integer mannerLevel) {
         validateMember(member);
 
         NotificationType notificationType = findNotificationType(notificationTypeTitle);

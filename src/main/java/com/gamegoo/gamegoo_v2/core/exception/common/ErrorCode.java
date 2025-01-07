@@ -135,6 +135,8 @@ public enum ErrorCode {
     MANNER_KEYWORD_INVALID(BAD_REQUEST, "MANNER_401", "잘못된 매너 키워드 값입니다."),
     MANNER_KEYWORD_NOT_FOUND(NOT_FOUND, "MANNER_402", "매너 키워드를 찾을 수 없습니다."),
     MANNER_RATING_EXISTS(BAD_REQUEST, "MANNER_403", "매너/비매너 평가는 최초 1회만 가능합니다."),
+    MANNER_RATING_NOT_FOUND(NOT_FOUND, "MANNER_404", "해당 매너 평가를 찾을 수 없습니다."),
+    MANNER_RATING_ACCESS_DENIED(FORBIDDEN, "MANNER_405", "해당 매너 평가에 접근 권한이 없습니다."),
 
     /**
      * socket 서버 관련 에러
