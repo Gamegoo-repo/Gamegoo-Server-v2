@@ -5,6 +5,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
@@ -73,5 +74,17 @@ public class BoardFacadeService {
 
         return BoardByIdResponseForMember.of(board, isBlocked, isFriend, friendRequestMemberId);
     }
+
+    /**
+     * 비회원 게시판 글 단건 조회 (파사드)
+     * - “비회원 전용” 조회 로직
+     */
+    public BoardByIdResponse getBoardById(Long boardId) {
+
+        Board board = boardService.findBoard(boardId);
+
+        return BoardByIdResponse.of(board);
+    }
+
 
 }
