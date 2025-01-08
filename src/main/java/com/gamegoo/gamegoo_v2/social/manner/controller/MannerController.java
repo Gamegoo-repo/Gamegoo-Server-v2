@@ -78,9 +78,10 @@ public class MannerController {
         return ApiResponse.ok(mannerFacadeService.getMannerRating(member, targetMemberId, false));
     }
 
-    @Operation(summary = "나의 매너 정보 조회 API", description = "나의 매너 정보를 조회하는 API 입니다.")
-    @GetMapping
-    public ApiResponse<Object> getMyManner(@AuthMember Member member) {
-        return ApiResponse.ok(mannerFacadeService.getMannerInfo(member));
+    @Operation(summary = "특정 회원의 매너 정보 조회 API", description = "특정 회원의 매너 정보를 조회하는 API 입니다.")
+    @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
+    @GetMapping("/{memberId}")
+    public ApiResponse<Object> getMyManner(@PathVariable(name = "memberId") Long memberId) {
+        return ApiResponse.ok(mannerFacadeService.getMannerInfo(memberId));
     }
 }

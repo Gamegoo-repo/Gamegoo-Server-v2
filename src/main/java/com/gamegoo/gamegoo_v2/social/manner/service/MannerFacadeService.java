@@ -121,10 +121,12 @@ public class MannerFacadeService {
     /**
      * 해당 회원의 매너 정보 조회 facade 메소드
      *
-     * @param member 회원
+     * @param memberId 회원 id
      * @return MannerResponse
      */
-    public MannerResponse getMannerInfo(Member member) {
+    public MannerResponse getMannerInfo(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+        
         // 매너 레벨 조회
         int mannerLevel = member.getMannerLevel();
 

@@ -890,11 +890,20 @@ class MannerFacadeServiceTest {
     @DisplayName("회원 매너 정보 조회")
     class GetMannerInfoTest {
 
+        @DisplayName("실패: 대상 회원을 찾을 수 없는 경우 예외가 발생한다.")
+        @Test
+        void getMannerInfo_shouldThrownWhenMemberNotFound() {
+            // when // then
+            assertThatThrownBy(() -> mannerFacadeService.getMannerInfo(1000L))
+                    .isInstanceOf(MemberException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
         @DisplayName("성공: 받은 매너 평가가 없는 경우")
         @Test
         void getMannerInfoSucceedsWhenNoMannerRating() {
             // when
-            MannerResponse response = mannerFacadeService.getMannerInfo(member);
+            MannerResponse response = mannerFacadeService.getMannerInfo(member.getId());
 
             // then
             assertThat(response.getMannerLevel()).isEqualTo(1);
@@ -920,9 +929,10 @@ class MannerFacadeServiceTest {
 
             member.updateMannerScore(5);
             member.updateMannerRank(50.0);
+            memberRepository.save(member);
 
             // when
-            MannerResponse response = mannerFacadeService.getMannerInfo(member);
+            MannerResponse response = mannerFacadeService.getMannerInfo(member.getId());
 
             // then
             assertThat(response.getMannerLevel()).isEqualTo(1);
