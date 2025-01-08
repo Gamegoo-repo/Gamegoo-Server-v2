@@ -7,6 +7,7 @@ import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerFacadeService;
 import org.junit.jupiter.api.DisplayName;
@@ -350,6 +351,24 @@ public class MannerControllerTest extends ControllerTestSupport {
                 .andExpect(jsonPath("$.message").value("OK"))
                 .andExpect(jsonPath("$.data.mannerRatingId").value(1L))
                 .andExpect(jsonPath("$.data.mannerKeywordIdList").isArray());
+    }
+
+    @DisplayName("특정 회원의 매너 정보 조회")
+    @Test
+    void getMannerInfoSucceeds() throws Exception {
+        // given
+        MannerResponse response = MannerResponse.of(1, 50.0, 2, List.of());
+
+        given(mannerFacadeService.getMannerInfo(TARGET_MEMBER_ID)).willReturn(response);
+
+        // when // then
+        mockMvc.perform(get(API_URL_PREFIX + "/{memberId}", TARGET_MEMBER_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data.mannerLevel").value(1))
+                .andExpect(jsonPath("$.data.mannerRank").value(50.0))
+                .andExpect(jsonPath("$.data.mannerRatingCount").value(2))
+                .andExpect(jsonPath("$.data.mannerKeywords").isArray());
     }
 
 }
