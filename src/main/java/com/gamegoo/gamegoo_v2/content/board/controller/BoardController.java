@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
@@ -79,6 +80,13 @@ public class BoardController {
     public ApiResponse<BoardByIdResponseForMember> getBoardByIdForMember(@PathVariable Long boardId,
                                                                          @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.getBoardByIdForMember(boardId, member));
+    }
+
+    @GetMapping("/list/{boardId}")
+    @Operation(summary = "비회원용 게시판 글 조회 API", description = "게시판에서 글을 조회하는 API 입니다.")
+    @Parameter(name = "boardId", description = "조회할 게시판 글 id 입니다.")
+    public ApiResponse<BoardByIdResponse> getBoardById(@PathVariable Long boardId) {
+        return ApiResponse.ok(boardFacadeService.getBoardById(boardId));
     }
 
 }
