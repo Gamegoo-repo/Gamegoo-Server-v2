@@ -47,6 +47,8 @@ public class Member extends BaseDateTimeEntity {
 
     private Integer mannerScore;
 
+    private Double mannerRank;
+
     @Column(nullable = false)
     private boolean blind = false;
 

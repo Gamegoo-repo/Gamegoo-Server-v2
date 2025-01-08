@@ -6,12 +6,16 @@ import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRating;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerKeywordResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -112,6 +116,32 @@ public class MannerFacadeService {
         Optional<MannerRating> mannerRating = mannerService.getMannerRatingByMember(member, targetMember, positive);
 
         return MannerRatingResponse.of(mannerRating);
+    }
+
+    /**
+     * 해당 회원의 매너 정보 조회 facade 메소드
+     *
+     * @param member 회원
+     * @return MannerResponse
+     */
+    public MannerResponse getMannerInfo(Member member) {
+        // 매너 레벨 조회
+        int mannerLevel = member.getMannerLevel();
+
+        // 매너 랭크 조회
+        Double mannerRank = member.getMannerRank();
+
+        // 매너 평가 개수 조회
+        int mannerRatingCount = mannerService.countMannerRatingByMember(member, true);
+
+        // 매너 키워드별 받은 개수 조회
+        Map<Long, Integer> mannerKeywordMap = mannerService.countMannerKeyword(member);
+
+        List<MannerKeywordResponse> mannerKeywordResponses = mannerKeywordMap.entrySet().stream()
+                .map(entry -> MannerKeywordResponse.of(entry.getKey(), entry.getValue()))
+                .toList();
+
+        return MannerResponse.of(mannerLevel, mannerRank, mannerRatingCount, mannerKeywordResponses);
     }
 
 }

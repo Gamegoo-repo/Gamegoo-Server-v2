@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -156,6 +157,27 @@ public class MannerService {
     public Optional<MannerRating> getMannerRatingByMember(Member member, Member targetMember, boolean positive) {
         return mannerRatingRepository.findByFromMemberIdAndToMemberIdAndPositive(member.getId(), targetMember.getId(),
                 positive);
+    }
+
+    /**
+     * 회원이 받은 매너/비매너 평가 개수 조회
+     *
+     * @param member   회원
+     * @param positive 매너/비매너 평가 여부
+     * @return 매너/비매너 평가 개수
+     */
+    public int countMannerRatingByMember(Member member, boolean positive) {
+        return mannerRatingRepository.countFromMemberByToMemberIdAndPositive(member.getId(), positive);
+    }
+
+    /**
+     * 회원이 받은 매너 키워드 별 개수 조회
+     *
+     * @param member 회원
+     * @return Map<매너 키워드 id, 개수>
+     */
+    public Map<Long, Integer> countMannerKeyword(Member member) {
+        return mannerRatingKeywordRepository.countMannerKeywordByToMemberId(member.getId());
     }
 
     /**

@@ -77,4 +77,10 @@ public class MannerController {
             @AuthMember Member member) {
         return ApiResponse.ok(mannerFacadeService.getMannerRating(member, targetMemberId, false));
     }
+
+    @Operation(summary = "나의 매너 정보 조회 API", description = "나의 매너 정보를 조회하는 API 입니다.")
+    @GetMapping
+    public ApiResponse<Object> getMyManner(@AuthMember Member member) {
+        return ApiResponse.ok(mannerFacadeService.getMannerInfo(member));
+    }
 }
