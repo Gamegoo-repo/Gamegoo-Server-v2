@@ -171,4 +171,9 @@ public class Member extends BaseDateTimeEntity {
         return this.mannerLevel;
     }
 
+    public Double updateMannerRank(Double mannerRank) {
+        this.mannerRank = mannerRank;
+        return this.mannerRank;
+    }
+
 }
