@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
     private final JwtInterceptor jwtInterceptor;
     private final List<String> excludeEndpoints = Arrays.asList("/api/v2/auth/token/**", "/api/v2/email/send/**",
             "/api/v2/internal/**", "/api/v2/email/verify", "/api/v2/riot/verify", "/api/v2/auth/join",
-            "/api/v2/auth/login", "/api/v2/password/reset", "/api/v2/auth/refresh");
+            "/api/v2/auth/login", "/api/v2/password/reset", "/api/v2/auth/refresh", "/api/v2/posts/list/**");
 
     // 인터셉터 설정
     @Override
