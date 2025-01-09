@@ -18,6 +18,7 @@ import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerRatingKeywordRepository;
@@ -33,7 +34,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -881,6 +884,82 @@ class MannerFacadeServiceTest {
             assertThat(response.getMannerRatingId()).isNull();
             assertThat(response.getMannerKeywordIdList()).isEmpty();
         }
+    }
+
+    @Nested
+    @DisplayName("회원 매너 정보 조회")
+    class GetMannerInfoTest {
+
+        @DisplayName("실패: 대상 회원을 찾을 수 없는 경우 예외가 발생한다.")
+        @Test
+        void getMannerInfo_shouldThrownWhenMemberNotFound() {
+            // when // then
+            assertThatThrownBy(() -> mannerFacadeService.getMannerInfo(1000L))
+                    .isInstanceOf(MemberException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("성공: 받은 매너 평가가 없는 경우")
+        @Test
+        void getMannerInfoSucceedsWhenNoMannerRating() {
+            // when
+            MannerResponse response = mannerFacadeService.getMannerInfo(member.getId());
+
+            // then
+            assertThat(response.getMannerLevel()).isEqualTo(1);
+            assertThat(response.getMannerRank()).isNull();
+            assertThat(response.getMannerRatingCount()).isEqualTo(0);
+            assertThat(response.getMannerKeywords())
+                    .isNotNull()
+                    .hasSize(12)
+                    .allSatisfy(mannerKeywordResponse -> assertThat(mannerKeywordResponse.getCount()).isEqualTo(0));
+        }
+
+        @DisplayName("성공: 받은 매너 평가가 있는 경우")
+        @Test
+        void getMannerInfoSucceeds() {
+            // given
+            Member targetMember1 = createMember("targetMember1@gmail.com", "targetMember1");
+            Member targetMember2 = createMember("targetMember2@gmail.com", "targetMember2");
+            Member targetMember3 = createMember("targetMember3@gmail.com", "targetMember3");
+
+            createMannerRating(List.of(1L, 2L, 3L, 4L, 5L, 6L), targetMember1, member, true);
+            createMannerRating(List.of(1L, 2L, 3L), targetMember2, member, true);
+            createMannerRating(List.of(7L, 8L), targetMember3, member, false);
+
+            member.updateMannerScore(5);
+            member.updateMannerRank(50.0);
+            memberRepository.save(member);
+
+            // when
+            MannerResponse response = mannerFacadeService.getMannerInfo(member.getId());
+
+            // then
+            assertThat(response.getMannerLevel()).isEqualTo(1);
+            assertThat(response.getMannerRank()).isEqualTo(50.0);
+            assertThat(response.getMannerRatingCount()).isEqualTo(2);
+
+            Map<Long, Integer> assertMap = new HashMap<>();
+            assertMap.put(1L, 2);
+            assertMap.put(2L, 2);
+            assertMap.put(3L, 2);
+            assertMap.put(4L, 1);
+            assertMap.put(5L, 1);
+            assertMap.put(6L, 1);
+            assertMap.put(7L, 1);
+            assertMap.put(8L, 1);
+            assertMap.put(9L, 0);
+            assertMap.put(10L, 0);
+            assertMap.put(11L, 0);
+            assertMap.put(12L, 0);
+
+            assertThat(response.getMannerKeywords())
+                    .hasSize(assertMap.size())
+                    .allMatch(mannerKeywordResponse ->
+                            assertMap.get(mannerKeywordResponse.getMannerKeywordId())
+                                    .equals(mannerKeywordResponse.getCount()));
+        }
+
     }
 
     private Member createMember(String email, String gameName) {

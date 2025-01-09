@@ -47,6 +47,8 @@ public class Member extends BaseDateTimeEntity {
 
     private Integer mannerScore;
 
+    private Double mannerRank;
+
     @Column(nullable = false)
     private boolean blind = false;
 
@@ -167,6 +169,11 @@ public class Member extends BaseDateTimeEntity {
     public int updateMannerLevel(int mannerLevel) {
         this.mannerLevel = mannerLevel;
         return this.mannerLevel;
+    }
+
+    public Double updateMannerRank(Double mannerRank) {
+        this.mannerRank = mannerRank;
+        return this.mannerRank;
     }
 
 }
