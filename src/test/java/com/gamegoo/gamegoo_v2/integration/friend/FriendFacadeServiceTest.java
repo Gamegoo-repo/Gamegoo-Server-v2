@@ -246,38 +246,14 @@ class FriendFacadeServiceTest {
         @Test
         void getFriendListSucceedsWhenNoFriend() {
             // when
-            FriendListResponse friends = friendFacadeService.getFriends(member, null);
+            FriendListResponse friends = friendFacadeService.getFriends(member);
 
             // then
             assertThat(friends.getFriendInfoList()).isEmpty();
             assertThat(friends.getListSize()).isEqualTo(0);
-            assertThat(friends.getNextCursor()).isNull();
-            assertThat(friends.isHasNext()).isFalse();
         }
 
-        @DisplayName("친구 목록 조회 성공: cursor를 입력하지 않은 경우")
-        @Test
-        void getFriendListSucceedsFirstPage() {
-            // given
-            for (int i = 1; i <= 5; i++) {
-                Member targetMember = createMember("member" + i + "@gmail.com", "member" + i);
-
-                // 친구 관계 생성
-                friendRepository.save(Friend.create(member, targetMember));
-                friendRepository.save(Friend.create(targetMember, member));
-            }
-
-            // when
-            FriendListResponse friends = friendFacadeService.getFriends(member, null);
-
-            // then
-            assertThat(friends.getFriendInfoList()).hasSize(5);
-            assertThat(friends.getListSize()).isEqualTo(5);
-            assertThat(friends.getNextCursor()).isNull();
-            assertThat(friends.isHasNext()).isFalse();
-        }
-
-        @DisplayName("친구 목록 조회 성공: 친구가 page size 이상이고 cursor를 입력한 경우")
+        @DisplayName("친구 목록 조회 성공: 친구가 있는 경우")
         @Test
         void getFriendListSucceedsNextPage() {
             // given
@@ -295,13 +271,11 @@ class FriendFacadeServiceTest {
             Long cursor = targetMembers.get(3).getId();
 
             // when
-            FriendListResponse friends = friendFacadeService.getFriends(member, cursor);
+            FriendListResponse friends = friendFacadeService.getFriends(member);
 
             // then
-            assertThat(friends.getFriendInfoList()).hasSize(5);
-            assertThat(friends.getListSize()).isEqualTo(5);
-            assertThat(friends.getNextCursor()).isNull();
-            assertThat(friends.isHasNext()).isFalse();
+            assertThat(friends.getFriendInfoList()).hasSize(15);
+            assertThat(friends.getListSize()).isEqualTo(15);
         }
 
     }
