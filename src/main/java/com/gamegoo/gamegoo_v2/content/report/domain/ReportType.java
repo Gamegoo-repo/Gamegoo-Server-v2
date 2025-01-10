@@ -1,4 +1,4 @@
-package com.gamegoo.gamegoo_v2.content.report.domain.domain;
+package com.gamegoo.gamegoo_v2.content.report.domain;
 
 import lombok.Getter;
 
