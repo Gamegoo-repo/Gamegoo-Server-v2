@@ -142,6 +142,8 @@ public enum ErrorCode {
      * 신고 관련 에러
      */
     REPORT_CODE_BAD_REQUEST(BAD_REQUEST, "REPORT_401", "잘못된 신고 타입 요청입니다."),
+    REPORT_NOT_FOUND(NOT_FOUND, "REPORT_402", "해당 신고 건을 찾을 수 없습니다."),
+    REPORT_PATH_NOT_FOUND(INTERNAL_SERVER_ERROR, "REPORT_403", "신고 접수 경로 정보를 찾을 수 없습니다. 관리자에게 문의 바랍니다."),
 
     /**
      * socket 서버 관련 에러

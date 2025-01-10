@@ -1,26 +1,25 @@
 package com.gamegoo.gamegoo_v2.content.report.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 @Getter
+@AllArgsConstructor
 public enum ReportType {
-    SPAM(1),               // 스팸 홍보/도배글
-    ILLEGAL_CONTENT(2),    // 불법 정보 포함
-    HARASSMENT(3),         // 성희롱 발언
-    HATE_SPEECH(4),        // 욕설/ 혐오/ 차별적 표현
-    PRIVACY_VIOLATION(5),  // 개인 정보 노출
-    OFFENSIVE(6)           // 불쾌한 표현
-    ;
+    SPAM(1, "스팸 홍보/도배글"),
+    ILLEGAL_CONTENT(2, "불법 정보 포함"),
+    HARASSMENT(3, "성희롱 발언"),
+    HATE_SPEECH(4, "욕설/ 혐오/ 차별적 표현"),
+    PRIVACY_VIOLATION(5, "개인 정보 노출"),
+    OFFENSIVE(6, "불쾌한 표현");
 
     private final int id;
-
-    ReportType(int id) {
-        this.id = id;
-    }
+    private final String description;
 
     // id로 ReportType 객체 조회하기 위한 map
     private static final Map<Integer, ReportType> REPORT_TYPE_MAP = Arrays.stream(values())

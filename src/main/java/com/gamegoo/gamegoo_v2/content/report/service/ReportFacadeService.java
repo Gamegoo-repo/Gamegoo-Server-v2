@@ -35,7 +35,7 @@ public class ReportFacadeService {
         Board board = (request.getBoardId() != null) ? boardService.findBoard(request.getBoardId()) : null;
 
         Report report = reportService.insertReport(member, targetMember, request.getReportCodeList(),
-                request.getContents(), board);
+                request.getContents(), request.getPathCode(), board);
 
         return ReportInsertResponse.of(report);
     }

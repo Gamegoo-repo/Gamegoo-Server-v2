@@ -35,6 +35,10 @@ socket:
   server:
     url: ${SOCKET_SERVER_URL}
 
+email:
+  report_email_to: gamegoo2025@gmail.com
+  report_email_template_path: templates/new-report.html
+
 ---
 # 로컬 환경
 spring:
