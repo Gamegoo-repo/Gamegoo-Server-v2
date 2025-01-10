@@ -5,10 +5,12 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardUpdateResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
@@ -84,6 +86,25 @@ public class BoardFacadeService {
         Board board = boardService.findBoard(boardId);
 
         return BoardByIdResponse.of(board);
+    }
+
+    /**
+     * 게시글 수정 (파사드)
+     *
+     * @param request 게시글 수정 요청 DTO
+     * @param member  현재 로그인한 Member
+     * @param boardId 수정할 게시글 ID
+     * @return 수정된 게시글 정보(Response)
+     */
+
+    public BoardUpdateResponse updateBoard(BoardUpdateRequest request, Member member, Long boardId) {
+
+        Board board = boardService.updateBoard(request, member.getId(), boardId);
+        boardGameStyleService.updateBoardGameStyles(board, request.getGameStyles());
+        Board savedBoard = boardService.saveBoard(board);
+        
+        return BoardUpdateResponse.of(savedBoard);
+
     }
 
 

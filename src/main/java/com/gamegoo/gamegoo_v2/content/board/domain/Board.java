@@ -95,4 +95,37 @@ public class Board extends BaseDateTimeEntity {
         boardGameStyle.setBoard(this);
     }
 
+    public void removeBoardGameStyle(BoardGameStyle boardGameStyle) {
+        boardGameStyles.remove(boardGameStyle);
+        boardGameStyle.setBoard(null);
+    }
+
+    public void updateBoard(int gameMode,
+                            Integer mainPosition,
+                            Integer subPosition,
+                            Integer wantPosition,
+                            Boolean mike,
+                            String content,
+                            int boardProfileImage) {
+        if (gameMode != 0) {
+            this.mode = gameMode;
+        }
+        if (mainPosition != null) {
+            this.mainPosition = mainPosition;
+        }
+        if (subPosition != null) {
+            this.subPosition = subPosition;
+        }
+        if (wantPosition != null) {
+            this.wantPosition = wantPosition;
+        }
+        if (mike != null) {
+            this.mike = mike;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+        this.boardProfileImage = boardProfileImage;
+    }
+
 }
