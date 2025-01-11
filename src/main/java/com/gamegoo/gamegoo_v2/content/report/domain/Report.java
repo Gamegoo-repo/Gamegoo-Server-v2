@@ -33,7 +33,7 @@ public class Report extends BaseDateTimeEntity {
     @Column(name = "report_id")
     private Long id;
 
-    @Column(nullable = false, length = 1000)
+    @Column(length = 1000)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -44,8 +44,6 @@ public class ReportService {
     @Transactional
     public Report insertReport(Member member, Member targetMember, List<Integer> reportCodes, String content,
                                Integer pathCode, Board board) {
-        // code 값 검증
-        validateReportTypeIds(reportCodes);
 
         // targetMember로 나 자신을 요청한 경우 검증
         memberValidator.throwIfEqual(member, targetMember);
@@ -64,6 +62,7 @@ public class ReportService {
                 .toList();
         reportTypeMappingRepository.saveAll(reportTypeMappings);
 
+        // 관리자에게 메일 발송 event 발생
         eventPublisher.publishEvent(SendReportEmailEvent.builder()
                 .reportId(report.getId())
                 .fromMemberId(member.getId())
