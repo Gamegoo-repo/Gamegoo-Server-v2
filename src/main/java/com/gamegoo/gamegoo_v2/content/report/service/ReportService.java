@@ -29,7 +29,6 @@ public class ReportService {
     private final ReportTypeMappingRepository reportTypeMappingRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-
     /**
      * 대상 회원에 대한 신고 엔티티 생성 및 저장
      *
@@ -44,7 +43,6 @@ public class ReportService {
     @Transactional
     public Report insertReport(Member member, Member targetMember, List<Integer> reportCodes, String content,
                                Integer pathCode, Board board) {
-
         // targetMember로 나 자신을 요청한 경우 검증
         memberValidator.throwIfEqual(member, targetMember);
 
@@ -97,19 +95,6 @@ public class ReportService {
                 .toList();
 
         return String.join(", ", reportTypes);
-    }
-
-    /**
-     * 신고 유형 코드 검증
-     *
-     * @param reportCodes 신고 유형 코드 list
-     */
-    private void validateReportTypeIds(List<Integer> reportCodes) {
-        for (Integer code : reportCodes) {
-            if (code == null || code < 1 || code > 6) {
-                throw new ReportException(ErrorCode.REPORT_CODE_BAD_REQUEST);
-            }
-        }
     }
 
 }
