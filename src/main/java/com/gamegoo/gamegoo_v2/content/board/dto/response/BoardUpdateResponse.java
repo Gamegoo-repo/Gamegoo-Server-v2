@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 @Getter
 @Builder
-
 public class BoardUpdateResponse {
 
     long boardId;

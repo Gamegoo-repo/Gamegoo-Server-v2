@@ -97,16 +97,11 @@ public class Board extends BaseDateTimeEntity {
 
     public void removeBoardGameStyle(BoardGameStyle boardGameStyle) {
         boardGameStyles.remove(boardGameStyle);
-        boardGameStyle.setBoard(null);
+        boardGameStyle.removeBoard();
     }
 
-    public void updateBoard(int gameMode,
-                            Integer mainPosition,
-                            Integer subPosition,
-                            Integer wantPosition,
-                            Boolean mike,
-                            String content,
-                            int boardProfileImage) {
+    public void updateBoard(int gameMode, Integer mainPosition, Integer subPosition, Integer wantPosition, Boolean mike,
+                            String content, int boardProfileImage) {
         if (gameMode != 0) {
             this.mode = gameMode;
         }
@@ -122,9 +117,13 @@ public class Board extends BaseDateTimeEntity {
         if (mike != null) {
             this.mike = mike;
         }
-        if (content != null) {
+        // B안
+        if (content == null) {
+            this.content = "";
+        } else {
             this.content = content;
         }
+
         this.boardProfileImage = boardProfileImage;
     }
 

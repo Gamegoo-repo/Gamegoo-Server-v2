@@ -96,14 +96,13 @@ public class BoardFacadeService {
      * @param boardId 수정할 게시글 ID
      * @return 수정된 게시글 정보(Response)
      */
-
+    @Transactional
     public BoardUpdateResponse updateBoard(BoardUpdateRequest request, Member member, Long boardId) {
 
         Board board = boardService.updateBoard(request, member.getId(), boardId);
         boardGameStyleService.updateBoardGameStyles(board, request.getGameStyles());
-        Board savedBoard = boardService.saveBoard(board);
-        
-        return BoardUpdateResponse.of(savedBoard);
+
+        return BoardUpdateResponse.of(board);
 
     }
 

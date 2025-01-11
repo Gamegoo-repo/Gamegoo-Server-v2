@@ -49,7 +49,7 @@ public class BoardGameStyleService {
 
     @Transactional
     public void updateBoardGameStyles(Board board, List<Long> gameStyleIds) {
-        if (gameStyleIds == null) {
+        if (gameStyleIds == null || gameStyleIds.isEmpty()) {
             // 게임스타일 수정이 없을 경우, 그냥 리턴
             return;
         }
