@@ -117,7 +117,7 @@ public class Board extends BaseDateTimeEntity {
         if (mike != null) {
             this.mike = mike;
         }
-        // B안
+
         if (content == null) {
             this.content = "";
         } else {
@@ -125,6 +125,10 @@ public class Board extends BaseDateTimeEntity {
         }
 
         this.boardProfileImage = boardProfileImage;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
 }

@@ -106,5 +106,16 @@ public class BoardFacadeService {
 
     }
 
+    /**
+     * 게시글 삭제 (파사드)
+     *
+     * @param member  현재 로그인한 Member
+     * @param boardId 삭제할 게시글 ID
+     */
+    @Transactional
+    public void deleteBoard(Member member, Long boardId) {
+        boardService.deleteBoard(boardId, member.getId());
+    }
+
 
 }

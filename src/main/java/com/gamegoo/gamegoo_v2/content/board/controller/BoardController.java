@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -100,5 +101,14 @@ public class BoardController {
                                                         @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.updateBoard(request, member, boardId));
     }
+
+    @DeleteMapping("/{boardId}")
+    @Operation(summary = "게시판 글 삭제 API", description = "게시판에서 글을 삭제하는 API 입니다.")
+    @Parameter(name = "boardId", description = "삭제할 게시판 글 id 입니다.")
+    public ApiResponse<String> delete(@PathVariable Long boardId, @AuthMember Member member) {
+        boardFacadeService.deleteBoard(member, boardId);
+        return ApiResponse.ok("게시글을 삭제하였습니다.");
+    }
+
 
 }
