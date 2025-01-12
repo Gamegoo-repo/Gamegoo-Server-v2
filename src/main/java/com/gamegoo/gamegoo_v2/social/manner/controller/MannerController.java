@@ -85,4 +85,5 @@ public class MannerController {
     public ApiResponse<MannerResponse> getMannerInfo(@PathVariable(name = "memberId") Long memberId) {
         return ApiResponse.ok(mannerFacadeService.getMannerInfo(memberId));
     }
+
 }
