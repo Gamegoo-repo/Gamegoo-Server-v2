@@ -97,6 +97,22 @@ public class BoardService {
     }
 
     /**
+     * 게시글 삭제
+     */
+    @Transactional
+    public void deleteBoard(Long boardId, Long memberId) {
+        Board board =
+                boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (!board.getMember().getId().equals(memberId)) {
+            throw new BoardException(ErrorCode.DELETE_BOARD_ACCESS_DENIED);
+        }
+
+        board.setDeleted(true);
+        boardRepository.save(board);
+    }
+
+    /**
      * Board 저장
      */
     @Transactional
