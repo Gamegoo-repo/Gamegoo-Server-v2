@@ -16,6 +16,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m.id FROM Member m WHERE m.mannerScore IS NOT NULL ORDER BY m.mannerScore desc")
     List<Long> getMemberIdsOrderByMannerScoreIsNotNull();
 
+    @Query("SELECT m.id FROM Member m WHERE m.mannerScore IS NULL AND m.mannerRank IS NOT NULL")
     List<Long> getMemberIdsWhereMannerScoreIsNullAndMannerRankIsNotNull();
 
 }

@@ -154,7 +154,7 @@ public class MannerFacadeService {
      */
     @Transactional
     public void resetMannerRanks() {
-        List<Long> memberIds = mannerService.getMannerRankNullUpdateTargets();
+        List<Long> memberIds = mannerService.getMannerRankResetTargets();
         Map<Long, Double> mannerRankMap = new HashMap<>();
         memberIds.forEach(memberId -> mannerRankMap.put(memberId, null));
         mannerService.batchUpdateMannerRanks(mannerRankMap);

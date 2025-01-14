@@ -185,7 +185,7 @@ public class MannerService {
     }
 
     /**
-     * mannerRank를 null이 아닌 값으로 업데이트할 대상 회원 id list 조회
+     * mannerRank를 업데이트할 대상 회원 id list 조회
      *
      * @return 회원 id list
      */
@@ -194,11 +194,11 @@ public class MannerService {
     }
 
     /**
-     * mannerRank를 null로 업데이트할 대상 회원 id list 조회
+     * mannerRank를 null로 초기화 할 대상 회원 id list 조회
      *
      * @return 회원 id list
      */
-    public List<Long> getMannerRankNullUpdateTargets() {
+    public List<Long> getMannerRankResetTargets() {
         return memberRepository.getMemberIdsWhereMannerScoreIsNullAndMannerRankIsNotNull();
     }
 
