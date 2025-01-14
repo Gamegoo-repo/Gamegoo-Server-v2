@@ -50,25 +50,27 @@ public class BatchFacadeService {
     public void updateMannerRanks() {
         List<Long> memberIds = mannerService.getMannerRankUpdateTargets();
 
-        if (!memberIds.isEmpty()) {
-            int totalMembers = memberIds.size();
+        int totalMembers = memberIds.size();
 
-            // mannerRank를 계산해 Map 생성
-            Map<Long, Double> mannerRankMap = IntStream.range(0, totalMembers)
-                    .boxed()
-                    .collect(Collectors.toMap(memberIds::get, i -> (double) i / totalMembers));
+        // mannerRank를 계산해 Map 생성
+        Map<Long, Double> mannerRankMap = IntStream.range(0, totalMembers)
+                .boxed()
+                .collect(Collectors.toMap(
+                        memberIds::get,
+                        i -> Math.round((double) (i + 1) / totalMembers * 1000) / 10.0
+                ));
 
-            // 전체 데이터 list 생성
-            List<Map.Entry<Long, Double>> entries = new ArrayList<>(mannerRankMap.entrySet());
+        // 전체 데이터 list 생성
+        List<Map.Entry<Long, Double>> entries = new ArrayList<>(mannerRankMap.entrySet());
 
-            // batch로 나누어 업데이트 처리
-            for (int i = 0; i < entries.size(); i += BATCH_SIZE) {
-                int end = Math.min(i + BATCH_SIZE, entries.size());
-                List<Map.Entry<Long, Double>> batch = entries.subList(i, end);
+        // batch로 나누어 업데이트 처리
+        for (int i = 0; i < entries.size(); i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, entries.size());
+            List<Map.Entry<Long, Double>> batch = entries.subList(i, end);
 
-                batchService.batchUpdateMannerRanks(batch);
-            }
+            batchService.batchUpdateMannerRanks(batch);
         }
+
     }
 
 }
