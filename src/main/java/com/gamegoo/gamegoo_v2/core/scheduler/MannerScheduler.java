@@ -1,6 +1,6 @@
-package com.gamegoo.gamegoo_v2.scheduler;
+package com.gamegoo.gamegoo_v2.core.scheduler;
 
-import com.gamegoo.gamegoo_v2.social.manner.service.MannerFacadeService;
+import com.gamegoo.gamegoo_v2.core.batch.BatchFacadeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MannerScheduler {
 
-    private final MannerFacadeService mannerFacadeService;
+    private final BatchFacadeService batchFacadeService;
 
     /**
      * 회원 mannerRank 업데이트
@@ -22,10 +22,10 @@ public class MannerScheduler {
     public void updateMannerRank() {
         try {
             // mannerScore가 있는 회원 업데이트
-            mannerFacadeService.updateMannerRanks();
+            batchFacadeService.updateMannerRanks();
 
             // mannerScore가 없는 회원 업데이트
-            mannerFacadeService.resetMannerRanks();
+            batchFacadeService.resetMannerRanks();
         } catch (Exception e) {
             log.error("failed to updateMannerRank Scheduler:", e);
         }

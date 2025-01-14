@@ -14,7 +14,6 @@ import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRatingKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerRatingKeywordRepository;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerRatingRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,6 @@ public class MannerService {
     private final MannerRatingKeywordRepository mannerRatingKeywordRepository;
     private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final EntityManager entityManager;
 
     private final int MANNER_KEYWORD_ID_MAX = 12;
     private final int MANNER_KEYWORD_ID_MIN = 1;
@@ -200,37 +198,6 @@ public class MannerService {
      */
     public List<Long> getMannerRankResetTargets() {
         return memberRepository.getMemberIdsWhereMannerScoreIsNullAndMannerRankIsNotNull();
-    }
-
-    /**
-     * id에 해당하는 회원의 mannerRank를 batch update
-     *
-     * @param mannerRankUpdates Map<회원 id,mannerRank>
-     */
-    @Transactional
-    public void batchUpdateMannerRanks(Map<Long, Double> mannerRankUpdates) {
-        if (mannerRankUpdates == null || mannerRankUpdates.isEmpty()) {
-            return;
-        }
-
-        // Native Query 생성
-        StringBuilder queryBuilder = new StringBuilder("UPDATE my_entity SET manner_rank = CASE ");
-
-        for (Map.Entry<Long, Double> entry : mannerRankUpdates.entrySet()) {
-            queryBuilder.append("WHEN id = ").append(entry.getKey())
-                    .append(" THEN ")
-                    .append(entry.getValue() == null ? "NULL" : entry.getValue())
-                    .append(" ");
-        }
-
-        queryBuilder.append("END WHERE id IN (")
-                .append(mannerRankUpdates.keySet().stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.joining(", ")))
-                .append(")");
-
-        // Native Query 실행
-        entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
     }
 
     /**

@@ -20,12 +20,9 @@ spring:
     api:
       key: ${RIOT_API}
 
-  # batch update 설정
-  jpa:
-    properties:
-      hibernate:
-        jdbc:
-          batch_size: 30
+# batch size 설정
+batch_size:
+  manner_rank: 30
 
 springdoc:
   swagger-ui:
@@ -45,6 +42,7 @@ socket:
 email:
   report_email_to: gamegoo2025@gmail.com
   report_email_template_path: templates/new-report.html
+
 
 ---
 # 로컬 환경
