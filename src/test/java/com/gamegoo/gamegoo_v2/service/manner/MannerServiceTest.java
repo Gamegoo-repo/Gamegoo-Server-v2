@@ -108,7 +108,6 @@ public class MannerServiceTest {
 
     }
 
-
     private void updateMannerScore(Member member, Integer score) {
         member.updateMannerScore(score);
         memberRepository.save(member);
