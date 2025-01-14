@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.social.manner.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.event.MannerLevelDownEvent;
 import com.gamegoo.gamegoo_v2.core.event.MannerLevelUpEvent;
@@ -13,6 +14,7 @@ import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRatingKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerRatingKeywordRepository;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerRatingRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,9 @@ public class MannerService {
     private final MannerRatingRepository mannerRatingRepository;
     private final MannerKeywordRepository mannerKeywordRepository;
     private final MannerRatingKeywordRepository mannerRatingKeywordRepository;
+    private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final EntityManager entityManager;
 
     private final int MANNER_KEYWORD_ID_MAX = 12;
     private final int MANNER_KEYWORD_ID_MIN = 1;
@@ -178,6 +182,55 @@ public class MannerService {
      */
     public Map<Long, Integer> countMannerKeyword(Member member) {
         return mannerRatingKeywordRepository.countMannerKeywordByToMemberId(member.getId());
+    }
+
+    /**
+     * mannerRank를 null이 아닌 값으로 업데이트할 대상 회원 id list 조회
+     *
+     * @return 회원 id list
+     */
+    public List<Long> getMannerRankUpdateTargets() {
+        return memberRepository.getMemberIdsOrderByMannerScoreIsNotNull();
+    }
+
+    /**
+     * mannerRank를 null로 업데이트할 대상 회원 id list 조회
+     *
+     * @return 회원 id list
+     */
+    public List<Long> getMannerRankNullUpdateTargets() {
+        return memberRepository.getMemberIdsWhereMannerScoreIsNullAndMannerRankIsNotNull();
+    }
+
+    /**
+     * id에 해당하는 회원의 mannerRank를 batch update
+     *
+     * @param mannerRankUpdates Map<회원 id,mannerRank>
+     */
+    @Transactional
+    public void batchUpdateMannerRanks(Map<Long, Double> mannerRankUpdates) {
+        if (mannerRankUpdates == null || mannerRankUpdates.isEmpty()) {
+            return;
+        }
+
+        // Native Query 생성
+        StringBuilder queryBuilder = new StringBuilder("UPDATE my_entity SET manner_rank = CASE ");
+
+        for (Map.Entry<Long, Double> entry : mannerRankUpdates.entrySet()) {
+            queryBuilder.append("WHEN id = ").append(entry.getKey())
+                    .append(" THEN ")
+                    .append(entry.getValue() == null ? "NULL" : entry.getValue())
+                    .append(" ");
+        }
+
+        queryBuilder.append("END WHERE id IN (")
+                .append(mannerRankUpdates.keySet().stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(", ")))
+                .append(")");
+
+        // Native Query 실행
+        entityManager.createNativeQuery(queryBuilder.toString()).executeUpdate();
     }
 
     /**

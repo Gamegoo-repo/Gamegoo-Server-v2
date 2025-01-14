@@ -14,9 +14,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -126,7 +129,7 @@ public class MannerFacadeService {
      */
     public MannerResponse getMannerInfo(Long memberId) {
         Member member = memberService.findMemberById(memberId);
-        
+
         // 매너 레벨 조회
         int mannerLevel = member.getMannerLevel();
 
@@ -144,6 +147,32 @@ public class MannerFacadeService {
                 .toList();
 
         return MannerResponse.of(mannerLevel, mannerRank, mannerRatingCount, mannerKeywordResponses);
+    }
+
+    /**
+     * 매너 점수가 null인 모든 회원의 mannerRank를 null로 업데이트하는 facade 메소드
+     */
+    @Transactional
+    public void resetMannerRanks() {
+        List<Long> memberIds = mannerService.getMannerRankNullUpdateTargets();
+        Map<Long, Double> mannerRankMap = new HashMap<>();
+        memberIds.forEach(memberId -> mannerRankMap.put(memberId, null));
+        mannerService.batchUpdateMannerRanks(mannerRankMap);
+    }
+
+    /**
+     * 매너 점수가 null이 아닌 모든 회원의 mannerRank를 계산해 업데이트하는 facade 메소드
+     */
+    @Transactional
+    public void updateMannerRanks() {
+        List<Long> memberIds = mannerService.getMannerRankUpdateTargets();
+        if (!memberIds.isEmpty()) {
+            int totalMembers = memberIds.size();
+            Map<Long, Double> mannerRankMap = IntStream.range(0, totalMembers)
+                    .boxed()
+                    .collect(Collectors.toMap(memberIds::get, i -> (double) i / totalMembers));
+            mannerService.batchUpdateMannerRanks(mannerRankMap);
+        }
     }
 
 }

@@ -20,6 +20,13 @@ spring:
     api:
       key: ${RIOT_API}
 
+  # batch update 설정
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 30
+
 springdoc:
   swagger-ui:
     tags-sorter: alpha            # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
