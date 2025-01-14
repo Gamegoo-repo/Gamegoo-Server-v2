@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Profile("dev")
 @Slf4j
@@ -19,7 +18,6 @@ public class MannerScheduler {
     /**
      * 회원 mannerRank 업데이트
      */
-    @Transactional
     @Scheduled(cron = "0 0 4 * * *")
     public void updateMannerRank() {
         try {
