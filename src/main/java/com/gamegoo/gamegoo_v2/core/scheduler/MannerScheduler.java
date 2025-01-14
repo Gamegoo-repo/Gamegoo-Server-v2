@@ -3,10 +3,12 @@ package com.gamegoo.gamegoo_v2.core.scheduler;
 import com.gamegoo.gamegoo_v2.core.batch.BatchFacadeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Profile("dev")
 @Slf4j
 @Component
 @RequiredArgsConstructor
