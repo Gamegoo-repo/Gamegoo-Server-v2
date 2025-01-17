@@ -1,4 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.auth.security;
+
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,9 +15,9 @@ import java.util.stream.Collectors;
 public class CustomUserDetails implements UserDetails {
 
     Long memberId;
-    String role;    // Member, Admin
+    Role role;    // Member, Admin
 
-    public CustomUserDetails(Long memberId, String role) {
+    public CustomUserDetails(Long memberId, Role role) {
         this.memberId = memberId;
         this.role = role;
     }

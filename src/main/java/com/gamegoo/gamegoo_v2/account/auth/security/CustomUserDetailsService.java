@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.auth.security;
 
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.core.exception.JwtAuthException;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
+
     private final MemberRepository memberRepository;
 
     public UserDetails loadUserByMemberId(Long memberId) throws UsernameNotFoundException {
@@ -26,11 +28,13 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new JwtAuthException(ErrorCode.INACTIVE_MEMBER);
         }
 
-        return new CustomUserDetails(member.getId(),"MEMBER");
+        return new CustomUserDetails(member.getId(), Role.MEMBER);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        throw new UnsupportedOperationException("loadUserByUsername(String username) is not supported. Use loadUserByMemberIdAndSocialId(Long socialId, String role) instead.");
+        throw new UnsupportedOperationException("loadUserByUsername(String username) is not supported. Use " +
+                "loadUserByMemberIdAndSocialId(Long socialId, String role) instead.");
     }
+
 }
