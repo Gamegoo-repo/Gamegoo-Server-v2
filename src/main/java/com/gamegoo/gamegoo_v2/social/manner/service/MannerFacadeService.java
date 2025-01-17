@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRating;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerKeywordListResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerKeywordResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerResponse;
@@ -119,14 +120,14 @@ public class MannerFacadeService {
     }
 
     /**
-     * 해당 회원의 매너 정보 조회 facade 메소드
+     * 해당 회원의 매너 레벨 정보 조회 facade 메소드
      *
      * @param memberId 회원 id
      * @return MannerResponse
      */
-    public MannerResponse getMannerInfo(Long memberId) {
+    public MannerResponse getMannerLevelInfo(Long memberId) {
         Member member = memberService.findMemberById(memberId);
-        
+
         // 매너 레벨 조회
         int mannerLevel = member.getMannerLevel();
 
@@ -136,6 +137,18 @@ public class MannerFacadeService {
         // 매너 평가 개수 조회
         int mannerRatingCount = mannerService.countMannerRatingByMember(member, true);
 
+        return MannerResponse.of(mannerLevel, mannerRank, mannerRatingCount);
+    }
+
+    /**
+     * 해당 회원의 매너 키워드별 받은 개수 정보 조회 facade 메소드
+     *
+     * @param memberId 회원 id
+     * @return MannerKewordListResponse
+     */
+    public MannerKeywordListResponse getMannerKeywordInfo(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+
         // 매너 키워드별 받은 개수 조회
         Map<Long, Integer> mannerKeywordMap = mannerService.countMannerKeyword(member);
 
@@ -143,7 +156,7 @@ public class MannerFacadeService {
                 .map(entry -> MannerKeywordResponse.of(entry.getKey(), entry.getValue()))
                 .toList();
 
-        return MannerResponse.of(mannerLevel, mannerRank, mannerRatingCount, mannerKeywordResponses);
+        return MannerKeywordListResponse.of(mannerKeywordResponses);
     }
 
 }
