@@ -84,7 +84,7 @@ public class MannerController {
     @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
     @GetMapping("/level/{memberId}")
     public ApiResponse<MannerResponse> getMannerLevelInfo(@PathVariable(name = "memberId") Long memberId) {
-        return ApiResponse.ok(mannerFacadeService.getMannerInfo(memberId));
+        return ApiResponse.ok(mannerFacadeService.getMannerLevelInfo(memberId));
     }
 
     @Operation(summary = "특정 회원의 매너 키워드 정보 조회 API", description = "특정 회원의 매너 키워드 정보를 조회하는 API 입니다.")
