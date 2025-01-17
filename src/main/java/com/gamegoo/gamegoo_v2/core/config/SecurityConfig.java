@@ -48,10 +48,10 @@ public class SecurityConfig {
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
         List<String> excludedPaths = Arrays.asList(
-                "/swagger-ui/**", "/v3/api-docs/**",
-                "/api/v2/auth/token/**", "/api/v2/email/send/**",
+                "/swagger-ui", "/v3/api-docs",
+                "/api/v2/auth/token/**", "/api/v2/email/send",
                 "/api/v2/internal/**", "/api/v2/email/verify", "/api/v2/riot/verify", "/api/v2/auth/join",
-                "/api/v2/auth/login", "/api/v2/password/reset", "/api/v2/auth/refresh", "/api/v2/posts/list/**"
+                "/api/v2/auth/login", "/api/v2/password/reset", "/api/v2/auth/refresh", "/api/v2/posts/list"
         );
 
         return new JwtAuthFilter(customUserDetailsService, excludedPaths, jwtProvider);
