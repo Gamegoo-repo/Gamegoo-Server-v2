@@ -100,7 +100,7 @@ public class EmailService {
             javaMailSender.send(message);
 
         } catch (Exception e) {
-            log.error("이메일 전송에 실패했습니다.");
+            log.error("이메일 전송에 실패했습니다.", e);
             throw new EmailException(ErrorCode.EMAIL_SEND_FAIL);
         }
     }
