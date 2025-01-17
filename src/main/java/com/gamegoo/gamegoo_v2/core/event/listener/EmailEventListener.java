@@ -46,7 +46,7 @@ public class EmailEventListener {
             placeholders.put("REPORT_TO_MEMBER_ID", event.getToMemberId().toString());
             placeholders.put("REPORT_PATH", report.getPath().name());
             placeholders.put("REPORT_TYPE", reportService.getReportTypeString(event.getReportId()));
-            placeholders.put("REPORT_CONTENT", report.getContent());
+            placeholders.put("REPORT_CONTENT", report.getContent() != null ? report.getContent() : "null");
 
             emailService.sendEmail(reportEmailTo, subject, reportTemplatePath, placeholders);
 

@@ -185,6 +185,37 @@ public class ReportControllerTest extends ControllerTestSupport {
                     .andExpect(jsonPath("$.message").value("contents는 1000자 이내여야 합니다."));
         }
 
+        @DisplayName("실패: 경로 코드 값이 없는 경우 에러 응답을 반환한다.")
+        @Test
+        void addReportFailedWhenPathCodeIsNull() throws Exception {
+            // given
+            List<Integer> reportCodeList = List.of(1, 2, 3);
+
+            ReportRequest request = ReportRequest.builder()
+                    .reportCodeList(reportCodeList)
+                    .contents("contents")
+                    .pathCode(null)
+                    .boardId(null)
+                    .build();
+
+            ReportInsertResponse response = ReportInsertResponse.builder()
+                    .reportId(1L)
+                    .message("신고가 정상적으로 접수 되었습니다.")
+                    .build();
+
+            given(reportFacadeService.addReport(any(Member.class), eq(TARGET_MEMBER_ID),
+                    any(ReportRequest.class))).willReturn(response);
+
+            // when // then
+            mockMvc.perform(post(API_URL_PREFIX + "/{memberId}", TARGET_MEMBER_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("VALID_ERROR"))
+                    .andExpect(jsonPath("$.message").value("path code는 필수 값 입니다."));
+
+        }
+
         @DisplayName("실패: 경로 코드가 1보다 작은 경우 에러 응답을 반환한다.")
         @Test
         void addReportFailedWhenPathCodeLessThanMin() throws Exception {
@@ -255,6 +286,37 @@ public class ReportControllerTest extends ControllerTestSupport {
             ReportRequest request = ReportRequest.builder()
                     .reportCodeList(reportCodeList)
                     .contents("contents")
+                    .pathCode(1)
+                    .boardId(null)
+                    .build();
+
+            ReportInsertResponse response = ReportInsertResponse.builder()
+                    .reportId(1L)
+                    .message("신고가 정상적으로 접수 되었습니다.")
+                    .build();
+
+            given(reportFacadeService.addReport(any(Member.class), eq(TARGET_MEMBER_ID),
+                    any(ReportRequest.class))).willReturn(response);
+
+            // when // then
+            mockMvc.perform(post(API_URL_PREFIX + "/{memberId}", TARGET_MEMBER_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("OK"))
+                    .andExpect(jsonPath("$.data.reportId").value(1L))
+                    .andExpect(jsonPath("$.data.message").value("신고가 정상적으로 접수 되었습니다."));
+        }
+
+        @DisplayName("텍스트, 게시글 id가 null일 때 성공")
+        @Test
+        void addReportFailedSucceedsWhenNull() throws Exception {
+            // given
+            List<Integer> reportCodeList = List.of(1, 2, 3);
+
+            ReportRequest request = ReportRequest.builder()
+                    .reportCodeList(reportCodeList)
+                    .contents(null)
                     .pathCode(1)
                     .boardId(null)
                     .build();
