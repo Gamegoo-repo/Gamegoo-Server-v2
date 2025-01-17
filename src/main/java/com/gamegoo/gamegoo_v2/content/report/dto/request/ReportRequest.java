@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.core.common.annotation.NotDuplicated;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
@@ -27,6 +28,7 @@ public class ReportRequest {
 
     @Min(value = 1, message = "path code는 1 이상의 값이어야 합니다.")
     @Max(value = 3, message = "path code는 3 이하의 값이어야 합니다.")
+    @NotNull(message = "path code는 필수 값 입니다.")
     Integer pathCode;
 
     Long boardId;
