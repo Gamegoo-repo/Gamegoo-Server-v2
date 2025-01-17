@@ -277,6 +277,37 @@ public class ReportControllerTest extends ControllerTestSupport {
                     .andExpect(jsonPath("$.data.message").value("신고가 정상적으로 접수 되었습니다."));
         }
 
+        @DisplayName("텍스트, 경로 코드, 게시글 id가 null일 때 성공")
+        @Test
+        void addReportFailedSucceedsWhenNull() throws Exception {
+            // given
+            List<Integer> reportCodeList = List.of(1, 2, 3);
+
+            ReportRequest request = ReportRequest.builder()
+                    .reportCodeList(reportCodeList)
+                    .contents(null)
+                    .pathCode(null)
+                    .boardId(null)
+                    .build();
+
+            ReportInsertResponse response = ReportInsertResponse.builder()
+                    .reportId(1L)
+                    .message("신고가 정상적으로 접수 되었습니다.")
+                    .build();
+
+            given(reportFacadeService.addReport(any(Member.class), eq(TARGET_MEMBER_ID),
+                    any(ReportRequest.class))).willReturn(response);
+
+            // when // then
+            mockMvc.perform(post(API_URL_PREFIX + "/{memberId}", TARGET_MEMBER_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("OK"))
+                    .andExpect(jsonPath("$.data.reportId").value(1L))
+                    .andExpect(jsonPath("$.data.message").value("신고가 정상적으로 접수 되었습니다."));
+        }
+
     }
 
 }
