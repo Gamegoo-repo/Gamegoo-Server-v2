@@ -31,10 +31,8 @@ public class MannerRatingKeywordRepositoryCustomImpl implements MannerRatingKeyw
                 )
                 .from(mannerKeyword)
                 .leftJoin(mannerRatingKeyword).on(mannerRatingKeyword.mannerKeyword.id.eq(mannerKeyword.id))
-                .leftJoin(mannerRating).on(
-                        mannerRatingKeyword.mannerRating.id.eq(mannerRating.id)
-                                .and(mannerRating.toMember.id.eq(memberId))
-                )
+                .leftJoin(mannerRating).on(mannerRatingKeyword.mannerRating.id.eq(mannerRating.id))
+                .where(mannerRating.toMember.id.eq(memberId)) // 필터링 추가
                 .groupBy(mannerKeyword.id)
                 .fetch();
 

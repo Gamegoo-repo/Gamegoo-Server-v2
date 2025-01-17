@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        p {
+            margin: 10px 0;
+            color: #555;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>신고 접수 알림</h1>
+    <p>{{TITLE}}</p>
+    <p><strong>신고 접수 번호:</strong> {{REPORT_ID}}</p>
+    <p><strong>신고 접수 회원 아이디:</strong> {{REPORT_FROM_MEMBER_ID}}</p>
+    <p><strong>신고 대상 회원 아이디:</strong> {{REPORT_TO_MEMBER_ID}}</p>
+    <p><strong>신고 접수 경로:</strong> {{REPORT_PATH}}</p>
+    <p><strong>신고 유형:</strong> {{REPORT_TYPE}}</p>
+    <p><strong>상세 내용:</strong> {{REPORT_CONTENT}}</p>
+</div>
+</body>
+</html>

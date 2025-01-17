@@ -17,6 +17,7 @@ import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRatingKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerKeywordListResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
@@ -443,6 +444,7 @@ class MannerFacadeServiceTest {
                         eq(NotificationTypeTitle.MANNER_LEVEL_DOWN), any(Member.class), eq(1));
             });
         }
+
     }
 
     @Nested
@@ -806,6 +808,7 @@ class MannerFacadeServiceTest {
                 verify(notificationService, times(0)).createMannerLevelNotification(any(), any(Member.class), any());
             });
         }
+
     }
 
     @Nested
@@ -884,17 +887,18 @@ class MannerFacadeServiceTest {
             assertThat(response.getMannerRatingId()).isNull();
             assertThat(response.getMannerKeywordIdList()).isEmpty();
         }
+
     }
 
     @Nested
-    @DisplayName("회원 매너 정보 조회")
-    class GetMannerInfoTest {
+    @DisplayName("회원 매너 레벨 정보 조회")
+    class GetMannerLevelInfoTest {
 
         @DisplayName("실패: 대상 회원을 찾을 수 없는 경우 예외가 발생한다.")
         @Test
         void getMannerInfo_shouldThrownWhenMemberNotFound() {
             // when // then
-            assertThatThrownBy(() -> mannerFacadeService.getMannerInfo(1000L))
+            assertThatThrownBy(() -> mannerFacadeService.getMannerLevelInfo(1000L))
                     .isInstanceOf(MemberException.class)
                     .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
         }
@@ -903,16 +907,12 @@ class MannerFacadeServiceTest {
         @Test
         void getMannerInfoSucceedsWhenNoMannerRating() {
             // when
-            MannerResponse response = mannerFacadeService.getMannerInfo(member.getId());
+            MannerResponse response = mannerFacadeService.getMannerLevelInfo(member.getId());
 
             // then
             assertThat(response.getMannerLevel()).isEqualTo(1);
             assertThat(response.getMannerRank()).isNull();
             assertThat(response.getMannerRatingCount()).isEqualTo(0);
-            assertThat(response.getMannerKeywords())
-                    .isNotNull()
-                    .hasSize(12)
-                    .allSatisfy(mannerKeywordResponse -> assertThat(mannerKeywordResponse.getCount()).isEqualTo(0));
         }
 
         @DisplayName("성공: 받은 매너 평가가 있는 경우")
@@ -932,13 +932,63 @@ class MannerFacadeServiceTest {
             memberRepository.save(member);
 
             // when
-            MannerResponse response = mannerFacadeService.getMannerInfo(member.getId());
+            MannerResponse response = mannerFacadeService.getMannerLevelInfo(member.getId());
 
             // then
             assertThat(response.getMannerLevel()).isEqualTo(1);
             assertThat(response.getMannerRank()).isEqualTo(50.0);
             assertThat(response.getMannerRatingCount()).isEqualTo(2);
+        }
 
+    }
+
+    @Nested
+    @DisplayName("회원 매너 키워드 정보 조회")
+    class GetMannerKeywordInfoTest {
+
+        @DisplayName("실패: 대상 회원을 찾을 수 없는 경우 예외가 발생한다.")
+        @Test
+        void getMannerKeywordInfo_shouldThrownWhenMemberNotFound() {
+            // when // then
+            assertThatThrownBy(() -> mannerFacadeService.getMannerKeywordInfo(1000L))
+                    .isInstanceOf(MemberException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("성공: 받은 매너 평가가 없는 경우")
+        @Test
+        void getMannerKeywordInfoSucceedsWhenNoMannerRating() {
+            // when
+            MannerKeywordListResponse response = mannerFacadeService.getMannerKeywordInfo(member.getId());
+
+            // then
+            assertThat(response.getMannerKeywords())
+                    .isNotNull()
+                    .hasSize(12)
+                    .allSatisfy(mannerKeywordResponse ->
+                            assertThat(mannerKeywordResponse.getCount()).isEqualTo(0));
+        }
+
+        @DisplayName("성공: 받은 매너 평가가 있는 경우")
+        @Test
+        void getMannerKeywordInfoSucceeds() {
+            // given
+            Member targetMember1 = createMember("targetMember1@gmail.com", "targetMember1");
+            Member targetMember2 = createMember("targetMember2@gmail.com", "targetMember2");
+            Member targetMember3 = createMember("targetMember3@gmail.com", "targetMember3");
+
+            createMannerRating(List.of(1L, 2L, 3L, 4L, 5L, 6L), targetMember1, member, true);
+            createMannerRating(List.of(1L, 2L, 3L), targetMember2, member, true);
+            createMannerRating(List.of(7L, 8L), targetMember3, member, false);
+
+            member.updateMannerScore(5);
+            member.updateMannerRank(50.0);
+            memberRepository.save(member);
+
+            // when
+            MannerKeywordListResponse response = mannerFacadeService.getMannerKeywordInfo(member.getId());
+
+            // then
             Map<Long, Integer> assertMap = new HashMap<>();
             assertMap.put(1L, 2);
             assertMap.put(2L, 2);

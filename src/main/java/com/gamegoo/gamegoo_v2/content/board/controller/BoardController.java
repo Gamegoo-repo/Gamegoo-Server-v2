@@ -4,10 +4,12 @@ import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardUpdateResponse;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
@@ -18,9 +20,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -88,5 +92,23 @@ public class BoardController {
     public ApiResponse<BoardByIdResponse> getBoardById(@PathVariable Long boardId) {
         return ApiResponse.ok(boardFacadeService.getBoardById(boardId));
     }
+
+    @PutMapping("/{boardId}")
+    @Operation(summary = "게시판 글 수정 API", description = "게시판에서 글을 수정하는 API 입니다.")
+    @Parameter(name = "boardId", description = "수정할 게시판 글 id 입니다.")
+    public ApiResponse<BoardUpdateResponse> boardUpdate(@PathVariable Long boardId,
+                                                        @Valid @RequestBody BoardUpdateRequest request,
+                                                        @AuthMember Member member) {
+        return ApiResponse.ok(boardFacadeService.updateBoard(request, member, boardId));
+    }
+
+    @DeleteMapping("/{boardId}")
+    @Operation(summary = "게시판 글 삭제 API", description = "게시판에서 글을 삭제하는 API 입니다.")
+    @Parameter(name = "boardId", description = "삭제할 게시판 글 id 입니다.")
+    public ApiResponse<String> delete(@PathVariable Long boardId, @AuthMember Member member) {
+        boardFacadeService.deleteBoard(member, boardId);
+        return ApiResponse.ok("게시글을 삭제하였습니다.");
+    }
+
 
 }

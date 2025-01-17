@@ -51,7 +51,16 @@ public class BoardGameStyle extends BaseDateTimeEntity {
             this.board.getBoardGameStyles().remove(this);
         }
         this.board = board;
-        board.getBoardGameStyles().add(this);
+        if (board != null && !board.getBoardGameStyles().contains(this)) {
+            board.getBoardGameStyles().add(this);
+        }
+    }
+
+    public void removeBoard() {
+        if (this.board != null) {
+            this.board.getBoardGameStyles().remove(this);
+            this.board = null;
+        }
     }
 
 }

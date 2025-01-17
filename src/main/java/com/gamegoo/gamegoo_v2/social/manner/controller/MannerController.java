@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
+import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerKeywordListResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerRatingResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerResponse;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerUpdateResponse;
@@ -79,10 +80,18 @@ public class MannerController {
         return ApiResponse.ok(mannerFacadeService.getMannerRating(member, targetMemberId, false));
     }
 
-    @Operation(summary = "특정 회원의 매너 정보 조회 API", description = "특정 회원의 매너 정보를 조회하는 API 입니다.")
+    @Operation(summary = "특정 회원의 매너 레벨 정보 조회 API", description = "특정 회원의 매너 레벨 정보를 조회하는 API 입니다.")
     @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
-    @GetMapping("/{memberId}")
-    public ApiResponse<MannerResponse> getMannerInfo(@PathVariable(name = "memberId") Long memberId) {
-        return ApiResponse.ok(mannerFacadeService.getMannerInfo(memberId));
+    @GetMapping("/level/{memberId}")
+    public ApiResponse<MannerResponse> getMannerLevelInfo(@PathVariable(name = "memberId") Long memberId) {
+        return ApiResponse.ok(mannerFacadeService.getMannerLevelInfo(memberId));
     }
+
+    @Operation(summary = "특정 회원의 매너 키워드 정보 조회 API", description = "특정 회원의 매너 키워드 정보를 조회하는 API 입니다.")
+    @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
+    @GetMapping("/keyword/{memberId}")
+    public ApiResponse<MannerKeywordListResponse> getMannerKeywordInfo(@PathVariable(name = "memberId") Long memberId) {
+        return ApiResponse.ok(mannerFacadeService.getMannerKeywordInfo(memberId));
+    }
+
 }

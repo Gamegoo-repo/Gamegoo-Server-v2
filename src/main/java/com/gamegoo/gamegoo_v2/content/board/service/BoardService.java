@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
 import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
 import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
@@ -67,6 +68,56 @@ public class BoardService {
      */
     public Board findBoard(Long boardId) {
         return boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+    }
+
+    /**
+     * 게시글 수정 로직
+     */
+    @Transactional
+    public Board updateBoard(BoardUpdateRequest request, Long memberId, Long boardId) {
+
+        Board board =
+                boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (!board.getMember().getId().equals(memberId)) {
+            throw new BoardException(ErrorCode.UPDATE_BOARD_ACCESS_DENIED);
+        }
+
+        board.updateBoard(
+                request.getGameMode(),
+                request.getMainPosition(),
+                request.getSubPosition(),
+                request.getWantPosition(),
+                request.getMike(),
+                request.getContents(),
+                request.getBoardProfileImage()
+        );
+
+        return board;
+    }
+
+    /**
+     * 게시글 삭제
+     */
+    @Transactional
+    public void deleteBoard(Long boardId, Long memberId) {
+        Board board =
+                boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (!board.getMember().getId().equals(memberId)) {
+            throw new BoardException(ErrorCode.DELETE_BOARD_ACCESS_DENIED);
+        }
+
+        board.setDeleted(true);
+        boardRepository.save(board);
+    }
+
+    /**
+     * Board 저장
+     */
+    @Transactional
+    public Board saveBoard(Board board) {
+        return boardRepository.save(board);
     }
 
 }
