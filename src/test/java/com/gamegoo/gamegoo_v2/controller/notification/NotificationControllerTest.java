@@ -1,9 +1,10 @@
 package com.gamegoo.gamegoo_v2.controller.notification;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
+import com.gamegoo.gamegoo_v2.controller.WithCustomMockMember;
 import com.gamegoo.gamegoo_v2.core.exception.NotificationException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.notification.controller.NotificationController;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.notification.dto.NotificationCursorListResponse;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(NotificationController.class)
+@WithCustomMockMember
 class NotificationControllerTest extends ControllerTestSupport {
 
     @MockitoBean
@@ -111,7 +113,8 @@ class NotificationControllerTest extends ControllerTestSupport {
                     .isLast(true)
                     .build();
 
-            given(notificationFacadeService.getNotificationPageList(any(Member.class), any(Integer.class))).willReturn(response);
+            given(notificationFacadeService.getNotificationPageList(any(Member.class), any(Integer.class))).willReturn(
+                    response);
 
             // when // then
             int pageIdx = 1;
