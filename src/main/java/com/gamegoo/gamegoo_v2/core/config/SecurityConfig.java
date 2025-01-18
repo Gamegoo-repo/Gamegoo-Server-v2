@@ -86,6 +86,9 @@ public class SecurityConfig {
                         "/api/v2/email/send/**",
                         "/api/v2/email/verify").permitAll()
                 .requestMatchers(
+                        "/api/v2/manner/keyword/*",
+                        "/api/v2/manner/level/*").permitAll()
+                .requestMatchers(
                         "/swagger-ui/**",
                         "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated());
