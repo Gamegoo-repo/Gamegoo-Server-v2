@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.service.ReportFacadeService;
 import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
+import com.gamegoo.gamegoo_v2.controller.WithCustomMockMember;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,10 +20,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReportController.class)
+@WithCustomMockMember
 public class ReportControllerTest extends ControllerTestSupport {
 
     @MockitoBean
@@ -60,6 +63,7 @@ public class ReportControllerTest extends ControllerTestSupport {
             mockMvc.perform(post(API_URL_PREFIX + "/{memberId}", TARGET_MEMBER_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
+                    .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value("VALID_ERROR"))
                     .andExpect(jsonPath("$.message").value("신고 코드 리스트는 비워둘 수 없습니다."));

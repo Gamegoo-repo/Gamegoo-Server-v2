@@ -1,13 +1,14 @@
 package com.gamegoo.gamegoo_v2.controller.block;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
+import com.gamegoo.gamegoo_v2.controller.WithCustomMockMember;
+import com.gamegoo.gamegoo_v2.core.exception.BlockException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.social.block.controller.BlockController;
 import com.gamegoo.gamegoo_v2.social.block.dto.BlockListResponse;
 import com.gamegoo.gamegoo_v2.social.block.dto.BlockResponse;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockFacadeService;
-import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
-import com.gamegoo.gamegoo_v2.core.exception.BlockException;
-import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BlockController.class)
+@WithCustomMockMember
 class BlockControllerTest extends ControllerTestSupport {
 
     @MockitoBean

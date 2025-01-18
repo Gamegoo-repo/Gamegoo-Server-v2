@@ -18,12 +18,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -34,11 +36,10 @@ public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final CustomUserDetailsService customUserDetailsService;
-    private final CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
-    private final EntryPointUnauthorizedHandler unauthorizedHandler = new EntryPointUnauthorizedHandler();
-    private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler =
-            new JwtAuthenticationExceptionHandler();
-
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final EntryPointUnauthorizedHandler unauthorizedHandler;
+    private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler;
+    private final SecurityJwtProperties securityJwtProperties;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -47,14 +48,11 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
-        List<String> excludedPaths = Arrays.asList(
-                "/swagger-ui", "/v3/api-docs",
-                "/api/v2/auth/token/**", "/api/v2/email/send",
-                "/api/v2/internal/**", "/api/v2/email/verify", "/api/v2/riot/verify", "/api/v2/auth/join",
-                "/api/v2/auth/login", "/api/v2/password/reset", "/api/v2/auth/refresh", "/api/v2/posts/list"
-        );
+        List<RequestMatcher> excludedRequestMatchers = securityJwtProperties.getExcludedMatchers().stream()
+                .map(e -> new AntPathRequestMatcher(e.getPattern(), e.getMethod()))
+                .collect(Collectors.toList());
 
-        return new JwtAuthFilter(customUserDetailsService, excludedPaths, jwtProvider);
+        return new JwtAuthFilter(customUserDetailsService, excludedRequestMatchers, jwtProvider);
     }
 
     @Bean
@@ -73,31 +71,39 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // 인증하지 않는 API 설정
-        http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/api/v2/internal/**").permitAll()
-                        .requestMatchers("/api/v2/auth/token/**", "/api/v2/email/send/**", "/api/v2/email/verify",
-                                "/api/v2/riot/verify", "/api/v2/auth/join", "/api/v2/auth/login", "/api/v2/auth" +
-                                        "/refresh").permitAll()   // Auth 관련
-                        .requestMatchers("/api/v2/password/reset").permitAll()  // Member 관련
-                        .requestMatchers("/api/v2/posts/list/**").permitAll()   // 게시판
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated());
+        http.authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/").permitAll()
+                .requestMatchers("/api/v2/internal/**").permitAll() // internal
+                .requestMatchers("/api/v2/password/reset").permitAll() // password
+                .requestMatchers("/api/v2/riot/verify").permitAll() // riot
+                .requestMatchers("/api/v2/posts/list/**").permitAll() // board
+                .requestMatchers(
+                        "/api/v2/auth/token/**",
+                        "/api/v2/auth/join",
+                        "/api/v2/auth/login",
+                        "/api/v2/auth/refresh").permitAll()
+                .requestMatchers(
+                        "/api/v2/email/send/**",
+                        "/api/v2/email/verify").permitAll()
+                .requestMatchers(
+                        "/api/v2/manner/keyword/*",
+                        "/api/v2/manner/level/*").permitAll()
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**").permitAll()
+                .anyRequest().authenticated());
 
-        // 필터 순서
+        // 커스텀 필터 추가
         http
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationExceptionHandler, jwtAuthFilter.getClass());
 
         // 예외처리
         http
-                .exceptionHandling(
-                        (exceptionHandling) ->
-                                exceptionHandling
-                                        .accessDeniedHandler(accessDeniedHandler) // access deny 되었을 때 커스텀 응답 주기 위한 핸들러
-                                        .authenticationEntryPoint(unauthorizedHandler)); // 로그인되지 않은 요청에 대해 커스텀 응답 주기
-        // 위한 핸들러
+                .exceptionHandling((exceptionHandling) -> exceptionHandling
+                        .accessDeniedHandler(accessDeniedHandler) // access deny 되었을 때 커스텀 응답 핸들러
+                        .authenticationEntryPoint(unauthorizedHandler)); // 로그인되지 않은 요청에 대해 커스텀 응답 핸들러
+
         return http.build();
     }
 

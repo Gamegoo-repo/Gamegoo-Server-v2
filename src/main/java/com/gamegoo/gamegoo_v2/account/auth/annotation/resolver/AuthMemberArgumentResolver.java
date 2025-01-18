@@ -2,10 +2,10 @@ package com.gamegoo.gamegoo_v2.account.auth.annotation.resolver;
 
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.auth.security.SecurityUtil;
-import com.gamegoo.gamegoo_v2.core.exception.MemberException;
-import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
+import com.gamegoo.gamegoo_v2.core.exception.MemberException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -39,7 +39,6 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         return memberRepository.findById(currentMemberId)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
-
     }
 
 }

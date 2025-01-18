@@ -2,32 +2,48 @@ package com.gamegoo.gamegoo_v2.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamegoo.gamegoo_v2.account.auth.annotation.resolver.AuthMemberArgumentResolver;
-import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtInterceptor;
+import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
+import com.gamegoo.gamegoo_v2.account.auth.security.CustomUserDetailsService;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @ActiveProfiles("test")
 @WebMvcTest
+@AutoConfigureMockMvc
 public abstract class ControllerTestSupport {
+
+    @Autowired
+    protected WebApplicationContext context;
 
     @Autowired
     protected MockMvc mockMvc;
 
     @MockitoBean
-    protected JwtInterceptor jwtInterceptor;
+    protected AuthMemberArgumentResolver authMemberArgumentResolver;
 
     @MockitoBean
-    protected AuthMemberArgumentResolver authMemberArgumentResolver;
+    protected JwtProvider jwtProvider;
+
+    @MockitoBean
+    protected CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -48,8 +64,14 @@ public abstract class ControllerTestSupport {
 
     @BeforeEach
     public void setUp() throws Exception {
-        // 인터셉터가 항상 true를 반환하도록 Mock 설정
-        given(jwtInterceptor.preHandle(any(), any(), any())).willReturn(true);
+        // csrf 설정
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .defaultRequest(post("/**").with(csrf()))
+                .defaultRequest(patch("/**").with(csrf()))
+                .defaultRequest(delete("/**").with(csrf()))
+                .build();
 
         // authMemberArgumentResolver가 mockMember를 반환하도록 Mock 설정
         mockMember = Member.builder()

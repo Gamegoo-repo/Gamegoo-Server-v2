@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.controller.manner;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
+import com.gamegoo.gamegoo_v2.controller.WithCustomMockMember;
 import com.gamegoo.gamegoo_v2.social.manner.controller.MannerController;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MannerController.class)
+@WithCustomMockMember
 public class MannerControllerTest extends ControllerTestSupport {
 
     @MockitoBean
