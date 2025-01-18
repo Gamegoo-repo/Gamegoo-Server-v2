@@ -34,11 +34,9 @@ public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final CustomUserDetailsService customUserDetailsService;
-    private final CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
-    private final EntryPointUnauthorizedHandler unauthorizedHandler = new EntryPointUnauthorizedHandler();
-    private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler =
-            new JwtAuthenticationExceptionHandler();
-
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final EntryPointUnauthorizedHandler unauthorizedHandler;
+    private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -49,8 +47,8 @@ public class SecurityConfig {
     public JwtAuthFilter jwtAuthFilter() {
         List<String> excludedPaths = Arrays.asList(
                 "/swagger-ui", "/v3/api-docs",
-                "/api/v2/auth/token/**", "/api/v2/email/send",
-                "/api/v2/internal/**", "/api/v2/email/verify", "/api/v2/riot/verify", "/api/v2/auth/join",
+                "/api/v2/auth/token/", "/api/v2/email/send",
+                "/api/v2/internal/", "/api/v2/email/verify", "/api/v2/riot/verify", "/api/v2/auth/join",
                 "/api/v2/auth/login", "/api/v2/password/reset", "/api/v2/auth/refresh", "/api/v2/posts/list"
         );
 
