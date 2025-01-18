@@ -5,6 +5,9 @@ on:
     types: [ closed ]
     branches:
       - develop
+  push:
+    branches:
+      - cicd/172
   workflow_dispatch: # 수동 실행 가능
 
 jobs:
@@ -98,7 +101,7 @@ jobs:
             -e GMAIL_PWD=${{ secrets.GMAIL_PWD }} \
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoov2-api:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
 
       # 실패 시 디스코드에 알림 보내기
       - name: 배포 실패 시 디스코드 알림 전송
