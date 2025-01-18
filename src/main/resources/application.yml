@@ -20,6 +20,10 @@ spring:
     api:
       key: ${RIOT_API}
 
+# batch size 설정
+batch_size:
+  manner_rank: 30
+
 springdoc:
   swagger-ui:
     tags-sorter: alpha            # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
@@ -38,6 +42,7 @@ socket:
 email:
   report_email_to: gamegoo2025@gmail.com
   report_email_template_path: templates/new-report.html
+
 
 ---
 # 로컬 환경

@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.social.manner.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.event.MannerLevelDownEvent;
 import com.gamegoo.gamegoo_v2.core.event.MannerLevelUpEvent;
@@ -35,6 +36,7 @@ public class MannerService {
     private final MannerRatingRepository mannerRatingRepository;
     private final MannerKeywordRepository mannerKeywordRepository;
     private final MannerRatingKeywordRepository mannerRatingKeywordRepository;
+    private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     private final int MANNER_KEYWORD_ID_MAX = 12;
@@ -178,6 +180,24 @@ public class MannerService {
      */
     public Map<Long, Integer> countMannerKeyword(Member member) {
         return mannerRatingKeywordRepository.countMannerKeywordByToMemberId(member.getId());
+    }
+
+    /**
+     * mannerRank를 업데이트할 대상 회원 id list 조회
+     *
+     * @return 회원 id list
+     */
+    public List<Long> getMannerRankUpdateTargets() {
+        return memberRepository.getMemberIdsOrderByMannerScoreIsNotNull();
+    }
+
+    /**
+     * mannerRank를 null로 초기화 할 대상 회원 id list 조회
+     *
+     * @return 회원 id list
+     */
+    public List<Long> getMannerRankResetTargets() {
+        return memberRepository.getMemberIdsWhereMannerScoreIsNullAndMannerRankIsNotNull();
     }
 
     /**
