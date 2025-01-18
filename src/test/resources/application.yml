@@ -27,6 +27,10 @@ spring:
     api:
       key: key
 
+# batch size 설정
+batch_size:
+  manner_rank: 30
+
 jwt:
   secret: "secretjwttestjwtsecretsecretjwttestjwtsecretsecretjwttestjwtsecretsecretjwttestjwtsecretsecretjwttestjwtsecret"
   access_expiration_time: 600000 # 10분 (10 * 60 * 1000 밀리초)

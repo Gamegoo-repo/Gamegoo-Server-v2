@@ -61,7 +61,7 @@ jobs:
           context: . # Dockerfile 위치
           file: ./Dockerfile # Dockerfile 경로
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoov2-api:${{ github.sha }} # 이미지 태그
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }} # 이미지 태그
           platforms: linux/amd64
           build-args: |  # Dockerfile에서 사용할 환경 변수 전달
             JWT_SECRET= ${{ secrets.JWT_SECRET }}
@@ -86,11 +86,11 @@ jobs:
           script: |
             sudo fuser -k -n tcp 8080 || true
 
-            docker rm -f gamegoov2-api
+            docker rm -f gamegoo-api-v2
 
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gamegoov2-api:${{ github.sha }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
 
-            docker run -d -p 8080:8080 --name gamegoov2-api \
+            docker run -d -p 8080:8080 --name gamegoo-api-v2 \
             -e SPRING_PROFILES_ACTIVE=dev \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e RDS_PRIVATE_IP=${{ secrets.RDS_PRIVATE_IP }} \
@@ -112,5 +112,5 @@ jobs:
           PR_AUTHOR="${{ github.event.pull_request.user.login }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
           curl -X POST -H "Content-Type: application/json" \
-          -d "{\"content\": \"🚨 **Gamegoo v2 API 배포 실패** 🚨\nPR 번호: '${PR_NUMBER}'\nPR 제목: '${PR_TITLE}'\nPR 작성자: '${PR_AUTHOR}'\n[PR 보기](${PR_URL})\"}" \
+          -d "{\"content\": \"🚨 **Gamegoo v2 API 배포 실패** 🚨\nPR 번호: ${PR_NUMBER}\nPR 제목: ${PR_TITLE}\nPR 작성자: ${PR_AUTHOR}\n[PR 보기](${PR_URL})\"}" \
           $DISCORD_WEBHOOK_URL
