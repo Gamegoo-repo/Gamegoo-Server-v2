@@ -1,0 +1,27 @@
+security:
+  jwt:
+    excluded-matchers:
+      - pattern: /swagger-ui/*
+      - pattern: /v3/api-docs/*
+      - pattern: /v3/api-docs
+      - pattern: /api/v2/internal/** # 모든 internal 엔드포인트
+      - method: GET
+        pattern: /api/v2/auth/token/* # 임시 access token 발급
+      - method: POST
+        pattern: /api/v2/auth/join # 회원 가입
+      - method: POST
+        pattern: /api/v2/auth/login # 로그인
+      - method: POST
+        pattern: /api/v2/auth/refresh # 토큰 재발급
+      - method: POST
+        pattern: /api/v2/password/reset # 비밀번호 재설정
+      - method: POST
+        pattern: /api/v2/email/send/** # 인증 메일 전송
+      - method: POST
+        pattern: /api/v2/email/verify # 이메일 인증코드 검증
+      - method: POST
+        pattern: /api/v2/riot/verify # riot 계정 검증
+      - method: GET
+        pattern: /api/v2/posts/list # 게시글 목록 조회
+      - method: GET
+        pattern: /api/v2/posts/list/* # 비회원용 특정 게시글 조회
