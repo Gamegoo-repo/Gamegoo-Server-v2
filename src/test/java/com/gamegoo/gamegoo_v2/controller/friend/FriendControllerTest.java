@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.controller.friend;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
+import com.gamegoo.gamegoo_v2.controller.WithCustomMockMember;
 import com.gamegoo.gamegoo_v2.core.exception.FriendException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FriendController.class)
+@WithCustomMockMember
 class FriendControllerTest extends ControllerTestSupport {
 
     @MockitoBean

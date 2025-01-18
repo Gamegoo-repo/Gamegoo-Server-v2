@@ -2,6 +2,10 @@ spring:
   profiles:
     default: local
 
+  # excluded-paths.yml 파일 import
+  config:
+    import: "optional:classpath:excluded-paths.yml"
+
   # Gmail 설정
   mail:
     host: smtp.gmail.com
