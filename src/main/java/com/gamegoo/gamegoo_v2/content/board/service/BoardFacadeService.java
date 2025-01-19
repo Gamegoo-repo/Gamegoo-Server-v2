@@ -122,7 +122,7 @@ public class BoardFacadeService {
      * 내가 작성한 게시글 목록 조회 (파사드)
      */
     public MyBoardResponse getMyBoardList(Member member, int pageIdx) {
-        Page<Board> boardPage = boardService.getMyBoards(member.getId(), pageIdx, 10);
+        Page<Board> boardPage = boardService.getMyBoards(member.getId(), pageIdx);
         return MyBoardResponse.of(boardPage);
     }
 
