@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <!-- base.xml default.xml 에 존재하는 Log 메시지의 Color 설정 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <!-- 콘솔에 출력되는 로그 패턴 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) - %msg%n"/>
+    <!-- Log파일에 기록되는 로그 패턴 -->
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n"/>
+
+    <!-- 로그 파일 저장 경로 -->
+    <property name="LOG_PATH" value="/Users/jennyeunjin/app/logs"/>
+
+    <!-- 콘솔로그 Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 파일로그 Appender -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <!-- 로그파일을 크기, 시간 기반으로 관리하기 위한 SizeAndTimeBasedRollingPolicy -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 로그파일명 패턴 -->
+            <!-- 날짜별로 기록, maxFileSize를 넘기면 인덱스(i)를 증가시켜 새로운 파일로 저장 -->
+            <fileNamePattern>${LOG_PATH}/api.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 로그파일 최대사이즈 -->
+            <maxFileSize>100MB</maxFileSize>
+            <!-- 생성한 로그파일 관리 일수 -->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- local Profile에서의 로그 설정 -->
+    <springProfile name="local">
+        <root level="INFO">
+            <!-- CONSOLE 로그만 등록 -->
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+    <!-- dev Profile에서의 로그 설정 -->
+    <springProfile name="dev">
+        <root level="INFO">
+            <!-- CONSOLE, FILE 등록-->
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
+</configuration>
