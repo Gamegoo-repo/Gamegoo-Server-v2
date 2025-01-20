@@ -72,14 +72,17 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false)
     private double winRate;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int mainPosition = 0;
+    private Position mainPosition = Position.ANY;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int subPosition = 0;
+    private Position subPosition = Position.ANY;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int wantPosition = 0;
+    private Position wantPosition = Position.ANY;
 
     @Column(nullable = false)
     private boolean mike = false;
@@ -151,7 +154,7 @@ public class Member extends BaseDateTimeEntity {
         this.mike = mike;
     }
 
-    public void updatePosition(int mainPosition, int subPosition, int wantPosition) {
+    public void updatePosition(Position mainPosition, Position subPosition, Position wantPosition) {
         this.mainPosition = mainPosition;
         this.subPosition = subPosition;
         this.wantPosition = wantPosition;

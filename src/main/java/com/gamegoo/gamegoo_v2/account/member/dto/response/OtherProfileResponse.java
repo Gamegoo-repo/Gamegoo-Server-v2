@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.account.member.dto.response;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
@@ -24,9 +25,9 @@ public class OtherProfileResponse {
     Double mannerRank;
     Long mannerRatingCount;  // 매너 평가를 한 사람의 수
     String updatedAt;
-    Integer mainP;
-    Integer subP;
-    Integer wantP;
+    Position mainP;
+    Position subP;
+    Position wantP;
     Boolean isAgree;
     Boolean isBlind;
     String loginType;

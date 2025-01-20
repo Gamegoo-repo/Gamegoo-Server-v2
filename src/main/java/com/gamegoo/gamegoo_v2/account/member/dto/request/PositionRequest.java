@@ -1,7 +1,7 @@
 package com.gamegoo.gamegoo_v2.account.member.dto.request;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,16 +9,13 @@ import lombok.Getter;
 @Builder
 public class PositionRequest {
 
-    @Min(value = 0, message = "메인 포지션의 값은 0이상이어야 합니다.")
-    @Max(value = 5, message = "메인 포지션의 값은 5이하이어야 합니다.")
-    int mainP;
-    
-    @Min(value = 0, message = "서브 포지션의 값은 0이상이어야 합니다.")
-    @Max(value = 5, message = "서브 포지션의 값은 5이하이어야합니다.")
-    int subP;
+    @NotNull(message = "메인 포지션은 null일 수 없습니다.")
+    private Position mainP; // 메인 포지션
 
-    @Min(value = 0, message = "원하는 포지션의 값은 0이상이어야 합니다.")
-    @Max(value = 5, message = "원하는 포지션의 값은 5이하이어야합니다.")
-    int wantP;
+    @NotNull(message = "서브 포지션은 null일 수 없습니다.")
+    private Position subP; // 서브 포지션
+
+    @NotNull(message = "원하는 포지션은 null일 수 없습니다.")
+    private Position wantP; // 원하는 포지션
 
 }
