@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.core.log;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamegoo.gamegoo_v2.account.auth.security.SecurityUtil;
+import com.gamegoo.gamegoo_v2.core.exception.JwtAuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -56,9 +57,27 @@ public class LogUtil {
         String httpMethod = request.getMethod();
         String clientIp = getClientIp(request);
         int statusCode = response.getStatus();
-        
+
         log.info("[{}] [{}] {} | IP: {} | Status: {} | Execution Time: {}ms", requestId, httpMethod, requestUrl,
                 clientIp, statusCode, executionTime);
+    }
+
+    /**
+     * jwt 검증 에러 응답 로그 출력
+     *
+     * @param request request 객체
+     * @param e       exception
+     */
+    public void apiJwtException(HttpServletRequest request, JwtAuthException e) {
+        String requestId = MDC.get("requestId");
+        String requestUrl = request.getRequestURI();
+        String httpMethod = request.getMethod();
+        String clientIp = getClientIp(request);
+        int statusCode = e.getStatus().value();
+        String errorCode = e.getCode();
+
+        log.info("[{}] [{}] {} | IP: {} | Status: {} {}", requestId, httpMethod, requestUrl, clientIp, statusCode,
+                errorCode);
     }
 
     /**
