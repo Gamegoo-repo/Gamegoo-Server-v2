@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.account.auth.security.CustomUserDetailsService;
 import com.gamegoo.gamegoo_v2.account.auth.security.EntryPointUnauthorizedHandler;
 import com.gamegoo.gamegoo_v2.account.auth.security.JwtAuthFilter;
 import com.gamegoo.gamegoo_v2.account.auth.security.JwtAuthenticationExceptionHandler;
+import com.gamegoo.gamegoo_v2.core.log.LoggingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +40,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final EntryPointUnauthorizedHandler unauthorizedHandler;
     private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler;
+    private final LoggingFilter loggingFilter;
     private final SecurityJwtProperties securityJwtProperties;
 
     @Bean
@@ -96,6 +98,7 @@ public class SecurityConfig {
         // 커스텀 필터 추가
         http
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(loggingFilter, JwtAuthFilter.class)
                 .addFilterBefore(jwtAuthenticationExceptionHandler, jwtAuthFilter.getClass());
 
         // 예외처리

@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.auth.security.SecurityUtil;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
+import com.gamegoo.gamegoo_v2.core.exception.AuthException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import lombok.NonNull;
@@ -37,8 +38,13 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
                                   @NonNull NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        return memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+        if (currentMemberId != null) {
+            return memberRepository.findById(currentMemberId)
+                    .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+        } else {
+            throw new AuthException(ErrorCode.UNAUTHORIZED_EXCEPTION);
+        }
+
     }
 
 }
