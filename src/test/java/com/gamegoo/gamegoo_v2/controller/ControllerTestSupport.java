@@ -7,6 +7,8 @@ import com.gamegoo.gamegoo_v2.account.auth.security.CustomUserDetailsService;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.core.log.LogUtil;
+import com.gamegoo.gamegoo_v2.core.log.LoggingFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -44,6 +46,12 @@ public abstract class ControllerTestSupport {
 
     @MockitoBean
     protected CustomUserDetailsService customUserDetailsService;
+
+    @MockitoBean
+    protected LoggingFilter loggingFilter;
+
+    @MockitoBean
+    protected LogUtil logUtil;
 
     @Autowired
     protected ObjectMapper objectMapper;
