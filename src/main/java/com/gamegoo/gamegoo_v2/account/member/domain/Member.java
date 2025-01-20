@@ -72,12 +72,15 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false)
     private double winRate;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Position mainPosition = Position.ANY;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Position subPosition = Position.ANY;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Position wantPosition = Position.ANY;
 

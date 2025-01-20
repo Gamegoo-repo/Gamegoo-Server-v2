@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.integration.member;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.MemberChampion;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.GameStyleRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.IsMikeRequest;
@@ -196,9 +197,9 @@ class MemberServiceFacadeTest {
     void setPosition() {
         // given
         PositionRequest request = PositionRequest.builder()
-                .mainP(1)
-                .subP(2)
-                .wantP(3)
+                .mainP(Position.valueOf("TOP"))
+                .subP(Position.valueOf("ANY"))
+                .wantP(Position.valueOf("MID"))
                 .build();
         // when
         memberFacadeService.setPosition(member, request);
