@@ -23,6 +23,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     public static final int PAGE_SIZE = 20;
+    public static final int MY_PAGE_SIZE = 10;
 
     /**
      * 게시글 엔티티 생성 및 저장
@@ -110,6 +111,18 @@ public class BoardService {
 
         board.setDeleted(true);
         boardRepository.save(board);
+    }
+
+    /**
+     * 내가 작성한 게시글(Page) 조회
+     */
+    public Page<Board> getMyBoards(Long memberId, int pageIdx) {
+        if (pageIdx <= 0) {
+            throw new IllegalArgumentException("pageIdx는 1 이상의 값이어야 합니다.");
+        }
+        // PageRequest.of의 첫 번째 인자(pageIdx - 1)는 0-based index
+        Pageable pageable = PageRequest.of(pageIdx - 1, MY_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return boardRepository.findByMemberIdAndDeletedFalse(memberId, pageable);
     }
 
     /**

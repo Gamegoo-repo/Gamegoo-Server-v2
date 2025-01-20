@@ -11,6 +11,7 @@ import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMem
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardUpdateResponse;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.MyBoardResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
@@ -115,6 +116,14 @@ public class BoardFacadeService {
     @Transactional
     public void deleteBoard(Member member, Long boardId) {
         boardService.deleteBoard(boardId, member.getId());
+    }
+
+    /**
+     * 내가 작성한 게시글 목록 조회 (파사드)
+     */
+    public MyBoardResponse getMyBoardList(Member member, int pageIdx) {
+        Page<Board> boardPage = boardService.getMyBoards(member.getId(), pageIdx);
+        return MyBoardResponse.of(boardPage);
     }
 
 
