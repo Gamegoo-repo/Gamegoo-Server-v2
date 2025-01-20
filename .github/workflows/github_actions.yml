@@ -87,7 +87,10 @@ jobs:
 
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
 
-            docker run -d -p 8080:8080 --name gamegoo-api-v2 \
+            docker run -d \
+            -p 8080:8080 \
+            --name gamegoo-api-v2 \
+            -v ${{ secrets.EC2_LOG_PATH }}:/app/logs \
             -e SPRING_PROFILES_ACTIVE=dev \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e RDS_PRIVATE_IP=${{ secrets.RDS_PRIVATE_IP }} \
@@ -99,6 +102,10 @@ jobs:
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
+
+      # 8. 기존 Docker 이미지 삭제
+      - name: 기존 Docker 이미지 삭제
+        run: docker image prune -a
 
       # 실패 시 디스코드에 알림 보내기
       - name: 배포 실패 시 디스코드 알림 전송
