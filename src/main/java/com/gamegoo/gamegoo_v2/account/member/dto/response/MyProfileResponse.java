@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.member.dto.response;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
@@ -16,7 +17,7 @@ public class MyProfileResponse {
 
     Long id;
     Integer profileImg;
-    Boolean mike;
+    Mike mike;
     String email;
     String gameName;
     String tag;
@@ -46,7 +47,7 @@ public class MyProfileResponse {
 
         return MyProfileResponse.builder()
                 .id(member.getId())
-                .mike(member.isMike())
+                .mike(member.getMike())
                 .email(member.getEmail())
                 .gameName(member.getGameName())
                 .tag(member.getTag())

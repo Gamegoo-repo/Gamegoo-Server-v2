@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.integration.member;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.MemberChampion;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.GameStyleRequest;
@@ -106,7 +107,7 @@ class MemberServiceFacadeTest {
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(member.getId());
         assertThat(response.getProfileImg()).isEqualTo(member.getProfileImage());
-        assertThat(response.getMike()).isEqualTo(member.isMike());
+        assertThat(response.getMike()).isEqualTo(member.getMike());
         assertThat(response.getEmail()).isEqualTo(member.getEmail());
         assertThat(response.getGameName()).isEqualTo(member.getGameName());
         assertThat(response.getTag()).isEqualTo(member.getTag());
@@ -142,7 +143,7 @@ class MemberServiceFacadeTest {
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(targetMember.getId());
         assertThat(response.getProfileImg()).isEqualTo(targetMember.getProfileImage());
-        assertThat(response.getMike()).isEqualTo(targetMember.isMike());
+        assertThat(response.getMike()).isEqualTo(targetMember.getMike());
         assertThat(response.getGameName()).isEqualTo(targetMember.getGameName());
         assertThat(response.getTag()).isEqualTo(targetMember.getTag());
         assertThat(response.getTier()).isEqualTo(targetMember.getTier());
@@ -184,12 +185,12 @@ class MemberServiceFacadeTest {
     void setMike() {
         // given
         IsMikeRequest request = IsMikeRequest.builder()
-                .isMike(true)
+                .mike(Mike.AVAILABLE)
                 .build();
         // when
-        memberFacadeService.setIsMike(member, request);
+        memberFacadeService.setMike(member, request);
         // then
-        assertThat(member.isMike()).isEqualTo(request.getIsMike());
+        assertThat(member.getMike()).isEqualTo(request.getMike());
     }
 
     @DisplayName("주/부/원하는 포지션 변경 성공")

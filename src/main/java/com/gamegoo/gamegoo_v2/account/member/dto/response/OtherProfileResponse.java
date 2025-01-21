@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.account.member.dto.response;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
@@ -16,7 +17,7 @@ public class OtherProfileResponse {
 
     Long id;
     Integer profileImg;
-    Boolean mike;
+    Mike mike;
     String gameName;
     String tag;
     Tier tier;
@@ -51,7 +52,7 @@ public class OtherProfileResponse {
 
         return OtherProfileResponse.builder()
                 .id(targetMember.getId())
-                .mike(targetMember.isMike())
+                .mike(targetMember.getMike())
                 .gameName(targetMember.getGameName())
                 .tag(targetMember.getTag())
                 .tier(targetMember.getTier())
