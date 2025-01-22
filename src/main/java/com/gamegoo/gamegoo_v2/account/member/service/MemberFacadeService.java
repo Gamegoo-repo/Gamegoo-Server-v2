@@ -29,8 +29,8 @@ public class MemberFacadeService {
     /**
      * 내 프로필 조회
      *
-     * @param member    조회할 회원
-     * @return          조회된 결과 DTO
+     * @param member 조회할 회원
+     * @return 조회된 결과 DTO
      */
     public MyProfileResponse getMyProfile(Member member) {
 
@@ -43,8 +43,8 @@ public class MemberFacadeService {
     /**
      * 다른 사람 프로필 조회
      *
-     * @param member    조회할 회원
-     * @return          조회된 결과 DTO
+     * @param member 조회할 회원
+     * @return 조회된 결과 DTO
      */
     public OtherProfileResponse getOtherProfile(Member member, Long targetMemberId) {
 
@@ -69,9 +69,9 @@ public class MemberFacadeService {
     /**
      * 프로필 이미지 수정
      *
-     * @param member    회원
-     * @param request   프로필이미지
-     * @return          성공 메세지
+     * @param member  회원
+     * @param request 프로필이미지
+     * @return 성공 메세지
      */
     @Transactional
     public String setProfileImage(Member member, ProfileImageRequest request) {
@@ -87,17 +87,17 @@ public class MemberFacadeService {
      * @return 성공 메세지
      */
     @Transactional
-    public String setIsMike(Member member, IsMikeRequest request) {
-        memberService.setIsMike(member, request.getIsMike());
+    public String setMike(Member member, IsMikeRequest request) {
+        memberService.setIsMike(member, request.getMike());
         return "마이크 여부 수정이 완료됐습니다";
     }
 
     /**
      * 포지션 수정
      *
-     * @param member    회원
-     * @param request   주/부/원하는 포지션
-     * @return          성공 메세지
+     * @param member  회원
+     * @param request 주/부/원하는 포지션
+     * @return 성공 메세지
      */
     @Transactional
     public String setPosition(Member member, PositionRequest request) {
@@ -107,9 +107,10 @@ public class MemberFacadeService {
 
     /**
      * 게임 스타일 수정
-     * @param member    사용자
-     * @param request   게임스타일 리스트
-     * @return          성공 메세지
+     *
+     * @param member  사용자
+     * @param request 게임스타일 리스트
+     * @return 성공 메세지
      */
     @Transactional
     public String setGameStyle(Member member, GameStyleRequest request) {

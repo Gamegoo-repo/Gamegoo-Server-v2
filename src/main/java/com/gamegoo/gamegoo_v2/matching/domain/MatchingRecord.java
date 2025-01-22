@@ -1,8 +1,10 @@
 package com.gamegoo.gamegoo_v2.matching.domain;
 
-import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,55 +26,129 @@ import lombok.NoArgsConstructor;
 public class MatchingRecord extends BaseDateTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "matching_id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "matching_uuid")
+    private String matchingUuid;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
-    private MatchingType matchingType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(10)")
+    @Column(nullable = false)
     private GameMode gameMode;
 
-    @Column(nullable = false)
-    private int mainPosition;
-
-    @Column(nullable = false)
-    private int subPosition;
-
-    @Column(nullable = false)
-    private int wantPosition;
-
-    @Column(nullable = false)
-    private boolean mike;
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Position mainPosition;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
-    private Tier tier;
+    @Column
+    private Position subPosition;
 
-    @Column(nullable = false, length = 10)
-    private int gameRank;
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Position wantPosition;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Mike mike;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Tier soloTier;
+
+    @Column
+    private int soloRank;
 
     @Column(nullable = false)
-    private double winRate;
+    private double soloWinRate;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Tier freeTier;
+
+    @Column
+    private int freeRank;
+
+    @Column
+    private double freeWinRate;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private MatchingType matchingType;
+
+    @Column
     private int mannerLevel;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(10)")
-    private MatchingStatus status;
+    @Column(nullable = false)
+    private MatchingStatus status = MatchingStatus.PENDING;
 
-    private Boolean mannerMessageSent;
+    @Column
+    private Boolean mannerMessageSent = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_member_id")
+    @JoinColumn(name = "target_id", nullable = false)
     private Member targetMember;
+
+    // MatchingRecord 생성 메서드
+    public static MatchingRecord create(GameMode gameMode, Position mainPosition, Position subPosition,
+                                        Position wantPosition, Mike mike, Tier soloTier, int soloRank,
+                                        double soloWinRate, Tier freeTier, int freeRank, double freeWinRate,
+                                        MatchingType matchingType, int mannerLevel, Member member) {
+        return MatchingRecord.builder()
+                .gameMode(gameMode)
+                .mainPosition(mainPosition)
+                .subPosition(subPosition)
+                .wantPosition(wantPosition)
+                .mike(mike)
+                .soloTier(soloTier)
+                .soloRank(soloRank)
+                .soloWinRate(soloWinRate)
+                .freeTier(freeTier)
+                .freeRank(freeRank)
+                .freeWinRate(freeWinRate)
+                .matchingType(matchingType)
+                .mannerLevel(mannerLevel)
+                .member(member)
+                .build();
+    }
+
+    // MatchingRecord Builder
+    @Builder
+    private MatchingRecord(GameMode gameMode, Position mainPosition, Position subPosition, Position wantPosition,
+                           Mike mike, Tier soloTier, int soloRank, double soloWinRate, Tier freeTier,
+                           int freeRank, double freeWinRate, MatchingType matchingType, int mannerLevel,
+                           Member member) {
+        this.gameMode = gameMode;
+        this.mainPosition = mainPosition;
+        this.subPosition = subPosition;
+        this.wantPosition = wantPosition;
+        this.mike = mike;
+        this.soloTier = soloTier;
+        this.soloRank = soloRank;
+        this.soloWinRate = soloWinRate;
+        this.freeTier = freeTier;
+        this.freeRank = freeRank;
+        this.freeWinRate = freeWinRate;
+        this.matchingType = matchingType;
+        this.mannerLevel = mannerLevel;
+        this.member = member;
+    }
+
+    // status 변경
+    public void updateStatus(MatchingStatus status) {
+        this.status = status;
+    }
+
+    // targetMember 설정
+    public void updateTargetMember(Member member) {
+        this.targetMember = member;
+    }
+
+    public void updateMannerMessageSent(Boolean mannerMessageSent) {
+        this.mannerMessageSent = mannerMessageSent;
+    }
 
 }

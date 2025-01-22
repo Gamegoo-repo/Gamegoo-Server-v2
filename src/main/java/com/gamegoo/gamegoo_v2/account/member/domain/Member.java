@@ -12,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +23,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
 @Getter
-@Table(name = "Member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseDateTimeEntity {
 
@@ -84,8 +82,9 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false)
     private Position wantPosition = Position.ANY;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean mike = false;
+    private Mike mike = Mike.UNAVAILABLE;
 
     @Column(nullable = false)
     private int gameCount;
@@ -150,7 +149,7 @@ public class Member extends BaseDateTimeEntity {
         this.profileImage = profileImage;
     }
 
-    public void updateMike(boolean mike) {
+    public void updateMike(Mike mike) {
         this.mike = mike;
     }
 

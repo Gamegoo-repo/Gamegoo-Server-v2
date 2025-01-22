@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.account.member.service;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.MemberGameStyle;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.GameStyleRequest;
@@ -109,11 +110,11 @@ public class MemberService {
      * 마이크 여부 수정
      *
      * @param member 회원
-     * @param isMike 마이크 여부
+     * @param mike   마이크 상태
      */
     @Transactional
-    public void setIsMike(Member member, boolean isMike) {
-        member.updateMike(isMike);
+    public void setIsMike(Member member, Mike mike) {
+        member.updateMike(mike);
     }
 
     /**
