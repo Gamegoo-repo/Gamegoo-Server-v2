@@ -1,5 +1,7 @@
 package com.gamegoo.gamegoo_v2.content.board.repository;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import org.springframework.data.domain.Page;
@@ -16,12 +18,12 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "(b.deleted = false) AND " +
             "(:mode IS NULL OR b.mode = :mode) AND " +
             "(:tier IS NULL OR m.tier = :tier) AND " +
-            "(:mainPosition IS NULL OR b.mainPosition = :mainPosition ) AND " +
+            "(:mainPosition IS NULL OR :mainPosition = 'ANY' OR b.mainPosition = :mainPosition ) AND " +
             "(:mike IS NULL OR b.mike = :mike)")
     Page<Board> findByFilters(@Param("mode") Integer mode,
                               @Param("tier") Tier tier,
-                              @Param("mainPosition") Integer mainPosition,
-                              @Param("mike") Boolean mike,
+                              @Param("mainPosition") Position mainPosition,
+                              @Param("mike") Mike mike,
                               Pageable pageable);
 
 

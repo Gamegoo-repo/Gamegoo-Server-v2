@@ -1,10 +1,14 @@
 package com.gamegoo.gamegoo_v2.content.board.domain;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,17 +37,21 @@ public class Board extends BaseDateTimeEntity {
     @Column(nullable = false)
     private int mode;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int mainPosition;
+    private Position mainPosition;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int subPosition;
+    private Position subPosition;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int wantPosition;
+    private Position wantPosition;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean mike = false;
+    private Mike mike;
 
     @Column(length = 5000)
     private String content;
@@ -62,8 +70,9 @@ public class Board extends BaseDateTimeEntity {
     private List<BoardGameStyle> boardGameStyles = new ArrayList<>();
 
 
-    public static Board create(Member member, int mode, int mainPosition, int subPosition, int wantPosition,
-                               boolean mike, String content, int boardProfileImage) {
+    public static Board create(Member member, int mode, Position mainPosition, Position subPosition,
+                               Position wantPosition,
+                               Mike mike, String content, int boardProfileImage) {
         return Board.builder()
                 .member(member)
                 .mode(mode)
@@ -77,7 +86,8 @@ public class Board extends BaseDateTimeEntity {
     }
 
     @Builder
-    private Board(int mode, int mainPosition, int subPosition, int wantPosition, boolean mike, String content,
+    private Board(int mode, Position mainPosition, Position subPosition, Position wantPosition, Mike mike,
+                  String content,
                   int boardProfileImage, boolean deleted, Member member) {
         this.mode = mode;
         this.mainPosition = mainPosition;
@@ -100,7 +110,7 @@ public class Board extends BaseDateTimeEntity {
         boardGameStyle.removeBoard();
     }
 
-    public void updateBoard(int gameMode, Integer mainPosition, Integer subPosition, Integer wantPosition, Boolean mike,
+    public void updateBoard(int gameMode, Position mainPosition, Position subPosition, Position wantPosition, Mike mike,
                             String content, int boardProfileImage) {
         if (gameMode != 0) {
             this.mode = gameMode;
@@ -130,5 +140,6 @@ public class Board extends BaseDateTimeEntity {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+
 
 }

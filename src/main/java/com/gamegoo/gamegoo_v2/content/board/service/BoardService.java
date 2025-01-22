@@ -1,6 +1,8 @@
 package com.gamegoo.gamegoo_v2.content.board.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
@@ -50,7 +52,7 @@ public class BoardService {
     /**
      * 게시글 목록 조회
      */
-    public Page<Board> findBoards(Integer mode, Tier tier, Integer mainPosition, Boolean mike, Pageable pageable) {
+    public Page<Board> findBoards(Integer mode, Tier tier, Position mainPosition, Mike mike, Pageable pageable) {
         return boardRepository.findByFilters(mode, tier, mainPosition, mike, pageable);
     }
 
@@ -58,7 +60,7 @@ public class BoardService {
      * 게시글 목록 조회 (페이징 처리)
      */
 
-    public Page<Board> getBoardsWithPagination(Integer mode, Tier tier, Integer mainPosition, Boolean mike,
+    public Page<Board> getBoardsWithPagination(Integer mode, Tier tier, Position mainPosition, Mike mike,
                                                int pageIdx) {
         Pageable pageable = PageRequest.of(pageIdx - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
         return findBoards(mode, tier, mainPosition, mike, pageable);

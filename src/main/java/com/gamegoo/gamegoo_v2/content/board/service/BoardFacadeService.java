@@ -1,6 +1,8 @@
 package com.gamegoo.gamegoo_v2.content.board.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
@@ -50,12 +52,11 @@ public class BoardFacadeService {
      * 게시판 글 목록 조회 (파사드)
      */
 
-    public BoardResponse getBoardList(Integer mode, Tier tier, Integer mainPosition, Boolean mike,
+    public BoardResponse getBoardList(Integer mode, Tier tier, Position mainPosition, Mike mike,
                                       @ValidPage int pageIdx) {
 
-        // <포지션 정보> 전체: 0, 탑: 1, 정글: 2, 미드: 3, 바텀: 4, 서포터: 5
-        if (mainPosition != null && mainPosition == 0) {
-            mainPosition = null;
+        if (mainPosition == null) {
+            mainPosition = Position.ANY;
         }
 
         Page<Board> boardPage = boardService.getBoardsWithPagination(mode, tier, mainPosition, mike, pageIdx);
