@@ -25,6 +25,20 @@ public class MatchingFacadeService {
     private final BlockValidator blockValidator;
 
     /**
+     * 매칭 우선순위 계산 및 기록 저장 API
+     */
+    @Transactional
+    public String calculatePriorityAndRecording() {
+        // 현재 매칭 중인 matchingRecord 조회
+
+        // 내 매칭 기록 생성
+
+        //
+
+        return "response DTO 변경 예정";
+    }
+
+    /**
      * 두 회원 사이 매칭을 통한 채팅방 시작 Facade 메소드
      *
      * @param member1 회원
