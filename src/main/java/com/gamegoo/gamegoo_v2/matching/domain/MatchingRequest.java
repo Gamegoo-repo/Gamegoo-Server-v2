@@ -86,12 +86,11 @@ public class MatchingRequest extends BaseDateTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "matching_request_sender", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "matchingRequestSender", cascade = CascadeType.ALL)
     private List<MatchingResult> matchingResultSenderList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "matching_request_receiver", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "matchingRequestReceiver", cascade = CascadeType.ALL)
     private List<MatchingResult> matchingResultReceiverList = new ArrayList<>();
-
 
     // MatchingRequest 생성 메서드
     public static MatchingRequest create(GameMode gameMode, Position mainPosition, Position subPosition,

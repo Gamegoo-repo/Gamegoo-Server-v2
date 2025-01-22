@@ -31,12 +31,13 @@ public class MatchingResult extends BaseDateTimeEntity {
     private Boolean mannerMessageSent;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "matching_request_sender", nullable = false)
+    @JoinColumn(name = "matching_uuid", insertable = false, updatable = false)
     private MatchingRequest matchingRequestSender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "matching_request_receiver", nullable = false)
+    @JoinColumn(name = "matching_uuid", insertable = false, updatable = false)
     private MatchingRequest matchingRequestReceiver;
+
 
     // MatchingResult 생성 메서드
     public static MatchingResult create(MatchingStatus status, Boolean mannerMessageSent,
