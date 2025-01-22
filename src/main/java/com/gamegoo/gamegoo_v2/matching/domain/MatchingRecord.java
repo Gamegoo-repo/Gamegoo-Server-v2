@@ -5,7 +5,6 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,19 +15,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MatchingRequest extends BaseDateTimeEntity {
+public class MatchingRecord extends BaseDateTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -82,22 +77,27 @@ public class MatchingRequest extends BaseDateTimeEntity {
     @Column
     private int mannerLevel;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MatchingStatus status = MatchingStatus.PENDING;
+
+    @Column
+    private Boolean mannerMessageSent = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "matchingRequestSender", cascade = CascadeType.ALL)
-    private List<MatchingResult> matchingResultSenderList = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "target_id", nullable = false)
+    private Member targetMember;
 
-    @OneToMany(mappedBy = "matchingRequestReceiver", cascade = CascadeType.ALL)
-    private List<MatchingResult> matchingResultReceiverList = new ArrayList<>();
-
-    // MatchingRequest 생성 메서드
-    public static MatchingRequest create(GameMode gameMode, Position mainPosition, Position subPosition,
-                                         Position wantPosition, Mike mike, Tier soloTier, int soloRank,
-                                         double soloWinRate, Tier freeTier, int freeRank, double freeWinRate,
-                                         MatchingType matchingType, int mannerLevel, Member member) {
-        return MatchingRequest.builder()
+    // MatchingRecord 생성 메서드
+    public static MatchingRecord create(GameMode gameMode, Position mainPosition, Position subPosition,
+                                        Position wantPosition, Mike mike, Tier soloTier, int soloRank,
+                                        double soloWinRate, Tier freeTier, int freeRank, double freeWinRate,
+                                        MatchingType matchingType, int mannerLevel, Member member) {
+        return MatchingRecord.builder()
                 .gameMode(gameMode)
                 .mainPosition(mainPosition)
                 .subPosition(subPosition)
@@ -115,12 +115,12 @@ public class MatchingRequest extends BaseDateTimeEntity {
                 .build();
     }
 
-    // MatchingRequest Builder
+    // MatchingRecord Builder
     @Builder
-    private MatchingRequest(GameMode gameMode, Position mainPosition, Position subPosition, Position wantPosition,
-                            Mike mike, Tier soloTier, int soloRank, double soloWinRate, Tier freeTier,
-                            int freeRank, double freeWinRate, MatchingType matchingType, int mannerLevel,
-                            Member member) {
+    private MatchingRecord(GameMode gameMode, Position mainPosition, Position subPosition, Position wantPosition,
+                           Mike mike, Tier soloTier, int soloRank, double soloWinRate, Tier freeTier,
+                           int freeRank, double freeWinRate, MatchingType matchingType, int mannerLevel,
+                           Member member) {
         this.gameMode = gameMode;
         this.mainPosition = mainPosition;
         this.subPosition = subPosition;
@@ -135,6 +135,20 @@ public class MatchingRequest extends BaseDateTimeEntity {
         this.matchingType = matchingType;
         this.mannerLevel = mannerLevel;
         this.member = member;
+    }
+
+    // status 변경
+    public void updateStatus(MatchingStatus status) {
+        this.status = status;
+    }
+
+    // targetMember 설정
+    public void updateTargetMember(Member member) {
+        this.targetMember = member;
+    }
+
+    public void updateMannerMessageSent(Boolean mannerMessageSent) {
+        this.mannerMessageSent = mannerMessageSent;
     }
 
 }

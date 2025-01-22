@@ -1,7 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.member.domain;
 
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
-import com.gamegoo.gamegoo_v2.matching.domain.MatchingRequest;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
 import jakarta.persistence.CascadeType;
@@ -104,9 +103,6 @@ public class Member extends BaseDateTimeEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberGameStyle> memberGameStyleList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<MatchingRequest> matchingRequestList = new ArrayList<>();
 
     // 회원가입용 create
     public static Member create(String email, String password, LoginType loginType, String gameName, String tag,
