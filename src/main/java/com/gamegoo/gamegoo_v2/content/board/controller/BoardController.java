@@ -16,6 +16,7 @@ import com.gamegoo.gamegoo_v2.content.board.dto.response.MyBoardResponse;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -63,7 +64,8 @@ public class BoardController {
             description = "게시판 글 목록을 조회하는 API 입니다. 필터링을 원하면 각 파라미터를 입력하세요.")
     @Parameters({
             @Parameter(name = "pageIdx", description = "조회할 페이지 번호를 입력해주세요. 페이지 당 20개의 게시물을 볼 수 있습니다."),
-            @Parameter(name = "mode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: 1, 솔로랭크: 2, 자유랭크: 3, 칼바람 나락: 4 >"),
+            @Parameter(name = "gameMode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, " +
+                    "칼바람 나락: ARAM >"),
             @Parameter(name = "tier", description = "(선택) 티어를 선택해주세요."),
             @Parameter(name = "mainP", description = "(선택) 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: " +
                     "MID, 원딜: ADC, " +
@@ -72,12 +74,12 @@ public class BoardController {
     })
     public ApiResponse<BoardResponse> boardList(
             @ValidPage @RequestParam(name = "page") Integer page,
-            @RequestParam(required = false) Integer mode,
+            @RequestParam(required = false) GameMode gameMode,
             @RequestParam(required = false) Tier tier,
             @RequestParam(required = false) Position mainP,
             @RequestParam(required = false) Mike mike) {
 
-        return ApiResponse.ok(boardFacadeService.getBoardList(mode, tier, mainP, mike, page));
+        return ApiResponse.ok(boardFacadeService.getBoardList(gameMode, tier, mainP, mike, page));
 
 
     }

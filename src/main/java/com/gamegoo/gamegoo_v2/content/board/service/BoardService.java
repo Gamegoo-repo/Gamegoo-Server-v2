@@ -10,6 +10,7 @@ import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
 import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
 import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,18 +53,18 @@ public class BoardService {
     /**
      * 게시글 목록 조회
      */
-    public Page<Board> findBoards(Integer mode, Tier tier, Position mainP, Mike mike, Pageable pageable) {
-        return boardRepository.findByFilters(mode, tier, mainP, mike, pageable);
+    public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Mike mike, Pageable pageable) {
+        return boardRepository.findByFilters(gameMode, tier, mainP, mike, pageable);
     }
 
     /**
      * 게시글 목록 조회 (페이징 처리)
      */
 
-    public Page<Board> getBoardsWithPagination(Integer mode, Tier tier, Position mainP, Mike mike,
+    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Mike mike,
                                                int pageIdx) {
         Pageable pageable = PageRequest.of(pageIdx - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return findBoards(mode, tier, mainP, mike, pageable);
+        return findBoards(gameMode, tier, mainP, mike, pageable);
     }
 
     /**

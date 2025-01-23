@@ -22,6 +22,7 @@ import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.core.exception.common.GlobalException;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -296,10 +297,10 @@ class ReportFacadeServiceTest {
     private Board createBoard(Member member) {
         return boardRepository.save(Board.builder()
                 .member(member)
-                .mode(1)
-                .mainPosition(Position.ADC)
-                .subPosition(Position.JUNGLE)
-                .wantPosition(Position.ADC)
+                .gameMode(GameMode.SOLO)
+                .mainP(Position.ADC)
+                .subP(Position.JUNGLE)
+                .wantP(Position.ADC)
                 .mike(Mike.AVAILABLE)
                 .content("content")
                 .boardProfileImage(1)

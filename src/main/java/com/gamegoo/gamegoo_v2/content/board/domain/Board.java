@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,8 +35,9 @@ public class Board extends BaseDateTimeEntity {
     @Column(name = "board_id")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int mode;
+    private GameMode gameMode;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -70,12 +72,12 @@ public class Board extends BaseDateTimeEntity {
     private List<BoardGameStyle> boardGameStyles = new ArrayList<>();
 
 
-    public static Board create(Member member, int mode, Position mainP, Position subP,
+    public static Board create(Member member, GameMode gameMode, Position mainP, Position subP,
                                Position wantP,
                                Mike mike, String content, int boardProfileImage) {
         return Board.builder()
                 .member(member)
-                .mode(mode)
+                .gameMode(gameMode)
                 .mainP(mainP)
                 .subP(subP)
                 .wantP(wantP)
@@ -86,10 +88,10 @@ public class Board extends BaseDateTimeEntity {
     }
 
     @Builder
-    private Board(int mode, Position mainP, Position subP, Position wantP, Mike mike,
+    private Board(GameMode gameMode, Position mainP, Position subP, Position wantP, Mike mike,
                   String content,
                   int boardProfileImage, boolean deleted, Member member) {
-        this.mode = mode;
+        this.gameMode = gameMode;
         this.mainP = mainP;
         this.subP = subP;
         this.wantP = wantP;
@@ -110,10 +112,10 @@ public class Board extends BaseDateTimeEntity {
         boardGameStyle.removeBoard();
     }
 
-    public void updateBoard(int gameMode, Position mainP, Position subP, Position wantP, Mike mike,
+    public void updateBoard(GameMode gameMode, Position mainP, Position subP, Position wantP, Mike mike,
                             String content, int boardProfileImage) {
-        if (gameMode != 0) {
-            this.mode = gameMode;
+        if (gameMode != null) {
+            this.gameMode = gameMode;
         }
         if (mainP != null) {
             this.mainP = mainP;

@@ -15,6 +15,7 @@ import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardUpdateResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.MyBoardResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
@@ -52,14 +53,14 @@ public class BoardFacadeService {
      * 게시판 글 목록 조회 (파사드)
      */
 
-    public BoardResponse getBoardList(Integer mode, Tier tier, Position mainP, Mike mike,
+    public BoardResponse getBoardList(GameMode gameMode, Tier tier, Position mainP, Mike mike,
                                       @ValidPage int pageIdx) {
 
         if (mainP == null) {
             mainP = Position.ANY;
         }
 
-        Page<Board> boardPage = boardService.getBoardsWithPagination(mode, tier, mainP, mike, pageIdx);
+        Page<Board> boardPage = boardService.getBoardsWithPagination(gameMode, tier, mainP, mike, pageIdx);
 
         return BoardResponse.of(boardPage);
     }

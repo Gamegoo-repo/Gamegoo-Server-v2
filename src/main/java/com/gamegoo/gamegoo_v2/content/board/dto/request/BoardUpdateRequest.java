@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.content.board.dto.request;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -20,9 +21,7 @@ public class BoardUpdateRequest {
     Integer boardProfileImage;
 
     @NotNull(message = "게임 모드는 필수 값입니다.")
-    @Min(value = 1, message = "게임 모드는 1 이상이어야 합니다.")
-    @Max(value = 4, message = "게임 모드는 4 이하여야 합니다.")
-    Integer gameMode;
+    GameMode gameMode;
 
     @NotNull(message = "주 포지션은 필수 값입니다.")
     Position mainP;

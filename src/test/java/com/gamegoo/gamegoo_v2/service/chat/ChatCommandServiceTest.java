@@ -21,6 +21,7 @@ import com.gamegoo.gamegoo_v2.core.config.AsyncConfig;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.external.socket.SocketService;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.domain.Block;
 import com.gamegoo.gamegoo_v2.social.block.repository.BlockRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -512,10 +513,10 @@ class ChatCommandServiceTest {
     private Board createBoard(Member member) {
         return boardRepository.save(Board.builder()
                 .member(member)
-                .mode(1)
-                .mainPosition(Position.ADC)
-                .subPosition(Position.JUNGLE)
-                .wantPosition(Position.ADC)
+                .gameMode(GameMode.FAST)
+                .mainP(Position.ADC)
+                .subP(Position.JUNGLE)
+                .wantP(Position.ADC)
                 .mike(Mike.AVAILABLE)
                 .content("content")
                 .boardProfileImage(1)
