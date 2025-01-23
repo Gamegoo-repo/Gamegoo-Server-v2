@@ -22,19 +22,16 @@ public class MatchingPriorityCalculateService {
                                      Tier myTier, Integer myRank, Tier otherTier, Integer otherRank) {
         int priority = 0;
 
-        // 포지션 우선순위
-        priority += matchingPriorityEvaluateService.getPositionPriority(myWantPosition, otherMainPosition,
-                otherSubPosition, 5, 3, 1);
+        // 매너 우선순위
+        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
+
+        // 티어 및 랭킹 점수
+        int averageTierRank = (myRank + otherRank) / 2;
+        priority += matchingPriorityEvaluateService.getTierRankPriority(myTier, averageTierRank, otherTier,
+                averageTierRank, 40, 5, 10);
 
         // 마이크 우선순위
-        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 5, 3);
-
-        // 매너 우선순위
-        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 10, 2);
-
-        // 티어 및 랭킹 우선순위
-        priority += matchingPriorityEvaluateService.getTierRankPriority(myTier, myRank, otherTier, otherRank, 50, 5,
-                10);
+        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3, 2);
 
         return priority;
     }
@@ -47,19 +44,16 @@ public class MatchingPriorityCalculateService {
                                      Tier myTier, Integer myRank, Tier otherTier, Integer otherRank) {
         int priority = 0;
 
-        // 포지션 우선순위
-        priority += matchingPriorityEvaluateService.getPositionPriority(myWantPosition, otherMainPosition,
-                otherSubPosition, 8, 4, 2);
+        // 매너 우선순위
+        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
+
+        // 티어 및 랭킹 제한 확인
+        if (!validateSoloRankRange(myTier, otherTier)) {
+            return 0;
+        }
 
         // 마이크 우선순위
-        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 4, 2);
-
-        // 매너 우선순위
-        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 15, 3);
-
-        // 티어 및 랭킹 우선순위
-        priority += matchingPriorityEvaluateService.getTierRankPriority(myTier, myRank, otherTier, otherRank, 60, 6,
-                12);
+        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3, 2);
 
         return priority;
     }
@@ -72,44 +66,85 @@ public class MatchingPriorityCalculateService {
                                      Tier myTier, Integer myRank, Tier otherTier, Integer otherRank) {
         int priority = 0;
 
-        // 포지션 우선순위
-        priority += matchingPriorityEvaluateService.getPositionPriority(myWantPosition, otherMainPosition,
-                otherSubPosition, 6, 3, 1);
+        // 매너 우선순위
+        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
+
+        // 티어 및 랭킹 제한 확인
+        if (myTier.ordinal() < 5 && otherTier.ordinal() >= 6) {
+            return 0;
+        }
 
         // 마이크 우선순위
-        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 6, 4);
-
-        // 매너 우선순위
-        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 12, 2);
-
-        // 티어 및 랭킹 우선순위
-        priority += matchingPriorityEvaluateService.getTierRankPriority(myTier, myRank, otherTier, otherRank, 45, 4, 9);
+        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3, 2);
 
         return priority;
     }
 
     /**
-     * ARAM 모드 우선순위 계산
+     * 칼바람 모드 우선순위 계산
      */
     public int calculateAramPriority(Position myWantPosition, Position otherMainPosition, Position otherSubPosition,
                                      Mike myMike, Mike otherMike, Integer myManner, Integer otherManner,
                                      Tier myTier, Integer myRank, Tier otherTier, Integer otherRank) {
         int priority = 0;
 
-        // 포지션 우선순위
-        priority += matchingPriorityEvaluateService.getPositionPriority(myWantPosition, otherMainPosition,
-                otherSubPosition, 4, 2, 1);
+        // 매너 우선순위
+        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
 
         // 마이크 우선순위
         priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3, 2);
 
-        // 매너 우선순위
-        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 8, 1);
-
-        // 티어 및 랭킹 우선순위
-        priority += matchingPriorityEvaluateService.getTierRankPriority(myTier, myRank, otherTier, otherRank, 30, 3, 6);
-
         return priority;
+    }
+
+    /**
+     * 정밀 매칭 검증 메서드
+     */
+    public boolean validatePreciseMatching(Mike myMike, Mike otherMike, Position myWantPosition,
+                                           Position otherMainPosition, Position otherSubPosition,
+                                           Tier myTier, Tier otherTier) {
+        // 마이크가 다를 경우 매칭 실패
+        if (!myMike.equals(otherMike)) {
+            return false;
+        }
+
+        // 내가 원하는 포지션이 상대 포지션이 아닐 경우 매칭 실패
+        if (!otherMainPosition.equals(myWantPosition) && !otherSubPosition.equals(myWantPosition)) {
+            return false;
+        }
+
+        // 티어 차이가 1개 이상 나면 매칭 실패
+        return Math.abs(myTier.ordinal() - otherTier.ordinal()) <= 1;
+    }
+
+    /**
+     * 개인 랭크 제한 검증
+     */
+    private boolean validateSoloRankRange(Tier myTier, Tier otherTier) {
+        int[][] allowedRanges = {
+                {0, 1, 2}, // 아이언
+                {0, 1, 2}, // 브론즈
+                {0, 1, 2, 3}, // 실버
+                {2, 3, 4}, // 골드
+                {3, 4, 5}, // 플레티넘
+                {4, 5, 6}, // 에메랄드
+                {5, 6} // 다이아몬드
+        };
+
+        int myTierIndex = myTier.ordinal();
+        int otherTierIndex = otherTier.ordinal();
+
+        if (myTierIndex >= allowedRanges.length) {
+            return false; // 마스터 이상은 제외
+        }
+
+        for (int tier : allowedRanges[myTierIndex]) {
+            if (tier == otherTierIndex) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

@@ -97,10 +97,6 @@ public class MatchingPriorityEvaluateService {
         if (myMike == Mike.AVAILABLE && otherMike == Mike.AVAILABLE) {
             return mikeMatchPriority;
         }
-        if ((myMike == Mike.AVAILABLE && otherMike == Mike.ONLY_LISTEN) ||
-                (myMike == Mike.ONLY_LISTEN && otherMike == Mike.AVAILABLE)) {
-            return mikePartialMatchPriority;
-        }
         return 0;
     }
 
