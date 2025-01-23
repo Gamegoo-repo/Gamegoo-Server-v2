@@ -65,7 +65,7 @@ public class BoardController {
             @Parameter(name = "pageIdx", description = "조회할 페이지 번호를 입력해주세요. 페이지 당 20개의 게시물을 볼 수 있습니다."),
             @Parameter(name = "mode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: 1, 솔로랭크: 2, 자유랭크: 3, 칼바람 나락: 4 >"),
             @Parameter(name = "tier", description = "(선택) 티어를 선택해주세요."),
-            @Parameter(name = "mainPosition", description = "(선택) 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: " +
+            @Parameter(name = "mainP", description = "(선택) 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: " +
                     "MID, 원딜: ADC, " +
                     "서포터: SUP >"),
             @Parameter(name = "mike", description = "(선택) 마이크 여부를 선택해주세요.")
@@ -74,10 +74,10 @@ public class BoardController {
             @ValidPage @RequestParam(name = "page") Integer page,
             @RequestParam(required = false) Integer mode,
             @RequestParam(required = false) Tier tier,
-            @RequestParam(required = false) Position mainPosition,
+            @RequestParam(required = false) Position mainP,
             @RequestParam(required = false) Mike mike) {
 
-        return ApiResponse.ok(boardFacadeService.getBoardList(mode, tier, mainPosition, mike, page));
+        return ApiResponse.ok(boardFacadeService.getBoardList(mode, tier, mainP, mike, page));
 
 
     }

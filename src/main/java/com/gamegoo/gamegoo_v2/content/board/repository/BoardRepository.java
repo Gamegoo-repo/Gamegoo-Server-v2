@@ -18,11 +18,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "(b.deleted = false) AND " +
             "(:mode IS NULL OR b.mode = :mode) AND " +
             "(:tier IS NULL OR m.tier = :tier) AND " +
-            "(:mainPosition IS NULL OR :mainPosition = 'ANY' OR b.mainPosition = :mainPosition ) AND " +
+            "(:mainP IS NULL OR :mainP = 'ANY' OR b.mainP = :mainP ) AND " +
             "(:mike IS NULL OR b.mike = :mike)")
     Page<Board> findByFilters(@Param("mode") Integer mode,
                               @Param("tier") Tier tier,
-                              @Param("mainPosition") Position mainPosition,
+                              @Param("mainP") Position mainP,
                               @Param("mike") Mike mike,
                               Pageable pageable);
 

@@ -34,7 +34,7 @@ public class BoardByIdResponseForMember {
     Mike mike;
     List<ChampionResponse> championResponseDTOList;
     int gameMode;
-    Position mainPosition;
+    Position mainP;
     Position subPosition;
     Position wantPosition;
     Integer recentGameCount;
@@ -78,9 +78,9 @@ public class BoardByIdResponseForMember {
                 .mike(board.getMike())
                 .championResponseDTOList(championResponseList)
                 .gameMode(board.getMode())
-                .mainPosition(board.getMainPosition())
-                .subPosition(board.getSubPosition())
-                .wantPosition(board.getWantPosition())
+                .mainP(board.getMainP())
+                .subPosition(board.getSubP())
+                .wantPosition(board.getWantP())
                 .recentGameCount(poster.getGameCount())
                 .winRate(poster.getWinRate())
                 .gameStyles(gameStyleIds)

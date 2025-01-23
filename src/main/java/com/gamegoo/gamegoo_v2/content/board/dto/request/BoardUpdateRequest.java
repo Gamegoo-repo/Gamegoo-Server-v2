@@ -25,13 +25,13 @@ public class BoardUpdateRequest {
     Integer gameMode;
 
     @NotNull(message = "주 포지션은 필수 값입니다.")
-    Position mainPosition;
+    Position mainP;
 
     @NotNull(message = "부 포지션은 필수 값입니다.")
-    Position subPosition;
+    Position subP;
 
     @NotNull(message = "희망 포지션은 필수 값입니다.")
-    Position wantPosition;
+    Position wantP;
 
     @Schema(description = "마이크 사용 여부 (선택)")
     Mike mike;

@@ -52,14 +52,14 @@ public class BoardFacadeService {
      * 게시판 글 목록 조회 (파사드)
      */
 
-    public BoardResponse getBoardList(Integer mode, Tier tier, Position mainPosition, Mike mike,
+    public BoardResponse getBoardList(Integer mode, Tier tier, Position mainP, Mike mike,
                                       @ValidPage int pageIdx) {
 
-        if (mainPosition == null) {
-            mainPosition = Position.ANY;
+        if (mainP == null) {
+            mainP = Position.ANY;
         }
 
-        Page<Board> boardPage = boardService.getBoardsWithPagination(mode, tier, mainPosition, mike, pageIdx);
+        Page<Board> boardPage = boardService.getBoardsWithPagination(mode, tier, mainP, mike, pageIdx);
 
         return BoardResponse.of(boardPage);
     }

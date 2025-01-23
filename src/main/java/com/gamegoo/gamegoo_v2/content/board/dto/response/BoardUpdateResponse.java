@@ -23,9 +23,9 @@ public class BoardUpdateResponse {
     Tier tier;
     Integer rank;
     Integer gameMode;
-    Position mainPosition;
-    Position subPosition;
-    Position wantPosition;
+    Position mainP;
+    Position subP;
+    Position wantP;
     Mike mike;
     List<Long> gameStyles;
     String contents;
@@ -45,9 +45,9 @@ public class BoardUpdateResponse {
                 .tier(member.getTier())
                 .rank(member.getGameRank())
                 .gameMode(board.getMode())
-                .mainPosition(board.getMainPosition())
-                .subPosition(board.getSubPosition())
-                .wantPosition(board.getWantPosition())
+                .mainP(board.getMainP())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
                 .mike(board.getMike())
                 .gameStyles(gameStyleIds)
                 .contents(board.getContent())

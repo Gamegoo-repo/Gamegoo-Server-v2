@@ -26,9 +26,9 @@ public class BoardListResponse {
     Tier tier;
     int rank;
     int gameMode;
-    Position mainPosition;
-    Position subPosition;
-    Position wantPosition;
+    Position mainP;
+    Position subP;
+    Position wantP;
     List<ChampionResponse> championResponseList;
     Double winRate;
     LocalDateTime createdAt;
@@ -52,9 +52,9 @@ public class BoardListResponse {
                 .tier(member.getTier())
                 .rank(member.getGameRank())
                 .gameMode(board.getMode())
-                .mainPosition(board.getMainPosition())
-                .subPosition(board.getSubPosition())
-                .wantPosition(board.getWantPosition())
+                .mainP(board.getMainP())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
                 .championResponseList(championResponseList)
                 .winRate(member.getWinRate())
                 .createdAt(board.getCreatedAt())

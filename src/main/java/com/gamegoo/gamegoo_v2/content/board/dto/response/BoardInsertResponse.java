@@ -22,9 +22,9 @@ public class BoardInsertResponse {
     private Tier tier;
     private int rank;
     private int gameMode;
-    private Position mainPosition;
-    private Position subPosition;
-    private Position wantPosition;
+    private Position mainP;
+    private Position subP;
+    private Position wantP;
     private Mike mike;
     private List<Long> gameStyles;
     private String contents;
@@ -39,9 +39,9 @@ public class BoardInsertResponse {
                 .tier(member.getTier())
                 .rank(member.getGameRank())
                 .gameMode(board.getMode())
-                .mainPosition(board.getMainPosition())
-                .subPosition(board.getSubPosition())
-                .wantPosition(board.getWantPosition())
+                .mainP(board.getMainP())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
                 .mike(board.getMike())
                 .gameStyles(board.getBoardGameStyles().stream()
                         .map(bg -> bg.getGameStyle().getId())
