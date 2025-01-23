@@ -30,13 +30,12 @@ public class MatchingPriorityEvaluateService {
      * @param otherRank           타겟 랭크
      * @param maxTierRankPriority 최대 점수
      * @param tierMultiplier      티어 점수
-     * @param maxRankScore        랭크 점수
      * @return 랭킹 우선순위 값
      */
     public int getTierRankPriority(Tier myTier, Integer myRank, Tier otherTier, Integer otherRank,
-                                   int maxTierRankPriority, int tierMultiplier, int maxRankScore) {
-        int myScore = getTierRankScore(myTier, myRank, tierMultiplier, maxRankScore);
-        int otherScore = getTierRankScore(otherTier, otherRank, tierMultiplier, maxRankScore);
+                                   int maxTierRankPriority, int tierMultiplier) {
+        int myScore = getTierRankScore(myTier, myRank, tierMultiplier);
+        int otherScore = getTierRankScore(otherTier, otherRank, tierMultiplier);
         int scoreDifference = Math.abs(myScore - otherScore);
 
         return maxTierRankPriority - scoreDifference;
@@ -48,11 +47,10 @@ public class MatchingPriorityEvaluateService {
      * @param tier           티어
      * @param rank           랭크
      * @param tierMultiplier 티어 점수
-     * @param maxRankScore   랭크 점수
      * @return 랭킹 점수
      */
-    private int getTierRankScore(Tier tier, int rank, int tierMultiplier, int maxRankScore) {
-        return tier.ordinal() * tierMultiplier + (maxRankScore - rank);
+    private int getTierRankScore(Tier tier, int rank, int tierMultiplier) {
+        return tier.ordinal() * tierMultiplier - rank;
     }
 
     /**
@@ -84,13 +82,12 @@ public class MatchingPriorityEvaluateService {
     /**
      * 마이크 우선순위 점수 계산
      *
-     * @param myMike                   내 마이크
-     * @param otherMike                타겟 마이크
-     * @param mikeMatchPriority        마이크 점수
-     * @param mikePartialMatchPriority 마이크 부분 점수
+     * @param myMike            내 마이크
+     * @param otherMike         타겟 마이크
+     * @param mikeMatchPriority 마이크 점수
      * @return 마이크 우선순위 점수
      */
-    public int getMikePriority(Mike myMike, Mike otherMike, int mikeMatchPriority, int mikePartialMatchPriority) {
+    public int getMikePriority(Mike myMike, Mike otherMike, int mikeMatchPriority) {
         if (myMike == Mike.UNAVAILABLE && otherMike == Mike.UNAVAILABLE) {
             return mikeMatchPriority;
         }

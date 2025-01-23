@@ -15,45 +15,65 @@ public class MatchingPriorityCalculateService {
     private final MatchingPriorityEvaluateService matchingPriorityEvaluateService;
 
     /**
-     * FAST 모드 우선순위 계산
+     * 정밀 매칭 우선순위 계산
      */
-    public int calculateFastPriority(Position myWantPosition, Position otherMainPosition, Position otherSubPosition,
+    public int calculatePrecisePriority(Integer myManner, Integer otherManner) {
+        return matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
+    }
+
+    /**
+     * 빠른대전 우선순위 계산
+     */
+    public int calculateFastPriority(Position myMainP, Position mySubP, Position myWantP,
+                                     Position otherMainP, Position otherSubP, Position otherWantP,
                                      Mike myMike, Mike otherMike, Integer myManner, Integer otherManner,
-                                     Tier myTier, Integer myRank, Tier otherTier, Integer otherRank) {
+                                     Tier mySoloTier, Integer mySoloRank, Tier myFreeTier, Integer myFreeRank,
+                                     Tier otherSoloTier, Integer otherSoloRank, Tier otherFreeTier,
+                                     Integer otherFreeRank) {
         int priority = 0;
 
         // 매너 우선순위
         priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
 
-        // 티어 및 랭킹 점수
-        int averageTierRank = (myRank + otherRank) / 2;
-        priority += matchingPriorityEvaluateService.getTierRankPriority(myTier, averageTierRank, otherTier,
-                averageTierRank, 40, 5, 10);
+        // TODO: 티어 및 랭킹 점수 계산
+        // priority += matchingPriorityEvaluateService.getTierRankPriority(myTier, myRank, otherTier, otherRank, 40, 4);
+
+        // 포지션 우선순위
+        priority += matchingPriorityEvaluateService.getPositionPriority(myWantP, otherMainP, otherSubP, 3, 2, 1);
+        priority += matchingPriorityEvaluateService.getPositionPriority(otherWantP, myMainP, mySubP, 3, 2, 1);
 
         // 마이크 우선순위
-        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3, 2);
+        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3);
 
         return priority;
     }
 
     /**
-     * SOLO 모드 우선순위 계산
+     * 개인 랭크 모드 우선순위 계산
      */
-    public int calculateSoloPriority(Position myWantPosition, Position otherMainPosition, Position otherSubPosition,
+    public int calculateSoloPriority(Position myMainP, Position mySubP, Position myWantP,
+                                     Position otherMainP, Position otherSubP, Position otherWantP,
                                      Mike myMike, Mike otherMike, Integer myManner, Integer otherManner,
                                      Tier myTier, Integer myRank, Tier otherTier, Integer otherRank) {
-        int priority = 0;
-
-        // 매너 우선순위
-        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
-
         // 티어 및 랭킹 제한 확인
         if (!validateSoloRankRange(myTier, otherTier)) {
             return 0;
         }
 
+        int priority = 0;
+
+        // 매너 우선순위
+        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
+
+        // 티어 및 랭킹 점수 계산
+        priority += matchingPriorityEvaluateService.getTierRankPriority(myTier, myRank, otherTier, otherRank, 40, 4);
+
+        // 포지션 우선순위
+        priority += matchingPriorityEvaluateService.getPositionPriority(myWantP, otherMainP, otherSubP, 3, 2, 1);
+        priority += matchingPriorityEvaluateService.getPositionPriority(otherWantP, myMainP, mySubP, 3, 2, 1);
+
         // 마이크 우선순위
-        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3, 2);
+        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 5);
 
         return priority;
     }
@@ -61,21 +81,29 @@ public class MatchingPriorityCalculateService {
     /**
      * FREE 모드 우선순위 계산
      */
-    public int calculateFreePriority(Position myWantPosition, Position otherMainPosition, Position otherSubPosition,
+    public int calculateFreePriority(Position myMainP, Position mySubP, Position myWantP,
+                                     Position otherMainP, Position otherSubP, Position otherWantP,
                                      Mike myMike, Mike otherMike, Integer myManner, Integer otherManner,
                                      Tier myTier, Integer myRank, Tier otherTier, Integer otherRank) {
-        int priority = 0;
-
-        // 매너 우선순위
-        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
-
         // 티어 및 랭킹 제한 확인
         if (myTier.ordinal() < 5 && otherTier.ordinal() >= 6) {
             return 0;
         }
 
+        int priority = 0;
+
+        // 매너 우선순위
+        priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
+
+        // 티어 및 랭킹 점수 계산
+        priority += matchingPriorityEvaluateService.getTierRankPriority(myTier, myRank, otherTier, otherRank, 40, 4);
+
+        // 포지션 우선순위
+        priority += matchingPriorityEvaluateService.getPositionPriority(myWantP, otherMainP, otherSubP, 3, 2, 1);
+        priority += matchingPriorityEvaluateService.getPositionPriority(otherWantP, myMainP, mySubP, 3, 2, 1);
+
         // 마이크 우선순위
-        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3, 2);
+        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3);
 
         return priority;
     }
@@ -92,7 +120,7 @@ public class MatchingPriorityCalculateService {
         priority += matchingPriorityEvaluateService.getMannerPriority(otherManner, myManner, 16, 4);
 
         // 마이크 우선순위
-        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3, 2);
+        priority += matchingPriorityEvaluateService.getMikePriority(myMike, otherMike, 3);
 
         return priority;
     }
