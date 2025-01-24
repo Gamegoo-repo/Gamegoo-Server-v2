@@ -1,6 +1,8 @@
 package com.gamegoo.gamegoo_v2.content.board.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
@@ -8,6 +10,7 @@ import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
 import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
 import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,9 +40,9 @@ public class BoardService {
         Board board = Board.create(
                 member,
                 request.getGameMode(),
-                request.getMainPosition(),
-                request.getSubPosition(),
-                request.getWantPosition(),
+                request.getMainP(),
+                request.getSubP(),
+                request.getWantP(),
                 request.getMike(),
                 request.getContents(),
                 boardProfileImage
@@ -50,18 +53,18 @@ public class BoardService {
     /**
      * 게시글 목록 조회
      */
-    public Page<Board> findBoards(Integer mode, Tier tier, Integer mainPosition, Boolean mike, Pageable pageable) {
-        return boardRepository.findByFilters(mode, tier, mainPosition, mike, pageable);
+    public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Mike mike, Pageable pageable) {
+        return boardRepository.findByFilters(gameMode, tier, mainP, mike, pageable);
     }
 
     /**
      * 게시글 목록 조회 (페이징 처리)
      */
 
-    public Page<Board> getBoardsWithPagination(Integer mode, Tier tier, Integer mainPosition, Boolean mike,
+    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Mike mike,
                                                int pageIdx) {
         Pageable pageable = PageRequest.of(pageIdx - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return findBoards(mode, tier, mainPosition, mike, pageable);
+        return findBoards(gameMode, tier, mainP, mike, pageable);
     }
 
     /**
@@ -86,9 +89,9 @@ public class BoardService {
 
         board.updateBoard(
                 request.getGameMode(),
-                request.getMainPosition(),
-                request.getSubPosition(),
-                request.getWantPosition(),
+                request.getMainP(),
+                request.getSubP(),
+                request.getWantP(),
                 request.getMike(),
                 request.getContents(),
                 request.getBoardProfileImage()

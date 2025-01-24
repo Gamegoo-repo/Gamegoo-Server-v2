@@ -1,8 +1,11 @@
 package com.gamegoo.gamegoo_v2.content.board.dto.response;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -24,12 +27,12 @@ public class BoardByIdResponse {
     Integer mannerLevel;
     Tier tier;
     int rank;
-    boolean mike;
+    Mike mike;
     List<ChampionResponse> championResponseList;
-    int gameMode;
-    int mainPosition;
-    int subPosition;
-    int wantPosition;
+    GameMode gameMode;
+    Position mainP;
+    Position subP;
+    Position wantP;
     Integer recentGameCount;
     Double winRate;
     List<Long> gameStyles;
@@ -57,12 +60,12 @@ public class BoardByIdResponse {
                 .mannerLevel(poster.getMannerLevel())
                 .tier(poster.getTier())
                 .rank(poster.getGameRank())
-                .mike(board.isMike())
+                .mike(board.getMike())
                 .championResponseList(championResponseList)
-                .gameMode(board.getMode())
-                .mainPosition(board.getMainPosition())
-                .subPosition(board.getSubPosition())
-                .wantPosition(board.getWantPosition())
+                .gameMode(board.getGameMode())
+                .mainP(board.getMainP())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
                 .recentGameCount(poster.getGameCount())
                 .winRate(poster.getWinRate())
                 .gameStyles(gameStyleIds)

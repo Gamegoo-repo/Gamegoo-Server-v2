@@ -1,8 +1,11 @@
 package com.gamegoo.gamegoo_v2.content.board.dto.response;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,11 +23,11 @@ public class BoardUpdateResponse {
     String tag;
     Tier tier;
     Integer rank;
-    Integer gameMode;
-    Integer mainPosition;
-    Integer subPosition;
-    Integer wantPosition;
-    Boolean mike;
+    GameMode gameMode;
+    Position mainP;
+    Position subP;
+    Position wantP;
+    Mike mike;
     List<Long> gameStyles;
     String contents;
 
@@ -42,11 +45,11 @@ public class BoardUpdateResponse {
                 .tag(member.getTag())
                 .tier(member.getTier())
                 .rank(member.getGameRank())
-                .gameMode(board.getMode())
-                .mainPosition(board.getMainPosition())
-                .subPosition(board.getSubPosition())
-                .wantPosition(board.getWantPosition())
-                .mike(board.isMike())
+                .gameMode(board.getGameMode())
+                .mainP(board.getMainP())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
+                .mike(board.getMike())
                 .gameStyles(gameStyleIds)
                 .contents(board.getContent())
                 .build();

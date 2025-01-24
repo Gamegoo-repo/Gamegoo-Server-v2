@@ -2,6 +2,8 @@ package com.gamegoo.gamegoo_v2.integration.chat;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
@@ -27,6 +29,7 @@ import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.core.exception.common.GlobalException;
 import com.gamegoo.gamegoo_v2.external.socket.SocketService;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.domain.Block;
 import com.gamegoo.gamegoo_v2.social.block.repository.BlockRepository;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
@@ -1121,11 +1124,11 @@ class ChatFacadeServiceTest {
     private Board createBoard(Member member) {
         return boardRepository.save(Board.builder()
                 .member(member)
-                .mode(1)
-                .mainPosition(1)
-                .subPosition(2)
-                .wantPosition(3)
-                .mike(true)
+                .gameMode(GameMode.SOLO)
+                .mainP(Position.ADC)
+                .subP(Position.JUNGLE)
+                .wantP(Position.ADC)
+                .mike(Mike.AVAILABLE)
                 .content("content")
                 .boardProfileImage(1)
                 .build());
