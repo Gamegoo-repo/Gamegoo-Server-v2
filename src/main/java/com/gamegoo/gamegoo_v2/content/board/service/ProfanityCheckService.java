@@ -9,13 +9,14 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 @Service
 public class ProfanityCheckService {
 
-    private final List<String> blockedWords = new ArrayList<>();
+    private Pattern badWordsPattern;
 
     /**
      * 빈 생성 후 초기화 시점에
@@ -25,6 +26,7 @@ public class ProfanityCheckService {
     public void loadBlockedWords() {
         try {
             ClassPathResource resource = new ClassPathResource("bad-words.txt");
+            Set<String> badWords = new HashSet<>();
             try (BufferedReader br = new BufferedReader(
                     new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
                 String line;
@@ -32,10 +34,12 @@ public class ProfanityCheckService {
                     if (line.isBlank() || line.startsWith("#")) {
                         continue;
                     }
-                    blockedWords.add(line.trim().toLowerCase());
+                    badWords.add(Pattern.quote(line.trim().toLowerCase()));
                 }
             }
 
+            String patternString = String.join("|", badWords);
+            badWordsPattern = Pattern.compile("\\b(" + patternString + ")\\b", Pattern.CASE_INSENSITIVE);
         } catch (Exception e) {
             throw new BoardException(ErrorCode.BOARD_FORBIDDEN_WORD_LOAD_FAILED);
         }
@@ -49,12 +53,11 @@ public class ProfanityCheckService {
         if (text == null || text.isBlank()) {
             return;
         }
-        String lowered = text.toLowerCase();
-        for (String badWord : blockedWords) {
-            if (lowered.contains(badWord)) {
-                throw new BoardException(ErrorCode.BOARD_Forbidden_WORD);
-            }
+        if (badWordsPattern.matcher(text).find()) {
+            throw new BoardException(ErrorCode.BOARD_Forbidden_WORD);
         }
+
     }
 
 }
+
