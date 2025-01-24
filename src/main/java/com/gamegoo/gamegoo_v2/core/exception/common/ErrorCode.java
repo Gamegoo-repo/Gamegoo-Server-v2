@@ -128,6 +128,8 @@ public enum ErrorCode {
     BOARD_GAME_STYLE_NOT_FOUND(NOT_FOUND, "BOARD_406", "게임 스타일을 찾을 수 없습니다."),
     BOARD_GAME_MODE_BAD_REQUEST(BAD_REQUEST, "BOARD_406", "게임모드 값은 1~4만 가능합니다."),
     BOARD_PAGE_BAD_REQUEST(BAD_REQUEST, "BOARD_407", "페이지 값은 0 이상만 가능합니다."),
+    BOARD_Forbidden_WORD(BAD_REQUEST, "BOARD_408", "금지어가 포함되어 있습니다."),
+    BOARD_FORBIDDEN_WORD_LOAD_FAILED(INTERNAL_SERVER_ERROR, "BOARD_409", "금지어 파일을 읽어오는데 실패했습니다."),
 
     /**
      * 매너평가 관련 에러
