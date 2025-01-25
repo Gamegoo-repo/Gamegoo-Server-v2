@@ -3,6 +3,8 @@ package com.gamegoo.gamegoo_v2.matching.Controller;
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,11 +23,18 @@ public class MatchingController {
 
     private final MatchingFacadeService matchingFacadeService;
 
-    @Operation(summary = "매칭 우선순위 계산 및 기록 저장 API", description = "API for calculating priority score and recording " +
-            "matchign")
+    @Operation(summary = "매칭 우선순위 계산 및 기록 저장 API", description = "API for calculating and recording matching \n\n"
+            + "gameMode: FAST, SOLO, FREE, ARAM string 을 넣어주세요. \n\n"
+            + "mike: UNAVAILABLE 또는 AVAILABLE 를 넣어주세요. \n\n"
+            + "matchingType: \"BASIC\" 또는 \"PRECISE\"를 넣어주세요.\n\n"
+            + "mainP: ANY, TOP, JUNGLE, MID, ADC, SUP string 을 넣어주세요. \n\n"
+            + "subP: ANY, TOP, JUNGLE, MID, ADC, SUP string 을 넣어주세요. \n\n"
+            + "wantP: ANY, TOP, JUNGLE, MID, ADC, SUP string 을 넣어주세요. \n\n"
+            + "gameStyleList: 1 ~ 17 int 를 넣어주세요.")
     @GetMapping
-    public ApiResponse<String> getMemberJWT(@AuthMember Member member) {
-        return ApiResponse.ok(matchingFacadeService.calculatePriorityAndRecording());
+    public ApiResponse<String> InitializeMatching(@AuthMember Member member,
+                                                  InitializingMatchingRequest request) {
+        return ApiResponse.ok(matchingFacadeService.calculatePriorityAndRecording(member, request));
     }
 
 }

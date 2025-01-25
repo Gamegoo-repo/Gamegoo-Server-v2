@@ -6,18 +6,15 @@ import com.gamegoo.gamegoo_v2.account.member.domain.MemberGameStyle;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.account.member.repository.MemberGameStyleRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.game.domain.GameStyle;
-import com.gamegoo.gamegoo_v2.game.repository.GameStyleRepository;
 import com.gamegoo.gamegoo_v2.utils.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,8 +23,7 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final GameStyleRepository gameStyleRepository;
-    private final MemberGameStyleRepository memberGameStyleRepository;
+    private final MemberGameStyleService memberGameStyleService;
 
     /**
      * Member 생성 메소드
@@ -134,85 +130,25 @@ public class MemberService {
      * @param gameStyleIdList 수정할 게임 스타일 리스트
      */
     @Transactional
-    public void setGameStyle(Member member, List<Long> gameStyleIdList) {
+    public void updateGameStyle(Member member, List<Long> gameStyleIdList) {
         // request의 Gamestyle 조회
-        List<GameStyle> requestGameStyleList = findRequestGameStyle(gameStyleIdList);
+        List<GameStyle> requestGameStyleList = memberGameStyleService.findRequestGameStyle(gameStyleIdList);
 
         // 현재 DB의 GameStyle 조회
-        List<MemberGameStyle> currentMemberGameStyleList = findCurrentMemberGameStyleList(member);
+        List<MemberGameStyle> currentMemberGameStyleList =
+                memberGameStyleService.findCurrentMemberGameStyleList(member);
 
         // request에 없고, DB에 있는 GameStyle 삭제
-        removeUnnecessaryGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
+        memberGameStyleService.removeUnnecessaryGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
 
         // request에 있고, DB에 없는 GameStyle 추가
-        addNewGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
-    }
-
-    /**
-     * request id로 GameStyle Entity 조회
-     *
-     * @return request의 GamestyleList
-     */
-    public List<GameStyle> findRequestGameStyle(List<Long> gameStyleIdList) {
-        return gameStyleIdList.stream()
-                .map(id -> gameStyleRepository.findById(id).orElseThrow(() -> new MemberException(ErrorCode.GAMESTYLE_NOT_FOUND)))
-                .toList();
-    }
-
-    /**
-     * 현재 DB의 MemberGameStyle List 조회
-     *
-     * @return MemberGameStyleList
-     */
-    public List<MemberGameStyle> findCurrentMemberGameStyleList(Member member) {
-        return new ArrayList<>(member.getMemberGameStyleList());
-    }
-
-    /**
-     * 불필요한 GameStyle 제거
-     *
-     * @param member                  회원
-     * @param requestedGameStyles     새로운 GameStyle
-     * @param currentMemberGameStyles 현재 Gamestyle
-     */
-    @Transactional
-    public void removeUnnecessaryGameStyles(Member member, List<GameStyle> requestedGameStyles,
-                                            List<MemberGameStyle> currentMemberGameStyles) {
-        currentMemberGameStyles.stream()
-                .filter(mgs -> !requestedGameStyles.contains(mgs.getGameStyle()))
-                .forEach(mgs -> {
-                    mgs.removeMember(member);
-                    memberGameStyleRepository.delete(mgs);
-                });
-    }
-
-    /**
-     * 새로운 GameStyle 추가
-     *
-     * @param member                  사용자
-     * @param requestedGameStyles     변경 후 게임스타일
-     * @param currentMemberGameStyles 변경 전 게임스타일
-     */
-    @Transactional
-    public void addNewGameStyles(Member member, List<GameStyle> requestedGameStyles,
-                                 List<MemberGameStyle> currentMemberGameStyles) {
-        List<GameStyle> currentGameStyles = currentMemberGameStyles.stream()
-                .map(MemberGameStyle::getGameStyle)
-                .toList();
-
-        requestedGameStyles.stream()
-                .filter(gs -> !currentGameStyles.contains(gs))
-                .forEach(gs -> {
-                    MemberGameStyle newMemberGameStyle = MemberGameStyle.create(gs, member);
-                    memberGameStyleRepository.save(newMemberGameStyle);
-                });
+        memberGameStyleService.addNewGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
     }
 
     @Transactional
-    public void updateMemberByMatchingInfo(Member member, Mike mike, Position mainP, Position subP, Position wantP,
-                                           List<Long> gameStyleIdList) {
+    public void updateMikePosition(Member member, Mike mike, Position mainP, Position subP, Position wantP) {
+        // 마이크, 포지션 수정
         member.updateMemberByMatchingRecord(mike, mainP, subP, wantP);
-        setGameStyle(member, gameStyleIdList);
     }
 
 }

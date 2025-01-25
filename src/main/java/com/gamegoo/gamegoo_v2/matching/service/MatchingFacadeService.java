@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.matching.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatQueryService;
@@ -8,6 +9,7 @@ import com.gamegoo.gamegoo_v2.core.common.validator.BlockValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,19 +25,26 @@ public class MatchingFacadeService {
     private final ChatCommandService chatCommandService;
     private final MemberValidator memberValidator;
     private final BlockValidator blockValidator;
+    private final MemberService memberService;
 
     /**
      * 매칭 우선순위 계산 및 기록 저장 API
      */
     @Transactional
-    public String calculatePriorityAndRecording() {
-        // 현재 매칭 중인 matchingRecord 조회
+    public String calculatePriorityAndRecording(Member member, InitializingMatchingRequest request) {
+        // 1. 매칭 정보로 member 업데이트
+        // 마이크, 포지션 변경
+        memberService.updateMikePosition(member, request.getMike(), request.getMainP(), request.getSubP(),
+                request.getWantP());
+        // 게임스타일 변경
+        memberService.updateGameStyle(member, request.getGameStyleIdList());
+        
+        // 2. matchingRecord DB에 저장
 
-        // 내 매칭 기록 생성
 
-        //
+        // 3. 현재 대기 중인 사용자 조회 후, 해당 사용자와의 우선순위 계산
 
-        return "response DTO 변경 예정";
+        return "D";
     }
 
     /**
