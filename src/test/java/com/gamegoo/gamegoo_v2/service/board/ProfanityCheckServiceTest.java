@@ -23,7 +23,7 @@ class ProfanityCheckServiceTest {
     @DisplayName("정상 텍스트(금지어 없음) 테스트")
     void noBadWord() {
 
-        String text = "안녕하세요, 반갑습니다.";
+        String text = "시발점이 될지도 몰라";
         assertDoesNotThrow(() -> profanityCheckService.validateProfanity(text));
     }
 
@@ -35,7 +35,7 @@ class ProfanityCheckServiceTest {
 
         assertThatThrownBy(() -> profanityCheckService.validateProfanity(text))
                 .isInstanceOf(BoardException.class)
-                .hasMessage(ErrorCode.BOARD_Forbidden_WORD.getMessage());
+                .hasMessage(ErrorCode.BOARD_FORBIDDEN_WORD.getMessage());
     }
 
 }

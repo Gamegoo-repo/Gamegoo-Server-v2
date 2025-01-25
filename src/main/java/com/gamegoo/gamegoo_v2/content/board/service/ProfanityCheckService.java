@@ -54,7 +54,7 @@ public class ProfanityCheckService {
             return;
         }
         if (badWordsPattern.matcher(text).find()) {
-            throw new BoardException(ErrorCode.BOARD_Forbidden_WORD);
+            throw new BoardException(ErrorCode.BOARD_FORBIDDEN_WORD);
         }
 
     }
