@@ -178,4 +178,11 @@ public class Member extends BaseDateTimeEntity {
         return this.mannerRank;
     }
 
+    public void updateMemberByMatchingRecord(Mike mike, Position mainP, Position subP, Position wantP) {
+        this.mike = mike;
+        this.mainPosition = mainP;
+        this.subPosition = subP;
+        this.wantPosition = wantP;
+    }
+
 }

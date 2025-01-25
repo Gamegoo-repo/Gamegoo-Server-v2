@@ -131,6 +131,27 @@ public class MemberService {
     }
 
     /**
+     * 게임 스타일 수정
+     *
+     * @param member  사용자
+     * @param request 게임스타일 리스트
+     */
+    @Transactional
+    public void setGameStyle(Member member, GameStyleRequest request) {
+        // request의 Gamestyle 조회
+        List<GameStyle> requestGameStyleList = findRequestGameStyle(request);
+
+        // 현재 DB의 GameStyle 조회
+        List<MemberGameStyle> currentMemberGameStyleList = findCurrentMemberGameStyleList(member);
+
+        // request에 없고, DB에 있는 GameStyle 삭제
+        removeUnnecessaryGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
+
+        // request에 있고, DB에 없는 GameStyle 추가
+        addNewGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
+    }
+
+    /**
      * request id로 GameStyle Entity 조회
      *
      * @return request의 GamestyleList
@@ -163,7 +184,7 @@ public class MemberService {
         currentMemberGameStyles.stream()
                 .filter(mgs -> !requestedGameStyles.contains(mgs.getGameStyle()))
                 .forEach(mgs -> {
-                    mgs.removeMember(member); // Remove bidirectional relationship
+                    mgs.removeMember(member);
                     memberGameStyleRepository.delete(mgs);
                 });
     }
@@ -188,6 +209,12 @@ public class MemberService {
                     MemberGameStyle newMemberGameStyle = MemberGameStyle.create(gs, member);
                     memberGameStyleRepository.save(newMemberGameStyle);
                 });
+    }
+
+    @Transactional
+    public void updateMemberByMatchingInfo(Member member, Mike mike, Position mainP, Position subP, Position wantP,
+                                           List<Long> gameStyleIdList) {
+        member.updateMemberByMatchingRecord(mike, mainP, subP, wantP);
     }
 
 }

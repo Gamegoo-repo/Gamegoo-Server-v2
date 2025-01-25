@@ -1,21 +1,17 @@
 package com.gamegoo.gamegoo_v2.account.member.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.account.member.domain.MemberGameStyle;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.GameStyleRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.IsMikeRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.PositionRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.ProfileImageRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.response.MyProfileResponse;
 import com.gamegoo.gamegoo_v2.account.member.dto.response.OtherProfileResponse;
-import com.gamegoo.gamegoo_v2.game.domain.GameStyle;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -114,18 +110,7 @@ public class MemberFacadeService {
      */
     @Transactional
     public String setGameStyle(Member member, GameStyleRequest request) {
-        // request의 Gamestyle 조회
-        List<GameStyle> requestGameStyleList = memberService.findRequestGameStyle(request);
-
-        // 현재 DB의 GameStyle 조회
-        List<MemberGameStyle> currentMemberGameStyleList = memberService.findCurrentMemberGameStyleList(member);
-
-        // request에 없고, DB에 있는 GameStyle 삭제
-        memberService.removeUnnecessaryGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
-
-        // request에 있고, DB에 없는 GameStyle 추가
-        memberService.addNewGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
-
+        memberService.setGameStyle(member, request);
         return "게임 스타일 수정이 완료되었습니다";
     }
 
