@@ -110,7 +110,7 @@ public class MemberFacadeService {
      */
     @Transactional
     public String setGameStyle(Member member, GameStyleRequest request) {
-        memberService.setGameStyle(member, request);
+        memberService.setGameStyle(member, request.getGameStyleIdList());
         return "게임 스타일 수정이 완료되었습니다";
     }
 

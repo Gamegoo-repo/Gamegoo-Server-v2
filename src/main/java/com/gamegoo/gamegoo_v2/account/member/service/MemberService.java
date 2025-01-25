@@ -6,7 +6,6 @@ import com.gamegoo.gamegoo_v2.account.member.domain.MemberGameStyle;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.account.member.dto.request.GameStyleRequest;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberGameStyleRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
@@ -131,15 +130,13 @@ public class MemberService {
     }
 
     /**
-     * 게임 스타일 수정
-     *
-     * @param member  사용자
-     * @param request 게임스타일 리스트
+     * @param member          회원
+     * @param gameStyleIdList 수정할 게임 스타일 리스트
      */
     @Transactional
-    public void setGameStyle(Member member, GameStyleRequest request) {
+    public void setGameStyle(Member member, List<Long> gameStyleIdList) {
         // request의 Gamestyle 조회
-        List<GameStyle> requestGameStyleList = findRequestGameStyle(request);
+        List<GameStyle> requestGameStyleList = findRequestGameStyle(gameStyleIdList);
 
         // 현재 DB의 GameStyle 조회
         List<MemberGameStyle> currentMemberGameStyleList = findCurrentMemberGameStyleList(member);
@@ -156,8 +153,8 @@ public class MemberService {
      *
      * @return request의 GamestyleList
      */
-    public List<GameStyle> findRequestGameStyle(GameStyleRequest request) {
-        return request.getGameStyleIdList().stream()
+    public List<GameStyle> findRequestGameStyle(List<Long> gameStyleIdList) {
+        return gameStyleIdList.stream()
                 .map(id -> gameStyleRepository.findById(id).orElseThrow(() -> new MemberException(ErrorCode.GAMESTYLE_NOT_FOUND)))
                 .toList();
     }
@@ -215,6 +212,7 @@ public class MemberService {
     public void updateMemberByMatchingInfo(Member member, Mike mike, Position mainP, Position subP, Position wantP,
                                            List<Long> gameStyleIdList) {
         member.updateMemberByMatchingRecord(mike, mainP, subP, wantP);
+        setGameStyle(member, gameStyleIdList);
     }
 
 }
