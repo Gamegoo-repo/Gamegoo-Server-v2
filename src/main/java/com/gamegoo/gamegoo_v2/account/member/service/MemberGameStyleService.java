@@ -22,13 +22,31 @@ public class MemberGameStyleService {
     private final GameStyleRepository gameStyleRepository;
     private final MemberGameStyleRepository memberGameStyleRepository;
 
+    /**
+     * @param member          회원
+     * @param gameStyleIdList 수정할 게임 스타일 리스트
+     */
+    @Transactional
+    public void updateGameStyle(Member member, List<Long> gameStyleIdList) {
+        // request의 Gamestyle 조회
+        List<GameStyle> requestGameStyleList = findRequestGameStyle(gameStyleIdList);
+
+        // 현재 DB의 GameStyle 조회
+        List<MemberGameStyle> currentMemberGameStyleList = findCurrentMemberGameStyleList(member);
+
+        // request에 없고, DB에 있는 GameStyle 삭제
+        removeUnnecessaryGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
+
+        // request에 있고, DB에 없는 GameStyle 추가
+        addNewGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
+    }
 
     /**
      * request id로 GameStyle Entity 조회
      *
      * @return request의 GamestyleList
      */
-    public List<GameStyle> findRequestGameStyle(List<Long> gameStyleIdList) {
+    private List<GameStyle> findRequestGameStyle(List<Long> gameStyleIdList) {
         return gameStyleIdList.stream()
                 .map(id -> gameStyleRepository.findById(id).orElseThrow(() -> new MemberException(ErrorCode.GAMESTYLE_NOT_FOUND)))
                 .toList();
@@ -39,7 +57,7 @@ public class MemberGameStyleService {
      *
      * @return MemberGameStyleList
      */
-    public List<MemberGameStyle> findCurrentMemberGameStyleList(Member member) {
+    private List<MemberGameStyle> findCurrentMemberGameStyleList(Member member) {
         return new ArrayList<>(member.getMemberGameStyleList());
     }
 
@@ -51,8 +69,8 @@ public class MemberGameStyleService {
      * @param currentMemberGameStyles 현재 Gamestyle
      */
     @Transactional
-    public void removeUnnecessaryGameStyles(Member member, List<GameStyle> requestedGameStyles,
-                                            List<MemberGameStyle> currentMemberGameStyles) {
+    protected void removeUnnecessaryGameStyles(Member member, List<GameStyle> requestedGameStyles,
+                                               List<MemberGameStyle> currentMemberGameStyles) {
         currentMemberGameStyles.stream()
                 .filter(mgs -> !requestedGameStyles.contains(mgs.getGameStyle()))
                 .forEach(mgs -> {
@@ -69,8 +87,8 @@ public class MemberGameStyleService {
      * @param currentMemberGameStyles 변경 전 게임스타일
      */
     @Transactional
-    public void addNewGameStyles(Member member, List<GameStyle> requestedGameStyles,
-                                 List<MemberGameStyle> currentMemberGameStyles) {
+    protected void addNewGameStyles(Member member, List<GameStyle> requestedGameStyles,
+                                    List<MemberGameStyle> currentMemberGameStyles) {
         List<GameStyle> currentGameStyles = currentMemberGameStyles.stream()
                 .map(MemberGameStyle::getGameStyle)
                 .toList();

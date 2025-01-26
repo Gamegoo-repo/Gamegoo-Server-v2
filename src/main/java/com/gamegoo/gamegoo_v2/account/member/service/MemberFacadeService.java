@@ -21,6 +21,7 @@ public class MemberFacadeService {
     private final MemberService memberService;
     private final FriendService friendService;
     private final BlockService blockService;
+    private final MemberGameStyleService memberGameStyleService;
 
     /**
      * 내 프로필 조회
@@ -110,7 +111,7 @@ public class MemberFacadeService {
      */
     @Transactional
     public String setGameStyle(Member member, GameStyleRequest request) {
-        memberService.updateGameStyle(member, request.getGameStyleIdList());
+        memberGameStyleService.updateGameStyle(member, request.getGameStyleIdList());
         return "게임 스타일 수정이 완료되었습니다";
     }
 

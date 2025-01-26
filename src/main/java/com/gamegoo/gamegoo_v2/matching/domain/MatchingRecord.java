@@ -98,7 +98,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_id", nullable = false)
+    @JoinColumn(name = "target_id")
     private Member targetMember;
 
     // MatchingRecord 생성 메서드
@@ -141,6 +141,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
         this.matchingType = matchingType;
         this.mannerLevel = mannerLevel;
         this.member = member;
+        this.targetMember = null;
     }
 
     // status 변경

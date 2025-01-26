@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.matching.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.service.MemberGameStyleService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
@@ -34,27 +35,31 @@ public class MatchingFacadeService {
     private final MemberService memberService;
     private final MatchingService matchingService;
     private final BlockService blockService;
+    private final MemberGameStyleService memberGameStyleService;
 
     /**
      * 매칭 우선순위 계산 및 기록 저장 API
      */
     @Transactional
-    public PriorityListResponse calculatePriorityAndRecording(Member member, InitializingMatchingRequest request) {
-        // 1. 매칭 정보로 member 업데이트
-        // 1-1. 마이크, 포지션 변경
+    public PriorityListResponse calculatePriorityAndRecording(Long memberId, InitializingMatchingRequest request) {
+        // 사용자 조회
+        Member member = memberService.findMemberById(memberId);
+
+        // 매칭 정보로 member 업데이트
+        // 마이크, 포지션 변경
         memberService.updateMikePosition(member, request.getMike(), request.getMainP(), request.getSubP(),
                 request.getWantP());
-        // 1-2. 게임스타일 변경
-        memberService.updateGameStyle(member, request.getGameStyleIdList());
+        // 게임스타일 변경
+        memberGameStyleService.updateGameStyle(member, request.getGameStyleIdList());
 
-        // 2. matchingRecord DB에 저장
+        // matchingRecord DB에 저장
         MatchingRecord matchingRecord = matchingService.createMatchingRecord(member, request.getMatchingType(),
                 request.getGameMode());
 
-        // 3. 현재 대기 중인 사용자 조회
+        // 현재 대기 중인 사용자 조회
         List<MatchingRecord> pendingMatchingRecords = matchingService.getPENDINGMatchingRecords(request.getGameMode());
 
-        // 4. 차단당한 사용자 제외
+        // 차단당한 사용자 제외
         List<Long> targetMemberIds = new ArrayList<>();
         for (MatchingRecord record : pendingMatchingRecords) {
             targetMemberIds.add(record.getMember().getId());
@@ -72,7 +77,7 @@ public class MatchingFacadeService {
             }
         }
 
-        // 5. myPriorityList, otherPriorityList 조회
+        // myPriorityList, otherPriorityList 조회
         return matchingService.calculatePriorityList(matchingRecord, filteredPENDINGMatchingRecords);
     }
 

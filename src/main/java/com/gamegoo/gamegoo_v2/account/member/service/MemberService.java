@@ -2,20 +2,16 @@ package com.gamegoo.gamegoo_v2.account.member.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.account.member.domain.MemberGameStyle;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import com.gamegoo.gamegoo_v2.game.domain.GameStyle;
 import com.gamegoo.gamegoo_v2.utils.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -125,25 +121,6 @@ public class MemberService {
         member.updatePosition(mainPosition, subPosition, wantPosition);
     }
 
-    /**
-     * @param member          회원
-     * @param gameStyleIdList 수정할 게임 스타일 리스트
-     */
-    @Transactional
-    public void updateGameStyle(Member member, List<Long> gameStyleIdList) {
-        // request의 Gamestyle 조회
-        List<GameStyle> requestGameStyleList = memberGameStyleService.findRequestGameStyle(gameStyleIdList);
-
-        // 현재 DB의 GameStyle 조회
-        List<MemberGameStyle> currentMemberGameStyleList =
-                memberGameStyleService.findCurrentMemberGameStyleList(member);
-
-        // request에 없고, DB에 있는 GameStyle 삭제
-        memberGameStyleService.removeUnnecessaryGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
-
-        // request에 있고, DB에 없는 GameStyle 추가
-        memberGameStyleService.addNewGameStyles(member, requestGameStyleList, currentMemberGameStyleList);
-    }
 
     @Transactional
     public void updateMikePosition(Member member, Mike mike, Position mainP, Position subP, Position wantP) {

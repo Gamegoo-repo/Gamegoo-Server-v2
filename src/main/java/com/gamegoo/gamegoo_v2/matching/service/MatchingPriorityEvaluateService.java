@@ -3,13 +3,9 @@ package com.gamegoo.gamegoo_v2.matching.service;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
-@Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Component
 public class MatchingPriorityEvaluateService {
 
     /**

@@ -18,7 +18,7 @@ public class InitializingMatchingRequest {
     @NotNull(message = "mike 는 비워둘 수 없습니다.")
     Mike mike;
 
-    @NotNull(message = "matching_type은 비워둘 수 없습니다.")
+    @NotNull(message = "matchingType은 비워둘 수 없습니다.")
     MatchingType matchingType;
 
     Position mainP;

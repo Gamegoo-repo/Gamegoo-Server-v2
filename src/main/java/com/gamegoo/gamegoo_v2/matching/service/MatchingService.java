@@ -32,7 +32,6 @@ public class MatchingService {
 
         for (MatchingRecord otherRecord : otherMatchingRecords) {
             Long otherMemberId = otherRecord.getMember().getId();
-
             // 자신이 아닌 다른 멤버와 비교
             if (!myMatchingRecord.getMember().getId().equals(otherMemberId)) {
                 // 나의 우선순위 계산
