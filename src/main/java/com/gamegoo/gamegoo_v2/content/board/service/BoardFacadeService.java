@@ -33,6 +33,7 @@ public class BoardFacadeService {
     private final MemberService memberService;
     private final FriendService friendService;
     private final BlockService blockService;
+    private final ProfanityCheckService profanityCheckService;
 
     /**
      * 게시글 생성 (파사드)
@@ -43,6 +44,7 @@ public class BoardFacadeService {
     @Transactional
     public BoardInsertResponse createBoard(BoardInsertRequest request, Member member) {
 
+        profanityCheckService.validateProfanity(request.getContents());
         Board board = boardService.createAndSaveBoard(request, member);
         boardGameStyleService.mapGameStylesToBoard(board, request.getGameStyles());
 
@@ -102,6 +104,7 @@ public class BoardFacadeService {
     @Transactional
     public BoardUpdateResponse updateBoard(BoardUpdateRequest request, Member member, Long boardId) {
 
+        profanityCheckService.validateProfanity(request.getContents());
         Board board = boardService.updateBoard(request, member.getId(), boardId);
         boardGameStyleService.updateBoardGameStyles(board, request.getGameStyles());
 
