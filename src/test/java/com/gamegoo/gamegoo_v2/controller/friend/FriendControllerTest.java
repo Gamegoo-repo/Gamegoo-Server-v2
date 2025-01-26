@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.controller.friend;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
+import com.gamegoo.gamegoo_v2.controller.WithCustomMockMember;
 import com.gamegoo.gamegoo_v2.core.exception.FriendException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
@@ -17,9 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.ArrayList;
@@ -37,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FriendController.class)
+@WithCustomMockMember
 class FriendControllerTest extends ControllerTestSupport {
 
     @MockitoBean
@@ -453,59 +452,21 @@ class FriendControllerTest extends ControllerTestSupport {
 
     }
 
-    @Nested
-    @DisplayName("친구 목록 조회")
-    class GetFriendListTest {
+    @DisplayName("친구 목록 조회 성공")
+    @Test
+    void getFriendListSucceeds() throws Exception {
+        // given
+        List<Friend> friends = new ArrayList<>();
+        FriendListResponse response = FriendListResponse.of(friends);
 
-        @DisplayName("친구 목록 조회 성공: cursor가 없는 경우")
-        @Test
-        void getFriendListSucceedsWhenNoCursor() throws Exception {
-            // given
-            List<Friend> friends = new ArrayList<>();
-            Slice<Friend> friendSlice = new SliceImpl<>(friends, Pageable.unpaged(), false);
-            FriendListResponse response = FriendListResponse.of(friendSlice);
+        given(friendFacadeService.getFriends(any(Member.class))).willReturn(response);
 
-            given(friendFacadeService.getFriends(any(Member.class), any())).willReturn(response);
-
-            // when // then
-            mockMvc.perform(get(API_URL_PREFIX))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message").value("OK"))
-                    .andExpect(jsonPath("$.data.friendInfoList").isArray())
-                    .andExpect(jsonPath("$.data.listSize").isNumber())
-                    .andExpect(jsonPath("$.data.hasNext").isBoolean());
-        }
-
-        @DisplayName("친구 목록 조회 성공: cursor가 있는 경우")
-        @Test
-        void getFriendListSucceedsWithCursor() throws Exception {
-            // given
-            List<Friend> friends = new ArrayList<>();
-            Slice<Friend> friendSlice = new SliceImpl<>(friends, Pageable.unpaged(), false);
-            FriendListResponse response = FriendListResponse.of(friendSlice);
-
-            given(friendFacadeService.getFriends(any(Member.class), any(Long.class))).willReturn(response);
-
-            // when // then
-            mockMvc.perform(get(API_URL_PREFIX)
-                            .param("cursor", "1"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message").value("OK"))
-                    .andExpect(jsonPath("$.data.friendInfoList").isArray())
-                    .andExpect(jsonPath("$.data.listSize").isNumber())
-                    .andExpect(jsonPath("$.data.hasNext").isBoolean());
-        }
-
-        @DisplayName("친구 목록 조회 실패: cursor가 음수인 경우 에러 응답을 반환한다.")
-        @Test
-        void getFriendListFailedWhenNegativeCursor() throws Exception {
-            // when // then
-            mockMvc.perform(get(API_URL_PREFIX)
-                            .param("cursor", "-1"))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value("커서는 1 이상의 값이어야 합니다."));
-        }
-
+        // when // then
+        mockMvc.perform(get(API_URL_PREFIX))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data.friendInfoList").isArray())
+                .andExpect(jsonPath("$.data.listSize").isNumber());
     }
 
     @Nested

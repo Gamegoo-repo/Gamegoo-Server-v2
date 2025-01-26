@@ -1,10 +1,15 @@
 package com.gamegoo.gamegoo_v2.content.board.domain;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,20 +35,25 @@ public class Board extends BaseDateTimeEntity {
     @Column(name = "board_id")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int mode;
+    private GameMode gameMode;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int mainPosition;
+    private Position mainP;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int subPosition;
+    private Position subP;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int wantPosition;
+    private Position wantP;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean mike = false;
+    private Mike mike;
 
     @Column(length = 5000)
     private String content;
@@ -62,14 +72,15 @@ public class Board extends BaseDateTimeEntity {
     private List<BoardGameStyle> boardGameStyles = new ArrayList<>();
 
 
-    public static Board create(Member member, int mode, int mainPosition, int subPosition, int wantPosition,
-                               boolean mike, String content, int boardProfileImage) {
+    public static Board create(Member member, GameMode gameMode, Position mainP, Position subP,
+                               Position wantP,
+                               Mike mike, String content, int boardProfileImage) {
         return Board.builder()
                 .member(member)
-                .mode(mode)
-                .mainPosition(mainPosition)
-                .subPosition(subPosition)
-                .wantPosition(wantPosition)
+                .gameMode(gameMode)
+                .mainP(mainP)
+                .subP(subP)
+                .wantP(wantP)
                 .mike(mike)
                 .content(content)
                 .boardProfileImage(boardProfileImage)
@@ -77,12 +88,13 @@ public class Board extends BaseDateTimeEntity {
     }
 
     @Builder
-    private Board(int mode, int mainPosition, int subPosition, int wantPosition, boolean mike, String content,
+    private Board(GameMode gameMode, Position mainP, Position subP, Position wantP, Mike mike,
+                  String content,
                   int boardProfileImage, boolean deleted, Member member) {
-        this.mode = mode;
-        this.mainPosition = mainPosition;
-        this.subPosition = subPosition;
-        this.wantPosition = wantPosition;
+        this.gameMode = gameMode;
+        this.mainP = mainP;
+        this.subP = subP;
+        this.wantP = wantP;
         this.mike = mike;
         this.content = content;
         this.boardProfileImage = boardProfileImage;
@@ -94,5 +106,42 @@ public class Board extends BaseDateTimeEntity {
         boardGameStyles.add(boardGameStyle);
         boardGameStyle.setBoard(this);
     }
+
+    public void removeBoardGameStyle(BoardGameStyle boardGameStyle) {
+        boardGameStyles.remove(boardGameStyle);
+        boardGameStyle.removeBoard();
+    }
+
+    public void updateBoard(GameMode gameMode, Position mainP, Position subP, Position wantP, Mike mike,
+                            String content, int boardProfileImage) {
+        if (gameMode != null) {
+            this.gameMode = gameMode;
+        }
+        if (mainP != null) {
+            this.mainP = mainP;
+        }
+        if (subP != null) {
+            this.subP = subP;
+        }
+        if (wantP != null) {
+            this.wantP = wantP;
+        }
+        if (mike != null) {
+            this.mike = mike;
+        }
+
+        if (content == null) {
+            this.content = "";
+        } else {
+            this.content = content;
+        }
+
+        this.boardProfileImage = boardProfileImage;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
 
 }

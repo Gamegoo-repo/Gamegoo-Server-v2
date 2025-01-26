@@ -7,7 +7,6 @@ on:
       - develop
   workflow_dispatch: # 수동 실행 가능
 
-
 jobs:
   build-and-deploy: # Job 이름
     runs-on: ubuntu-latest # 실행 환경 - 가장 최신 버전 Ubuntu 환경
@@ -59,7 +58,7 @@ jobs:
           context: . # Dockerfile 위치
           file: ./Dockerfile # Dockerfile 경로
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoov2-api:${{ github.sha }} # 이미지 태그
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }} # 이미지 태그
           platforms: linux/amd64
           build-args: |  # Dockerfile에서 사용할 환경 변수 전달
             JWT_SECRET= ${{ secrets.JWT_SECRET }}
@@ -84,11 +83,14 @@ jobs:
           script: |
             sudo fuser -k -n tcp 8080 || true
 
-            docker rm -f gamegoov2-api
+            docker rm -f gamegoo-api-v2
 
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gamegoov2-api:${{ github.sha }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
 
-            docker run -d -p 8080:8080 --name gamegoov2-api \
+            docker run -d \
+            -p 8080:8080 \
+            --name gamegoo-api-v2 \
+            -v ${{ secrets.EC2_LOG_PATH }}:/app/logs \
             -e SPRING_PROFILES_ACTIVE=dev \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e RDS_PRIVATE_IP=${{ secrets.RDS_PRIVATE_IP }} \
@@ -99,13 +101,20 @@ jobs:
             -e GMAIL_PWD=${{ secrets.GMAIL_PWD }} \
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoov2-api:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
+
+      # 8. 기존 Docker 이미지 삭제
+      - name: 기존 Docker 이미지 삭제
+        run: docker image prune -a
 
       # 실패 시 디스코드에 알림 보내기
-      - name: Notify Discord on failure
+      - name: 배포 실패 시 디스코드 알림 전송
         if: failure() # 이전 스텝이 실패한 경우에만 실행
         run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
           curl -X POST -H "Content-Type: application/json" \
-          -d "{\"content\": \"🚨 **Gamegoo v2 API 배포 실패** 🚨\n브랜치: '${{ github.ref }}'\n커밋: '${{ github.sha }}'\nPR 제목: '${PR_TITLE}'\n[로그 확인하기]('${{ github.run_url }}')\"}" \
+          -d "{\"content\": \"🚨 **Gamegoo v2 API 배포 실패** 🚨\nPR 번호: ${PR_NUMBER}\nPR 제목: ${PR_TITLE}\nPR 작성자: ${PR_AUTHOR}\n[PR 보기](${PR_URL})\"}" \
           $DISCORD_WEBHOOK_URL

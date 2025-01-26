@@ -3,6 +3,8 @@ package com.gamegoo.gamegoo_v2.account.member.service;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.MemberGameStyle;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.GameStyleRequest;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberGameStyleRepository;
@@ -108,11 +110,11 @@ public class MemberService {
      * 마이크 여부 수정
      *
      * @param member 회원
-     * @param isMike 마이크 여부
+     * @param mike   마이크 상태
      */
     @Transactional
-    public void setIsMike(Member member, boolean isMike) {
-        member.updateMike(isMike);
+    public void setIsMike(Member member, Mike mike) {
+        member.updateMike(mike);
     }
 
     /**
@@ -124,7 +126,7 @@ public class MemberService {
      * @param wantPosition 원하는 포지션
      */
     @Transactional
-    public void setPosition(Member member, int mainPosition, int subPosition, int wantPosition) {
+    public void setPosition(Member member, Position mainPosition, Position subPosition, Position wantPosition) {
         member.updatePosition(mainPosition, subPosition, wantPosition);
     }
 
@@ -168,9 +170,10 @@ public class MemberService {
 
     /**
      * 새로운 GameStyle 추가
-     * @param member                    사용자
-     * @param requestedGameStyles       변경 후 게임스타일
-     * @param currentMemberGameStyles   변경 전 게임스타일
+     *
+     * @param member                  사용자
+     * @param requestedGameStyles     변경 후 게임스타일
+     * @param currentMemberGameStyles 변경 전 게임스타일
      */
     @Transactional
     public void addNewGameStyles(Member member, List<GameStyle> requestedGameStyles,

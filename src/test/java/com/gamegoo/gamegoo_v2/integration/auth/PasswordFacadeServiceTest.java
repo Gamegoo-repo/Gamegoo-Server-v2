@@ -23,16 +23,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class PasswordFacadeServiceTest {
+class PasswordFacadeServiceTest {
 
     @Autowired
-    PasswordFacadeService passwordFacadeService;
+    private PasswordFacadeService passwordFacadeService;
 
     @Autowired
-    MemberRepository memberRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
-    EmailVerifyRecordRepository emailVerifyRecordRepository;
+    private EmailVerifyRecordRepository emailVerifyRecordRepository;
 
     private Member member;
 

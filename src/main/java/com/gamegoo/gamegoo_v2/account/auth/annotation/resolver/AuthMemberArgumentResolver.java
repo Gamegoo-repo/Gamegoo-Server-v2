@@ -1,11 +1,13 @@
 package com.gamegoo.gamegoo_v2.account.auth.annotation.resolver;
 
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
-import com.gamegoo.gamegoo_v2.core.exception.JwtAuthException;
-import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.account.auth.security.SecurityUtil;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import com.gamegoo.gamegoo_v2.core.exception.AuthException;
+import com.gamegoo.gamegoo_v2.core.exception.MemberException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -32,16 +34,17 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-
-        Long memberId = (Long) request.getAttribute("memberId");
-        if (memberId == null) {
-            throw new JwtAuthException(ErrorCode.MEMBER_EXTRACTION_FAILED);
+    public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer,
+                                  @NonNull NativeWebRequest webRequest,
+                                  WebDataBinderFactory binderFactory) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        if (currentMemberId != null) {
+            return memberRepository.findById(currentMemberId)
+                    .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+        } else {
+            throw new AuthException(ErrorCode.UNAUTHORIZED_EXCEPTION);
         }
 
-        return memberRepository.findById(memberId).orElseThrow(() -> new JwtAuthException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
 }

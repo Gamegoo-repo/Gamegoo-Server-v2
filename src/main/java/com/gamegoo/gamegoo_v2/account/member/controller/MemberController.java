@@ -55,7 +55,7 @@ public class MemberController {
     @PutMapping("/mike")
     public ApiResponse<String> modifyIsMike(
             @Valid @RequestBody IsMikeRequest request, @AuthMember Member member) {
-        return ApiResponse.ok(memberFacadeService.setIsMike(member, request));
+        return ApiResponse.ok(memberFacadeService.setMike(member, request));
     }
 
     @Operation(summary = "주/부/원하는 포지션 수정 API 입니다.", description = "API for Main/Sub/Want Position Modification")

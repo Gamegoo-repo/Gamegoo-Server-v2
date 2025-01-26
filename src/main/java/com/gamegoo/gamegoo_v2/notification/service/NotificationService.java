@@ -9,6 +9,7 @@ import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
+import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ public class NotificationService {
 
     private final NotificationTypeRepository notificationTypeRepository;
     private final NotificationRepository notificationRepository;
+    private final MannerKeywordRepository mannerKeywordRepository;
 
     private static final String PLACEHOLDER = "n";
     private final static int PAGE_SIZE = 10;
@@ -104,7 +106,7 @@ public class NotificationService {
      */
     @Transactional
     public Notification createMannerLevelNotification(NotificationTypeTitle notificationTypeTitle, Member member,
-                                                      int mannerLevel) {
+                                                      Integer mannerLevel) {
         validateMember(member);
 
         NotificationType notificationType = findNotificationType(notificationTypeTitle);
@@ -115,14 +117,17 @@ public class NotificationService {
     /**
      * 매너 평가 등록됨 알림 생성 메소드
      *
-     * @param mannerKeywordList 매너 키워드 list
-     * @param member            알림 전송 대상 회원
+     * @param mannerKeywordIdList 매너 키워드 id list
+     * @param member              알림 전송 대상 회원
      * @return Notification
      */
     @Transactional
-    public Notification createMannerRatingNotification(List<MannerKeyword> mannerKeywordList, Member member) {
+    public Notification createMannerRatingNotification(List<Long> mannerKeywordIdList, Member member) {
         validateMember(member);
-        validateMannerKeywordList(mannerKeywordList);
+        validateMannerKeywordList(mannerKeywordIdList);
+
+        // 매너 키워드 엔티티 조회
+        List<MannerKeyword> mannerKeywordList = mannerKeywordRepository.findAllById(mannerKeywordIdList);
 
         NotificationType notificationType = findNotificationType(NotificationTypeTitle.MANNER_KEYWORD_RATED);
 
@@ -231,10 +236,10 @@ public class NotificationService {
     /**
      * mannerKeywordList에 키워드가 1개 이상 있는지 검증하는 메소드
      *
-     * @param mannerKeywordList 매너 레벨 키워드 list
+     * @param mannerKeywordIdList 매너 레벨 키워드 id list
      */
-    private void validateMannerKeywordList(List<MannerKeyword> mannerKeywordList) {
-        if (mannerKeywordList.isEmpty()) {
+    private void validateMannerKeywordList(List<Long> mannerKeywordIdList) {
+        if (mannerKeywordIdList.isEmpty()) {
             throw new NotificationException(ErrorCode.NOTIFICATION_METHOD_BAD_REQUEST);
         }
     }

@@ -4,15 +4,11 @@ import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.gamegoo.gamegoo_v2.social.friend.domain.QFriend.friend;
 
@@ -22,7 +18,7 @@ public class FriendRepositoryCustomImpl implements FriendRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<Friend> findFriendsByCursor(Long memberId, Long cursorId, int pageSize) {
+    public List<Friend> findAllFriendsOrdered(Long memberId) {
         // 전체 친구 목록 조회
         List<Friend> allFriends = queryFactory.selectFrom(friend)
                 .where(friend.fromMember.id.eq(memberId))
@@ -32,22 +28,7 @@ public class FriendRepositoryCustomImpl implements FriendRepositoryCustom {
         allFriends.sort(
                 (f1, f2) -> memberNameComparator.compare(f1.getToMember().getGameName(),
                         f2.getToMember().getGameName()));
-
-        // 정렬된 데이터에서 페이징 적용
-        // cursorId에 해당하는 요소의 인덱스 찾기
-        int startIndex = findCursorIndex(allFriends, cursorId);
-
-        List<Friend> pagedFriends = allFriends.stream()
-                .skip(startIndex)
-                .limit(pageSize + 1) // 다음 페이지가 있는지 확인하기 위해 +1
-                .collect(Collectors.toList());
-
-        boolean hasNext = pagedFriends.size() > pageSize;
-        if (hasNext) {
-            pagedFriends.remove(pagedFriends.size() - 1); // 다음 페이지가 있으면 마지막 요소를 제거
-        }
-
-        return new SliceImpl<>(pagedFriends, Pageable.unpaged(), hasNext);
+        return allFriends;
     }
 
     @Override

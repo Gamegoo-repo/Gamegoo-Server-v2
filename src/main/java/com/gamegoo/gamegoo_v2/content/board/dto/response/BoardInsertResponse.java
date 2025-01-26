@@ -1,7 +1,11 @@
 package com.gamegoo.gamegoo_v2.content.board.dto.response;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
+import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,13 +20,13 @@ public class BoardInsertResponse {
     private Integer profileImage;
     private String gameName;
     private String tag;
-    private String tier;
+    private Tier tier;
     private int rank;
-    private int gameMode;
-    private int mainPosition;
-    private int subPosition;
-    private int wantPosition;
-    private boolean mike;
+    private GameMode gameMode;
+    private Position mainP;
+    private Position subP;
+    private Position wantP;
+    private Mike mike;
     private List<Long> gameStyles;
     private String contents;
 
@@ -33,13 +37,13 @@ public class BoardInsertResponse {
                 .profileImage(board.getBoardProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getTier().name())
+                .tier(member.getTier())
                 .rank(member.getGameRank())
-                .gameMode(board.getMode())
-                .mainPosition(board.getMainPosition())
-                .subPosition(board.getSubPosition())
-                .wantPosition(board.getWantPosition())
-                .mike(board.isMike())
+                .gameMode(board.getGameMode())
+                .mainP(board.getMainP())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
+                .mike(board.getMike())
                 .gameStyles(board.getBoardGameStyles().stream()
                         .map(bg -> bg.getGameStyle().getId())
                         .toList())

@@ -12,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +23,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
 @Getter
-@Table(name = "Member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseDateTimeEntity {
 
@@ -45,7 +43,9 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false)
     private int mannerLevel = 1;
 
-    private int mannerScore = 0;
+    private Integer mannerScore;
+
+    private Double mannerRank;
 
     @Column(nullable = false)
     private boolean blind = false;
@@ -70,17 +70,21 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false)
     private double winRate;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int mainPosition = 0;
+    private Position mainPosition = Position.ANY;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int subPosition = 0;
+    private Position subPosition = Position.ANY;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int wantPosition = 0;
+    private Position wantPosition = Position.ANY;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean mike = false;
+    private Mike mike = Mike.UNAVAILABLE;
 
     @Column(nullable = false)
     private int gameCount;
@@ -145,11 +149,11 @@ public class Member extends BaseDateTimeEntity {
         this.profileImage = profileImage;
     }
 
-    public void updateMike(boolean mike) {
+    public void updateMike(Mike mike) {
         this.mike = mike;
     }
 
-    public void updatePosition(int mainPosition, int subPosition, int wantPosition) {
+    public void updatePosition(Position mainPosition, Position subPosition, Position wantPosition) {
         this.mainPosition = mainPosition;
         this.subPosition = subPosition;
         this.wantPosition = wantPosition;
@@ -157,6 +161,21 @@ public class Member extends BaseDateTimeEntity {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public Integer updateMannerScore(int mannerScore) {
+        this.mannerScore = mannerScore;
+        return this.mannerScore;
+    }
+
+    public int updateMannerLevel(int mannerLevel) {
+        this.mannerLevel = mannerLevel;
+        return this.mannerLevel;
+    }
+
+    public Double updateMannerRank(Double mannerRank) {
+        this.mannerRank = mannerRank;
+        return this.mannerRank;
     }
 
     public void deactiveMember() {

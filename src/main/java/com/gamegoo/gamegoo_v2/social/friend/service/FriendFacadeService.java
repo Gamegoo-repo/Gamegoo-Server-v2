@@ -129,11 +129,10 @@ public class FriendFacadeService {
      * 친구 목록 조회 Facade 메소드
      *
      * @param member 회원
-     * @param cursor 친구 회원 id
      * @return FriendListResponse
      */
-    public FriendListResponse getFriends(Member member, Long cursor) {
-        return FriendListResponse.of(friendService.getFriendSlice(member, cursor));
+    public FriendListResponse getFriends(Member member) {
+        return FriendListResponse.of(friendService.getFriendList(member));
     }
 
     /**
