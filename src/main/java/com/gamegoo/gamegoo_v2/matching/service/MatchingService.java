@@ -147,7 +147,7 @@ public class MatchingService {
      * @param gameMode 게임모드
      * @return 대기 중인 매칭 리스트
      */
-    public List<MatchingRecord> getPENDINGMatchingRecords(GameMode gameMode) {
+    public List<MatchingRecord> getPendingMatchingRecords(GameMode gameMode) {
         LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
 
         return matchingRecordRepository.findMatchingRecordsWithGroupBy(

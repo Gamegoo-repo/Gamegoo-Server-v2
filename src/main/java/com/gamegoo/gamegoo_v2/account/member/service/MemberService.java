@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final MemberGameStyleService memberGameStyleService;
 
     /**
      * Member 생성 메소드
