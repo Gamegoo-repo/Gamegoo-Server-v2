@@ -111,9 +111,7 @@ public class MatchingPriorityCalculateService {
     /**
      * 칼바람 모드 우선순위 계산
      */
-    public int calculateAramPriority(Position myWantPosition, Position otherMainPosition, Position otherSubPosition,
-                                     Mike myMike, Mike otherMike, Integer myManner, Integer otherManner,
-                                     Tier myTier, Integer myRank, Tier otherTier, Integer otherRank) {
+    public int calculateAramPriority(Mike myMike, Mike otherMike, Integer myManner, Integer otherManner) {
         int priority = 0;
 
         // 매너 우선순위
@@ -125,19 +123,39 @@ public class MatchingPriorityCalculateService {
         return priority;
     }
 
+    public boolean validateMatching(Position myMainP, Position mySubP, Position myWantP, Position otherMainP,
+                                    Position otherSubP, Position otherWantP) {
+        // 1. <A의 주가 B의 부이거나 B의 주가 A의 부일 때>
+        // 1.1 A의 찾는 포지션(myWantP)이 B의 부 포지션(otherSubP)일 경우
+        if ((myMainP == otherSubP || otherMainP == mySubP) && myWantP == otherSubP) {
+            return true;
+        }
+
+        // 1.2 B의 찾는 포지션(otherWantP)이 A의 부 포지션(mySubP)일 경우
+        if ((otherMainP == mySubP || myMainP == otherSubP) && otherWantP == mySubP) {
+            return true;
+        }
+
+        // 2. 주/부 포지션이 순서 상관없이 겹칠 경우 false 반환
+        if ((myMainP == otherMainP || myMainP == otherSubP) && (mySubP == otherMainP || mySubP == otherSubP)) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * 정밀 매칭 검증 메서드
      */
-    public boolean validatePreciseMatching(Mike myMike, Mike otherMike, Position myWantPosition,
-                                           Position otherMainPosition, Position otherSubPosition,
-                                           Tier myTier, Tier otherTier) {
+    public boolean validatePreciseMatching(Mike myMike, Mike otherMike, Position myWantP, Position otherMainP,
+                                           Position otherSubP, Tier myTier, Tier otherTier) {
         // 마이크가 다를 경우 매칭 실패
         if (!myMike.equals(otherMike)) {
             return false;
         }
 
         // 내가 원하는 포지션이 상대 포지션이 아닐 경우 매칭 실패
-        if (!otherMainPosition.equals(myWantPosition) && !otherSubPosition.equals(myWantPosition)) {
+        if (!otherMainP.equals(myWantP) && !otherSubP.equals(myWantP)) {
             return false;
         }
 

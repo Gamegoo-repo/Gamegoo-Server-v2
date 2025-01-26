@@ -53,6 +53,25 @@ public class MatchingService {
 
 
     public int calculatePriority(GameMode gameMode, MatchingRecord myRecord, MatchingRecord otherRecord) {
+        // 공통 조건
+        if (!matchingPriorityCalculateService.validateMatching(myRecord.getMainPosition(), myRecord.getSubPosition(),
+                myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(),
+                otherRecord.getWantPosition())) {
+            return 0;
+        }
+
+        // 정밀 매칭
+        if (myRecord.getMatchingType() == MatchingType.PRECISE) {
+            if (matchingPriorityCalculateService.validatePreciseMatching(myRecord.getMike(), otherRecord.getMike(),
+                    myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(),
+                    myRecord.getSoloTier(), otherRecord.getSoloTier())) {
+                return matchingPriorityCalculateService.calculatePrecisePriority(myRecord.getMannerLevel(),
+                        otherRecord.getMannerLevel());
+            }
+            return 0;
+        }
+
+        // 겜구 매칭
         return switch (gameMode) {
             case SOLO ->
                 // 개인 랭크 모드 우선순위 계산
@@ -93,18 +112,10 @@ public class MatchingService {
             case ARAM ->
                 // 칼바람 모드 우선순위 계산
                     matchingPriorityCalculateService.calculateAramPriority(
-                            myRecord.getWantPosition(),
-                            otherRecord.getMainPosition(),
-                            otherRecord.getSubPosition(),
                             myRecord.getMike(),
                             otherRecord.getMike(),
                             myRecord.getMannerLevel(),
-                            otherRecord.getMannerLevel(),
-                            myRecord.getSoloTier(),
-                            myRecord.getSoloRank(),
-                            otherRecord.getSoloTier(),
-                            otherRecord.getSoloRank()
-                    );
+                            otherRecord.getMannerLevel());
             case FAST ->
                 // 빠른대전 우선순위 계산
                     matchingPriorityCalculateService.calculateFastPriority(
