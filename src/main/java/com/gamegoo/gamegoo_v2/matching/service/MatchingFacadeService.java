@@ -9,12 +9,18 @@ import com.gamegoo.gamegoo_v2.core.common.validator.BlockValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
+import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -26,25 +32,48 @@ public class MatchingFacadeService {
     private final MemberValidator memberValidator;
     private final BlockValidator blockValidator;
     private final MemberService memberService;
+    private final MatchingService matchingService;
+    private final BlockService blockService;
 
     /**
      * 매칭 우선순위 계산 및 기록 저장 API
      */
     @Transactional
-    public String calculatePriorityAndRecording(Member member, InitializingMatchingRequest request) {
+    public PriorityListResponse calculatePriorityAndRecording(Member member, InitializingMatchingRequest request) {
         // 1. 매칭 정보로 member 업데이트
-        // 마이크, 포지션 변경
+        // 1-1. 마이크, 포지션 변경
         memberService.updateMikePosition(member, request.getMike(), request.getMainP(), request.getSubP(),
                 request.getWantP());
-        // 게임스타일 변경
+        // 1-2. 게임스타일 변경
         memberService.updateGameStyle(member, request.getGameStyleIdList());
-        
+
         // 2. matchingRecord DB에 저장
+        MatchingRecord matchingRecord = matchingService.createMatchingRecord(member, request.getMatchingType(),
+                request.getGameMode());
 
+        // 3. 현재 대기 중인 사용자 조회
+        List<MatchingRecord> pendingMatchingRecords = matchingService.getPENDINGMatchingRecords(request.getGameMode());
 
-        // 3. 현재 대기 중인 사용자 조회 후, 해당 사용자와의 우선순위 계산
+        // 4. 차단당한 사용자 제외
+        List<Long> targetMemberIds = new ArrayList<>();
+        for (MatchingRecord record : pendingMatchingRecords) {
+            targetMemberIds.add(record.getMember().getId());
+        }
 
-        return "D";
+        // 차단 여부 확인
+        Map<Long, Boolean> blockedStatusMap = blockService.isBlockedByTargetMembersBatch(member, targetMemberIds);
+
+        // 차단되지 않은 사용자만 필터링
+        List<MatchingRecord> filteredPENDINGMatchingRecords = new ArrayList<>();
+        for (MatchingRecord record : pendingMatchingRecords) {
+            Long targetMemberId = record.getMember().getId();
+            if (!blockedStatusMap.getOrDefault(targetMemberId, false)) {
+                filteredPENDINGMatchingRecords.add(record);
+            }
+        }
+
+        // 5. myPriorityList, otherPriorityList 조회
+        return matchingService.calculatePriorityList(matchingRecord, filteredPENDINGMatchingRecords);
     }
 
     /**

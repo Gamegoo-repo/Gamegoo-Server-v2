@@ -23,17 +23,18 @@ public class MatchingController {
 
     private final MatchingFacadeService matchingFacadeService;
 
-    @Operation(summary = "매칭 우선순위 계산 및 기록 저장 API", description = "API for calculating and recording matching \n\n"
-            + "gameMode: FAST, SOLO, FREE, ARAM string 을 넣어주세요. \n\n"
-            + "mike: UNAVAILABLE 또는 AVAILABLE 를 넣어주세요. \n\n"
-            + "matchingType: \"BASIC\" 또는 \"PRECISE\"를 넣어주세요.\n\n"
-            + "mainP: ANY, TOP, JUNGLE, MID, ADC, SUP string 을 넣어주세요. \n\n"
-            + "subP: ANY, TOP, JUNGLE, MID, ADC, SUP string 을 넣어주세요. \n\n"
-            + "wantP: ANY, TOP, JUNGLE, MID, ADC, SUP string 을 넣어주세요. \n\n"
-            + "gameStyleList: 1 ~ 17 int 를 넣어주세요.")
+    @Operation(summary = "매칭 우선순위 계산 및 기록 저장 API", description = """
+            API for calculating and recording matching
+            gameMode: FAST, SOLO, FREE, ARAM string 을 넣어주세요.\s
+            mike: UNAVAILABLE 또는 AVAILABLE 를 넣어주세요.\s
+            matchingType: "BASIC" 또는 "PRECISE"를 넣어주세요. \s
+            mainP: ANY, TOP, JUNGLE, MID, ADC, SUP string 을 넣어주세요.\s
+            subP: ANY, TOP, JUNGLE, MID, ADC, SUP string 을 넣어주세요.\s
+            wantP: ANY, TOP, JUNGLE, MID, ADC, SUP string 을 넣어주세요.\s
+            gameStyleList: 1 ~ 17 int 를 넣어주세요.""")
     @GetMapping
-    public ApiResponse<String> InitializeMatching(@AuthMember Member member,
-                                                  InitializingMatchingRequest request) {
+    public ApiResponse<PriorityListResponse> InitializeMatching(@AuthMember Member member,
+                                                                InitializingMatchingRequest request) {
         return ApiResponse.ok(matchingFacadeService.calculatePriorityAndRecording(member, request));
     }
 

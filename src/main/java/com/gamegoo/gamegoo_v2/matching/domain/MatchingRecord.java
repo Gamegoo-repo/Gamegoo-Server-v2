@@ -13,8 +13,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +25,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        indexes = {
+                @Index(name = "idx_matching_record_created_at_status_game_mode", columnList = "createdAt, status, " +
+                        "gameMode"),
+                @Index(name = "idx_matching_record_member_id", columnList = "member_id")
+        }
+)
 public class MatchingRecord extends BaseDateTimeEntity {
 
     @Id
@@ -93,24 +102,21 @@ public class MatchingRecord extends BaseDateTimeEntity {
     private Member targetMember;
 
     // MatchingRecord 생성 메서드
-    public static MatchingRecord create(GameMode gameMode, Position mainPosition, Position subPosition,
-                                        Position wantPosition, Mike mike, Tier soloTier, int soloRank,
-                                        double soloWinRate, Tier freeTier, int freeRank, double freeWinRate,
-                                        MatchingType matchingType, int mannerLevel, Member member) {
+    public static MatchingRecord create(GameMode gameMode, MatchingType matchingType, Member member) {
         return MatchingRecord.builder()
                 .gameMode(gameMode)
-                .mainPosition(mainPosition)
-                .subPosition(subPosition)
-                .wantPosition(wantPosition)
-                .mike(mike)
-                .soloTier(soloTier)
-                .soloRank(soloRank)
-                .soloWinRate(soloWinRate)
-                .freeTier(freeTier)
-                .freeRank(freeRank)
-                .freeWinRate(freeWinRate)
+                .mainPosition(member.getMainPosition())
+                .subPosition(member.getSubPosition())
+                .wantPosition(member.getWantPosition())
+                .mike(member.getMike())
+                .soloTier(member.getTier()) // TODO:
+                .soloRank(member.getGameRank()) // TODO:
+                .soloWinRate(member.getWinRate()) // TODO:
+                .freeTier(member.getTier()) // TODO:
+                .freeRank(member.getGameRank()) // TODO:
+                .freeWinRate(member.getWinRate()) // TODO:
                 .matchingType(matchingType)
-                .mannerLevel(mannerLevel)
+                .mannerLevel(member.getMannerLevel())
                 .member(member)
                 .build();
     }
