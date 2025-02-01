@@ -6,7 +6,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MatchingPriorityEvaluateService {
+public class MatchingScoreCalculator {
 
     /**
      * 매너레벨 점수 계산
@@ -84,13 +84,10 @@ public class MatchingPriorityEvaluateService {
      * @return 마이크 우선순위 점수
      */
     public int getMikePriority(Mike myMike, Mike otherMike, int mikeMatchPriority) {
-        if (myMike == Mike.UNAVAILABLE && otherMike == Mike.UNAVAILABLE) {
-            return mikeMatchPriority;
+        if (!myMike.equals(otherMike)) {
+            return 0;
         }
-        if (myMike == Mike.AVAILABLE && otherMike == Mike.AVAILABLE) {
-            return mikeMatchPriority;
-        }
-        return 0;
+        return mikeMatchPriority;
     }
 
 }

@@ -3,7 +3,6 @@ package com.gamegoo.gamegoo_v2.matching.service;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
-import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +19,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class MatchingService {
 
-    private final MatchingPriorityCalculateService matchingPriorityCalculateService;
+    private final MatchingStrategyProcessor matchingStrategyProcessor;
     private final MatchingRecordRepository matchingRecordRepository;
 
     public PriorityListResponse calculatePriorityList(MatchingRecord myMatchingRecord,
@@ -50,22 +48,11 @@ public class MatchingService {
                 myMatchingRecord.getMatchingUuid());
     }
 
-
     public int calculatePriority(GameMode gameMode, MatchingRecord myRecord, MatchingRecord otherRecord) {
-        // 공통 조건
-        if (!matchingPriorityCalculateService.validateMatching(myRecord.getMainPosition(), myRecord.getSubPosition(),
-                myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(),
-                otherRecord.getWantPosition())) {
-            return 0;
-        }
-
         // 정밀 매칭
         if (myRecord.getMatchingType() == MatchingType.PRECISE) {
-            if (matchingPriorityCalculateService.validatePreciseMatching(myRecord.getMike(), otherRecord.getMike(),
-                    myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(),
-                    myRecord.getSoloTier(), otherRecord.getSoloTier())) {
-                return matchingPriorityCalculateService.calculatePrecisePriority(myRecord.getMannerLevel(),
-                        otherRecord.getMannerLevel());
+            if (matchingStrategyProcessor.validatePreciseMatching(myRecord, otherRecord)) {
+                return matchingStrategyProcessor.calculatePrecisePriority(myRecord, otherRecord);
             }
             return 0;
         }
@@ -74,72 +61,18 @@ public class MatchingService {
         return switch (gameMode) {
             case SOLO ->
                 // 개인 랭크 모드 우선순위 계산
-                    matchingPriorityCalculateService.calculateSoloPriority(
-                            myRecord.getMainPosition(),
-                            myRecord.getSubPosition(),
-                            myRecord.getWantPosition(),
-                            otherRecord.getMainPosition(),
-                            otherRecord.getSubPosition(),
-                            otherRecord.getWantPosition(),
-                            myRecord.getMike(),
-                            otherRecord.getMike(),
-                            myRecord.getMannerLevel(),
-                            otherRecord.getMannerLevel(),
-                            myRecord.getSoloTier(),
-                            myRecord.getSoloRank(),
-                            otherRecord.getSoloTier(),
-                            otherRecord.getSoloRank()
-                    );
+                    matchingStrategyProcessor.calculateSoloPriority(myRecord, otherRecord);
             case FREE ->
                 // 자유 랭크 모드 우선순위 계산
-                    matchingPriorityCalculateService.calculateFreePriority(
-                            myRecord.getMainPosition(),
-                            myRecord.getSubPosition(),
-                            myRecord.getWantPosition(),
-                            otherRecord.getMainPosition(),
-                            otherRecord.getSubPosition(),
-                            otherRecord.getWantPosition(),
-                            myRecord.getMike(),
-                            otherRecord.getMike(),
-                            myRecord.getMannerLevel(),
-                            otherRecord.getMannerLevel(),
-                            myRecord.getFreeTier(),
-                            myRecord.getFreeRank(),
-                            otherRecord.getFreeTier(),
-                            otherRecord.getFreeRank()
-                    );
+                    matchingStrategyProcessor.calculateFreePriority(myRecord, otherRecord);
             case ARAM ->
                 // 칼바람 모드 우선순위 계산
-                    matchingPriorityCalculateService.calculateAramPriority(
-                            myRecord.getMike(),
-                            otherRecord.getMike(),
-                            myRecord.getMannerLevel(),
-                            otherRecord.getMannerLevel());
+                    matchingStrategyProcessor.calculateAramPriority(myRecord, otherRecord);
             case FAST ->
                 // 빠른대전 우선순위 계산
-                    matchingPriorityCalculateService.calculateFastPriority(
-                            myRecord.getMainPosition(),
-                            myRecord.getSubPosition(),
-                            myRecord.getWantPosition(),
-                            otherRecord.getMainPosition(),
-                            otherRecord.getSubPosition(),
-                            otherRecord.getWantPosition(),
-                            myRecord.getMike(),
-                            otherRecord.getMike(),
-                            myRecord.getMannerLevel(),
-                            otherRecord.getMannerLevel(),
-                            myRecord.getSoloTier(),
-                            myRecord.getSoloRank(),
-                            myRecord.getFreeTier(),
-                            myRecord.getFreeRank(),
-                            otherRecord.getSoloTier(),
-                            otherRecord.getSoloRank(),
-                            otherRecord.getFreeTier(),
-                            otherRecord.getFreeRank()
-                    );
+                    matchingStrategyProcessor.calculateFastPriority(myRecord, otherRecord);
         };
     }
-
 
     /**
      * 매칭 대기 중인 Matching Records List 조회
@@ -148,13 +81,8 @@ public class MatchingService {
      * @return 대기 중인 매칭 리스트
      */
     public List<MatchingRecord> getPendingMatchingRecords(GameMode gameMode) {
-        LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
 
-        return matchingRecordRepository.findMatchingRecordsWithGroupBy(
-                fiveMinutesAgo,
-                MatchingStatus.PENDING,
-                gameMode
-        );
+        return matchingRecordRepository.findRecentValidMatchingRecords(gameMode);
 
     }
 
