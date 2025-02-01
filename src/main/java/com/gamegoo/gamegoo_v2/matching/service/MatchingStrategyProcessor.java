@@ -72,7 +72,7 @@ public class MatchingStrategyProcessor {
     }
 
     /**
-     * FREE 모드 우선순위 계산
+     * 자유 랭크 모드 우선순위 계산
      */
     public int calculateFreePriority(MatchingRecord myRecord, MatchingRecord otherRecord) {
         int priority = 0;

@@ -22,6 +22,13 @@ public class MatchingService {
     private final MatchingStrategyProcessor matchingStrategyProcessor;
     private final MatchingRecordRepository matchingRecordRepository;
 
+    /**
+     * 매칭 우선순위 리스트 계산 후 조회
+     *
+     * @param myMatchingRecord     내 매칭 정보
+     * @param otherMatchingRecords 상대방 매칭 정보
+     * @return 우선순위 계산 API 응답 DTO
+     */
     public PriorityListResponse calculatePriorityList(MatchingRecord myMatchingRecord,
                                                       List<MatchingRecord> otherMatchingRecords) {
         // 우선순위 리스트 초기화
@@ -81,7 +88,6 @@ public class MatchingService {
      * @return 대기 중인 매칭 리스트
      */
     public List<MatchingRecord> getPendingMatchingRecords(GameMode gameMode) {
-
         return matchingRecordRepository.findRecentValidMatchingRecords(gameMode);
 
     }
