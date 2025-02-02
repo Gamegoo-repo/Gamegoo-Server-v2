@@ -30,7 +30,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     public static final int PAGE_SIZE = 20;
     public static final int MY_PAGE_SIZE = 10;
-    private static final Duration BUMP_INTERVAL = Duration.ofHours(1);
+    private static final Duration BUMP_INTERVAL = Duration.ofMinutes(1);
 
     /**
      * 게시글 엔티티 생성 및 저장
