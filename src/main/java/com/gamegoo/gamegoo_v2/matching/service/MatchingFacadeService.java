@@ -38,7 +38,11 @@ public class MatchingFacadeService {
     private final MemberGameStyleService memberGameStyleService;
 
     /**
-     * 매칭 우선순위 계산 및 기록 저장 API
+     * 매칭 우선순위 계산 및 DB 저장
+     *
+     * @param memberId 회원 ID
+     * @param request  회원 정보
+     * @return 매칭 정보
      */
     @Transactional
     public PriorityListResponse calculatePriorityAndRecording(Long memberId, InitializingMatchingRequest request) {

@@ -11,7 +11,11 @@ public class MatchingStrategyProcessor {
     private final MatchingScoreCalculator matchingScoreCalculator;
 
     /**
-     * 정밀 매칭 우선순위 계산
+     * 정밀매칭 우선순위 계산
+     *
+     * @param myRecord    내 매칭 정보
+     * @param otherRecord 상대방 매칭 정보
+     * @return 우선순위 점수
      */
     public int calculatePrecisePriority(MatchingRecord myRecord, MatchingRecord otherRecord) {
         return matchingScoreCalculator.getMannerPriority(
@@ -20,6 +24,10 @@ public class MatchingStrategyProcessor {
 
     /**
      * 빠른대전 우선순위 계산
+     *
+     * @param myRecord    내 매칭 정보
+     * @param otherRecord 상대방 매칭 정보
+     * @return 우선순위 점수
      */
     public int calculateFastPriority(MatchingRecord myRecord, MatchingRecord otherRecord) {
         int priority = 0;
@@ -45,7 +53,11 @@ public class MatchingStrategyProcessor {
     }
 
     /**
-     * 개인 랭크 모드 우선순위 계산
+     * 개인랭크 모드 우선순위 계산
+     *
+     * @param myRecord    내 매칭 정보
+     * @param otherRecord 상대방 매칭 정보
+     * @return 우선순위 점수
      */
     public int calculateSoloPriority(MatchingRecord myRecord, MatchingRecord otherRecord) {
         int priority = 0;
@@ -72,7 +84,11 @@ public class MatchingStrategyProcessor {
     }
 
     /**
-     * 자유 랭크 모드 우선순위 계산
+     * 자유랭크 모드 우선순위 계산
+     *
+     * @param myRecord    내 매칭 정보
+     * @param otherRecord 상대방 매칭 정보
+     * @return 우선순위 점수
      */
     public int calculateFreePriority(MatchingRecord myRecord, MatchingRecord otherRecord) {
         int priority = 0;
@@ -100,6 +116,10 @@ public class MatchingStrategyProcessor {
 
     /**
      * 칼바람 모드 우선순위 계산
+     *
+     * @param myRecord    내 매칭 정보
+     * @param otherRecord 상대방 매칭 정보
+     * @return 우선순위 점수
      */
     public int calculateAramPriority(MatchingRecord myRecord, MatchingRecord otherRecord) {
         int priority = 0;
@@ -115,7 +135,11 @@ public class MatchingStrategyProcessor {
     }
 
     /**
-     * 정밀 매칭 검증 메서드
+     * 정밀 매칭 검증
+     *
+     * @param myRecord    내 매칭 정보
+     * @param otherRecord 상대방 매칭 정보
+     * @return 매칭 가능 여부
      */
     public boolean validatePreciseMatching(MatchingRecord myRecord, MatchingRecord otherRecord) {
         // 마이크가 다를 경우 매칭 실패

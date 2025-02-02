@@ -55,6 +55,14 @@ public class MatchingService {
                 myMatchingRecord.getMatchingUuid());
     }
 
+    /**
+     * 우선순위 점수 계산
+     *
+     * @param gameMode    게임모드
+     * @param myRecord    내 매칭 정보
+     * @param otherRecord 상대방 매칭 정보
+     * @return 우선순위 점수
+     */
     public int calculatePriority(GameMode gameMode, MatchingRecord myRecord, MatchingRecord otherRecord) {
         // 정밀 매칭
         if (myRecord.getMatchingType() == MatchingType.PRECISE) {

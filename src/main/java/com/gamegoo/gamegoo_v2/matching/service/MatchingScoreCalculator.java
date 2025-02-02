@@ -10,6 +10,12 @@ public class MatchingScoreCalculator {
 
     /**
      * 매너레벨 점수 계산
+     *
+     * @param otherManner                상대방 매너 점수
+     * @param myManner                   내 매너 점수
+     * @param maxMannerPriority          매너 점수 최대 우선순위 값
+     * @param mannerDifferenceMultiplier 매너 점수 별 가중치 값
+     * @return 최종 매너점수
      */
     public int getMannerPriority(Integer otherManner, Integer myManner, int maxMannerPriority,
                                  int mannerDifferenceMultiplier) {
