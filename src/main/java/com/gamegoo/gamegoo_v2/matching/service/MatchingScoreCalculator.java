@@ -58,7 +58,7 @@ public class MatchingScoreCalculator {
     /**
      * 포지션 우선순위 점수 계산
      *
-     * @param myWantPosition          내 주포지션
+     * @param myWantPosition          내가 원하는 포지션
      * @param otherMainPosition       타겟 주포지션
      * @param otherSubPosition        타겟 부포지션
      * @param mainPositionPriority    높은 추가 점수
