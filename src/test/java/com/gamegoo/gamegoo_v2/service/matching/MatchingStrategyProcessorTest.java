@@ -1,0 +1,282 @@
+package com.gamegoo.gamegoo_v2.service.matching;
+
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
+import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
+import com.gamegoo.gamegoo_v2.matching.service.MatchingScoreCalculator;
+import com.gamegoo.gamegoo_v2.matching.service.MatchingStrategyProcessor;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@ActiveProfiles("test")
+@SpringBootTest
+class MatchingStrategyProcessorTest {
+
+    @Autowired
+    MatchingScoreCalculator calculator;
+
+    @Autowired
+    MatchingStrategyProcessor processor;
+
+    @Test
+    @DisplayName("정밀 매칭 우선순위 계산")
+    void testCalculatePrecisePriority() {
+        // given
+        // 랭크 점수 차이 : 0 점
+        Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
+        Member member2 = createMember("user2@gmail.com", Tier.GOLD, false);
+
+        // 매너 점수 차이 : 8점
+        member1.updateMannerLevel(4);
+        member2.updateMannerLevel(2);
+
+        // when
+        MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
+        MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member2);
+
+        int result = processor.calculatePrecisePriority(record1, record2);
+
+        // then
+        int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4);
+        assertThat(result).isEqualTo(expectedPriority);
+    }
+
+    @Test
+    @DisplayName("개인랭크 우선순위 계산")
+    void testCalculateSoloPriorityWithStateChanges() {
+        // given
+        Member member1 = createMember("user1@gmail.com", Tier.DIAMOND, true);
+        Member member2 = createMember("user2@gmail.com", Tier.PLATINUM, true);
+
+        // 마이크 차이 : 5점
+        member1.updateMike(Mike.AVAILABLE);
+        member2.updateMike(Mike.UNAVAILABLE);
+
+        // 포지션 점수 차이 : 2+3=5점
+        member1.updatePosition(Position.TOP, Position.MID, Position.ANY);
+        member2.updatePosition(Position.JUNGLE, Position.SUP, Position.MID);
+
+        // 매너 점수 차이 : 8점
+        member1.updateMannerLevel(5);
+        member2.updateMannerLevel(3);
+
+        // when
+        MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
+        MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
+        int result = processor.calculateSoloPriority(record1, record2);
+
+        // then
+        int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
+                (40 - Math.abs(record1.getSoloTier().ordinal() * 4 + record1.getSoloRank() -
+                        record2.getSoloTier().ordinal() * 4 - record2.getSoloRank())) +
+                (record1.getMike().equals(record2.getMike()) ? 5 : 0) + getPositionExpectedPriority(member1, member2);
+
+        assertThat(result).isEqualTo(expectedPriority);
+    }
+
+
+    @Test
+    @DisplayName("자유랭크 우선순위 계산")
+    void testCalculateFreePriority() {
+        // given
+        // 랭크 점수 차이 : 4점
+        Member member1 = createMember("user1@gmail.com", Tier.BRONZE, true);
+        Member member2 = createMember("user2@gmail.com", Tier.SILVER, true);
+
+        // 포지션 점수 차이 : 6점
+        member1.updatePosition(Position.MID, Position.SUP, Position.ANY);
+        member2.updatePosition(Position.JUNGLE, Position.ADC, Position.MID);
+
+        // 매너 점수 차이 : 4점
+        member1.updateMannerLevel(3);
+        member2.updateMannerLevel(2);
+
+        // 마이크 점수 차이 : 3점
+        member1.updateMike(Mike.AVAILABLE);
+        member2.updateMike(Mike.UNAVAILABLE);
+
+        // when
+        MatchingRecord record1 = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member1);
+        MatchingRecord record2 = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member2);
+        int result = processor.calculateFreePriority(record1, record2);
+
+        // then
+        int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
+                (40 - Math.abs(record1.getFreeTier().ordinal() * 4 + record1.getFreeRank() -
+                        record2.getFreeTier().ordinal() * 4 - record2.getFreeRank())) +
+                (record1.getMike().equals(record2.getMike()) ? 3 : 0) + getPositionExpectedPriority(member1, member2);
+
+        assertThat(result).isEqualTo(expectedPriority);
+    }
+
+    @Test
+    @DisplayName("빠른대전 우선순위 계산")
+    void testCalculateFastPriority() {
+        // given
+        // 랭크 점수 차이 : 4점
+        Member member1 = createMember("user1@gmail.com", Tier.BRONZE, true);
+        Member member2 = createMember("user2@gmail.com", Tier.SILVER, true);
+
+        // 포지션 점수 차이 : 6점
+        member1.updatePosition(Position.MID, Position.SUP, Position.ANY);
+        member2.updatePosition(Position.JUNGLE, Position.ADC, Position.MID);
+
+        // 매너 점수 차이 : 4점
+        member1.updateMannerLevel(3);
+        member2.updateMannerLevel(2);
+
+        // 마이크 점수 차이 : 3점
+        member1.updateMike(Mike.AVAILABLE);
+        member2.updateMike(Mike.UNAVAILABLE);
+
+        // when
+        MatchingRecord record1 = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member1);
+        MatchingRecord record2 = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member2);
+        int result = processor.calculateFastPriority(record1, record2);
+
+        // then
+        int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
+                (40 - Math.abs(record1.getFreeTier().ordinal() * 4 + record1.getFreeRank() -
+                        record2.getFreeTier().ordinal() * 4 - record2.getFreeRank())) +
+                (record1.getMike().equals(record2.getMike()) ? 3 : 0) + getPositionExpectedPriority(member1, member2);
+
+        assertThat(result).isEqualTo(expectedPriority);
+    }
+
+
+    @Test
+    @DisplayName("칼바람 모드 우선순위 계산 - 다양한 마이크 설정")
+    void testCalculateAramPriority() {
+        // given
+        Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
+        Member member2 = createMember("user2@gmail.com", Tier.GOLD, false);
+
+        // 마이크 점수 차이 : 3점
+        member1.updateMike(Mike.AVAILABLE);
+        member2.updateMike(Mike.UNAVAILABLE);
+
+        // when
+        MatchingRecord record1 = createMatchingRecord(GameMode.ARAM, MatchingType.BASIC, member1);
+        MatchingRecord record2 = createMatchingRecord(GameMode.ARAM, MatchingType.BASIC, member2);
+        int result = processor.calculateAramPriority(record1, record2);
+
+        // then
+        int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
+                (record1.getMike().equals(record2.getMike()) ? 3 : 0);
+
+        assertThat(result).isEqualTo(expectedPriority);
+    }
+
+
+    @Nested
+    @DisplayName("정밀 매칭 검증")
+    class ValidatePreciseMatchingTests {
+
+        @Test
+        @DisplayName("성공 케이스")
+        void testValidatePreciseMatching_Success() {
+            Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
+            member1.updatePosition(Position.TOP, Position.MID, Position.MID);
+            Member member2 = createMember("user2@gmail.com", Tier.GOLD, true);
+            member2.updatePosition(Position.MID, Position.JUNGLE, Position.MID);
+            MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
+            MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
+
+            boolean isValid = processor.validatePreciseMatching(record1, record2);
+            assertThat(isValid).isTrue();
+        }
+
+        @Test
+        @DisplayName("실패 케이스: 티어 차이")
+        void testValidatePreciseMatching_Fail_Tier() {
+            // given
+            Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
+            Member member2 = createMember("user2@gmail.com", Tier.SILVER, true);
+
+            // when
+            MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
+            MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
+
+            boolean isValid = processor.validatePreciseMatching(record1, record2);
+
+            // then
+            assertThat(isValid).isFalse();
+        }
+
+        @Test
+        @DisplayName("실패 케이스: 포지션 불일치")
+        void testValidatePreciseMatching_Fail_Position() {
+            // given
+            Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
+            member1.updatePosition(Position.TOP, Position.MID, Position.MID);
+            Member member2 = createMember("user2@gmail.com", Tier.GOLD, true);
+            member2.updatePosition(Position.JUNGLE, Position.SUP, Position.MID);
+
+            // when
+            MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
+            MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
+
+            boolean isValid = processor.validatePreciseMatching(record1, record2);
+
+            // then
+            assertThat(isValid).isFalse();
+        }
+
+        @Test
+        @DisplayName("실패 케이스: 마이크 불일치")
+        void testValidatePreciseMatching_Fail_Mike() {
+            // given
+            Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
+            member1.updateMike(Mike.UNAVAILABLE);
+            Member member2 = createMember("user2@gmail.com", Tier.GOLD, false);
+            member2.updateMike(Mike.AVAILABLE);
+
+            // when
+            MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
+            MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
+
+            boolean isValid = processor.validatePreciseMatching(record1, record2);
+
+            // then
+            assertThat(isValid).isFalse();
+        }
+
+    }
+
+    private Member createMember(String email, Tier tier, boolean hasMike) {
+        return Member.create(email, "password123", LoginType.GENERAL, "gameUser", "TAG",
+                tier, 4, 55.0, 100, hasMike);
+    }
+
+    private MatchingRecord createMatchingRecord(GameMode mode, MatchingType type, Member member) {
+        return MatchingRecord.create(mode, type, member);
+    }
+
+    private int getPositionExpectedPriority(Member member1, Member member2) {
+        // 포지션 expectedPriority 계산
+        int positionPriority = 0;
+
+        positionPriority += calculator.getPositionPriority(
+                member1.getWantPosition(), member2.getMainPosition(), member2.getSubPosition(),
+                3, 2, 1
+        );
+
+        positionPriority += calculator.getPositionPriority(
+                member2.getWantPosition(), member1.getMainPosition(), member1.getSubPosition(),
+                3, 2, 1
+        );
+        return positionPriority;
+    }
+
+}
