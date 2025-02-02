@@ -24,10 +24,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MatchingStrategyProcessorTest {
 
     @Autowired
-    MatchingScoreCalculator calculator;
+    MatchingScoreCalculator matchingScoreCalculator;
 
     @Autowired
-    MatchingStrategyProcessor processor;
+    MatchingStrategyProcessor matchingStrategyProcessor;
 
     @Test
     @DisplayName("정밀 매칭 우선순위 계산")
@@ -45,7 +45,7 @@ class MatchingStrategyProcessorTest {
         MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
         MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member2);
 
-        int result = processor.calculatePrecisePriority(record1, record2);
+        int result = matchingStrategyProcessor.calculatePrecisePriority(record1, record2);
 
         // then
         int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4);
@@ -74,7 +74,7 @@ class MatchingStrategyProcessorTest {
         // when
         MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
         MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
-        int result = processor.calculateSoloPriority(record1, record2);
+        int result = matchingStrategyProcessor.calculateSoloPriority(record1, record2);
 
         // then
         int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
@@ -109,7 +109,7 @@ class MatchingStrategyProcessorTest {
         // when
         MatchingRecord record1 = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member1);
         MatchingRecord record2 = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member2);
-        int result = processor.calculateFreePriority(record1, record2);
+        int result = matchingStrategyProcessor.calculateFreePriority(record1, record2);
 
         // then
         int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
@@ -143,7 +143,7 @@ class MatchingStrategyProcessorTest {
         // when
         MatchingRecord record1 = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member1);
         MatchingRecord record2 = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member2);
-        int result = processor.calculateFastPriority(record1, record2);
+        int result = matchingStrategyProcessor.calculateFastPriority(record1, record2);
 
         // then
         int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
@@ -169,7 +169,7 @@ class MatchingStrategyProcessorTest {
         // when
         MatchingRecord record1 = createMatchingRecord(GameMode.ARAM, MatchingType.BASIC, member1);
         MatchingRecord record2 = createMatchingRecord(GameMode.ARAM, MatchingType.BASIC, member2);
-        int result = processor.calculateAramPriority(record1, record2);
+        int result = matchingStrategyProcessor.calculateAramPriority(record1, record2);
 
         // then
         int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
@@ -193,7 +193,7 @@ class MatchingStrategyProcessorTest {
             MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
             MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
 
-            boolean isValid = processor.validatePreciseMatching(record1, record2);
+            boolean isValid = matchingStrategyProcessor.validatePreciseMatching(record1, record2);
             assertThat(isValid).isTrue();
         }
 
@@ -208,7 +208,7 @@ class MatchingStrategyProcessorTest {
             MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
             MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
 
-            boolean isValid = processor.validatePreciseMatching(record1, record2);
+            boolean isValid = matchingStrategyProcessor.validatePreciseMatching(record1, record2);
 
             // then
             assertThat(isValid).isFalse();
@@ -227,7 +227,7 @@ class MatchingStrategyProcessorTest {
             MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
             MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
 
-            boolean isValid = processor.validatePreciseMatching(record1, record2);
+            boolean isValid = matchingStrategyProcessor.validatePreciseMatching(record1, record2);
 
             // then
             assertThat(isValid).isFalse();
@@ -246,7 +246,7 @@ class MatchingStrategyProcessorTest {
             MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
             MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
 
-            boolean isValid = processor.validatePreciseMatching(record1, record2);
+            boolean isValid = matchingStrategyProcessor.validatePreciseMatching(record1, record2);
 
             // then
             assertThat(isValid).isFalse();
@@ -267,12 +267,12 @@ class MatchingStrategyProcessorTest {
         // 포지션 expectedPriority 계산
         int positionPriority = 0;
 
-        positionPriority += calculator.getPositionPriority(
+        positionPriority += matchingScoreCalculator.getPositionPriority(
                 member1.getWantPosition(), member2.getMainPosition(), member2.getSubPosition(),
                 3, 2, 1
         );
 
-        positionPriority += calculator.getPositionPriority(
+        positionPriority += matchingScoreCalculator.getPositionPriority(
                 member2.getWantPosition(), member1.getMainPosition(), member1.getSubPosition(),
                 3, 2, 1
         );
