@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -305,7 +306,7 @@ class MatchingServiceTest {
 
         // then
         List<MatchingRecord> expectedMatchingRecords =
-                matchingRecordRepository.findRecentValidMatchingRecords(gameMode);
+                matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now().minusMinutes(5), gameMode);
         assertThat(matchingRecords.size()).isEqualTo(expectedMatchingRecords.size());
     }
 

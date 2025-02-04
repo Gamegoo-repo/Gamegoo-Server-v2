@@ -24,7 +24,6 @@ import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingMemberInfoResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.repository.MatchingRecordRepository;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
@@ -41,11 +40,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.w3c.dom.ls.LSInput;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +51,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
@@ -66,6 +63,7 @@ import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 @SpringBootTest
+@Transactional
 public class MatchingFacadeServiceTest {
 
     @MockitoSpyBean
@@ -248,7 +246,7 @@ public class MatchingFacadeServiceTest {
     void getPriorityListAndCheckRecord() {
         // given
         // 유저 정보 생성
-        Member matchingMember = createMatchingMember("user1@gmail.com", "User1", "Tag1", Tier.GOLD, 2, true,
+        Member matchingMember = createMatchingMember("matchinguser@gmail.com", "User1", "Tag1", Tier.GOLD, 2, true,
                 Position.ADC, Position.MID, Position.SUP, 2);
 
         // dto 생성
@@ -261,10 +259,6 @@ public class MatchingFacadeServiceTest {
                 .gameMode(GameMode.SOLO)
                 .gameStyleIdList(List.of())
                 .build();
-
-        MatchingRecord matchingRecord = MatchingRecord.create(request.getGameMode(), request.getMatchingType(),
-                matchingMember);
-        matchingRecord.updateStatus(MatchingStatus.PENDING);
 
         // 랜덤 대기 유저 생성
         Random random = new Random();
@@ -293,21 +287,37 @@ public class MatchingFacadeServiceTest {
         PriorityListResponse priorityListResponse =
                 matchingFacadeService.calculatePriorityAndRecording(matchingMember.getId(), request);
 
+        Member updatedMember = memberRepository.findByEmail("matchinguser@gmail.com")
+                .orElseThrow(() -> new AssertionError("테스트 실패: Member가 존재하지 않음"));
+
+        MatchingRecord matchingRecord = MatchingRecord.create(request.getGameMode(), request.getMatchingType(),
+                updatedMember);
+        matchingRecord.updateStatus(MatchingStatus.PENDING);
+
         // then
         assertThat(priorityListResponse).isNotNull();
 
         // 1. Member 정보 업데이트 검증
-        //assertThat(matchingMember.getMike()).isEqualTo(request.getMike());
-        //assertThat(matchingMember.getMainPosition()).isEqualTo(request.getMainP());
-        //assertThat(matchingMember.getSubPosition()).isEqualTo(request.getSubP());
-        //assertThat(matchingMember.getWantPosition()).isEqualTo(request.getWantP());
-        //assertThat(matchingMember.getMemberGameStyleList()).isEqualTo(request.getGameStyleIdList());
+        assertThat(updatedMember.getMike()).isEqualTo(request.getMike());
+        assertThat(updatedMember.getMainPosition()).isEqualTo(request.getMainP());
+        assertThat(updatedMember.getSubPosition()).isEqualTo(request.getSubP());
+        assertThat(updatedMember.getWantPosition()).isEqualTo(request.getWantP());
 
         // 2. 생성된 MatchingRecord 검증
+        MatchingRecord actualMatchingRecord = matchingRecordRepository.findLatestByMember(updatedMember);
+
+        assertThat(actualMatchingRecord.getGameMode()).isEqualTo(request.getGameMode());
+        assertThat(actualMatchingRecord.getMatchingType()).isEqualTo(request.getMatchingType());
+        assertThat(actualMatchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
+        assertThat(actualMatchingRecord.getMember().getId()).isEqualTo(updatedMember.getId());
+        assertThat(actualMatchingRecord.getMainPosition()).isEqualTo(request.getMainP());
+        assertThat(actualMatchingRecord.getSubPosition()).isEqualTo(request.getSubP());
+        assertThat(actualMatchingRecord.getWantPosition()).isEqualTo(request.getWantP());
+        assertThat(actualMatchingRecord.getMike()).isEqualTo(request.getMike());
 
         // 3. Priority 검증
         List<MatchingRecord> recentValidMatchingRecords =
-                matchingRecordRepository.findRecentValidMatchingRecords(request.getGameMode());
+                matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now().minusMinutes(5), GameMode.SOLO);
         PriorityListResponse expectedPriorityList = matchingService.calculatePriorityList(matchingRecord,
                 recentValidMatchingRecords);
 
@@ -320,8 +330,14 @@ public class MatchingFacadeServiceTest {
         priorityListResponse.getMyPriorityList().sort(priorityComparator);
         priorityListResponse.getOtherPriorityList().sort(priorityComparator);
 
-        assertThat(priorityListResponse.getMyPriorityList()).isEqualTo(expectedPriorityList.getMyPriorityList());
-        assertThat(priorityListResponse.getOtherPriorityList()).isEqualTo(expectedPriorityList.getOtherPriorityList());
+        assertThat(priorityListResponse.getMyPriorityList())
+                .usingRecursiveComparison()
+                .ignoringFields("matchingUuid")
+                .isEqualTo(expectedPriorityList.getMyPriorityList());
+        assertThat(priorityListResponse.getOtherPriorityList())
+                .usingRecursiveComparison()
+                .ignoringFields("matchingUuid")
+                .isEqualTo(expectedPriorityList.getOtherPriorityList());
     }
 
 
