@@ -267,6 +267,47 @@ class MatchingServiceTest {
 
     }
 
+    @DisplayName("대기 중인 매칭 리스트 조회")
+    @Test
+    void getPendingMatchingRecordLists() {
+        // given
+        Random random = new Random();
+        GameMode gameMode = GameMode.values()[random.nextInt(GameMode.values().length)];
+        List<MatchingRecord> allMatchingRecords = new ArrayList<>();
+
+        for (int i = 0; i < 20; i++) {
+            // 랜덤값 생성
+            String email = "user" + i + "@gmail.com";
+            String gameName = "USER" + i;
+            String tag = "TAG" + i;
+            Tier tier = Tier.values()[random.nextInt(Tier.values().length)];
+            int gameRank = random.nextInt(4) + 1;
+            boolean hasMike = random.nextBoolean();
+            Position mainP = Position.values()[random.nextInt(Position.values().length)];
+            Position subP = Position.values()[random.nextInt(Position.values().length)];
+            Position wantP = Position.values()[random.nextInt(Position.values().length)];
+            int mannerLevel = random.nextInt(4) + 1;
+            GameMode randomGameMode = GameMode.values()[random.nextInt(GameMode.values().length)];
+            MatchingType randomMatchingType = MatchingType.values()[random.nextInt(MatchingType.values().length)];
+            MatchingStatus randomMatchingStatus = MatchingStatus.PENDING;
+
+            Member targetMember = createMember(email, gameName, tag, tier, gameRank, hasMike, mainP, subP, wantP,
+                    mannerLevel);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(randomGameMode, randomMatchingType, targetMember,
+                    randomMatchingStatus);
+
+            // MatchingRecord 리스트에 저장
+            allMatchingRecords.add(targetMatchingRecord);
+        }
+
+        // when
+        List<MatchingRecord> matchingRecords = matchingService.getPendingMatchingRecords(gameMode);
+
+        // then
+        List<MatchingRecord> expectedMatchingRecords =
+                matchingRecordRepository.findRecentValidMatchingRecords(gameMode);
+        assertThat(matchingRecords.size()).isEqualTo(expectedMatchingRecords.size());
+    }
 
     private Member createMember(String email, String gameName, String tag, Tier tier, int gameRank, boolean hasMike,
                                 Position mainP, Position subP,
