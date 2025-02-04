@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardBumpResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
@@ -131,5 +132,16 @@ public class BoardFacadeService {
         return MyBoardResponse.of(boardPage);
     }
 
+    /**
+     * 게시글 끌올(bump) 기능 (파사드)
+     * 사용자가 "끌올" 버튼을 누르면 해당 게시글의 bumpTime을 업데이트합니다.
+     * 단, 마지막 끌올 후 1시간이 지나지 않았다면 예외를 발생시킵니다.
+     */
+
+    @Transactional
+    public BoardBumpResponse bumpBoard(Long boardId, Member member) {
+        Board board = boardService.bumpBoard(boardId, member.getId());
+        return BoardBumpResponse.of(board.getId(), board.getBumpTime());
+    }
 
 }
