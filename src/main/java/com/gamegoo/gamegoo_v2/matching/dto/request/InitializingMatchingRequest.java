@@ -5,11 +5,13 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
+@Builder
 public class InitializingMatchingRequest {
 
     @NotNull(message = "gameMode 는 비워둘 수 없습니다.")
