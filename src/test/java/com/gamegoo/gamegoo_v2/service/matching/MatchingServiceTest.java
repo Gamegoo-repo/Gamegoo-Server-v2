@@ -309,6 +309,19 @@ class MatchingServiceTest {
         assertThat(matchingRecords.size()).isEqualTo(expectedMatchingRecords.size());
     }
 
+    @DisplayName("매칭 기록 생성")
+    @Test
+    void createMatchingRecord() {
+        // when
+        MatchingRecord matchingRecord = matchingService.createMatchingRecord(member, MatchingType.BASIC, GameMode.FREE);
+
+        // then
+        assertThat(matchingRecord).isNotNull();
+        assertThat(matchingRecord.getGameMode()).isEqualTo(GameMode.FREE);
+        assertThat(matchingRecord.getMatchingType()).isEqualTo(MatchingType.BASIC);
+        assertThat(matchingRecord.getMember()).isEqualTo(member);
+    }
+
     private Member createMember(String email, String gameName, String tag, Tier tier, int gameRank, boolean hasMike,
                                 Position mainP, Position subP,
                                 Position wantP, int mannerLevel) {
