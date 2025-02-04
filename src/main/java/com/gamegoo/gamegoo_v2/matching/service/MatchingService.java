@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +97,7 @@ public class MatchingService {
      * @return 대기 중인 매칭 리스트
      */
     public List<MatchingRecord> getPendingMatchingRecords(GameMode gameMode) {
-        return matchingRecordRepository.findRecentValidMatchingRecords(gameMode);
+        return matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now().minusMinutes(5), gameMode);
     }
 
     /**
