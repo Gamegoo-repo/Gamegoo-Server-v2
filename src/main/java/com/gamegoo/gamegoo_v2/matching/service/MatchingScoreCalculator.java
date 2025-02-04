@@ -3,9 +3,7 @@ package com.gamegoo.gamegoo_v2.matching.service;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MatchingScoreCalculator {
 
     /**
@@ -17,8 +15,8 @@ public class MatchingScoreCalculator {
      * @param mannerDifferenceMultiplier 매너 점수 별 가중치 값
      * @return 최종 매너점수
      */
-    public int getMannerPriority(Integer otherManner, Integer myManner, int maxMannerPriority,
-                                 int mannerDifferenceMultiplier) {
+    public static int getMannerPriority(Integer otherManner, Integer myManner, int maxMannerPriority,
+                                        int mannerDifferenceMultiplier) {
         int mannerDifference = Math.abs(myManner - otherManner);
         return maxMannerPriority - mannerDifference * mannerDifferenceMultiplier;
     }
@@ -34,8 +32,8 @@ public class MatchingScoreCalculator {
      * @param tierMultiplier      티어 점수
      * @return 랭킹 우선순위 값
      */
-    public int getTierRankPriority(Tier myTier, Integer myRank, Tier otherTier, Integer otherRank,
-                                   int maxTierRankPriority, int tierMultiplier) {
+    public static int getTierRankPriority(Tier myTier, Integer myRank, Tier otherTier, Integer otherRank,
+                                          int maxTierRankPriority, int tierMultiplier) {
         int myScore = getTierRankScore(myTier, myRank, tierMultiplier);
         int otherScore = getTierRankScore(otherTier, otherRank, tierMultiplier);
         int scoreDifference = Math.abs(myScore - otherScore);
@@ -51,7 +49,7 @@ public class MatchingScoreCalculator {
      * @param tierMultiplier 티어 점수
      * @return 랭킹 점수
      */
-    private int getTierRankScore(Tier tier, int rank, int tierMultiplier) {
+    private static int getTierRankScore(Tier tier, int rank, int tierMultiplier) {
         return tier.ordinal() * tierMultiplier - rank;
     }
 
@@ -66,8 +64,8 @@ public class MatchingScoreCalculator {
      * @param defaultPositionPriority 낮은 추가 점수
      * @return 포지션 우선순위 점수
      */
-    public int getPositionPriority(Position myWantPosition, Position otherMainPosition, Position otherSubPosition,
-                                   int mainPositionPriority, int subPositionPriority, int defaultPositionPriority) {
+    public static int getPositionPriority(Position myWantPosition, Position otherMainPosition, Position otherSubPosition,
+                                          int mainPositionPriority, int subPositionPriority, int defaultPositionPriority) {
         int priority = 0;
 
         if (myWantPosition == otherMainPosition || myWantPosition == Position.ANY || otherMainPosition == Position.ANY) {
@@ -89,7 +87,7 @@ public class MatchingScoreCalculator {
      * @param mikeMatchPriority 마이크 점수
      * @return 마이크 우선순위 점수
      */
-    public int getMikePriority(Mike myMike, Mike otherMike, int mikeMatchPriority) {
+    public static int getMikePriority(Mike myMike, Mike otherMike, int mikeMatchPriority) {
         if (!myMike.equals(otherMike)) {
             return 0;
         }

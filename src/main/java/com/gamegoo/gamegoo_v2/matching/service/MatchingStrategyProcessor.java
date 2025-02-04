@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MatchingStrategyProcessor {
 
-    private final MatchingScoreCalculator matchingScoreCalculator;
-
     /**
      * 정밀매칭 우선순위 계산
      *
@@ -18,7 +16,7 @@ public class MatchingStrategyProcessor {
      * @return 우선순위 점수
      */
     public int calculatePrecisePriority(MatchingRecord myRecord, MatchingRecord otherRecord) {
-        return matchingScoreCalculator.getMannerPriority(
+        return MatchingScoreCalculator.getMannerPriority(
                 otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
     }
 
@@ -33,21 +31,21 @@ public class MatchingStrategyProcessor {
         int priority = 0;
 
         // 매너 우선순위
-        priority += matchingScoreCalculator.getMannerPriority(
+        priority += MatchingScoreCalculator.getMannerPriority(
                 otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
 
         // TODO: 티어 및 랭킹 점수 계산
-        priority += matchingScoreCalculator.getTierRankPriority(myRecord.getSoloTier(), myRecord.getSoloRank(),
+        priority += MatchingScoreCalculator.getTierRankPriority(myRecord.getSoloTier(), myRecord.getSoloRank(),
                 otherRecord.getSoloTier(), otherRecord.getSoloRank(), 40, 4);
 
         // 포지션 우선순위
-        priority += matchingScoreCalculator.getPositionPriority(
+        priority += MatchingScoreCalculator.getPositionPriority(
                 myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(), 3, 2, 1);
-        priority += matchingScoreCalculator.getPositionPriority(
+        priority += MatchingScoreCalculator.getPositionPriority(
                 otherRecord.getWantPosition(), myRecord.getMainPosition(), myRecord.getSubPosition(), 3, 2, 1);
 
         // 마이크 우선순위
-        priority += matchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
+        priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
 
         return priority;
     }
@@ -63,22 +61,22 @@ public class MatchingStrategyProcessor {
         int priority = 0;
 
         // 매너 우선순위
-        priority += matchingScoreCalculator.getMannerPriority(
+        priority += MatchingScoreCalculator.getMannerPriority(
                 otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
 
         // 티어 및 랭킹 점수 계산
-        priority += matchingScoreCalculator.getTierRankPriority(
+        priority += MatchingScoreCalculator.getTierRankPriority(
                 myRecord.getSoloTier(), myRecord.getSoloRank(),
                 otherRecord.getSoloTier(), otherRecord.getSoloRank(), 40, 4);
 
         // 포지션 우선순위
-        priority += matchingScoreCalculator.getPositionPriority(
+        priority += MatchingScoreCalculator.getPositionPriority(
                 myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(), 3, 2, 1);
-        priority += matchingScoreCalculator.getPositionPriority(
+        priority += MatchingScoreCalculator.getPositionPriority(
                 otherRecord.getWantPosition(), myRecord.getMainPosition(), myRecord.getSubPosition(), 3, 2, 1);
 
         // 마이크 우선순위
-        priority += matchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 5);
+        priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 5);
 
         return priority;
     }
@@ -94,22 +92,22 @@ public class MatchingStrategyProcessor {
         int priority = 0;
 
         // 매너 우선순위
-        priority += matchingScoreCalculator.getMannerPriority(
+        priority += MatchingScoreCalculator.getMannerPriority(
                 otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
 
         // 티어 및 랭킹 점수 계산
-        priority += matchingScoreCalculator.getTierRankPriority(
+        priority += MatchingScoreCalculator.getTierRankPriority(
                 myRecord.getFreeTier(), myRecord.getFreeRank(),
                 otherRecord.getFreeTier(), otherRecord.getFreeRank(), 40, 4);
 
         // 포지션 우선순위
-        priority += matchingScoreCalculator.getPositionPriority(
+        priority += MatchingScoreCalculator.getPositionPriority(
                 myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(), 3, 2, 1);
-        priority += matchingScoreCalculator.getPositionPriority(
+        priority += MatchingScoreCalculator.getPositionPriority(
                 otherRecord.getWantPosition(), myRecord.getMainPosition(), myRecord.getSubPosition(), 3, 2, 1);
 
         // 마이크 우선순위
-        priority += matchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
+        priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
 
         return priority;
     }
@@ -125,11 +123,11 @@ public class MatchingStrategyProcessor {
         int priority = 0;
 
         // 매너 우선순위
-        priority += matchingScoreCalculator.getMannerPriority(
+        priority += MatchingScoreCalculator.getMannerPriority(
                 otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
 
         // 마이크 우선순위
-        priority += matchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
+        priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
 
         return priority;
     }

@@ -24,9 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MatchingStrategyProcessorTest {
 
     @Autowired
-    MatchingScoreCalculator matchingScoreCalculator;
-
-    @Autowired
     MatchingStrategyProcessor matchingStrategyProcessor;
 
     @Test
@@ -267,12 +264,12 @@ class MatchingStrategyProcessorTest {
         // 포지션 expectedPriority 계산
         int positionPriority = 0;
 
-        positionPriority += matchingScoreCalculator.getPositionPriority(
+        positionPriority += MatchingScoreCalculator.getPositionPriority(
                 member1.getWantPosition(), member2.getMainPosition(), member2.getSubPosition(),
                 3, 2, 1
         );
 
-        positionPriority += matchingScoreCalculator.getPositionPriority(
+        positionPriority += MatchingScoreCalculator.getPositionPriority(
                 member2.getWantPosition(), member1.getMainPosition(), member1.getSubPosition(),
                 3, 2, 1
         );
