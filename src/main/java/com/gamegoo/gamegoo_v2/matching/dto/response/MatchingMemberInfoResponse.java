@@ -7,12 +7,14 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
 @Builder
+@EqualsAndHashCode
 public class MatchingMemberInfoResponse {
 
     Long memberId;

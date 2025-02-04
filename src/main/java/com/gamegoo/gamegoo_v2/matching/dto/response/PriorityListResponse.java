@@ -3,12 +3,14 @@ package com.gamegoo.gamegoo_v2.matching.dto.response;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
 @Builder
+@EqualsAndHashCode
 public class PriorityListResponse {
 
     List<PriorityValue> myPriorityList;
