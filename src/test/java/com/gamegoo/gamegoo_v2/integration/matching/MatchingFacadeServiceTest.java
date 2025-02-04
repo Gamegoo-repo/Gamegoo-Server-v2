@@ -2,6 +2,8 @@ package com.gamegoo.gamegoo_v2.integration.matching;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
@@ -16,7 +18,16 @@ import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.core.exception.common.GlobalException;
 import com.gamegoo.gamegoo_v2.external.socket.SocketService;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
+import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
+import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
+import com.gamegoo.gamegoo_v2.matching.repository.MatchingRecordRepository;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
+import com.gamegoo.gamegoo_v2.matching.service.MatchingService;
 import com.gamegoo.gamegoo_v2.social.block.domain.Block;
 import com.gamegoo.gamegoo_v2.social.block.repository.BlockRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -29,11 +40,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -49,6 +63,7 @@ import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 @SpringBootTest
+@Transactional
 public class MatchingFacadeServiceTest {
 
     @MockitoSpyBean
@@ -69,6 +84,12 @@ public class MatchingFacadeServiceTest {
     @Autowired
     private MatchingFacadeService matchingFacadeService;
 
+    @Autowired
+    MatchingService matchingService;
+
+    @Autowired
+    private MatchingRecordRepository matchingRecordRepository;
+
     @MockitoBean
     private SocketService socketService;
 
@@ -87,6 +108,7 @@ public class MatchingFacadeServiceTest {
         memberChatroomRepository.deleteAllInBatch();
         chatroomRepository.deleteAllInBatch();
         blockRepository.deleteAllInBatch();
+        matchingRecordRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
     }
 
@@ -219,6 +241,106 @@ public class MatchingFacadeServiceTest {
 
     }
 
+    @DisplayName("매칭 우선순위 계산 및 DB 저장 테스트")
+    @Test
+    void getPriorityListAndCheckRecord() {
+        // given
+        // 유저 정보 생성
+        Member matchingMember = createMatchingMember("matchinguser@gmail.com", "User1", "Tag1", Tier.GOLD, 2, true,
+                Position.ADC, Position.MID, Position.SUP, 2);
+
+        // dto 생성
+        InitializingMatchingRequest request = InitializingMatchingRequest.builder()
+                .mike(Mike.UNAVAILABLE)
+                .matchingType(MatchingType.BASIC)
+                .mainP(Position.TOP)
+                .subP(Position.ADC)
+                .wantP(Position.JUNGLE)
+                .gameMode(GameMode.SOLO)
+                .gameStyleIdList(List.of())
+                .build();
+
+        // 랜덤 대기 유저 생성
+        Random random = new Random();
+        for (int i = 0; i < 20; i++) {
+            // 랜덤값 생성
+            String email = "user" + i + "@gmail.com";
+            String gameName = "USER" + i;
+            String tag = "TAG" + i;
+            Tier tier = Tier.values()[random.nextInt(Tier.values().length)];
+            int gameRank = random.nextInt(4) + 1;
+            boolean hasMike = random.nextBoolean();
+            Position mainP = Position.values()[random.nextInt(Position.values().length)];
+            Position subP = Position.values()[random.nextInt(Position.values().length)];
+            Position wantP = Position.values()[random.nextInt(Position.values().length)];
+            int mannerLevel = random.nextInt(4) + 1;
+            GameMode randomGameMode = GameMode.values()[random.nextInt(GameMode.values().length)];
+            MatchingType randomMatchingType = MatchingType.values()[random.nextInt(MatchingType.values().length)];
+            MatchingStatus randomMatchingStatus = MatchingStatus.PENDING;
+
+            Member targetMember = createMatchingMember(email, gameName, tag, tier, gameRank, hasMike, mainP, subP,
+                    wantP, mannerLevel);
+            createMatchingRecord(randomGameMode, randomMatchingType, targetMember, randomMatchingStatus);
+        }
+
+        // when
+        PriorityListResponse priorityListResponse =
+                matchingFacadeService.calculatePriorityAndRecording(matchingMember.getId(), request);
+
+        Member updatedMember = memberRepository.findByEmail("matchinguser@gmail.com")
+                .orElseThrow(() -> new AssertionError("테스트 실패: Member가 존재하지 않음"));
+
+        MatchingRecord matchingRecord = MatchingRecord.create(request.getGameMode(), request.getMatchingType(),
+                updatedMember);
+        matchingRecord.updateStatus(MatchingStatus.PENDING);
+
+        // then
+        assertThat(priorityListResponse).isNotNull();
+
+        // 1. Member 정보 업데이트 검증
+        assertThat(updatedMember.getMike()).isEqualTo(request.getMike());
+        assertThat(updatedMember.getMainPosition()).isEqualTo(request.getMainP());
+        assertThat(updatedMember.getSubPosition()).isEqualTo(request.getSubP());
+        assertThat(updatedMember.getWantPosition()).isEqualTo(request.getWantP());
+
+        // 2. 생성된 MatchingRecord 검증
+        MatchingRecord actualMatchingRecord = matchingRecordRepository.findLatestByMember(updatedMember);
+
+        assertThat(actualMatchingRecord.getGameMode()).isEqualTo(request.getGameMode());
+        assertThat(actualMatchingRecord.getMatchingType()).isEqualTo(request.getMatchingType());
+        assertThat(actualMatchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
+        assertThat(actualMatchingRecord.getMember().getId()).isEqualTo(updatedMember.getId());
+        assertThat(actualMatchingRecord.getMainPosition()).isEqualTo(request.getMainP());
+        assertThat(actualMatchingRecord.getSubPosition()).isEqualTo(request.getSubP());
+        assertThat(actualMatchingRecord.getWantPosition()).isEqualTo(request.getWantP());
+        assertThat(actualMatchingRecord.getMike()).isEqualTo(request.getMike());
+
+        // 3. Priority 검증
+        List<MatchingRecord> recentValidMatchingRecords =
+                matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now().minusMinutes(5), GameMode.SOLO);
+        PriorityListResponse expectedPriorityList = matchingService.calculatePriorityList(matchingRecord,
+                recentValidMatchingRecords);
+
+        assertThat(priorityListResponse).isNotNull();
+
+        // 정렬 (ID 기준으로 정렬하여 비교)
+        Comparator<PriorityValue> priorityComparator = Comparator.comparing(PriorityValue::getMemberId);
+        expectedPriorityList.getMyPriorityList().sort(priorityComparator);
+        expectedPriorityList.getOtherPriorityList().sort(priorityComparator);
+        priorityListResponse.getMyPriorityList().sort(priorityComparator);
+        priorityListResponse.getOtherPriorityList().sort(priorityComparator);
+
+        assertThat(priorityListResponse.getMyPriorityList())
+                .usingRecursiveComparison()
+                .ignoringFields("matchingUuid")
+                .isEqualTo(expectedPriorityList.getMyPriorityList());
+        assertThat(priorityListResponse.getOtherPriorityList())
+                .usingRecursiveComparison()
+                .ignoringFields("matchingUuid")
+                .isEqualTo(expectedPriorityList.getOtherPriorityList());
+    }
+
+
     private Member createMember(String email, String gameName) {
         return memberRepository.save(Member.builder()
                 .email(email)
@@ -257,6 +379,25 @@ public class MatchingFacadeServiceTest {
 
     private Block blockMember(Member member, Member targetMember) {
         return blockRepository.save(Block.create(member, targetMember));
+    }
+
+    private Member createMatchingMember(String email, String gameName, String tag, Tier tier, int gameRank,
+                                        boolean hasMike,
+                                        Position mainP, Position subP,
+                                        Position wantP, int mannerLevel) {
+
+        Member member = Member.create(email, "password123", LoginType.GENERAL, gameName, tag, tier, gameRank, 55.0,
+                100, hasMike);
+        member.updateMannerLevel(mannerLevel);
+        member.updatePosition(mainP, subP, wantP);
+        return memberRepository.save(member);
+    }
+
+    private MatchingRecord createMatchingRecord(GameMode mode, MatchingType type, Member member,
+                                                MatchingStatus status) {
+        MatchingRecord matchingRecord = MatchingRecord.create(mode, type, member);
+        matchingRecord.updateStatus(status);
+        return matchingRecordRepository.save(matchingRecord);
     }
 
 }

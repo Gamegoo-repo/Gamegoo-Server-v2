@@ -89,28 +89,25 @@ public class MatchingRecord extends BaseDateTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_id", nullable = false)
+    @JoinColumn(name = "target_id")
     private Member targetMember;
 
     // MatchingRecord 생성 메서드
-    public static MatchingRecord create(GameMode gameMode, Position mainPosition, Position subPosition,
-                                        Position wantPosition, Mike mike, Tier soloTier, int soloRank,
-                                        double soloWinRate, Tier freeTier, int freeRank, double freeWinRate,
-                                        MatchingType matchingType, int mannerLevel, Member member) {
+    public static MatchingRecord create(GameMode gameMode, MatchingType matchingType, Member member) {
         return MatchingRecord.builder()
                 .gameMode(gameMode)
-                .mainPosition(mainPosition)
-                .subPosition(subPosition)
-                .wantPosition(wantPosition)
-                .mike(mike)
-                .soloTier(soloTier)
-                .soloRank(soloRank)
-                .soloWinRate(soloWinRate)
-                .freeTier(freeTier)
-                .freeRank(freeRank)
-                .freeWinRate(freeWinRate)
+                .mainPosition(member.getMainPosition())
+                .subPosition(member.getSubPosition())
+                .wantPosition(member.getWantPosition())
+                .mike(member.getMike())
+                .soloTier(member.getTier()) // TODO:
+                .soloRank(member.getGameRank()) // TODO:
+                .soloWinRate(member.getWinRate()) // TODO:
+                .freeTier(member.getTier()) // TODO:
+                .freeRank(member.getGameRank()) // TODO:
+                .freeWinRate(member.getWinRate()) // TODO:
                 .matchingType(matchingType)
-                .mannerLevel(mannerLevel)
+                .mannerLevel(member.getMannerLevel())
                 .member(member)
                 .build();
     }
@@ -135,6 +132,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
         this.matchingType = matchingType;
         this.mannerLevel = mannerLevel;
         this.member = member;
+        this.targetMember = null;
     }
 
     // status 변경

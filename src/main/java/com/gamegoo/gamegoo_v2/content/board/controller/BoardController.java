@@ -7,6 +7,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardBumpResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
@@ -122,6 +123,18 @@ public class BoardController {
     public ApiResponse<MyBoardResponse> getMyBoardList(@ValidPage @RequestParam(name = "page") Integer page,
                                                        @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.getMyBoardList(member, page));
+    }
+
+    /**
+     * 게시글 끌올(bump) API
+     * 사용자가 "끌올" 버튼을 누르면 해당 게시글의 bumpTime이 업데이트되어 상단으로 노출됩니다.
+     */
+    @PostMapping("/{boardId}/bump")
+    @Operation(summary = "게시글 끌올 API", description = "게시글을 끌올하여 상단 노출시키는 API 입니다. 마지막 끌올 후 1시간 제한이 적용됩니다.")
+    @Parameter(name = "boardId", description = "끌올할 게시판 글 id 입니다.")
+    public ApiResponse<BoardBumpResponse> bumpBoard(@PathVariable Long boardId,
+                                                    @AuthMember Member member) {
+        return ApiResponse.ok(boardFacadeService.bumpBoard(boardId, member));
     }
 
 }

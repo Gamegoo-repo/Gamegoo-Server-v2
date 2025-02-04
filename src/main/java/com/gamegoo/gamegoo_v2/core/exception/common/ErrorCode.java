@@ -130,7 +130,8 @@ public enum ErrorCode {
     BOARD_PAGE_BAD_REQUEST(BAD_REQUEST, "BOARD_407", "페이지 값은 0 이상만 가능합니다."),
     BOARD_FORBIDDEN_WORD(BAD_REQUEST, "BOARD_408", "금지어가 포함되어 있습니다."),
     BOARD_FORBIDDEN_WORD_LOAD_FAILED(INTERNAL_SERVER_ERROR, "BOARD_409", "금지어 파일을 읽어오는데 실패했습니다."),
-
+    BUMP_ACCESS_DENIED(FORBIDDEN, "BOARD_410", "게시글 끌어올리기 권한이 없습니다."),
+    BUMP_TIME_LIMIT(BAD_REQUEST, "BOARD_411", "게시글 끌어올리기는 24시간에 1회만 가능합니다."),
     /**
      * 매너평가 관련 에러
      */

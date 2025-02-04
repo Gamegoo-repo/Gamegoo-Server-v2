@@ -19,6 +19,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,6 +30,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     public static final int PAGE_SIZE = 20;
     public static final int MY_PAGE_SIZE = 10;
+    private static final Duration BUMP_INTERVAL = Duration.ofMinutes(1);
 
     /**
      * 게시글 엔티티 생성 및 저장
@@ -63,7 +67,7 @@ public class BoardService {
 
     public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Mike mike,
                                                int pageIdx) {
-        Pageable pageable = PageRequest.of(pageIdx - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(pageIdx - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityTime"));
         return findBoards(gameMode, tier, mainP, mike, pageable);
     }
 
@@ -133,6 +137,30 @@ public class BoardService {
      */
     @Transactional
     public Board saveBoard(Board board) {
+        return boardRepository.save(board);
+    }
+
+    /**
+     * 끌올 기능: 사용자가 게시글을 끌올하면 bumpTime을 현재 시간으로 업데이트
+     */
+    @Transactional
+    public Board bumpBoard(Long boardId, Long memberId) {
+        Board board = boardRepository.findByIdAndDeleted(boardId, false)
+                .orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (!board.getMember().getId().equals(memberId)) {
+            throw new BoardException(ErrorCode.BUMP_ACCESS_DENIED);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        if (board.getBumpTime() != null) {
+            Duration diff = Duration.between(board.getBumpTime(), now);
+            if (diff.compareTo(BUMP_INTERVAL) < 0) {
+                throw new BoardException(ErrorCode.BUMP_TIME_LIMIT);
+            }
+        }
+
+        board.bump(now);
         return boardRepository.save(board);
     }
 

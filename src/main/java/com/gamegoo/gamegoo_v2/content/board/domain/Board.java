@@ -21,7 +21,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +72,11 @@ public class Board extends BaseDateTimeEntity {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<BoardGameStyle> boardGameStyles = new ArrayList<>();
+
+    private LocalDateTime bumpTime;
+
+    @Formula("GREATEST(COALESCE(bump_time, created_at), created_at)")
+    private LocalDateTime activityTime;
 
 
     public static Board create(Member member, GameMode gameMode, Position mainP, Position subP,
@@ -141,6 +148,14 @@ public class Board extends BaseDateTimeEntity {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public void bump(LocalDateTime bumpTime) {
+        this.bumpTime = bumpTime;
+    }
+
+    public LocalDateTime getActivityTime() {
+        return activityTime;
     }
 
 
