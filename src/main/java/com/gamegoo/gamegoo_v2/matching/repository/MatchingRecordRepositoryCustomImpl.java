@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.matching.repository;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
@@ -35,6 +36,18 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
                 )
                 .orderBy(matchingRecord.member.id.asc(), matchingRecord.createdAt.desc()) // 최신순 정렬
                 .fetch();
+    }
+
+    @Override
+    public MatchingRecord findLatestByMember(Member member) {
+        QMatchingRecord matchingRecord = QMatchingRecord.matchingRecord;
+
+        return queryFactory
+                .selectFrom(matchingRecord)
+                .where(matchingRecord.member.eq(member))
+                .orderBy(matchingRecord.createdAt.desc())
+                .limit(1)
+                .fetchOne();
     }
 
     /**
