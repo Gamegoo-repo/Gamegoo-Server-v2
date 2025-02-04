@@ -97,7 +97,6 @@ public class MatchingService {
      */
     public List<MatchingRecord> getPendingMatchingRecords(GameMode gameMode) {
         return matchingRecordRepository.findRecentValidMatchingRecords(gameMode);
-
     }
 
     /**

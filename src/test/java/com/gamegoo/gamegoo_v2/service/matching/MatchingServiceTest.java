@@ -7,12 +7,14 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingMemberInfoResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.repository.MatchingRecordRepository;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingService;
+import com.gamegoo.gamegoo_v2.matching.service.MatchingStrategyProcessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +39,10 @@ class MatchingServiceTest {
     MatchingService matchingService;
 
     @Autowired
-    private MemberRepository memberRepository;
+    MatchingStrategyProcessor matchingStrategyProcessor;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @Autowired
     MatchingRecordRepository matchingRecordRepository;
@@ -63,7 +68,8 @@ class MatchingServiceTest {
         @Test
         void getMatchingPriorityListSucceedsWhenNoUser() {
             // given
-            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member);
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member,
+                    MatchingStatus.PENDING);
 
             // when
             PriorityListResponse priorityListResponse = matchingService.calculatePriorityList(matchingRecord,
@@ -81,9 +87,10 @@ class MatchingServiceTest {
 
         @DisplayName("매칭 리스트 조회 성공 : 랜덤 대기자 20명")
         @Test
-        void validateMatchingPriorityLists() {
+        void validateMatchingPriorityListsSucceeds() {
             // given
-            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member);
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member,
+                    MatchingStatus.PENDING);
 
             Random random = new Random();
             List<MatchingRecord> allMatchingRecords = new ArrayList<>();
@@ -100,12 +107,12 @@ class MatchingServiceTest {
                 Position wantP = Position.values()[random.nextInt(Position.values().length)];
                 int mannerLevel = random.nextInt(4) + 1;
 
-                Member tempMember = createMember(email, gameName, tag, tier, gameRank, hasMike, mainP, subP, wantP,
+                Member targetMember = createMember(email, gameName, tag, tier, gameRank, hasMike, mainP, subP, wantP,
                         mannerLevel);
-                MatchingRecord tempMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
-                        tempMember);
+                MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                        targetMember, MatchingStatus.PENDING);
 
-                allMatchingRecords.add(tempMatchingRecord);
+                allMatchingRecords.add(targetMatchingRecord);
             }
 
             // when
@@ -145,6 +152,122 @@ class MatchingServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("매칭 우선순위 점수 계산")
+    class getMatchingPriority {
+
+        @DisplayName("매칭 우선순위 점수 계산 : 개인 랭크")
+        @Test
+        void getMatchingPrioritySucceedsWhenSoloGameMode() {
+            // given
+            MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+                    Position.SUP, Position.TOP, Position.ADC, 3);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            // when
+            int priority = matchingService.calculatePriority(myMatchingRecord.getGameMode(), myMatchingRecord,
+                    targetMatchingRecord);
+
+            // then
+            int expectedPriority = matchingStrategyProcessor.calculateSoloPriority(myMatchingRecord,
+                    targetMatchingRecord);
+            assertThat(priority).isEqualTo(expectedPriority);
+        }
+
+        @DisplayName("매칭 우선순위 점수 계산 : 자유랭크")
+        @Test
+        void getMatchingPrioritySucceedsWhenFreeGameMode() {
+            // given
+            MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+                    Position.SUP, Position.TOP, Position.ADC, 3);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.FREE, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            // when
+            int priority = matchingService.calculatePriority(myMatchingRecord.getGameMode(), myMatchingRecord,
+                    targetMatchingRecord);
+
+            // then
+            int expectedPriority = matchingStrategyProcessor.calculateFreePriority(myMatchingRecord,
+                    targetMatchingRecord);
+            assertThat(priority).isEqualTo(expectedPriority);
+        }
+
+
+        @DisplayName("매칭 우선순위 점수 계산 : 칼바람")
+        @Test
+        void getMatchingPrioritySucceedsWhenAramGameMode() {
+            // given
+            MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.ARAM, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+                    Position.ANY, Position.ANY, Position.ANY, 3);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.ARAM, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            // when
+            int priority = matchingService.calculatePriority(myMatchingRecord.getGameMode(), myMatchingRecord,
+                    targetMatchingRecord);
+
+            // then
+            int expectedPriority = matchingStrategyProcessor.calculateAramPriority(myMatchingRecord,
+                    targetMatchingRecord);
+            assertThat(priority).isEqualTo(expectedPriority);
+        }
+
+        @DisplayName("매칭 우선순위 점수 계산 : 빠른 대전")
+        @Test
+        void getMatchingPrioritySucceedsWhenFastGameMode() {
+            // given
+            MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.FAST, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+                    Position.SUP, Position.TOP, Position.ADC, 3);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.FAST, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            // when
+            int priority = matchingService.calculatePriority(myMatchingRecord.getGameMode(), myMatchingRecord,
+                    targetMatchingRecord);
+
+            // then
+            int expectedPriority = matchingStrategyProcessor.calculateFastPriority(myMatchingRecord,
+                    targetMatchingRecord);
+            assertThat(priority).isEqualTo(expectedPriority);
+        }
+
+        @DisplayName("매칭 우선순위 점수 계산 : 정밀 매칭")
+        @Test
+        void getMatchingPrioritySucceedsWhenPreciseMatchingType() {
+            // given
+            MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.FAST, MatchingType.PRECISE, member,
+                    MatchingStatus.PENDING);
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+                    Position.SUP, Position.TOP, Position.ADC, 3);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.FAST, MatchingType.PRECISE,
+                    targetMember, MatchingStatus.PENDING);
+
+            // when
+            int priority = matchingService.calculatePriority(myMatchingRecord.getGameMode(), myMatchingRecord,
+                    targetMatchingRecord);
+
+            // then
+            int expectedPriority = 0;
+            if (matchingStrategyProcessor.validatePreciseMatching(myMatchingRecord, targetMatchingRecord)) {
+                expectedPriority = matchingStrategyProcessor.calculatePrecisePriority(myMatchingRecord,
+                        targetMatchingRecord);
+            }
+            assertThat(priority).isEqualTo(expectedPriority);
+        }
+
+    }
+
+
     private Member createMember(String email, String gameName, String tag, Tier tier, int gameRank, boolean hasMike,
                                 Position mainP, Position subP,
                                 Position wantP, int mannerLevel) {
@@ -156,8 +279,10 @@ class MatchingServiceTest {
         return memberRepository.save(member);
     }
 
-    private MatchingRecord createMatchingRecord(GameMode mode, MatchingType type, Member member) {
+    private MatchingRecord createMatchingRecord(GameMode mode, MatchingType type, Member member,
+                                                MatchingStatus status) {
         MatchingRecord matchingRecord = MatchingRecord.create(mode, type, member);
+        matchingRecord.updateStatus(status);
         return matchingRecordRepository.save(matchingRecord);
     }
 
