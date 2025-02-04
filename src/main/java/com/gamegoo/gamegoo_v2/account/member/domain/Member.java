@@ -104,7 +104,6 @@ public class Member extends BaseDateTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberGameStyle> memberGameStyleList = new ArrayList<>();
 
-    // 회원가입용 create
     public static Member create(String email, String password, LoginType loginType, String gameName, String tag,
                                 Tier tier, int gameRank, double winRate, int gameCount, boolean isAgree) {
         int randomProfileImage = ThreadLocalRandom.current().nextInt(1, 9);
@@ -124,7 +123,6 @@ public class Member extends BaseDateTimeEntity {
                 .build();
     }
 
-    // 회원가입용 Builder
     @Builder
     private Member(String email, String password, int profileImage, LoginType loginType, String gameName,
                    String tag, Tier tier, int gameRank, double winRate, int gameCount, boolean isAgree) {
@@ -176,6 +174,13 @@ public class Member extends BaseDateTimeEntity {
     public Double updateMannerRank(Double mannerRank) {
         this.mannerRank = mannerRank;
         return this.mannerRank;
+    }
+
+    public void updateMemberByMatchingRecord(Mike mike, Position mainP, Position subP, Position wantP) {
+        this.mike = mike;
+        this.mainPosition = mainP;
+        this.subPosition = subP;
+        this.wantPosition = wantP;
     }
 
 }

@@ -1,6 +1,8 @@
 package com.gamegoo.gamegoo_v2.matching.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.service.MemberGameStyleService;
+import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatQueryService;
@@ -8,11 +10,18 @@ import com.gamegoo.gamegoo_v2.core.common.validator.BlockValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
+import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
+import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +32,58 @@ public class MatchingFacadeService {
     private final ChatCommandService chatCommandService;
     private final MemberValidator memberValidator;
     private final BlockValidator blockValidator;
+    private final MemberService memberService;
+    private final MatchingService matchingService;
+    private final BlockService blockService;
+    private final MemberGameStyleService memberGameStyleService;
+
+    /**
+     * 매칭 우선순위 계산 및 DB 저장
+     *
+     * @param memberId 회원 ID
+     * @param request  회원 정보
+     * @return 매칭 정보
+     */
+    @Transactional
+    public PriorityListResponse calculatePriorityAndRecording(Long memberId, InitializingMatchingRequest request) {
+        // 사용자 조회
+        Member member = memberService.findMemberById(memberId);
+
+        // 매칭 정보로 member 업데이트
+        // 마이크, 포지션 변경
+        memberService.updateMikePosition(member, request.getMike(), request.getMainP(), request.getSubP(),
+                request.getWantP());
+        // 게임스타일 변경
+        memberGameStyleService.updateGameStyle(member, request.getGameStyleIdList());
+
+        // matchingRecord DB에 저장
+        MatchingRecord matchingRecord = matchingService.createMatchingRecord(member, request.getMatchingType(),
+                request.getGameMode());
+
+        // 현재 대기 중인 사용자 조회
+        List<MatchingRecord> pendingMatchingRecords = matchingService.getPendingMatchingRecords(request.getGameMode());
+
+        // 차단당한 사용자 제외
+        List<Long> targetMemberIds = new ArrayList<>();
+        for (MatchingRecord record : pendingMatchingRecords) {
+            targetMemberIds.add(record.getMember().getId());
+        }
+
+        // 차단 여부 확인
+        Map<Long, Boolean> blockedStatusMap = blockService.isBlockedByTargetMembersBatch(member, targetMemberIds);
+
+        // 차단되지 않은 사용자만 필터링
+        List<MatchingRecord> filteredPENDINGMatchingRecords = new ArrayList<>();
+        for (MatchingRecord record : pendingMatchingRecords) {
+            Long targetMemberId = record.getMember().getId();
+            if (!blockedStatusMap.getOrDefault(targetMemberId, false)) {
+                filteredPENDINGMatchingRecords.add(record);
+            }
+        }
+
+        // myPriorityList, otherPriorityList 조회
+        return matchingService.calculatePriorityList(matchingRecord, filteredPENDINGMatchingRecords);
+    }
 
     /**
      * 두 회원 사이 매칭을 통한 채팅방 시작 Facade 메소드
