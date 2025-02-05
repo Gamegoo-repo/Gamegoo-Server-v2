@@ -246,8 +246,8 @@ public class MatchingFacadeServiceTest {
     void getPriorityListAndCheckRecord() {
         // given
         // 유저 정보 생성
-        Member matchingMember = createMatchingMember("matchinguser@gmail.com", "User1", "Tag1", Tier.GOLD, 2, true,
-                Position.ADC, Position.MID, Position.SUP, 2);
+        Member matchingMember = createMatchingMember("matchinguser@gmail.com", "User1", "Tag1", Tier.GOLD, 2,
+                Mike.AVAILABLE, Position.ADC, Position.MID, Position.SUP, 2);
 
         // dto 생성
         InitializingMatchingRequest request = InitializingMatchingRequest.builder()
@@ -269,7 +269,7 @@ public class MatchingFacadeServiceTest {
             String tag = "TAG" + i;
             Tier tier = Tier.values()[random.nextInt(Tier.values().length)];
             int gameRank = random.nextInt(4) + 1;
-            boolean hasMike = random.nextBoolean();
+            Mike mike = Mike.values()[random.nextInt(Mike.values().length)];
             Position mainP = Position.values()[random.nextInt(Position.values().length)];
             Position subP = Position.values()[random.nextInt(Position.values().length)];
             Position wantP = Position.values()[random.nextInt(Position.values().length)];
@@ -278,7 +278,7 @@ public class MatchingFacadeServiceTest {
             MatchingType randomMatchingType = MatchingType.values()[random.nextInt(MatchingType.values().length)];
             MatchingStatus randomMatchingStatus = MatchingStatus.PENDING;
 
-            Member targetMember = createMatchingMember(email, gameName, tag, tier, gameRank, hasMike, mainP, subP,
+            Member targetMember = createMatchingMember(email, gameName, tag, tier, gameRank, mike, mainP, subP,
                     wantP, mannerLevel);
             createMatchingRecord(randomGameMode, randomMatchingType, targetMember, randomMatchingStatus);
         }
@@ -349,10 +349,14 @@ public class MatchingFacadeServiceTest {
                 .loginType(LoginType.GENERAL)
                 .gameName(gameName)
                 .tag("TAG")
-                .tier(Tier.IRON)
-                .gameRank(0)
-                .winRate(0.0)
-                .gameCount(0)
+                .soloTier(Tier.IRON)
+                .soloRank(0)
+                .soloWinRate(0.0)
+                .soloGameCount(0)
+                .freeTier(Tier.IRON)
+                .freeRank(0)
+                .freeWinRate(0.0)
+                .freeGameCount(0)
                 .isAgree(true)
                 .build());
     }
@@ -382,15 +386,29 @@ public class MatchingFacadeServiceTest {
     }
 
     private Member createMatchingMember(String email, String gameName, String tag, Tier tier, int gameRank,
-                                        boolean hasMike,
-                                        Position mainP, Position subP,
-                                        Position wantP, int mannerLevel) {
-
-        Member member = Member.create(email, "password123", LoginType.GENERAL, gameName, tag, tier, gameRank, 55.0,
-                100, hasMike);
-        member.updateMannerLevel(mannerLevel);
-        member.updatePosition(mainP, subP, wantP);
-        return memberRepository.save(member);
+                                        Mike mike, Position mainP, Position subP, Position wantP,
+                                        int mannerLevel) {
+        Member member1 = Member.builder()
+                .email(email)
+                .password("testPassword")
+                .profileImage(1)
+                .loginType(LoginType.GENERAL)
+                .gameName(gameName)
+                .tag(tag)
+                .soloTier(tier)
+                .soloRank(0)
+                .soloWinRate(0.0)
+                .soloGameCount(0)
+                .freeTier(tier)
+                .freeRank(gameRank)
+                .freeWinRate(0.0)
+                .freeGameCount(0)
+                .isAgree(true)
+                .build();
+        member1.updateMike(mike);
+        member1.updatePosition(mainP, subP, wantP);
+        member1.updateMannerLevel(mannerLevel);
+        return memberRepository.save(member1);
     }
 
     private MatchingRecord createMatchingRecord(GameMode mode, MatchingType type, Member member,

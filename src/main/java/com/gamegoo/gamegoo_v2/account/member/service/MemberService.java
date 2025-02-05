@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.member.service;
 
+import com.gamegoo.gamegoo_v2.account.auth.dto.request.JoinRequest;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
@@ -8,10 +9,14 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.utils.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,28 +25,51 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    /**
-     * Member 생성 메소드
-     *
-     * @param email     이메일
-     * @param password  비밀번호
-     * @param gameName  소환사명
-     * @param tag       태그
-     * @param tier      티어
-     * @param rank      랭크
-     * @param winrate   승률
-     * @param gameCount 총 게임 횟수
-     * @param isAgree   개인정보 동의
-     * @return Member
-     */
     @Transactional
-    public Member createMember(String email, String password, String gameName, String tag, Tier tier, int rank,
-                               double winrate, int gameCount, boolean isAgree) {
-        Member member = Member.create(email, PasswordUtil.encodePassword(password), LoginType.GENERAL, gameName, tag,
-                tier, rank, winrate, gameCount, isAgree);
+    public Member createMember(JoinRequest request, List<TierDetails> tiers) {
+
+        // 기본 값 설정
+        Tier soloTier = Tier.UNRANKED;
+        int soloRank = 0;
+        double soloWinRate = 0.0;
+        int soloGameCount = 0;
+
+        Tier freeTier = Tier.UNRANKED;
+        int freeRank = 0;
+        double freeWinRate = 0.0;
+        int freeGameCount = 0;
+
+        // 티어 정보 설정
+        for (TierDetails tierDetail : tiers) {
+            if (tierDetail.getGameMode() == GameMode.SOLO) {
+                soloTier = tierDetail.getTier();
+                soloRank = tierDetail.getRank();
+                soloWinRate = tierDetail.getWinrate();
+                soloGameCount = tierDetail.getGameCount();
+            } else if (tierDetail.getGameMode() == GameMode.FREE) {
+                freeTier = tierDetail.getTier();
+                freeRank = tierDetail.getRank();
+                freeWinRate = tierDetail.getWinrate();
+                freeGameCount = tierDetail.getGameCount();
+            }
+        }
+
+        // Member 생성
+        Member member = Member.create(
+                request.getEmail(),
+                PasswordUtil.encodePassword(request.getPassword()),
+                LoginType.GENERAL,
+                request.getGameName(),
+                request.getTag(),
+                soloTier, soloRank, soloWinRate,
+                freeTier, freeRank, freeWinRate,
+                soloGameCount, freeGameCount, true
+        );
+
         memberRepository.save(member);
         return member;
     }
+
 
     /**
      * 회원 정보 조회

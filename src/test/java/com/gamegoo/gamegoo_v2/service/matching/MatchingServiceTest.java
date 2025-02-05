@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.service.matching;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
@@ -57,8 +58,8 @@ class MatchingServiceTest {
 
     @BeforeEach
     void setUp() {
-        member = createMember("user1@gmail.com", "User1", "Tag1", Tier.GOLD, 2, true, Position.ADC, Position.MID,
-                Position.SUP, 2);
+        member = createMember("user1@gmail.com", "User1", "Tag1", Tier.GOLD, 2, Mike.AVAILABLE, Position.ADC,
+                Position.MID, Position.SUP, 2);
     }
 
     @Nested
@@ -102,13 +103,13 @@ class MatchingServiceTest {
                 String tag = "TAG" + i;
                 Tier tier = Tier.values()[random.nextInt(Tier.values().length)];
                 int gameRank = random.nextInt(4) + 1;
-                boolean hasMike = random.nextBoolean();
+                Mike mike = Mike.values()[random.nextInt(Mike.values().length)];
                 Position mainP = Position.values()[random.nextInt(Position.values().length)];
                 Position subP = Position.values()[random.nextInt(Position.values().length)];
                 Position wantP = Position.values()[random.nextInt(Position.values().length)];
                 int mannerLevel = random.nextInt(4) + 1;
 
-                Member targetMember = createMember(email, gameName, tag, tier, gameRank, hasMike, mainP, subP, wantP,
+                Member targetMember = createMember(email, gameName, tag, tier, gameRank, mike, mainP, subP, wantP,
                         mannerLevel);
                 MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
                         targetMember, MatchingStatus.PENDING);
@@ -163,7 +164,7 @@ class MatchingServiceTest {
             // given
             MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
-            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, Mike.AVAILABLE,
                     Position.SUP, Position.TOP, Position.ADC, 3);
             MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
                     targetMember, MatchingStatus.PENDING);
@@ -184,7 +185,7 @@ class MatchingServiceTest {
             // given
             MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
-            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, Mike.AVAILABLE,
                     Position.SUP, Position.TOP, Position.ADC, 3);
             MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.FREE, MatchingType.BASIC,
                     targetMember, MatchingStatus.PENDING);
@@ -206,7 +207,7 @@ class MatchingServiceTest {
             // given
             MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.ARAM, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
-            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, Mike.AVAILABLE,
                     Position.ANY, Position.ANY, Position.ANY, 3);
             MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.ARAM, MatchingType.BASIC,
                     targetMember, MatchingStatus.PENDING);
@@ -227,7 +228,7 @@ class MatchingServiceTest {
             // given
             MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.FAST, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
-            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, Mike.AVAILABLE,
                     Position.SUP, Position.TOP, Position.ADC, 3);
             MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.FAST, MatchingType.BASIC,
                     targetMember, MatchingStatus.PENDING);
@@ -248,7 +249,7 @@ class MatchingServiceTest {
             // given
             MatchingRecord myMatchingRecord = createMatchingRecord(GameMode.FAST, MatchingType.PRECISE, member,
                     MatchingStatus.PENDING);
-            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, true,
+            Member targetMember = createMember("target@gmail.com", "target", "tag", Tier.SILVER, 1, Mike.AVAILABLE,
                     Position.SUP, Position.TOP, Position.ADC, 3);
             MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.FAST, MatchingType.PRECISE,
                     targetMember, MatchingStatus.PENDING);
@@ -283,7 +284,7 @@ class MatchingServiceTest {
             String tag = "TAG" + i;
             Tier tier = Tier.values()[random.nextInt(Tier.values().length)];
             int gameRank = random.nextInt(4) + 1;
-            boolean hasMike = random.nextBoolean();
+            Mike mike = Mike.values()[random.nextInt(Mike.values().length)];
             Position mainP = Position.values()[random.nextInt(Position.values().length)];
             Position subP = Position.values()[random.nextInt(Position.values().length)];
             Position wantP = Position.values()[random.nextInt(Position.values().length)];
@@ -292,7 +293,7 @@ class MatchingServiceTest {
             MatchingType randomMatchingType = MatchingType.values()[random.nextInt(MatchingType.values().length)];
             MatchingStatus randomMatchingStatus = MatchingStatus.PENDING;
 
-            Member targetMember = createMember(email, gameName, tag, tier, gameRank, hasMike, mainP, subP, wantP,
+            Member targetMember = createMember(email, gameName, tag, tier, gameRank, mike, mainP, subP, wantP,
                     mannerLevel);
             MatchingRecord targetMatchingRecord = createMatchingRecord(randomGameMode, randomMatchingType, targetMember,
                     randomMatchingStatus);
@@ -323,13 +324,12 @@ class MatchingServiceTest {
         assertThat(matchingRecord.getMember()).isEqualTo(member);
     }
 
-    private Member createMember(String email, String gameName, String tag, Tier tier, int gameRank, boolean hasMike,
-                                Position mainP, Position subP,
-                                Position wantP, int mannerLevel) {
-
+    private Member createMember(String email, String gameName, String tag, Tier tier, int gameRank, Mike mike,
+                                Position mainP, Position subP, Position wantP, int mannerLevel) {
         Member member = Member.create(email, "password123", LoginType.GENERAL, gameName, tag, tier, gameRank, 55.0,
-                100, hasMike);
+                tier, gameRank, 55.0, 100, 100, true);
         member.updateMannerLevel(mannerLevel);
+        member.updateMike(mike);
         member.updatePosition(mainP, subP, wantP);
         return memberRepository.save(member);
     }

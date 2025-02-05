@@ -51,7 +51,7 @@ public class Member extends BaseDateTimeEntity {
     private boolean blind = false;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private LoginType loginType;
 
     @Column(nullable = false, length = 100)
@@ -61,17 +61,27 @@ public class Member extends BaseDateTimeEntity {
     private String tag;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Tier tier;
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
+    private Tier soloTier = Tier.UNRANKED;
 
     @Column(nullable = false)
-    private int gameRank;
+    private int soloRank = 0;
 
     @Column(nullable = false)
-    private double winRate;
+    private double soloWinRate = 0.0;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
+    private Tier freeTier = Tier.UNRANKED;
+
     @Column(nullable = false)
+    private int freeRank = 0;
+
+    @Column(nullable = false)
+    private double freeWinRate = 0.0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Position mainPosition = Position.ANY;
 
     @Enumerated(EnumType.STRING)
@@ -79,15 +89,18 @@ public class Member extends BaseDateTimeEntity {
     private Position subPosition = Position.ANY;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Position wantPosition = Position.ANY;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private Mike mike = Mike.UNAVAILABLE;
 
     @Column(nullable = false)
-    private int gameCount;
+    private int soloGameCount = 0;
+
+    @Column(nullable = false)
+    private int freeGameCount = 0;
 
     @Column(nullable = false)
     private boolean isAgree;
@@ -105,7 +118,8 @@ public class Member extends BaseDateTimeEntity {
     private List<MemberGameStyle> memberGameStyleList = new ArrayList<>();
 
     public static Member create(String email, String password, LoginType loginType, String gameName, String tag,
-                                Tier tier, int gameRank, double winRate, int gameCount, boolean isAgree) {
+                                Tier soloTier, int soloRank, double soloWinRate, Tier freeTier, int freeRank,
+                                double freeWinRate, int soloGameCount, int freeGameCount, boolean isAgree) {
         int randomProfileImage = ThreadLocalRandom.current().nextInt(1, 9);
 
         return Member.builder()
@@ -115,27 +129,36 @@ public class Member extends BaseDateTimeEntity {
                 .loginType(loginType)
                 .gameName(gameName)
                 .tag(tag)
-                .tier(tier)
-                .gameCount(gameCount)
-                .gameRank(gameRank)
-                .winRate(winRate)
+                .soloGameCount(soloGameCount)
+                .freeGameCount(freeGameCount)
+                .soloTier(soloTier)
+                .soloRank(soloRank)
+                .soloWinRate(soloWinRate)
+                .freeTier(freeTier)
+                .freeRank(freeRank)
+                .freeWinRate(freeWinRate)
                 .isAgree(isAgree)
                 .build();
     }
 
     @Builder
     private Member(String email, String password, int profileImage, LoginType loginType, String gameName,
-                   String tag, Tier tier, int gameRank, double winRate, int gameCount, boolean isAgree) {
+                   String tag, Tier soloTier, int soloRank, double soloWinRate, Tier freeTier, int freeRank,
+                   double freeWinRate, int soloGameCount, int freeGameCount, boolean isAgree) {
         this.email = email;
         this.password = password;
         this.profileImage = profileImage;
         this.loginType = loginType;
         this.gameName = gameName;
         this.tag = tag;
-        this.tier = tier;
-        this.gameRank = gameRank;
-        this.winRate = winRate;
-        this.gameCount = gameCount;
+        this.soloTier = soloTier;
+        this.soloRank = soloRank;
+        this.soloWinRate = soloWinRate;
+        this.soloGameCount = soloGameCount;
+        this.freeTier = freeTier;
+        this.freeRank = freeRank;
+        this.freeWinRate = freeWinRate;
+        this.freeGameCount = freeGameCount;
         this.isAgree = isAgree;
     }
 

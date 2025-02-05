@@ -65,15 +65,15 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
      * SOLO 모드 - 개인 랭크 제한 검증 (validateSoloRankRange 적용)
      */
     private BooleanExpression validateSoloRankFilter() {
-        return validateSoloRankRange(matchingRecord.soloTier);
+        return validateSoloRankRange(matchingRecord.tier);
     }
 
     /**
      * FREE 모드 - 자유 랭크 제한 검증
      */
     private BooleanExpression validateFreeRankFilter() {
-        return matchingRecord.freeTier.in(Tier.IRON, Tier.BRONZE, Tier.SILVER, Tier.GOLD)
-                .and(matchingRecord.freeTier.notIn(Tier.EMERALD, Tier.DIAMOND, Tier.MASTER, Tier.GRANDMASTER,
+        return matchingRecord.tier.in(Tier.IRON, Tier.BRONZE, Tier.SILVER, Tier.GOLD)
+                .and(matchingRecord.tier.notIn(Tier.EMERALD, Tier.DIAMOND, Tier.MASTER, Tier.GRANDMASTER,
                         Tier.CHALLENGER));
     }
 
@@ -94,7 +94,7 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
     }
 
     /**
-     * 매칭 가능한 포지션 조건 ]
+     * 매칭 가능한 포지션 조건
      */
     private BooleanExpression isValidMatchingPosition(QMatchingRecord myRecord, QMatchingRecord otherRecord) {
         BooleanExpression condition1 = myRecord.mainPosition.ne(Position.ANY)
@@ -127,15 +127,15 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
      * 개인 랭크 제한 검증 (SOLO 모드 전용) - QueryDSL에서 적용 가능하도록 수정
      */
     private BooleanExpression validateSoloRankRange(EnumPath<Tier> tierPath) {
-        return tierPath.eq(Tier.IRON).or(tierPath.eq(Tier.BRONZE)).and(matchingRecord.soloTier.in(Tier.IRON,
+        return tierPath.eq(Tier.IRON).or(tierPath.eq(Tier.BRONZE)).and(matchingRecord.tier.in(Tier.IRON,
                         Tier.BRONZE, Tier.SILVER))
-                .or(tierPath.eq(Tier.SILVER).and(matchingRecord.soloTier.in(Tier.IRON, Tier.BRONZE, Tier.SILVER,
+                .or(tierPath.eq(Tier.SILVER).and(matchingRecord.tier.in(Tier.IRON, Tier.BRONZE, Tier.SILVER,
                         Tier.GOLD)))
-                .or(tierPath.eq(Tier.GOLD).and(matchingRecord.soloTier.in(Tier.SILVER, Tier.GOLD, Tier.PLATINUM)))
-                .or(tierPath.eq(Tier.PLATINUM).and(matchingRecord.soloTier.in(Tier.GOLD, Tier.PLATINUM, Tier.EMERALD)))
-                .or(tierPath.eq(Tier.EMERALD).and(matchingRecord.soloTier.in(Tier.PLATINUM, Tier.EMERALD,
+                .or(tierPath.eq(Tier.GOLD).and(matchingRecord.tier.in(Tier.SILVER, Tier.GOLD, Tier.PLATINUM)))
+                .or(tierPath.eq(Tier.PLATINUM).and(matchingRecord.tier.in(Tier.GOLD, Tier.PLATINUM, Tier.EMERALD)))
+                .or(tierPath.eq(Tier.EMERALD).and(matchingRecord.tier.in(Tier.PLATINUM, Tier.EMERALD,
                         Tier.DIAMOND)))
-                .or(tierPath.eq(Tier.DIAMOND).and(matchingRecord.soloTier.in(Tier.EMERALD, Tier.DIAMOND)))
+                .or(tierPath.eq(Tier.DIAMOND).and(matchingRecord.tier.in(Tier.EMERALD, Tier.DIAMOND)))
                 .or(Expressions.FALSE); // 마스터 이상 필터 적용 안 함
     }
 

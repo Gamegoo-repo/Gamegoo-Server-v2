@@ -30,8 +30,8 @@ public class MyBoardListResponse {
                 .profileImage(board.getBoardProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getTier())
-                .rank(member.getGameRank())
+                .tier(member.getSoloTier())
+                .rank(member.getSoloRank())
                 .createdAt(board.getCreatedAt())
                 .build();
     }

@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.dto;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,6 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TierDetails {
 
+    GameMode gameMode;
     Tier tier;
     double winrate;
     int rank;
