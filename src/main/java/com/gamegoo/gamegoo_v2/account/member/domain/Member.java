@@ -71,7 +71,7 @@ public class Member extends BaseDateTimeEntity {
     private double soloWinRate = 0.0;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private Tier freeTier = Tier.UNRANKED;
 
     @Column(nullable = false)
