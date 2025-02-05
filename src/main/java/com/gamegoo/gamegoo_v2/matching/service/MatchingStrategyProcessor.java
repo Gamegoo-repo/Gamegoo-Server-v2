@@ -35,8 +35,8 @@ public class MatchingStrategyProcessor {
                 otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
 
         // TODO: 티어 및 랭킹 점수 계산
-        priority += MatchingScoreCalculator.getTierRankPriority(myRecord.getSoloTier(), myRecord.getSoloRank(),
-                otherRecord.getSoloTier(), otherRecord.getSoloRank(), 40, 4);
+        priority += MatchingScoreCalculator.getTierRankPriority(myRecord.getTier(), myRecord.getGameRank(),
+                otherRecord.getTier(), otherRecord.getGameRank(), 40, 4);
 
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
@@ -66,8 +66,8 @@ public class MatchingStrategyProcessor {
 
         // 티어 및 랭킹 점수 계산
         priority += MatchingScoreCalculator.getTierRankPriority(
-                myRecord.getSoloTier(), myRecord.getSoloRank(),
-                otherRecord.getSoloTier(), otherRecord.getSoloRank(), 40, 4);
+                myRecord.getTier(), myRecord.getGameRank(),
+                otherRecord.getTier(), otherRecord.getGameRank(), 40, 4);
 
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
@@ -97,8 +97,8 @@ public class MatchingStrategyProcessor {
 
         // 티어 및 랭킹 점수 계산
         priority += MatchingScoreCalculator.getTierRankPriority(
-                myRecord.getFreeTier(), myRecord.getFreeRank(),
-                otherRecord.getFreeTier(), otherRecord.getFreeRank(), 40, 4);
+                myRecord.getTier(), myRecord.getGameRank(),
+                otherRecord.getTier(), otherRecord.getGameRank(), 40, 4);
 
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
@@ -152,7 +152,7 @@ public class MatchingStrategyProcessor {
         }
 
         // 티어 차이가 1개 이상 나면 매칭 실패
-        return Math.abs(myRecord.getSoloTier().ordinal() - otherRecord.getSoloTier().ordinal()) < 1;
+        return Math.abs(myRecord.getTier().ordinal() - otherRecord.getTier().ordinal()) < 1;
     }
 
 

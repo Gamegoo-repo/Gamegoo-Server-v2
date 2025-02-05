@@ -1,4 +1,4 @@
-package com.gamegoo.gamegoo_v2.service.matching;
+package com.gamegoo.gamegoo_v2.unit;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;

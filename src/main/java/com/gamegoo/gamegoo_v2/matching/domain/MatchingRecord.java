@@ -31,54 +31,44 @@ public class MatchingRecord extends BaseDateTimeEntity {
     private String matchingUuid;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private GameMode gameMode;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(columnDefinition = "VARCHAR(20)")
     private Position mainPosition;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(columnDefinition = "VARCHAR(20)")
     private Position subPosition;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(columnDefinition = "VARCHAR(20)")
     private Position wantPosition;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(columnDefinition = "VARCHAR(20)")
     private Mike mike;
 
     @Enumerated(EnumType.STRING)
-    @Column
-    private Tier soloTier;
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
+    private Tier tier;
 
     @Column
-    private int soloRank;
+    private int gameRank;
 
     @Column(nullable = false)
-    private double soloWinRate;
+    private double winrate;
 
     @Enumerated(EnumType.STRING)
-    @Column
-    private Tier freeTier;
-
-    @Column
-    private int freeRank;
-
-    @Column
-    private double freeWinRate;
-
-    @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private MatchingType matchingType;
 
     @Column
     private int mannerLevel;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private MatchingStatus status = MatchingStatus.PENDING;
 
     @Column
@@ -100,12 +90,9 @@ public class MatchingRecord extends BaseDateTimeEntity {
                 .subPosition(member.getSubPosition())
                 .wantPosition(member.getWantPosition())
                 .mike(member.getMike())
-                .soloTier(member.getTier()) // TODO:
-                .soloRank(member.getGameRank()) // TODO:
-                .soloWinRate(member.getWinRate()) // TODO:
-                .freeTier(member.getTier()) // TODO:
-                .freeRank(member.getGameRank()) // TODO:
-                .freeWinRate(member.getWinRate()) // TODO:
+                .tier(member.getSoloTier()) // TODO:
+                .gameRank(member.getSoloRank()) // TODO:
+                .winrate(member.getSoloWinRate()) // TODO:
                 .matchingType(matchingType)
                 .mannerLevel(member.getMannerLevel())
                 .member(member)
@@ -115,20 +102,16 @@ public class MatchingRecord extends BaseDateTimeEntity {
     // MatchingRecord Builder
     @Builder
     private MatchingRecord(GameMode gameMode, Position mainPosition, Position subPosition, Position wantPosition,
-                           Mike mike, Tier soloTier, int soloRank, double soloWinRate, Tier freeTier,
-                           int freeRank, double freeWinRate, MatchingType matchingType, int mannerLevel,
-                           Member member) {
+                           Mike mike, Tier tier, int gameRank, double winrate, MatchingType matchingType,
+                           int mannerLevel, Member member) {
         this.gameMode = gameMode;
         this.mainPosition = mainPosition;
         this.subPosition = subPosition;
         this.wantPosition = wantPosition;
         this.mike = mike;
-        this.soloTier = soloTier;
-        this.soloRank = soloRank;
-        this.soloWinRate = soloWinRate;
-        this.freeTier = freeTier;
-        this.freeRank = freeRank;
-        this.freeWinRate = freeWinRate;
+        this.tier = tier;
+        this.gameRank = gameRank;
+        this.winrate = winrate;
         this.matchingType = matchingType;
         this.mannerLevel = mannerLevel;
         this.member = member;
