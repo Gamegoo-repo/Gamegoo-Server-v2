@@ -223,10 +223,10 @@ class ChatResponseFactoryTest {
                 .loginType(LoginType.GENERAL)
                 .gameName(gameName)
                 .tag("TAG")
-                .tier(Tier.IRON)
-                .gameRank(0)
-                .winRate(0.0)
-                .gameCount(0)
+                .soloTier(Tier.IRON)
+                .soloRank(0)
+                .soloWinRate(0.0)
+                .soloGameCount(0)
                 .isAgree(true)
                 .build();
     }

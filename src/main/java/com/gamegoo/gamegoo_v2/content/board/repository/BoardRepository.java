@@ -18,7 +18,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("SELECT b From Board b JOIN b.member m WHERE" +
             "(b.deleted = false) AND " +
             "(:mode IS NULL OR b.gameMode = :mode) AND " +
-            "(:tier IS NULL OR m.tier = :tier) AND " +
+            "(:tier IS NULL OR m.soloTier = :tier) AND " +
             "(:mainP IS NULL OR :mainP = 'ANY' OR b.mainP = :mainP ) AND " +
             "(:mike IS NULL OR b.mike = :mike)")
     Page<Board> findByFilters(@Param("mode") GameMode gameMode,

@@ -61,7 +61,7 @@ class FriendRequestFacadeServiceTest {
 
     @MockitoSpyBean
     private NotificationRepository notificationRepository;
-    
+
     private static final String TARGET_EMAIL = "target@naver.com";
     private static final String TARGET_GAMENAME = "target";
 
@@ -382,10 +382,14 @@ class FriendRequestFacadeServiceTest {
                 .loginType(LoginType.GENERAL)
                 .gameName(gameName)
                 .tag("TAG")
-                .tier(Tier.IRON)
-                .gameRank(0)
-                .winRate(0.0)
-                .gameCount(0)
+                .soloTier(Tier.IRON)
+                .soloRank(0)
+                .soloWinRate(0.0)
+                .soloGameCount(0)
+                .freeTier(Tier.IRON)
+                .freeRank(0)
+                .freeWinRate(0.0)
+                .freeGameCount(0)
                 .isAgree(true)
                 .build());
     }

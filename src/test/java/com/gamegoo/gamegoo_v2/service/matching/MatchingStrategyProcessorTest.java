@@ -5,11 +5,13 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingScoreCalculator;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingStrategyProcessor;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,14 @@ class MatchingStrategyProcessorTest {
 
     @Autowired
     MatchingStrategyProcessor matchingStrategyProcessor;
+
+    @Autowired
+    MemberRepository memberRepository;
+
+    @AfterEach
+    void tearDown() {
+        memberRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("정밀 매칭 우선순위 계산")
@@ -75,8 +85,8 @@ class MatchingStrategyProcessorTest {
 
         // then
         int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
-                (40 - Math.abs(record1.getSoloTier().ordinal() * 4 + record1.getSoloRank() -
-                        record2.getSoloTier().ordinal() * 4 - record2.getSoloRank())) +
+                (40 - Math.abs(record1.getTier().ordinal() * 4 + record1.getGameRank() -
+                        record2.getTier().ordinal() * 4 - record2.getGameRank())) +
                 (record1.getMike().equals(record2.getMike()) ? 5 : 0) + getPositionExpectedPriority(member1, member2);
 
         assertThat(result).isEqualTo(expectedPriority);
@@ -110,8 +120,8 @@ class MatchingStrategyProcessorTest {
 
         // then
         int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
-                (40 - Math.abs(record1.getFreeTier().ordinal() * 4 + record1.getFreeRank() -
-                        record2.getFreeTier().ordinal() * 4 - record2.getFreeRank())) +
+                (40 - Math.abs(record1.getTier().ordinal() * 4 + record1.getGameRank() -
+                        record2.getTier().ordinal() * 4 - record2.getGameRank())) +
                 (record1.getMike().equals(record2.getMike()) ? 3 : 0) + getPositionExpectedPriority(member1, member2);
 
         assertThat(result).isEqualTo(expectedPriority);
@@ -144,8 +154,8 @@ class MatchingStrategyProcessorTest {
 
         // then
         int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
-                (40 - Math.abs(record1.getFreeTier().ordinal() * 4 + record1.getFreeRank() -
-                        record2.getFreeTier().ordinal() * 4 - record2.getFreeRank())) +
+                (40 - Math.abs(record1.getTier().ordinal() * 4 + record1.getGameRank() -
+                        record2.getTier().ordinal() * 4 - record2.getGameRank())) +
                 (record1.getMike().equals(record2.getMike()) ? 3 : 0) + getPositionExpectedPriority(member1, member2);
 
         assertThat(result).isEqualTo(expectedPriority);
@@ -252,8 +262,17 @@ class MatchingStrategyProcessorTest {
     }
 
     private Member createMember(String email, Tier tier, boolean hasMike) {
-        return Member.create(email, "password123", LoginType.GENERAL, "gameUser", "TAG",
-                tier, 4, 55.0, 100, hasMike);
+        Member member = Member.create(email, "password123", LoginType.GENERAL, "gameUser", "TAG",
+                tier, 4, 55.0, tier, 4, 55.0, 100, 100, true);
+
+        if (hasMike) {
+            member.updateMike(Mike.AVAILABLE);
+        } else {
+            member.updateMike(Mike.UNAVAILABLE);
+        }
+
+        return memberRepository.save(member);
+
     }
 
     private MatchingRecord createMatchingRecord(GameMode mode, MatchingType type, Member member) {

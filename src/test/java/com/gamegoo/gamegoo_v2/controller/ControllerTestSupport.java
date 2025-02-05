@@ -89,10 +89,10 @@ public abstract class ControllerTestSupport {
                 .loginType(MOCK_LOGIN_TYPE)
                 .gameName(MOCK_GAMENAME)
                 .tag(MOCK_TAG)
-                .tier(MOCK_TIER)
-                .gameRank(MOCK_GAME_RANK)
-                .winRate(MOCK_WIN_RATE)
-                .gameCount(MOCK_GAME_COUNT)
+                .soloTier(MOCK_TIER)
+                .soloRank(MOCK_GAME_RANK)
+                .soloWinRate(MOCK_WIN_RATE)
+                .soloGameCount(MOCK_GAME_COUNT)
                 .isAgree(MOCK_IS_AGREE)
                 .build();
         given(authMemberArgumentResolver.resolveArgument(any(), any(), any(), any())).willReturn(mockMember);

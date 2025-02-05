@@ -95,7 +95,7 @@ class AuthFacadeServiceTest {
 
             RefreshToken refreshToken = refreshTokenRepository.findByMember(member).orElseThrow();
             Long tokenExpirationTime = jwtProvider.getTokenExpirationTime(refreshToken.getRefreshToken()); // 만료 시간
-            checkEpirationTime(tokenExpirationTime);
+            checkExpirationTime(tokenExpirationTime);
         }
 
 
@@ -182,7 +182,7 @@ class AuthFacadeServiceTest {
             assertThat(responseId).isEqualTo(memberId);
 
             Long tokenExpirationTime = jwtProvider.getTokenExpirationTime(result.get().getRefreshToken());
-            checkEpirationTime(tokenExpirationTime);
+            checkExpirationTime(tokenExpirationTime);
 
         }
 
@@ -216,15 +216,19 @@ class AuthFacadeServiceTest {
                 .loginType(LoginType.GENERAL)
                 .gameName(gameName)
                 .tag("TAG")
-                .tier(Tier.IRON)
-                .gameRank(0)
-                .winRate(0.0)
-                .gameCount(0)
+                .soloTier(Tier.IRON)
+                .soloRank(0)
+                .soloWinRate(0.0)
+                .soloGameCount(0)
+                .freeTier(Tier.IRON)
+                .freeRank(0)
+                .freeWinRate(0.0)
+                .freeGameCount(0)
                 .isAgree(true)
                 .build());
     }
 
-    private static void checkEpirationTime(Long tokenExpirationTime) {
+    private static void checkExpirationTime(Long tokenExpirationTime) {
         long currentTimeMillis = Instant.now().toEpochMilli(); // 현재 시간
 
         // AssertJ를 이용해 만료 시간이 현재 시간 이후인지 확인
@@ -232,4 +236,5 @@ class AuthFacadeServiceTest {
                 .as("Check if the token expiration time is after the current time")
                 .isGreaterThan(currentTimeMillis);
     }
+
 }
