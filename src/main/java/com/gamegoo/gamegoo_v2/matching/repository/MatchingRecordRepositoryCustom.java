@@ -10,16 +10,16 @@ import java.util.List;
 public interface MatchingRecordRepositoryCustom {
 
     /**
-     * 매칭 가능한 유효한 레코드 조회 (5분 이내, 특정 게임 모드, PENDING 상태)
+     * 매칭 가능한 유효한 레코드 조회
      *
-     * @param createdAt 5분 전 시간 기준
+     * @param createdAt 생성 시간
      * @param gameMode  게임 모드
      * @return 매칭 가능한 레코드 리스트
      */
     List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode);
 
     /**
-     * 가장 최근 기록 불러오기
+     * 가장 최근 기록 불러오기 - member
      *
      * @param member 사용자
      * @return 사용자의 가장 최근 매칭 기록

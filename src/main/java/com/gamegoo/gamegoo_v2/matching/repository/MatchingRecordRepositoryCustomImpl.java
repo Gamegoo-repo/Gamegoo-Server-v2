@@ -28,13 +28,13 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
     public List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode) {
         return queryFactory.selectFrom(matchingRecord)
                 .where(
-                        matchingRecord.createdAt.gt(createdAt),    // 5분 이내
-                        matchingRecord.status.eq(MatchingStatus.PENDING),  // 상태 PENDING
-                        matchingRecord.gameMode.eq(gameMode),   // 특정 게임 모드
-                        existsValidMatchSubquery(),  // 유효한 매칭만 가져오기
-                        applyGameModeFilter(gameMode) // 게임모드별 추가 필터 적용 (SOLO, FREE)
+                        matchingRecord.createdAt.gt(createdAt),
+                        matchingRecord.status.eq(MatchingStatus.PENDING),
+                        matchingRecord.gameMode.eq(gameMode),
+                        existsValidMatchSubquery(),
+                        applyGameModeFilter(gameMode)
                 )
-                .orderBy(matchingRecord.member.id.asc(), matchingRecord.createdAt.desc()) // 최신순 정렬
+                .orderBy(matchingRecord.member.id.asc(), matchingRecord.createdAt.desc())
                 .fetch();
     }
 

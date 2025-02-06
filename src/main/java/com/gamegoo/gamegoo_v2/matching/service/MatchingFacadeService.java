@@ -12,6 +12,7 @@ import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMyMatchingStatusRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import lombok.RequiredArgsConstructor;
@@ -73,16 +74,34 @@ public class MatchingFacadeService {
         Map<Long, Boolean> blockedStatusMap = blockService.isBlockedByTargetMembersBatch(member, targetMemberIds);
 
         // 차단되지 않은 사용자만 필터링
-        List<MatchingRecord> filteredPENDINGMatchingRecords = new ArrayList<>();
+        List<MatchingRecord> filteredPendingMatchingRecords = new ArrayList<>();
         for (MatchingRecord record : pendingMatchingRecords) {
             Long targetMemberId = record.getMember().getId();
             if (!blockedStatusMap.getOrDefault(targetMemberId, false)) {
-                filteredPENDINGMatchingRecords.add(record);
+                filteredPendingMatchingRecords.add(record);
             }
         }
 
         // myPriorityList, otherPriorityList 조회
-        return matchingService.calculatePriorityList(matchingRecord, filteredPENDINGMatchingRecords);
+        return matchingService.calculatePriorityList(matchingRecord, filteredPendingMatchingRecords);
+    }
+
+    /**
+     * 나의 matching Status 변경
+     *
+     * @param request request
+     * @return 성공 메시지
+     */
+    @Transactional
+    public String modifyMyMatchingStatus(ModifyMyMatchingStatusRequest request) {
+        // matching 조회
+        MatchingRecord matchingRecordByMatchingUuid =
+                matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
+
+        // 변경
+        matchingService.setMatchingStatus(request.getStatus(), matchingRecordByMatchingUuid);
+
+        return "status 변경이 완료되었습니다.";
     }
 
     /**

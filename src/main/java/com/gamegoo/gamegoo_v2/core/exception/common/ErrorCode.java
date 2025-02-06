@@ -72,6 +72,11 @@ public enum ErrorCode {
     CHAMPION_NOT_FOUND(NOT_FOUND, "CHAMPION_401", "해당 챔피언이 존재하지 않습니다."),
 
     /**
+     * 매칭 관련 에러
+     */
+    MATCHING_NOT_FOUND(NOT_FOUND, "MATCH_401", "해당 매칭이 존재하지 않습니다."),
+
+    /**
      * 차단 관련 에러
      */
     ALREADY_BLOCKED(BAD_REQUEST, "BLOCK_401", "이미 차단한 회원입니다."),
@@ -132,6 +137,7 @@ public enum ErrorCode {
     BOARD_FORBIDDEN_WORD_LOAD_FAILED(INTERNAL_SERVER_ERROR, "BOARD_409", "금지어 파일을 읽어오는데 실패했습니다."),
     BUMP_ACCESS_DENIED(FORBIDDEN, "BOARD_410", "게시글 끌어올리기 권한이 없습니다."),
     BUMP_TIME_LIMIT(BAD_REQUEST, "BOARD_411", "게시글 끌어올리기는 24시간에 1회만 가능합니다."),
+
     /**
      * 매너평가 관련 에러
      */

@@ -1,8 +1,11 @@
 package com.gamegoo.gamegoo_v2.matching.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.core.exception.MatchingException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
@@ -108,9 +111,31 @@ public class MatchingService {
      * @param gameMode     게임 모드
      * @return 매칭 기록
      */
+    @Transactional
     public MatchingRecord createMatchingRecord(Member member, MatchingType matchingType, GameMode gameMode) {
         MatchingRecord matchingRecord = MatchingRecord.create(gameMode, matchingType, member);
         return matchingRecordRepository.save(matchingRecord);
+    }
+
+    /**
+     * 가장 최신 매칭 불러오기
+     *
+     * @param matchingUuid 매칭 uuid
+     * @return matchingRecord
+     */
+    public MatchingRecord getMatchingRecordByMatchingUuid(String matchingUuid) {
+        return matchingRecordRepository.findMatchingRecordsByMatchingUuid(matchingUuid).orElseThrow(() -> new MatchingException(ErrorCode.MATCHING_NOT_FOUND));
+    }
+
+    /**
+     * 매칭 status 변경
+     *
+     * @param matchingStatus 변경된 status 값
+     * @param matchingRecord 변경될 matchingRecord
+     */
+    @Transactional
+    public void setMatchingStatus(MatchingStatus matchingStatus, MatchingRecord matchingRecord) {
+        matchingRecord.updateStatus(matchingStatus);
     }
 
 }
