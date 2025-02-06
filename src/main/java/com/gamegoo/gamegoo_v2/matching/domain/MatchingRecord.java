@@ -36,15 +36,15 @@ public class MatchingRecord extends BaseDateTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20)")
-    private Position mainPosition;
+    private Position mainP;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20)")
-    private Position subPosition;
+    private Position subP;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20)")
-    private Position wantPosition;
+    private Position wantP;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20)")
@@ -86,9 +86,9 @@ public class MatchingRecord extends BaseDateTimeEntity {
     public static MatchingRecord create(GameMode gameMode, MatchingType matchingType, Member member) {
         return MatchingRecord.builder()
                 .gameMode(gameMode)
-                .mainPosition(member.getMainPosition())
-                .subPosition(member.getSubPosition())
-                .wantPosition(member.getWantPosition())
+                .mainP(member.getMainP())
+                .subP(member.getSubP())
+                .wantP(member.getWantP())
                 .mike(member.getMike())
                 .tier(member.getSoloTier()) // TODO:
                 .gameRank(member.getSoloRank()) // TODO:
@@ -101,13 +101,13 @@ public class MatchingRecord extends BaseDateTimeEntity {
 
     // MatchingRecord Builder
     @Builder
-    private MatchingRecord(GameMode gameMode, Position mainPosition, Position subPosition, Position wantPosition,
+    private MatchingRecord(GameMode gameMode, Position mainP, Position subP, Position wantP,
                            Mike mike, Tier tier, int gameRank, double winrate, MatchingType matchingType,
                            int mannerLevel, Member member) {
         this.gameMode = gameMode;
-        this.mainPosition = mainPosition;
-        this.subPosition = subPosition;
-        this.wantPosition = wantPosition;
+        this.mainP = mainP;
+        this.subP = subP;
+        this.wantP = wantP;
         this.mike = mike;
         this.tier = tier;
         this.gameRank = gameRank;

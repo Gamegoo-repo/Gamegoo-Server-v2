@@ -40,9 +40,9 @@ public class MatchingStrategyProcessor {
 
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
-                myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(), 3, 2, 1);
+                myRecord.getWantP(), otherRecord.getMainP(), otherRecord.getSubP(), 3, 2, 1);
         priority += MatchingScoreCalculator.getPositionPriority(
-                otherRecord.getWantPosition(), myRecord.getMainPosition(), myRecord.getSubPosition(), 3, 2, 1);
+                otherRecord.getWantP(), myRecord.getMainP(), myRecord.getSubP(), 3, 2, 1);
 
         // 마이크 우선순위
         priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
@@ -71,9 +71,9 @@ public class MatchingStrategyProcessor {
 
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
-                myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(), 3, 2, 1);
+                myRecord.getWantP(), otherRecord.getMainP(), otherRecord.getSubP(), 3, 2, 1);
         priority += MatchingScoreCalculator.getPositionPriority(
-                otherRecord.getWantPosition(), myRecord.getMainPosition(), myRecord.getSubPosition(), 3, 2, 1);
+                otherRecord.getWantP(), myRecord.getMainP(), myRecord.getSubP(), 3, 2, 1);
 
         // 마이크 우선순위
         priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 5);
@@ -102,9 +102,9 @@ public class MatchingStrategyProcessor {
 
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
-                myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(), 3, 2, 1);
+                myRecord.getWantP(), otherRecord.getMainP(), otherRecord.getSubP(), 3, 2, 1);
         priority += MatchingScoreCalculator.getPositionPriority(
-                otherRecord.getWantPosition(), myRecord.getMainPosition(), myRecord.getSubPosition(), 3, 2, 1);
+                otherRecord.getWantP(), myRecord.getMainP(), myRecord.getSubP(), 3, 2, 1);
 
         // 마이크 우선순위
         priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
@@ -146,8 +146,8 @@ public class MatchingStrategyProcessor {
         }
 
         // 내가 원하는 포지션이 상대 포지션이 아닐 경우 매칭 실패
-        if (!otherRecord.getMainPosition().equals(myRecord.getWantPosition()) &&
-                !otherRecord.getSubPosition().equals(myRecord.getWantPosition())) {
+        if (!otherRecord.getMainP().equals(myRecord.getWantP()) &&
+                !otherRecord.getSubP().equals(myRecord.getWantP())) {
             return false;
         }
 

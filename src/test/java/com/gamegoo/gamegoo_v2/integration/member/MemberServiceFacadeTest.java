@@ -114,9 +114,9 @@ class MemberServiceFacadeTest {
         assertThat(response.getTier()).isEqualTo(member.getSoloTier());
         assertThat(response.getGameRank()).isEqualTo(member.getSoloRank());
         assertThat(response.getWinrate()).isEqualTo(member.getSoloWinRate());
-        assertThat(response.getMainP()).isEqualTo(member.getMainPosition());
-        assertThat(response.getSubP()).isEqualTo(member.getSubPosition());
-        assertThat(response.getWantP()).isEqualTo(member.getWantPosition());
+        assertThat(response.getMainP()).isEqualTo(member.getMainP());
+        assertThat(response.getSubP()).isEqualTo(member.getSubP());
+        assertThat(response.getWantP()).isEqualTo(member.getWantP());
         assertThat(response.getIsAgree()).isEqualTo(member.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(member.isBlind());
         assertThat(response.getLoginType()).isEqualTo(member.getLoginType().name());
@@ -149,9 +149,9 @@ class MemberServiceFacadeTest {
         assertThat(response.getTier()).isEqualTo(targetMember.getSoloTier());
         assertThat(response.getGameRank()).isEqualTo(targetMember.getSoloRank());
         assertThat(response.getMannerLevel()).isEqualTo(targetMember.getMannerLevel());
-        assertThat(response.getMainP()).isEqualTo(targetMember.getMainPosition());
-        assertThat(response.getSubP()).isEqualTo(targetMember.getSubPosition());
-        assertThat(response.getWantP()).isEqualTo(targetMember.getWantPosition());
+        assertThat(response.getMainP()).isEqualTo(targetMember.getMainP());
+        assertThat(response.getSubP()).isEqualTo(targetMember.getSubP());
+        assertThat(response.getWantP()).isEqualTo(targetMember.getWantP());
         assertThat(response.getIsAgree()).isEqualTo(targetMember.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(targetMember.isBlind());
         assertThat(response.getLoginType()).isEqualTo(String.valueOf(targetMember.getLoginType()));
@@ -205,9 +205,9 @@ class MemberServiceFacadeTest {
         // when
         memberFacadeService.setPosition(member, request);
         // then
-        assertThat(member.getMainPosition()).isEqualTo(request.getMainP());
-        assertThat(member.getSubPosition()).isEqualTo(request.getSubP());
-        assertThat(member.getWantPosition()).isEqualTo(request.getWantP());
+        assertThat(member.getMainP()).isEqualTo(request.getMainP());
+        assertThat(member.getSubP()).isEqualTo(request.getSubP());
+        assertThat(member.getWantP()).isEqualTo(request.getWantP());
     }
 
     @Nested

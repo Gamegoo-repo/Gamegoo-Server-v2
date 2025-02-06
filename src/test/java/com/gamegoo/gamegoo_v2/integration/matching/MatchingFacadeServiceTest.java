@@ -299,9 +299,9 @@ public class MatchingFacadeServiceTest {
 
         // 1. Member 정보 업데이트 검증
         assertThat(updatedMember.getMike()).isEqualTo(request.getMike());
-        assertThat(updatedMember.getMainPosition()).isEqualTo(request.getMainP());
-        assertThat(updatedMember.getSubPosition()).isEqualTo(request.getSubP());
-        assertThat(updatedMember.getWantPosition()).isEqualTo(request.getWantP());
+        assertThat(updatedMember.getMainP()).isEqualTo(request.getMainP());
+        assertThat(updatedMember.getSubP()).isEqualTo(request.getSubP());
+        assertThat(updatedMember.getWantP()).isEqualTo(request.getWantP());
 
         // 2. 생성된 MatchingRecord 검증
         MatchingRecord actualMatchingRecord = matchingRecordRepository.findLatestByMember(updatedMember);
@@ -310,9 +310,9 @@ public class MatchingFacadeServiceTest {
         assertThat(actualMatchingRecord.getMatchingType()).isEqualTo(request.getMatchingType());
         assertThat(actualMatchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
         assertThat(actualMatchingRecord.getMember().getId()).isEqualTo(updatedMember.getId());
-        assertThat(actualMatchingRecord.getMainPosition()).isEqualTo(request.getMainP());
-        assertThat(actualMatchingRecord.getSubPosition()).isEqualTo(request.getSubP());
-        assertThat(actualMatchingRecord.getWantPosition()).isEqualTo(request.getWantP());
+        assertThat(actualMatchingRecord.getMainP()).isEqualTo(request.getMainP());
+        assertThat(actualMatchingRecord.getSubP()).isEqualTo(request.getSubP());
+        assertThat(actualMatchingRecord.getWantP()).isEqualTo(request.getWantP());
         assertThat(actualMatchingRecord.getMike()).isEqualTo(request.getMike());
 
         // 3. Priority 검증
