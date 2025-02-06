@@ -33,6 +33,8 @@ public class BoardListResponse {
     List<ChampionResponse> championResponseList;
     Double winRate;
     LocalDateTime createdAt;
+    LocalDateTime bumpTime;
+    String contents;
     Mike mike;
 
     public static BoardListResponse of(Board board) {
@@ -59,6 +61,8 @@ public class BoardListResponse {
                 .championResponseList(championResponseList)
                 .winRate(member.getSoloWinRate())
                 .createdAt(board.getCreatedAt())
+                .bumpTime(board.getBumpTime())
+                .contents(board.getContent())
                 .mike(board.getMike())
                 .build();
     }
