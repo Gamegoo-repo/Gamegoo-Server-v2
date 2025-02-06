@@ -14,6 +14,7 @@ import com.gamegoo.gamegoo_v2.chat.repository.ChatRepository;
 import com.gamegoo.gamegoo_v2.chat.repository.ChatroomRepository;
 import com.gamegoo.gamegoo_v2.chat.repository.MemberChatroomRepository;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
+import com.gamegoo.gamegoo_v2.core.exception.MatchingException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.core.exception.common.GlobalException;
@@ -24,6 +25,7 @@ import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMyMatchingStatusRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.repository.MatchingRecordRepository;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
@@ -299,9 +301,9 @@ public class MatchingFacadeServiceTest {
 
         // 1. Member 정보 업데이트 검증
         assertThat(updatedMember.getMike()).isEqualTo(request.getMike());
-        assertThat(updatedMember.getMainPosition()).isEqualTo(request.getMainP());
-        assertThat(updatedMember.getSubPosition()).isEqualTo(request.getSubP());
-        assertThat(updatedMember.getWantPosition()).isEqualTo(request.getWantP());
+        assertThat(updatedMember.getMainP()).isEqualTo(request.getMainP());
+        assertThat(updatedMember.getSubP()).isEqualTo(request.getSubP());
+        assertThat(updatedMember.getWantP()).isEqualTo(request.getWantP());
 
         // 2. 생성된 MatchingRecord 검증
         MatchingRecord actualMatchingRecord = matchingRecordRepository.findLatestByMember(updatedMember);
@@ -310,9 +312,9 @@ public class MatchingFacadeServiceTest {
         assertThat(actualMatchingRecord.getMatchingType()).isEqualTo(request.getMatchingType());
         assertThat(actualMatchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
         assertThat(actualMatchingRecord.getMember().getId()).isEqualTo(updatedMember.getId());
-        assertThat(actualMatchingRecord.getMainPosition()).isEqualTo(request.getMainP());
-        assertThat(actualMatchingRecord.getSubPosition()).isEqualTo(request.getSubP());
-        assertThat(actualMatchingRecord.getWantPosition()).isEqualTo(request.getWantP());
+        assertThat(actualMatchingRecord.getMainP()).isEqualTo(request.getMainP());
+        assertThat(actualMatchingRecord.getSubP()).isEqualTo(request.getSubP());
+        assertThat(actualMatchingRecord.getWantP()).isEqualTo(request.getWantP());
         assertThat(actualMatchingRecord.getMike()).isEqualTo(request.getMike());
 
         // 3. Priority 검증
@@ -338,6 +340,40 @@ public class MatchingFacadeServiceTest {
                 .usingRecursiveComparison()
                 .ignoringFields("matchingUuid")
                 .isEqualTo(expectedPriorityList.getOtherPriorityList());
+    }
+
+    @DisplayName("성공: 매칭 status 변경된 경우")
+    @Test
+    void updateMatchingStatusSucceed() {
+        // given
+        MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                MatchingStatus.PENDING);
+        ModifyMyMatchingStatusRequest request = ModifyMyMatchingStatusRequest.builder()
+                .matchingUuid(matchingRecord.getMatchingUuid())
+                .status(MatchingStatus.FAIL)
+                .build();
+        // when
+        matchingFacadeService.modifyMyMatchingStatus(request);
+
+        // then
+        assertThat(matchingRecord.getStatus()).isEqualTo(MatchingStatus.FAIL);
+
+    }
+
+    @DisplayName("실패: 매칭 uuid가 잘못된 경우")
+    @Test
+    void updateMatchingStatusFail() {
+        // given
+        MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                MatchingStatus.PENDING);
+        ModifyMyMatchingStatusRequest request = ModifyMyMatchingStatusRequest.builder()
+                .matchingUuid("wronguuid")
+                .status(MatchingStatus.FAIL)
+                .build();
+        // when
+        assertThatThrownBy(() -> matchingFacadeService.modifyMyMatchingStatus(request))
+                .isInstanceOf(MatchingException.class)
+                .hasMessage(ErrorCode.MATCHING_NOT_FOUND.getMessage());
     }
 
 

@@ -47,9 +47,9 @@ public class MatchingMemberInfoResponse {
                 .rank(member.getSoloRank())
                 .profileImg(member.getProfileImage())
                 .mannerLevel(member.getMannerLevel())
-                .mainP(member.getMainPosition())
-                .subP(member.getSubPosition())
-                .wantP(member.getWantPosition())
+                .mainP(member.getMainP())
+                .subP(member.getSubP())
+                .wantP(member.getWantP())
                 .gameStyleResponseList(gameStyleResponseList)
                 .build();
     }
