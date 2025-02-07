@@ -298,11 +298,8 @@ public class MatchingFacadeServiceTest {
         assertThat(updatedMember.getWantP()).isEqualTo(request.getWantP());
 
         // 2. 생성된 MatchingRecord 검증
-        Optional<MatchingRecord> actualMatchingRecord = matchingRecordRepository.findLatestByMember(updatedMember);
-
-Optional<MatchingRecord> matchingRecordOptional = matchingRecordRepository.findLatestByMember(updatedMember);
+        Optional<MatchingRecord> matchingRecordOptional = matchingRecordRepository.findLatestByMember(updatedMember);
         MatchingRecord actualMatchingRecord = matchingRecordOptional.orElseThrow();
-
         assertThat(actualMatchingRecord.getGameMode()).isEqualTo(request.getGameMode());
         assertThat(actualMatchingRecord.getMatchingType()).isEqualTo(request.getMatchingType());
         assertThat(actualMatchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
