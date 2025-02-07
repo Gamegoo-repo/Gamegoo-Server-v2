@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ModifyMyMatchingStatusRequest {
+public class ModifyMatchingStatusRequest {
 
     @NotNull
     String matchingUuid;

@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.gamegoo.gamegoo_v2.matching.domain.QMatchingRecord.matchingRecord;
 
@@ -39,15 +40,17 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
     }
 
     @Override
-    public MatchingRecord findLatestByMember(Member member) {
+    public Optional<MatchingRecord> findLatestByMember(Member member) {
         QMatchingRecord matchingRecord = QMatchingRecord.matchingRecord;
 
-        return queryFactory
+        MatchingRecord record = queryFactory
                 .selectFrom(matchingRecord)
                 .where(matchingRecord.member.eq(member))
                 .orderBy(matchingRecord.createdAt.desc())
                 .limit(1)
                 .fetchOne();
+
+        return Optional.ofNullable(record);
     }
 
     /**
