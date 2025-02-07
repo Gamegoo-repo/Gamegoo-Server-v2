@@ -45,7 +45,7 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
 
         MatchingRecord record = queryFactory
                 .selectFrom(matchingRecord)
-                .where(matchingRecord.member.eq(member))
+                .where(member == null ? matchingRecord.member.isNull() : matchingRecord.member.eq(member)) // ✅ Null 체크 추가
                 .orderBy(matchingRecord.createdAt.desc())
                 .limit(1)
                 .fetchOne();
