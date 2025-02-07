@@ -22,4 +22,10 @@ public class HomeController {
         throw new GlobalException(ErrorCode._BAD_REQUEST);
     }
 
+    @Operation(summary = "Health Check", description = "health check를 위한 API 입니다.")
+    @GetMapping("/healthcheck")
+    public ApiResponse<String> healthcheck() {
+        return ApiResponse.ok("OK");
+    }
+
 }
