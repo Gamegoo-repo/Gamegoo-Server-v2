@@ -334,6 +334,7 @@ public class MatchingFacadeServiceTest {
                 .isEqualTo(expectedPriorityList.getOtherPriorityList());
     }
 
+    @DisplayName("내 매칭 status 변경")
     @Nested
     class changeMyStatus {
 
@@ -373,6 +374,7 @@ public class MatchingFacadeServiceTest {
 
     }
 
+    @DisplayName("상대방과 내 매칭 status 변경")
     @Nested
     class changeBothStatus {
 
