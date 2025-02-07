@@ -300,14 +300,17 @@ public class MatchingFacadeServiceTest {
         // 2. 생성된 MatchingRecord 검증
         Optional<MatchingRecord> actualMatchingRecord = matchingRecordRepository.findLatestByMember(updatedMember);
 
-        assertThat(actualMatchingRecord.get().getGameMode()).isEqualTo(request.getGameMode());
-        assertThat(actualMatchingRecord.get().getMatchingType()).isEqualTo(request.getMatchingType());
-        assertThat(actualMatchingRecord.get().getStatus()).isEqualTo(MatchingStatus.PENDING);
-        assertThat(actualMatchingRecord.get().getMember().getId()).isEqualTo(updatedMember.getId());
-        assertThat(actualMatchingRecord.get().getMainP()).isEqualTo(request.getMainP());
-        assertThat(actualMatchingRecord.get().getSubP()).isEqualTo(request.getSubP());
-        assertThat(actualMatchingRecord.get().getWantP()).isEqualTo(request.getWantP());
-        assertThat(actualMatchingRecord.get().getMike()).isEqualTo(request.getMike());
+Optional<MatchingRecord> matchingRecordOptional = matchingRecordRepository.findLatestByMember(updatedMember);
+        MatchingRecord actualMatchingRecord = matchingRecordOptional.orElseThrow();
+
+        assertThat(actualMatchingRecord.getGameMode()).isEqualTo(request.getGameMode());
+        assertThat(actualMatchingRecord.getMatchingType()).isEqualTo(request.getMatchingType());
+        assertThat(actualMatchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
+        assertThat(actualMatchingRecord.getMember().getId()).isEqualTo(updatedMember.getId());
+        assertThat(actualMatchingRecord.getMainP()).isEqualTo(request.getMainP());
+        assertThat(actualMatchingRecord.getSubP()).isEqualTo(request.getSubP());
+        assertThat(actualMatchingRecord.getWantP()).isEqualTo(request.getWantP());
+        assertThat(actualMatchingRecord.getMike()).isEqualTo(request.getMike());
 
         // 3. Priority 검증
         List<MatchingRecord> recentValidMatchingRecords =
