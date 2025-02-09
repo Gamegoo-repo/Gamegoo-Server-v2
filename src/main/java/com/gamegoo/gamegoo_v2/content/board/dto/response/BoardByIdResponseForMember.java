@@ -30,16 +30,20 @@ public class BoardByIdResponseForMember {
     String tag;
     Integer mannerLevel;
     List<MannerKeyword> mannerKeywords;
-    Tier tier;
-    int rank;
+    Tier soloTier;
+    Tier freeTier;
+    int soloRank;
+    int freeRank;
     Mike mike;
     List<ChampionResponse> championResponseDTOList;
     GameMode gameMode;
     Position mainP;
     Position subPosition;
     Position wantPosition;
-    Integer recentGameCount;
-    Double winRate;
+    Integer soloRecentGameCount;
+    Integer freeRecentGameCount;
+    Double soloWinRate;
+    Double freeWinRate;
     List<Long> gameStyles;
     String contents;
 
@@ -74,16 +78,20 @@ public class BoardByIdResponseForMember {
                 .gameName(poster.getGameName())
                 .tag(poster.getTag())
                 .mannerLevel(poster.getMannerLevel())
-                .tier(poster.getSoloTier())
-                .rank(poster.getSoloRank())
+                .soloTier(poster.getSoloTier())
+                .freeTier(poster.getFreeTier())
+                .soloRank(poster.getSoloRank())
+                .freeRank(poster.getFreeRank())
                 .mike(board.getMike())
                 .championResponseDTOList(championResponseList)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subPosition(board.getSubP())
                 .wantPosition(board.getWantP())
-                .recentGameCount(poster.getSoloGameCount())
-                .winRate(poster.getSoloWinRate())
+                .soloRecentGameCount(poster.getSoloGameCount())
+                .freeRecentGameCount(poster.getFreeGameCount())
+                .soloWinRate(poster.getSoloWinRate())
+                .freeWinRate(poster.getFreeWinRate())
                 .gameStyles(gameStyleIds)
                 .contents(board.getContent())
                 .build();

@@ -20,8 +20,10 @@ public class BoardInsertResponse {
     private Integer profileImage;
     private String gameName;
     private String tag;
-    private Tier tier;
-    private int rank;
+    private Tier soloTier;
+    private Tier freeTier;
+    private int soloRank;
+    private int freeRank;
     private GameMode gameMode;
     private Position mainP;
     private Position subP;
@@ -37,8 +39,10 @@ public class BoardInsertResponse {
                 .profileImage(board.getBoardProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getSoloTier())
-                .rank(member.getSoloRank())
+                .soloTier(member.getSoloTier())
+                .freeTier(member.getFreeTier())
+                .soloRank(member.getSoloRank())
+                .freeRank(member.getFreeRank())
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())

@@ -50,7 +50,10 @@ public class BoardController {
      */
     @PostMapping
     @Operation(summary = "게시판 글 작성 API",
-            description = "게시판에서 글을 작성하는 API 입니다. 게임 모드 1~4, 포지션을 입력하세요. 게임스타일은 최대 3개까지 입력가능합니다.")
+            description = "게시판에서 글을 작성하는 API 입니다. 프로필이미지 값: 1~8, gameMode: < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, 칼바람 " +
+                    "나락: ARAM >, " +
+                    "주 포지션, 부포지션, 희망 포지션: < TOP, JUNGLE, MID, ADC, SUP, ANY >, 마이크 여부: < AVAILABLE, UNAVAILABLE >, 게임" +
+                    " 스타일 리스트: 1~3개 선택 가능")
     public ApiResponse<BoardInsertResponse> boardInsert(
             @AuthMember Member member,
             @Valid @RequestBody BoardInsertRequest request) {
@@ -67,7 +70,8 @@ public class BoardController {
             @Parameter(name = "pageIdx", description = "조회할 페이지 번호를 입력해주세요. 페이지 당 20개의 게시물을 볼 수 있습니다."),
             @Parameter(name = "gameMode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, " +
                     "칼바람 나락: ARAM >"),
-            @Parameter(name = "tier", description = "(선택) 티어를 선택해주세요."),
+            @Parameter(name = "soloTier", description = "(선택) 솔로랭크 티어를 선택해주세요."),
+            @Parameter(name = "freeTier", description = "(선택) 자유랭크 티어를 선택해주세요."),
             @Parameter(name = "mainP", description = "(선택) 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: " +
                     "MID, 원딜: ADC, " +
                     "서포터: SUP >"),
@@ -76,11 +80,12 @@ public class BoardController {
     public ApiResponse<BoardResponse> boardList(
             @ValidPage @RequestParam(name = "page") Integer page,
             @RequestParam(required = false) GameMode gameMode,
-            @RequestParam(required = false) Tier tier,
+            @RequestParam(required = false) Tier soloTier,
+            @RequestParam(required = false) Tier freeTier,
             @RequestParam(required = false) Position mainP,
             @RequestParam(required = false) Mike mike) {
 
-        return ApiResponse.ok(boardFacadeService.getBoardList(gameMode, tier, mainP, mike, page));
+        return ApiResponse.ok(boardFacadeService.getBoardList(gameMode, soloTier, freeTier, mainP, mike, page));
 
 
     }
