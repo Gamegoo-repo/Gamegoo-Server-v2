@@ -50,7 +50,10 @@ public class BoardController {
      */
     @PostMapping
     @Operation(summary = "게시판 글 작성 API",
-            description = "게시판에서 글을 작성하는 API 입니다. 게임 모드 1~4, 포지션을 입력하세요. 게임스타일은 최대 3개까지 입력가능합니다.")
+            description = "게시판에서 글을 작성하는 API 입니다. 프로필이미지 값: 1~8, gameMode: < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, 칼바람 " +
+                    "나락: ARAM >, " +
+                    "주 포지션, 부포지션, 희망 포지션: < TOP, JUNGLE, MID, ADC, SUP, ANY >, 마이크 여부: < AVAILABLE, UNAVAILABLE >, 게임" +
+                    " 스타일 리스트: 1~3개 선택 가능")
     public ApiResponse<BoardInsertResponse> boardInsert(
             @AuthMember Member member,
             @Valid @RequestBody BoardInsertRequest request) {
