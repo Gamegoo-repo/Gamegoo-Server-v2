@@ -37,6 +37,7 @@ public class MyBoardListResponse {
                 .freeTier(member.getFreeTier())
                 .soloRank(member.getSoloRank())
                 .freeRank(member.getFreeRank())
+                .contents(board.getContent())
                 .createdAt(board.getCreatedAt())
                 .bumpTime(board.getBumpTime())
                 .build();
