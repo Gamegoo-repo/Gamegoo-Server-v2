@@ -57,18 +57,20 @@ public class BoardService {
     /**
      * 게시글 목록 조회
      */
-    public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Mike mike, Pageable pageable) {
-        return boardRepository.findByFilters(gameMode, tier, mainP, mike, pageable);
+    public Page<Board> findBoards(GameMode gameMode, Tier soloTier, Tier freeTier, Position mainP, Mike mike,
+                                  Pageable pageable) {
+        return boardRepository.findByFilters(gameMode, soloTier, freeTier, mainP, mike, pageable);
     }
 
     /**
      * 게시글 목록 조회 (페이징 처리)
      */
 
-    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Mike mike,
+    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier soloTier, Tier freeTier, Position mainP,
+                                               Mike mike,
                                                int pageIdx) {
         Pageable pageable = PageRequest.of(pageIdx - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityTime"));
-        return findBoards(gameMode, tier, mainP, mike, pageable);
+        return findBoards(gameMode, soloTier, freeTier, mainP, mike, pageable);
     }
 
     /**

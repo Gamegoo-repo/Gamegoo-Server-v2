@@ -17,10 +17,13 @@ public class MyBoardListResponse {
     Integer profileImage;
     String gameName;
     String tag;
-    Tier tier;
-    int rank;
+    Tier soloTier;
+    Tier freeTier;
+    int soloRank;
+    int freeRank;
     String contents;
     LocalDateTime createdAt;
+    LocalDateTime bumpTime;
 
     public static MyBoardListResponse of(Board board) {
         Member member = board.getMember();
@@ -30,9 +33,13 @@ public class MyBoardListResponse {
                 .profileImage(board.getBoardProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getSoloTier())
-                .rank(member.getSoloRank())
+                .soloTier(member.getSoloTier())
+                .freeTier(member.getFreeTier())
+                .soloRank(member.getSoloRank())
+                .freeRank(member.getFreeRank())
+                .contents(board.getContent())
                 .createdAt(board.getCreatedAt())
+                .bumpTime(board.getBumpTime())
                 .build();
     }
 

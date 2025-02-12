@@ -21,8 +21,10 @@ public class BoardUpdateResponse {
     Integer profileImage;
     String gameName;
     String tag;
-    Tier tier;
-    Integer rank;
+    Tier soloTier;
+    Tier freeTier;
+    Integer soloRank;
+    Integer freeRank;
     GameMode gameMode;
     Position mainP;
     Position subP;
@@ -43,8 +45,10 @@ public class BoardUpdateResponse {
                 .profileImage(board.getBoardProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getSoloTier())
-                .rank(member.getSoloRank())
+                .soloTier(member.getSoloTier())
+                .freeTier(member.getFreeTier())
+                .soloRank(member.getSoloRank())
+                .freeRank(member.getFreeRank())
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())

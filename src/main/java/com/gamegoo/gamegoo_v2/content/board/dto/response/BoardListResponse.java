@@ -24,15 +24,20 @@ public class BoardListResponse {
     String gameName;
     String tag;
     Integer mannerLevel;
-    Tier tier;
-    int rank;
+    Tier soloTier;
+    Tier freeTier;
+    int soloRank;
+    int freeRank;
     GameMode gameMode;
     Position mainP;
     Position subP;
     Position wantP;
     List<ChampionResponse> championResponseList;
-    Double winRate;
+    Double soloWinRate;
+    Double freeWinRate;
     LocalDateTime createdAt;
+    LocalDateTime bumpTime;
+    String contents;
     Mike mike;
 
     public static BoardListResponse of(Board board) {
@@ -50,15 +55,20 @@ public class BoardListResponse {
                 .gameName(member.getGameName())
                 .tag(member.getTag())
                 .mannerLevel(member.getMannerLevel())
-                .tier(member.getSoloTier())
-                .rank(member.getSoloRank())
+                .soloTier(member.getSoloTier())
+                .freeTier(member.getFreeTier())
+                .soloRank(member.getSoloRank())
+                .freeRank(member.getFreeRank())
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())
                 .wantP(board.getWantP())
                 .championResponseList(championResponseList)
-                .winRate(member.getSoloWinRate())
+                .soloWinRate(member.getSoloWinRate())
+                .freeWinRate(member.getFreeWinRate())
                 .createdAt(board.getCreatedAt())
+                .bumpTime(board.getBumpTime())
+                .contents(board.getContent())
                 .mike(board.getMike())
                 .build();
     }
