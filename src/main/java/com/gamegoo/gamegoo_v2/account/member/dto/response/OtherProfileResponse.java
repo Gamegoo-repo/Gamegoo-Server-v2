@@ -20,8 +20,12 @@ public class OtherProfileResponse {
     Mike mike;
     String gameName;
     String tag;
-    Tier tier;
-    Integer gameRank;
+    Tier soloTier;
+    Integer soloRank;
+    Double soloWinrate;
+    Tier freeTier;
+    Integer freeRank;
+    Double freeWinrate;
     Integer mannerLevel;
     Double mannerRank;
     Long mannerRatingCount;  // 매너 평가를 한 사람의 수
@@ -32,7 +36,6 @@ public class OtherProfileResponse {
     Boolean isAgree;
     Boolean isBlind;
     String loginType;
-    Double winrate;
     Boolean blocked; // 해당 회원을 차단했는지 여부
     Boolean friend; // 해당 회원과의 친구 여부
     Long friendRequestMemberId; // 해당 회원과의 친구 요청 상태
@@ -55,8 +58,12 @@ public class OtherProfileResponse {
                 .mike(targetMember.getMike())
                 .gameName(targetMember.getGameName())
                 .tag(targetMember.getTag())
-                .tier(targetMember.getSoloTier())
-                .gameRank(targetMember.getSoloRank())
+                .soloTier(targetMember.getSoloTier())
+                .soloRank(targetMember.getSoloRank())
+                .soloWinrate(targetMember.getSoloWinRate())
+                .freeTier(targetMember.getFreeTier())
+                .freeRank(targetMember.getFreeRank())
+                .freeWinrate(targetMember.getFreeWinRate())
                 .profileImg(targetMember.getProfileImage())
                 .mannerLevel(targetMember.getMannerLevel())
                 .mannerRank(managerRank)
@@ -66,7 +73,6 @@ public class OtherProfileResponse {
                 .subP(targetMember.getSubP())
                 .isAgree(targetMember.isAgree())
                 .isBlind(targetMember.isBlind())
-                .winrate(targetMember.getSoloWinRate())
                 .loginType(String.valueOf(targetMember.getLoginType()))
                 .updatedAt(String.valueOf(targetMember.getUpdatedAt()))
                 .blocked(isBlocked)
