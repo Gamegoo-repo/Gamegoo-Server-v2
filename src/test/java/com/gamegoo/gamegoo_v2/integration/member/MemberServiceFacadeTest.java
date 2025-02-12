@@ -111,9 +111,12 @@ class MemberServiceFacadeTest {
         assertThat(response.getEmail()).isEqualTo(member.getEmail());
         assertThat(response.getGameName()).isEqualTo(member.getGameName());
         assertThat(response.getTag()).isEqualTo(member.getTag());
-        assertThat(response.getTier()).isEqualTo(member.getSoloTier());
-        assertThat(response.getGameRank()).isEqualTo(member.getSoloRank());
-        assertThat(response.getWinrate()).isEqualTo(member.getSoloWinRate());
+        assertThat(response.getSoloTier()).isEqualTo(member.getSoloTier());
+        assertThat(response.getSoloRank()).isEqualTo(member.getSoloRank());
+        assertThat(response.getSoloWinrate()).isEqualTo(member.getSoloWinRate());
+        assertThat(response.getFreeTier()).isEqualTo(member.getFreeTier());
+        assertThat(response.getFreeRank()).isEqualTo(member.getFreeRank());
+        assertThat(response.getFreeWinrate()).isEqualTo(member.getFreeWinRate());
         assertThat(response.getMainP()).isEqualTo(member.getMainP());
         assertThat(response.getSubP()).isEqualTo(member.getSubP());
         assertThat(response.getWantP()).isEqualTo(member.getWantP());
