@@ -21,8 +21,12 @@ public class MyProfileResponse {
     String email;
     String gameName;
     String tag;
-    Tier tier;
-    Integer gameRank;
+    Tier soloTier;
+    Integer soloRank;
+    Double soloWinrate;
+    Tier freeTier;
+    Integer freeRank;
+    Double freeWinrate;
     Double mannerRank;
     Integer mannerLevel;
     String updatedAt;
@@ -32,7 +36,6 @@ public class MyProfileResponse {
     Boolean isAgree;
     Boolean isBlind;
     String loginType;
-    Double winrate;
     List<GameStyleResponse> gameStyleResponseList;
     List<ChampionResponse> championResponseList;
 
@@ -51,8 +54,12 @@ public class MyProfileResponse {
                 .email(member.getEmail())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getSoloTier())
-                .gameRank(member.getSoloRank())
+                .soloTier(member.getSoloTier())
+                .soloRank(member.getSoloRank())
+                .soloWinrate(member.getSoloWinRate())
+                .freeTier(member.getFreeTier())
+                .freeRank(member.getFreeRank())
+                .freeWinrate(member.getFreeWinRate())
                 .profileImg(member.getProfileImage())
                 .mannerLevel(member.getMannerLevel())
                 .mannerRank(mannerRank)
@@ -61,7 +68,6 @@ public class MyProfileResponse {
                 .wantP(member.getWantP())
                 .isAgree(member.isAgree())
                 .isBlind(member.isBlind())
-                .winrate(member.getSoloWinRate())
                 .loginType(String.valueOf(member.getLoginType()))
                 .updatedAt(String.valueOf(member.getUpdatedAt()))
                 .gameStyleResponseList(gameStyleResponseList)
