@@ -25,6 +25,13 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
 
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * 생성 시간 내 만들어진 매칭 기록 조회
+     *
+     * @param createdAt 생성 시간
+     * @param gameMode  게임 모드
+     * @return 매칭 기록
+     */
     @Override
     public List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode) {
         return queryFactory.selectFrom(matchingRecord)
@@ -39,13 +46,19 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
                 .fetch();
     }
 
+    /**
+     * 해당 회원의 가장 최근 매칭
+     *
+     * @param member 사용자
+     * @return 매칭 기록
+     */
     @Override
     public Optional<MatchingRecord> findLatestByMember(Member member) {
         QMatchingRecord matchingRecord = QMatchingRecord.matchingRecord;
 
         MatchingRecord record = queryFactory
                 .selectFrom(matchingRecord)
-                .where(member == null ? matchingRecord.member.isNull() : matchingRecord.member.eq(member)) // ✅ Null 체크 추가
+                .where(member == null ? matchingRecord.member.isNull() : matchingRecord.member.eq(member))
                 .orderBy(matchingRecord.createdAt.desc())
                 .limit(1)
                 .fetchOne();
