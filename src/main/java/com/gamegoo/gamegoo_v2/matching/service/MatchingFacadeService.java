@@ -145,6 +145,19 @@ public class MatchingFacadeService {
         // 상대방 matchingRecord 조회
         MatchingRecord targetMatchingRecord =
                 matchingService.getMatchingRecordByMatchingUuid(request.getTargetMatchingUuid());
+        
+        Member member = matchingRecord.getMember();
+        Member targetMember = targetMatchingRecord.getMember();
+
+        // 동일 인물인지 검증
+        memberValidator.throwIfEqual(member, targetMember);
+
+        // 탈퇴하지 않았는지 검증
+        memberValidator.throwIfBlind(member);
+        memberValidator.throwIfBlind(targetMember);
+
+        // 서로의 차단 여부 검증
+        validateBlockStatus(member, targetMember);
 
         // 내 매칭 status가 올바른지 검증
         if (matchingService.isInvalidMatchingStatus(MatchingStatus.PENDING, matchingRecord)) {
