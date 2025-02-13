@@ -167,16 +167,4 @@ public class MatchingService {
         targetMatchingRecord.updateTargetMatchingRecord(matchingRecord);
     }
 
-    /**
-     * 매칭 요청의 상태가 올바른지 검증합니다.
-     *
-     * @param status         요청하려는 매칭 상태
-     * @param matchingRecord 현재 매칭 기록
-     * @return 주어진 상태가 현재 매칭 기록의 상태와 동일하면 {@code true}, 그렇지 않으면 {@code false}
-     */
-
-    public boolean isInvalidMatchingStatus(MatchingStatus status, MatchingRecord matchingRecord) {
-        return (status != matchingRecord.getStatus());
-    }
-
 }

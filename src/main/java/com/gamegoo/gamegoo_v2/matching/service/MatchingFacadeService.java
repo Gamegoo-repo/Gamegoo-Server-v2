@@ -7,6 +7,7 @@ import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatQueryService;
 import com.gamegoo.gamegoo_v2.core.common.validator.BlockValidator;
+import com.gamegoo.gamegoo_v2.core.common.validator.MatchingValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.MatchingException;
@@ -41,6 +42,7 @@ public class MatchingFacadeService {
     private final MatchingService matchingService;
     private final BlockService blockService;
     private final MemberGameStyleService memberGameStyleService;
+    private final MatchingValidator matchingValidator;
 
     /**
      * 매칭 우선순위 계산 및 DB 저장
@@ -145,7 +147,7 @@ public class MatchingFacadeService {
         // 상대방 matchingRecord 조회
         MatchingRecord targetMatchingRecord =
                 matchingService.getMatchingRecordByMatchingUuid(request.getTargetMatchingUuid());
-        
+
         Member member = matchingRecord.getMember();
         Member targetMember = targetMatchingRecord.getMember();
 
@@ -160,14 +162,10 @@ public class MatchingFacadeService {
         validateBlockStatus(member, targetMember);
 
         // 내 매칭 status가 올바른지 검증
-        if (matchingService.isInvalidMatchingStatus(MatchingStatus.PENDING, matchingRecord)) {
-            throw new MatchingException(ErrorCode.MATCHING_STATUS_NOT_ALLOWED);
-        }
+        validateMyMatchingStatus(MatchingStatus.PENDING, matchingRecord);
 
         // 상대방 매칭 status가 올바른지 검증
-        if (matchingService.isInvalidMatchingStatus(MatchingStatus.PENDING, targetMatchingRecord)) {
-            throw new MatchingException(ErrorCode.MATCHING_TARGET_UNAVAILABLE);
-        }
+        validateTargetMatchingStatus(MatchingStatus.PENDING, targetMatchingRecord);
 
         // targetMatchingRecord 지정하기
         matchingService.setTargetMatchingMember(matchingRecord, targetMatchingRecord);
@@ -221,6 +219,16 @@ public class MatchingFacadeService {
                 ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED);
         blockValidator.throwIfBlocked(member2, member1, ChatException.class,
                 ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET);
+    }
+
+    private void validateMyMatchingStatus(MatchingStatus status, MatchingRecord matchingRecord) {
+        matchingValidator.throwIfInvalidStatus(matchingRecord, status, MatchingException.class,
+                ErrorCode.MATCHING_STATUS_NOT_ALLOWED);
+    }
+
+    private void validateTargetMatchingStatus(MatchingStatus status, MatchingRecord matchingRecord) {
+        matchingValidator.throwIfInvalidStatus(matchingRecord, status, MatchingException.class,
+                ErrorCode.MATCHING_TARGET_UNAVAILABLE);
     }
 
 }
