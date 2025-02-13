@@ -140,7 +140,7 @@ public class MatchingService {
         if (targetMatchingRecord == null) {
             throw new MatchingException(ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND);
         }
-        
+
         return targetMatchingRecord;
     }
 
@@ -154,6 +154,18 @@ public class MatchingService {
     @Transactional
     public void setMatchingStatus(MatchingStatus matchingStatus, MatchingRecord matchingRecord) {
         matchingRecord.updateStatus(matchingStatus);
+    }
+
+    /**
+     * targetMatchingRecord 지정
+     *
+     * @param matchingRecord       내 matchingRecord
+     * @param targetMatchingRecord 상대방 matchingRecord
+     */
+    @Transactional
+    public void setTargetMatchingMember(MatchingRecord matchingRecord, MatchingRecord targetMatchingRecord) {
+        matchingRecord.updateTargetMatchingRecord(targetMatchingRecord);
+        targetMatchingRecord.updateTargetMatchingRecord(matchingRecord);
     }
 
 }

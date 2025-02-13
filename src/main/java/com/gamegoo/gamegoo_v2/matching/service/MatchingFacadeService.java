@@ -11,8 +11,11 @@ import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.request.MatchingFoundRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import lombok.RequiredArgsConstructor;
@@ -126,6 +129,31 @@ public class MatchingFacadeService {
         return "status 변경이 완료되었습니다.";
     }
 
+    /**
+     * targetMatchingRecord 지정 및 status 변경
+     *
+     * @param request 내 MatchingUuid, 상대 MatchingUuid
+     * @return 나와 상대방의 매칭 정보
+     */
+    @Transactional
+    public MatchingFoundResponse modifyTargetMatchingRecordAndStatus(MatchingFoundRequest request) {
+        // 내 matching 조회
+        MatchingRecord matchingRecord =
+                matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
+
+        // 상대방 matchingRecord 조회
+        MatchingRecord targetMatchingRecord =
+                matchingService.getMatchingRecordByMatchingUuid(request.getTargetMatchingUuid());
+
+        // targetMatchingRecord 지정하기
+        matchingService.setTargetMatchingMember(matchingRecord, targetMatchingRecord);
+
+        // matchingStatus 변경
+        matchingService.setMatchingStatus(MatchingStatus.FOUND, matchingRecord);
+        matchingService.setMatchingStatus(MatchingStatus.FOUND, targetMatchingRecord);
+
+        return MatchingFoundResponse.of(matchingRecord, targetMatchingRecord);
+    }
 
     /**
      * 두 회원 사이 매칭을 통한 채팅방 시작 Facade 메소드
