@@ -135,10 +135,13 @@ public class MatchingService {
      * @return matchingRecord 상대방 matchingRecord
      */
     public MatchingRecord getTargetMatchingRecord(MatchingRecord matchingRecord) {
-        Member targetMember = matchingRecord.getTargetMember();
-        return matchingRecordRepository.findLatestByMember(targetMember).orElseThrow(() -> new MatchingException(ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND));
+        MatchingRecord targetMatchingRecord = matchingRecord.getTargetMatchingRecord();
 
-
+        if (targetMatchingRecord == null) {
+            throw new MatchingException(ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND);
+        }
+        
+        return targetMatchingRecord;
     }
 
 

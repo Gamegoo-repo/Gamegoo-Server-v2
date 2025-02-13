@@ -386,8 +386,8 @@ public class MatchingFacadeServiceTest {
                     MatchingStatus.PENDING);
             MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
                     targetMember, MatchingStatus.PENDING);
-            matchingRecord.updateTargetMember(targetMember);
-            targetMatchingRecord.updateTargetMember(member);
+            matchingRecord.updateTargetMatchingRecord(targetMatchingRecord);
+            targetMatchingRecord.updateTargetMatchingRecord(matchingRecord);
 
             ModifyMatchingStatusRequest request = ModifyMatchingStatusRequest.builder()
                     .matchingUuid(matchingRecord.getMatchingUuid())
