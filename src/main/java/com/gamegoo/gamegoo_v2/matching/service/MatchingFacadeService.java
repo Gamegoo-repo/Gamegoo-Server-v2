@@ -159,13 +159,10 @@ public class MatchingFacadeService {
         memberValidator.throwIfBlind(targetMember);
 
         // 서로의 차단 여부 검증
-        validateBlockStatus(member, targetMember);
+        validateBlockStatusWhenMatch(member, targetMember);
 
         // 내 매칭 status가 올바른지 검증
-        validateMyMatchingStatus(MatchingStatus.PENDING, matchingRecord);
-
-        // 상대방 매칭 status가 올바른지 검증
-        validateTargetMatchingStatus(MatchingStatus.PENDING, targetMatchingRecord);
+        validateMatchingStatus(MatchingStatus.PENDING, matchingRecord, targetMatchingRecord);
 
         // targetMatchingRecord 지정하기
         matchingService.setTargetMatchingMember(matchingRecord, targetMatchingRecord);
@@ -193,7 +190,7 @@ public class MatchingFacadeService {
         memberValidator.throwIfBlind(member2);
 
         // 서로의 차단 여부 검증
-        validateBlockStatus(member1, member2);
+        validateBlockStatusWhenChat(member1, member2);
 
         // 채팅방 조회, 생성 및 입장 처리
         Chatroom chatroom = chatQueryService.findExistingChatroom(member1, member2)
@@ -209,25 +206,43 @@ public class MatchingFacadeService {
     }
 
     /**
-     * 두 회원의 서로 차단 여부 검증
+     * 채팅방 두 회원의 서로 차단 여부 검증
      *
      * @param member1 회원
      * @param member2 회원
      */
-    private void validateBlockStatus(Member member1, Member member2) {
+    private void validateBlockStatusWhenChat(Member member1, Member member2) {
         blockValidator.throwIfBlocked(member1, member2, ChatException.class,
                 ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED);
         blockValidator.throwIfBlocked(member2, member1, ChatException.class,
                 ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET);
     }
 
-    private void validateMyMatchingStatus(MatchingStatus status, MatchingRecord matchingRecord) {
-        matchingValidator.throwIfInvalidStatus(matchingRecord, status, MatchingException.class,
-                ErrorCode.MATCHING_STATUS_NOT_ALLOWED);
+    /**
+     * 매칭 두 회원의 서로 차단 여부 검증
+     *
+     * @param member1 회원
+     * @param member2 회원
+     */
+    private void validateBlockStatusWhenMatch(Member member1, Member member2) {
+        blockValidator.throwIfBlocked(member1, member2, ChatException.class,
+                ErrorCode.MATCHING_FOUND_FAILED_TARGET_IS_BLOCKED);
+        blockValidator.throwIfBlocked(member2, member1, ChatException.class,
+                ErrorCode.MATCHING_FOUND_FAILED_BLOCKED_BY_TARGET);
     }
 
-    private void validateTargetMatchingStatus(MatchingStatus status, MatchingRecord matchingRecord) {
+    /**
+     * 두 회원의 matchingStatus 검증
+     *
+     * @param status               매칭 status
+     * @param matchingRecord       내 matchingRecord
+     * @param targetMatchingRecord 상대방 matchingRecord
+     */
+    private void validateMatchingStatus(MatchingStatus status, MatchingRecord matchingRecord,
+                                        MatchingRecord targetMatchingRecord) {
         matchingValidator.throwIfInvalidStatus(matchingRecord, status, MatchingException.class,
+                ErrorCode.MATCHING_STATUS_NOT_ALLOWED);
+        matchingValidator.throwIfInvalidStatus(targetMatchingRecord, status, MatchingException.class,
                 ErrorCode.MATCHING_TARGET_UNAVAILABLE);
     }
 

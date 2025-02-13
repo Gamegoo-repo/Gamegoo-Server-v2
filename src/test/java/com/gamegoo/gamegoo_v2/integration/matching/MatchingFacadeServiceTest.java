@@ -490,7 +490,7 @@ public class MatchingFacadeServiceTest {
             // when // then
             assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
                     .isInstanceOf(ChatException.class)
-                    .hasMessage(ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED.getMessage());
+                    .hasMessage(ErrorCode.MATCHING_FOUND_FAILED_TARGET_IS_BLOCKED.getMessage());
         }
 
         @DisplayName("실패: 상대 회원에게 차단 당한 경우 예외가 발생한다.")
@@ -512,7 +512,7 @@ public class MatchingFacadeServiceTest {
             // when // then
             assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
                     .isInstanceOf(ChatException.class)
-                    .hasMessage(ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET.getMessage());
+                    .hasMessage(ErrorCode.MATCHING_FOUND_FAILED_BLOCKED_BY_TARGET.getMessage());
         }
 
         @DisplayName("실패: 내 매칭 uuid없는 uuid일 경우")
