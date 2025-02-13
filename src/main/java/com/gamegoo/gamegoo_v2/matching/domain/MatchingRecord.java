@@ -79,7 +79,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_matchingUuid")
+    @JoinColumn(name = "target_matching_uuid")
     private MatchingRecord targetMatchingRecord;
 
     // MatchingRecord 생성 메서드
