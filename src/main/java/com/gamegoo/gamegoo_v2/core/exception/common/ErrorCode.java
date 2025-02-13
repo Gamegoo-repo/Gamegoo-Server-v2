@@ -76,6 +76,9 @@ public enum ErrorCode {
      */
     MATCHING_NOT_FOUND(NOT_FOUND, "MATCH_401", "해당 매칭이 존재하지 않습니다."),
     TARGET_MATCHING_MEMBER_NOT_FOUND(NOT_FOUND, "MATCH_402", "해당 회원과 매칭된 회원이 없습니다"),
+    MATCHING_STATUS_NOT_ALLOWED(BAD_REQUEST, "MATCH_403", "현재 매칭 상태에서는 요청할 수 없습니다."),
+    MATCHING_TARGET_UNAVAILABLE(BAD_REQUEST, "MATCH_404", "상대방이 다른 매칭 로직을 진행 중입니다."),
+
 
     /**
      * 차단 관련 에러

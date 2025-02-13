@@ -9,6 +9,7 @@ import com.gamegoo.gamegoo_v2.chat.service.ChatQueryService;
 import com.gamegoo.gamegoo_v2.core.common.validator.BlockValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
+import com.gamegoo.gamegoo_v2.core.exception.MatchingException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
@@ -144,6 +145,16 @@ public class MatchingFacadeService {
         // 상대방 matchingRecord 조회
         MatchingRecord targetMatchingRecord =
                 matchingService.getMatchingRecordByMatchingUuid(request.getTargetMatchingUuid());
+
+        // 내 매칭 status가 올바른지 검증
+        if (matchingService.isInvalidMatchingStatus(MatchingStatus.PENDING, matchingRecord)) {
+            throw new MatchingException(ErrorCode.MATCHING_STATUS_NOT_ALLOWED);
+        }
+
+        // 상대방 매칭 status가 올바른지 검증
+        if (matchingService.isInvalidMatchingStatus(MatchingStatus.PENDING, targetMatchingRecord)) {
+            throw new MatchingException(ErrorCode.MATCHING_TARGET_UNAVAILABLE);
+        }
 
         // targetMatchingRecord 지정하기
         matchingService.setTargetMatchingMember(matchingRecord, targetMatchingRecord);
