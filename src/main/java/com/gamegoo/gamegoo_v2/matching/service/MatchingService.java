@@ -127,6 +127,24 @@ public class MatchingService {
         return matchingRecordRepository.findMatchingRecordsByMatchingUuid(matchingUuid).orElseThrow(() -> new MatchingException(ErrorCode.MATCHING_NOT_FOUND));
     }
 
+
+    /**
+     * 나와 연결되어있는 상대방 MatchingRecord 불러오기
+     *
+     * @param matchingRecord 내 matchingRecord
+     * @return matchingRecord 상대방 matchingRecord
+     */
+    public MatchingRecord getTargetMatchingRecord(MatchingRecord matchingRecord) {
+        MatchingRecord targetMatchingRecord = matchingRecord.getTargetMatchingRecord();
+
+        if (targetMatchingRecord == null) {
+            throw new MatchingException(ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND);
+        }
+        
+        return targetMatchingRecord;
+    }
+
+
     /**
      * 매칭 status 변경
      *

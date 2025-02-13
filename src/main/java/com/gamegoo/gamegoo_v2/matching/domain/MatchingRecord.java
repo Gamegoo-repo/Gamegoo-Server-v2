@@ -80,7 +80,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_id")
-    private Member targetMember;
+    private MatchingRecord targetMatchingRecord;
 
     // MatchingRecord 생성 메서드
     public static MatchingRecord create(GameMode gameMode, MatchingType matchingType, Member member) {
@@ -115,7 +115,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
         this.matchingType = matchingType;
         this.mannerLevel = mannerLevel;
         this.member = member;
-        this.targetMember = null;
+        this.targetMatchingRecord = null;
     }
 
     // status 변경
@@ -124,8 +124,8 @@ public class MatchingRecord extends BaseDateTimeEntity {
     }
 
     // targetMember 설정
-    public void updateTargetMember(Member member) {
-        this.targetMember = member;
+    public void updateTargetMatchingRecord(MatchingRecord targetMatchingRecord) {
+        this.targetMatchingRecord = targetMatchingRecord;
     }
 
     public void updateMannerMessageSent(Boolean mannerMessageSent) {

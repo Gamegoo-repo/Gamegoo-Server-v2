@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface MatchingRecordRepositoryCustom {
 
@@ -24,6 +25,6 @@ public interface MatchingRecordRepositoryCustom {
      * @param member 사용자
      * @return 사용자의 가장 최근 매칭 기록
      */
-    MatchingRecord findLatestByMember(Member member);
+    Optional<MatchingRecord> findLatestByMember(Member member);
 
 }
