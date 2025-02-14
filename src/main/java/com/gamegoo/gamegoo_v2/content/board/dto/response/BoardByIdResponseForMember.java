@@ -30,20 +30,16 @@ public class BoardByIdResponseForMember {
     String tag;
     Integer mannerLevel;
     List<MannerKeyword> mannerKeywords;
-    Tier soloTier;
-    Tier freeTier;
-    int soloRank;
-    int freeRank;
+    Tier tier;
+    int rank;
     Mike mike;
     List<ChampionResponse> championResponseDTOList;
     GameMode gameMode;
     Position mainP;
     Position subP;
     Position wantP;
-    Integer soloRecentGameCount;
-    Integer freeRecentGameCount;
-    Double soloWinRate;
-    Double freeWinRate;
+    Integer recentGameCount;
+    Double winRate;
     List<Long> gameStyles;
     String contents;
 
@@ -67,6 +63,23 @@ public class BoardByIdResponseForMember {
                 .map(bgs -> bgs.getGameStyle().getId())
                 .collect(Collectors.toList());
 
+        Tier tier;
+        int rank;
+        Integer recentGameCount;
+        Double winRate;
+
+        if (board.getGameMode() == GameMode.FREE) {
+            tier = poster.getFreeTier();
+            rank = poster.getFreeRank();
+            recentGameCount = poster.getFreeGameCount();
+            winRate = poster.getFreeWinRate();
+        } else {
+            tier = poster.getSoloTier();
+            rank = poster.getSoloRank();
+            recentGameCount = poster.getSoloGameCount();
+            winRate = poster.getSoloWinRate();
+        }
+
         return BoardByIdResponseForMember.builder()
                 .boardId(board.getId())
                 .memberId(poster.getId())
@@ -78,20 +91,16 @@ public class BoardByIdResponseForMember {
                 .gameName(poster.getGameName())
                 .tag(poster.getTag())
                 .mannerLevel(poster.getMannerLevel())
-                .soloTier(poster.getSoloTier())
-                .freeTier(poster.getFreeTier())
-                .soloRank(poster.getSoloRank())
-                .freeRank(poster.getFreeRank())
+                .tier(tier)
+                .rank(rank)
                 .mike(board.getMike())
                 .championResponseDTOList(championResponseList)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())
                 .wantP(board.getWantP())
-                .soloRecentGameCount(poster.getSoloGameCount())
-                .freeRecentGameCount(poster.getFreeGameCount())
-                .soloWinRate(poster.getSoloWinRate())
-                .freeWinRate(poster.getFreeWinRate())
+                .recentGameCount(recentGameCount)
+                .winRate(winRate)
                 .gameStyles(gameStyleIds)
                 .contents(board.getContent())
                 .build();

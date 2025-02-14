@@ -24,17 +24,14 @@ public class BoardListResponse {
     String gameName;
     String tag;
     Integer mannerLevel;
-    Tier soloTier;
-    Tier freeTier;
-    int soloRank;
-    int freeRank;
+    Tier tier;
+    int rank;
     GameMode gameMode;
     Position mainP;
     Position subP;
     Position wantP;
     List<ChampionResponse> championResponseList;
-    Double soloWinRate;
-    Double freeWinRate;
+    Double winRate;
     LocalDateTime createdAt;
     LocalDateTime bumpTime;
     String contents;
@@ -48,6 +45,19 @@ public class BoardListResponse {
                         .collect(Collectors.toList())
                 : null;
 
+        Tier tier;
+        int rank;
+        Double winRate;
+        if (board.getGameMode() == GameMode.FREE) {
+            tier = member.getFreeTier();
+            rank = member.getFreeRank();
+            winRate = member.getFreeWinRate();
+        } else {
+            tier = member.getSoloTier();
+            rank = member.getSoloRank();
+            winRate = member.getSoloWinRate();
+        }
+
         return BoardListResponse.builder()
                 .boardId(board.getId())
                 .memberId(member.getId())
@@ -55,17 +65,14 @@ public class BoardListResponse {
                 .gameName(member.getGameName())
                 .tag(member.getTag())
                 .mannerLevel(member.getMannerLevel())
-                .soloTier(member.getSoloTier())
-                .freeTier(member.getFreeTier())
-                .soloRank(member.getSoloRank())
-                .freeRank(member.getFreeRank())
+                .tier(tier)
+                .rank(rank)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())
                 .wantP(board.getWantP())
                 .championResponseList(championResponseList)
-                .soloWinRate(member.getSoloWinRate())
-                .freeWinRate(member.getFreeWinRate())
+                .winRate(winRate)
                 .createdAt(board.getCreatedAt())
                 .bumpTime(board.getBumpTime())
                 .contents(board.getContent())

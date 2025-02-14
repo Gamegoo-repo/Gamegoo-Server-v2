@@ -20,10 +20,8 @@ public class BoardInsertResponse {
     private Integer profileImage;
     private String gameName;
     private String tag;
-    private Tier soloTier;
-    private Tier freeTier;
-    private int soloRank;
-    private int freeRank;
+    private Tier tier;
+    private int rank;
     private GameMode gameMode;
     private Position mainP;
     private Position subP;
@@ -33,16 +31,25 @@ public class BoardInsertResponse {
     private String contents;
 
     public static BoardInsertResponse of(Board board, Member member) {
+
+        Tier tier;
+        int rank;
+        if (board.getGameMode() == GameMode.FREE) {
+            tier = member.getFreeTier();
+            rank = member.getFreeRank();
+        } else {
+            tier = member.getSoloTier();
+            rank = member.getSoloRank();
+        }
+
         return BoardInsertResponse.builder()
                 .boardId(board.getId())
                 .memberId(member.getId())
                 .profileImage(board.getBoardProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .soloTier(member.getSoloTier())
-                .freeTier(member.getFreeTier())
-                .soloRank(member.getSoloRank())
-                .freeRank(member.getFreeRank())
+                .tier(tier)
+                .rank(rank)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())

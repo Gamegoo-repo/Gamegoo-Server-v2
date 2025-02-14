@@ -18,15 +18,16 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("SELECT b FROM Board b JOIN b.member m WHERE " +
             "b.deleted = false AND " +
             "(:mode IS NULL OR b.gameMode = :mode) AND " +
-            "(COALESCE(:soloTier, :freeTier) IS NULL OR m.soloTier = :soloTier OR m.freeTier = :freeTier) AND " +
+            "(:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m" +
+            ".freeTier ELSE m.soloTier END) = :tier) AND " +
             "(:mainP IS NULL OR :mainP = 'ANY' OR b.mainP = :mainP) AND " +
             "(:mike IS NULL OR b.mike = :mike)")
     Page<Board> findByFilters(@Param("mode") GameMode gameMode,
-                              @Param("soloTier") Tier soloTier,
-                              @Param("freeTier") Tier freeTier,
+                              @Param("tier") Tier tier,
                               @Param("mainP") Position mainP,
                               @Param("mike") Mike mike,
                               Pageable pageable);
+
 
     Optional<Board> findByIdAndDeleted(Long boardId, boolean b);
 
