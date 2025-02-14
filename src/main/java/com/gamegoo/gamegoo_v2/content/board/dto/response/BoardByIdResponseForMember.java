@@ -38,8 +38,8 @@ public class BoardByIdResponseForMember {
     List<ChampionResponse> championResponseDTOList;
     GameMode gameMode;
     Position mainP;
-    Position subPosition;
-    Position wantPosition;
+    Position subP;
+    Position wantP;
     Integer soloRecentGameCount;
     Integer freeRecentGameCount;
     Double soloWinRate;
@@ -86,8 +86,8 @@ public class BoardByIdResponseForMember {
                 .championResponseDTOList(championResponseList)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
-                .subPosition(board.getSubP())
-                .wantPosition(board.getWantP())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
                 .soloRecentGameCount(poster.getSoloGameCount())
                 .freeRecentGameCount(poster.getFreeGameCount())
                 .soloWinRate(poster.getSoloWinRate())
