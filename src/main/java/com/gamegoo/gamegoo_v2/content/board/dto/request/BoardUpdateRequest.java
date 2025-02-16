@@ -30,7 +30,8 @@ public class BoardUpdateRequest {
     Position subP;
 
     @NotNull(message = "희망 포지션은 필수 값입니다.")
-    Position wantP;
+    @Size(min = 1, message = "최소 하나 이상의 희망 포지션을 선택해야 합니다.")
+    List<Position> wantP;
 
     @Schema(description = "마이크 사용 여부 (선택)")
     Mike mike;

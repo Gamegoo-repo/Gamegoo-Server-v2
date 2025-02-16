@@ -25,7 +25,7 @@ public class BoardInsertResponse {
     private GameMode gameMode;
     private Position mainP;
     private Position subP;
-    private Position wantP;
+    private List<Position> wantP;
     private Mike mike;
     private List<Long> gameStyles;
     private String contents;

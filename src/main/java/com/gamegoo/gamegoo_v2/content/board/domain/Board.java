@@ -6,7 +6,9 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Formula;
 
 import java.time.LocalDateTime;
@@ -29,6 +32,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Board extends BaseDateTimeEntity {
 
@@ -49,9 +53,11 @@ public class Board extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Position subP;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "board_want_positions", joinColumns = @JoinColumn(name = "board_id"))
+    @Column(name = "wantP", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
-    private Position wantP;
+    private List<Position> wantP = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
@@ -80,7 +86,7 @@ public class Board extends BaseDateTimeEntity {
 
 
     public static Board create(Member member, GameMode gameMode, Position mainP, Position subP,
-                               Position wantP,
+                               List<Position> wantP,
                                Mike mike, String content, int boardProfileImage) {
         return Board.builder()
                 .member(member)
@@ -95,7 +101,7 @@ public class Board extends BaseDateTimeEntity {
     }
 
     @Builder
-    private Board(GameMode gameMode, Position mainP, Position subP, Position wantP, Mike mike,
+    private Board(GameMode gameMode, Position mainP, Position subP, List<Position> wantP, Mike mike,
                   String content,
                   int boardProfileImage, boolean deleted, Member member) {
         this.gameMode = gameMode;
@@ -119,7 +125,7 @@ public class Board extends BaseDateTimeEntity {
         boardGameStyle.removeBoard();
     }
 
-    public void updateBoard(GameMode gameMode, Position mainP, Position subP, Position wantP, Mike mike,
+    public void updateBoard(GameMode gameMode, Position mainP, Position subP, List<Position> wantP, Mike mike,
                             String content, int boardProfileImage) {
         if (gameMode != null) {
             this.gameMode = gameMode;
