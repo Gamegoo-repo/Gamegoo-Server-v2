@@ -30,8 +30,10 @@ public class BoardByIdResponseForMember {
     String tag;
     Integer mannerLevel;
     List<MannerKeyword> mannerKeywords;
-    Tier tier;
-    int rank;
+    Tier soloTier;
+    int soloRank;
+    Tier freeTier;
+    int freeRank;
     Mike mike;
     List<ChampionResponse> championResponseDTOList;
     GameMode gameMode;
@@ -63,19 +65,13 @@ public class BoardByIdResponseForMember {
                 .map(bgs -> bgs.getGameStyle().getId())
                 .collect(Collectors.toList());
 
-        Tier tier;
-        int rank;
         Integer recentGameCount;
         Double winRate;
 
         if (board.getGameMode() == GameMode.FREE) {
-            tier = poster.getFreeTier();
-            rank = poster.getFreeRank();
             recentGameCount = poster.getFreeGameCount();
             winRate = poster.getFreeWinRate();
         } else {
-            tier = poster.getSoloTier();
-            rank = poster.getSoloRank();
             recentGameCount = poster.getSoloGameCount();
             winRate = poster.getSoloWinRate();
         }
@@ -91,8 +87,10 @@ public class BoardByIdResponseForMember {
                 .gameName(poster.getGameName())
                 .tag(poster.getTag())
                 .mannerLevel(poster.getMannerLevel())
-                .tier(tier)
-                .rank(rank)
+                .soloTier(poster.getSoloTier())
+                .soloRank(poster.getSoloRank())
+                .freeTier(poster.getFreeTier())
+                .freeRank(poster.getFreeRank())
                 .mike(board.getMike())
                 .championResponseDTOList(championResponseList)
                 .gameMode(board.getGameMode())
