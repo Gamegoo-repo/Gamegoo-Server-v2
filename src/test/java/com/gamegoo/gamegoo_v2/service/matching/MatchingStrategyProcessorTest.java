@@ -154,8 +154,6 @@ class MatchingStrategyProcessorTest {
 
         // then
         int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4) +
-                (40 - Math.abs(record1.getTier().ordinal() * 4 + record1.getGameRank() -
-                        record2.getTier().ordinal() * 4 - record2.getGameRank())) +
                 (record1.getMike().equals(record2.getMike()) ? 3 : 0) + getPositionExpectedPriority(member1, member2);
 
         assertThat(result).isEqualTo(expectedPriority);

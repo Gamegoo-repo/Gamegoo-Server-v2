@@ -82,7 +82,6 @@ public class MatchingRecord extends BaseDateTimeEntity {
     @JoinColumn(name = "target_id")
     private MatchingRecord targetMatchingRecord;
 
-    // MatchingRecord 생성 메서드
     public static MatchingRecord create(GameMode gameMode, MatchingType matchingType, Member member) {
         return MatchingRecord.builder()
                 .gameMode(gameMode)
@@ -90,13 +89,34 @@ public class MatchingRecord extends BaseDateTimeEntity {
                 .subP(member.getSubP())
                 .wantP(member.getWantP())
                 .mike(member.getMike())
-                .tier(member.getSoloTier()) // TODO:
-                .gameRank(member.getSoloRank()) // TODO:
-                .winrate(member.getSoloWinRate()) // TODO:
+                .tier(getTierByGameMode(gameMode, member))
+                .gameRank(getGameRankByGameMode(gameMode, member))
+                .winrate(getWinRateByGameMode(gameMode, member))
                 .matchingType(matchingType)
                 .mannerLevel(member.getMannerLevel())
                 .member(member)
                 .build();
+    }
+
+    private static Tier getTierByGameMode(GameMode gameMode, Member member) {
+        if (gameMode == GameMode.FREE) {
+            return member.getFreeTier();
+        }
+        return member.getSoloTier();
+    }
+
+    private static int getGameRankByGameMode(GameMode gameMode, Member member) {
+        if (gameMode == GameMode.FREE) {
+            return member.getFreeRank();
+        }
+        return member.getSoloRank();
+    }
+
+    private static double getWinRateByGameMode(GameMode gameMode, Member member) {
+        if (gameMode == GameMode.FREE) {
+            return member.getFreeWinRate();
+        }
+        return member.getSoloWinRate();
     }
 
     // MatchingRecord Builder
