@@ -142,7 +142,6 @@ class MemberServiceFacadeTest {
         OtherProfileResponse response = memberFacadeService.getOtherProfile(member, targetMember.getId());
 
         // then
-        // TODO: GameStyle 로직 추가 후 수정 필요
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(targetMember.getId());
         assertThat(response.getProfileImg()).isEqualTo(targetMember.getProfileImage());

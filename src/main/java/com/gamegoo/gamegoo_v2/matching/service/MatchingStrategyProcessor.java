@@ -34,10 +34,6 @@ public class MatchingStrategyProcessor {
         priority += MatchingScoreCalculator.getMannerPriority(
                 otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
 
-        // TODO: 티어 및 랭킹 점수 계산
-        priority += MatchingScoreCalculator.getTierRankPriority(myRecord.getTier(), myRecord.getGameRank(),
-                otherRecord.getTier(), otherRecord.getGameRank(), 40, 4);
-
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
                 myRecord.getWantP(), otherRecord.getMainP(), otherRecord.getSubP(), 3, 2, 1);
