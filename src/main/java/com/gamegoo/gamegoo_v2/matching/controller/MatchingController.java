@@ -2,7 +2,9 @@ package com.gamegoo.gamegoo_v2.matching.controller;
 
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.request.MatchingFoundRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +45,12 @@ public class MatchingController {
     @PatchMapping("/matching/status/target")
     public ApiResponse<String> UpdateBothMatchingStatus(@RequestBody @Valid ModifyMatchingStatusRequest request) {
         return ApiResponse.ok(matchingFacadeService.modifyBothMatchingStatus(request));
+    }
+
+    @Operation(summary = "매칭 FOUND API", description = "API triggered when a match is found")
+    @PostMapping("/matching/found")
+    public ApiResponse<MatchingFoundResponse> FindMatching(@RequestBody @Valid MatchingFoundRequest request) {
+        return ApiResponse.ok(matchingFacadeService.modifyTargetMatchingRecordAndStatus(request));
     }
 
 }

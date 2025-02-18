@@ -25,7 +25,9 @@ import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.request.MatchingFoundRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.repository.MatchingRecordRepository;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
@@ -420,6 +422,211 @@ public class MatchingFacadeServiceTest {
                     .hasMessage(ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND.getMessage());
         }
 
+
+    }
+
+    @DisplayName("매칭 Found : targetMember 지정 및 status 변경")
+    @Nested
+    class MatchingFound {
+
+        @DisplayName("실패: 두 회원이 동일한 경우 예외가 발생한다.")
+        @Test
+        void startChatroomByMatching_shouldThrownWhenTargetMemberIsSelf() {
+            // given
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    member, MatchingStatus.PENDING);
+
+            MatchingFoundRequest request = MatchingFoundRequest.builder()
+                    .matchingUuid(matchingRecord.getMatchingUuid())
+                    .targetMatchingUuid(targetMatchingRecord.getMatchingUuid())
+                    .build();
+
+
+            // when // then
+            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+                    .isInstanceOf(GlobalException.class);
+        }
+
+        @DisplayName("실패: 회원이 탈퇴한 경우 예외가 발생한다.")
+        @Test
+        void startChatroomByMatching_shouldThrownWhenMemberIsBlind() {
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            MatchingFoundRequest request = MatchingFoundRequest.builder()
+                    .matchingUuid(matchingRecord.getMatchingUuid())
+                    .targetMatchingUuid(targetMatchingRecord.getMatchingUuid())
+                    .build();
+
+            // given
+            blindMember(targetMember);
+
+            // when // then
+            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+                    .isInstanceOf(MemberException.class)
+                    .hasMessage(ErrorCode.TARGET_MEMBER_DEACTIVATED.getMessage());
+        }
+
+        @DisplayName("실패: 상대 회원을 차단한 경우 예외가 발생한다.")
+        @Test
+        void startChatroomByMatching_shouldThrownWhenTargetIsBlocked() {
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            MatchingFoundRequest request = MatchingFoundRequest.builder()
+                    .matchingUuid(matchingRecord.getMatchingUuid())
+                    .targetMatchingUuid(targetMatchingRecord.getMatchingUuid())
+                    .build();
+
+            // given
+            blockMember(member, targetMember);
+
+            // when // then
+            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+                    .isInstanceOf(ChatException.class)
+                    .hasMessage(ErrorCode.MATCHING_FOUND_FAILED_TARGET_IS_BLOCKED.getMessage());
+        }
+
+        @DisplayName("실패: 상대 회원에게 차단 당한 경우 예외가 발생한다.")
+        @Test
+        void startChatroomByMatching_shouldThrownWhenBlockedByTarget() {
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            MatchingFoundRequest request = MatchingFoundRequest.builder()
+                    .matchingUuid(matchingRecord.getMatchingUuid())
+                    .targetMatchingUuid(targetMatchingRecord.getMatchingUuid())
+                    .build();
+
+            // given
+            blockMember(targetMember, member);
+
+            // when // then
+            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+                    .isInstanceOf(ChatException.class)
+                    .hasMessage(ErrorCode.MATCHING_FOUND_FAILED_BLOCKED_BY_TARGET.getMessage());
+        }
+
+        @DisplayName("실패: 내 매칭 uuid없는 uuid일 경우")
+        @Test
+        void notFoundMatchingUuid() {
+            // given
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            MatchingFoundRequest request = MatchingFoundRequest.builder()
+                    .matchingUuid(UUID.randomUUID().toString())
+                    .targetMatchingUuid(targetMatchingRecord.getMatchingUuid())
+                    .build();
+
+            // when, then
+            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+                    .isInstanceOf(MatchingException.class)
+                    .hasMessage(ErrorCode.MATCHING_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("실패: 상대 매칭 uuid없는 uuid일 경우")
+        @Test
+        void notFoundTargetMatchingUuid() {
+            // given
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    member, MatchingStatus.PENDING);
+
+            MatchingFoundRequest request = MatchingFoundRequest.builder()
+                    .matchingUuid(matchingRecord.getMatchingUuid())
+                    .targetMatchingUuid(UUID.randomUUID().toString())
+                    .build();
+
+            // when, then
+            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+                    .isInstanceOf(MatchingException.class)
+                    .hasMessage(ErrorCode.MATCHING_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("실패: 내 매칭 status가 Pending이 아니었던 경우")
+        @Test
+        void myMatchingStatusNotPending() {
+            // given
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                    MatchingStatus.FAIL);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            MatchingFoundRequest request = MatchingFoundRequest.builder()
+                    .matchingUuid(matchingRecord.getMatchingUuid())
+                    .targetMatchingUuid(targetMatchingRecord.getMatchingUuid())
+                    .build();
+
+            // when then
+            assertThat(matchingRecord.getTargetMatchingRecord()).isNull();
+            assertThat(targetMatchingRecord.getTargetMatchingRecord()).isNull();
+            assertThat(matchingRecord.getStatus()).isEqualTo(MatchingStatus.FAIL);
+            assertThat(targetMatchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
+            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+                    .isInstanceOf(MatchingException.class)
+                    .hasMessage(ErrorCode.MATCHING_STATUS_NOT_ALLOWED.getMessage());
+        }
+
+        @DisplayName("실패: 상대 매칭 status가 Pending이 아니었던 경우")
+        @Test
+        void targetMatchingStatusNotPending() {
+            // given
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    targetMember, MatchingStatus.SUCCESS);
+
+            MatchingFoundRequest request = MatchingFoundRequest.builder()
+                    .matchingUuid(matchingRecord.getMatchingUuid())
+                    .targetMatchingUuid(targetMatchingRecord.getMatchingUuid())
+                    .build();
+
+            // when then
+            assertThat(matchingRecord.getTargetMatchingRecord()).isNull();
+            assertThat(targetMatchingRecord.getTargetMatchingRecord()).isNull();
+            assertThat(matchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
+            assertThat(targetMatchingRecord.getStatus()).isEqualTo(MatchingStatus.SUCCESS);
+            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+                    .isInstanceOf(MatchingException.class)
+                    .hasMessage(ErrorCode.MATCHING_TARGET_UNAVAILABLE.getMessage());
+        }
+
+        @DisplayName("성공: matching status 변경 및 target 지정")
+        @Test
+        void matchingFoundSucceed() {
+            // given
+            MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
+                    MatchingStatus.PENDING);
+            MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
+                    targetMember, MatchingStatus.PENDING);
+
+            MatchingFoundRequest request = MatchingFoundRequest.builder()
+                    .matchingUuid(matchingRecord.getMatchingUuid())
+                    .targetMatchingUuid(targetMatchingRecord.getMatchingUuid())
+                    .build();
+
+            // when
+            MatchingFoundResponse matchingFoundResponse =
+                    matchingFacadeService.modifyTargetMatchingRecordAndStatus(request);
+
+            // then
+            assertThat(matchingRecord.getStatus()).isEqualTo(MatchingStatus.FOUND);
+            assertThat(targetMatchingRecord.getStatus()).isEqualTo(MatchingStatus.FOUND);
+            assertThat(targetMatchingRecord.getTargetMatchingRecord().getMatchingUuid()).isEqualTo(matchingRecord.getMatchingUuid());
+            assertThat(matchingRecord.getTargetMatchingRecord().getMatchingUuid()).isEqualTo(targetMatchingRecord.getMatchingUuid());
+
+            MatchingFoundResponse expectedResponse = MatchingFoundResponse.of(matchingRecord, targetMatchingRecord);
+            assertThat(matchingFoundResponse).isEqualTo(expectedResponse);
+
+        }
 
     }
 

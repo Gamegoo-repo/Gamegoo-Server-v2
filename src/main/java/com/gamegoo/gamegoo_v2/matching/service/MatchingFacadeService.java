@@ -7,12 +7,17 @@ import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatQueryService;
 import com.gamegoo.gamegoo_v2.core.common.validator.BlockValidator;
+import com.gamegoo.gamegoo_v2.core.common.validator.MatchingValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
+import com.gamegoo.gamegoo_v2.core.exception.MatchingException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.request.MatchingFoundRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
+import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +42,7 @@ public class MatchingFacadeService {
     private final MatchingService matchingService;
     private final BlockService blockService;
     private final MemberGameStyleService memberGameStyleService;
+    private final MatchingValidator matchingValidator;
 
     /**
      * 매칭 우선순위 계산 및 DB 저장
@@ -126,6 +132,47 @@ public class MatchingFacadeService {
         return "status 변경이 완료되었습니다.";
     }
 
+    /**
+     * targetMatchingRecord 지정 및 status 변경
+     *
+     * @param request 내 MatchingUuid, 상대 MatchingUuid
+     * @return 나와 상대방의 매칭 정보
+     */
+    @Transactional
+    public MatchingFoundResponse modifyTargetMatchingRecordAndStatus(MatchingFoundRequest request) {
+        // 내 matching 조회
+        MatchingRecord matchingRecord =
+                matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
+
+        // 상대방 matchingRecord 조회
+        MatchingRecord targetMatchingRecord =
+                matchingService.getMatchingRecordByMatchingUuid(request.getTargetMatchingUuid());
+
+        Member member = matchingRecord.getMember();
+        Member targetMember = targetMatchingRecord.getMember();
+
+        // 동일 인물인지 검증
+        memberValidator.throwIfEqual(member, targetMember);
+
+        // 탈퇴하지 않았는지 검증
+        memberValidator.throwIfBlind(member);
+        memberValidator.throwIfBlind(targetMember);
+
+        // 서로의 차단 여부 검증
+        validateBlockStatusWhenMatch(member, targetMember);
+
+        // 내 매칭 status가 올바른지 검증
+        validateMatchingStatus(MatchingStatus.PENDING, matchingRecord, targetMatchingRecord);
+
+        // targetMatchingRecord 지정하기
+        matchingService.setTargetMatchingMember(matchingRecord, targetMatchingRecord);
+
+        // matchingStatus 변경
+        matchingService.setMatchingStatus(MatchingStatus.FOUND, matchingRecord);
+        matchingService.setMatchingStatus(MatchingStatus.FOUND, targetMatchingRecord);
+
+        return MatchingFoundResponse.of(matchingRecord, targetMatchingRecord);
+    }
 
     /**
      * 두 회원 사이 매칭을 통한 채팅방 시작 Facade 메소드
@@ -143,7 +190,7 @@ public class MatchingFacadeService {
         memberValidator.throwIfBlind(member2);
 
         // 서로의 차단 여부 검증
-        validateBlockStatus(member1, member2);
+        validateBlockStatusWhenChat(member1, member2);
 
         // 채팅방 조회, 생성 및 입장 처리
         Chatroom chatroom = chatQueryService.findExistingChatroom(member1, member2)
@@ -159,16 +206,44 @@ public class MatchingFacadeService {
     }
 
     /**
-     * 두 회원의 서로 차단 여부 검증
+     * 채팅방 두 회원의 서로 차단 여부 검증
      *
      * @param member1 회원
      * @param member2 회원
      */
-    private void validateBlockStatus(Member member1, Member member2) {
+    private void validateBlockStatusWhenChat(Member member1, Member member2) {
         blockValidator.throwIfBlocked(member1, member2, ChatException.class,
                 ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED);
         blockValidator.throwIfBlocked(member2, member1, ChatException.class,
                 ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET);
+    }
+
+    /**
+     * 매칭 두 회원의 서로 차단 여부 검증
+     *
+     * @param member1 회원
+     * @param member2 회원
+     */
+    private void validateBlockStatusWhenMatch(Member member1, Member member2) {
+        blockValidator.throwIfBlocked(member1, member2, ChatException.class,
+                ErrorCode.MATCHING_FOUND_FAILED_TARGET_IS_BLOCKED);
+        blockValidator.throwIfBlocked(member2, member1, ChatException.class,
+                ErrorCode.MATCHING_FOUND_FAILED_BLOCKED_BY_TARGET);
+    }
+
+    /**
+     * 두 회원의 matchingStatus 검증
+     *
+     * @param status               매칭 status
+     * @param matchingRecord       내 matchingRecord
+     * @param targetMatchingRecord 상대방 matchingRecord
+     */
+    private void validateMatchingStatus(MatchingStatus status, MatchingRecord matchingRecord,
+                                        MatchingRecord targetMatchingRecord) {
+        matchingValidator.throwIfInvalidStatus(matchingRecord, status, MatchingException.class,
+                ErrorCode.MATCHING_STATUS_NOT_ALLOWED);
+        matchingValidator.throwIfInvalidStatus(targetMatchingRecord, status, MatchingException.class,
+                ErrorCode.MATCHING_TARGET_UNAVAILABLE);
     }
 
 }
