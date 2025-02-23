@@ -26,7 +26,7 @@ public class BoardUpdateResponse {
     GameMode gameMode;
     Position mainP;
     Position subP;
-    Position wantP;
+    List<Position> wantP;
     Mike mike;
     List<Long> gameStyles;
     String contents;

@@ -39,7 +39,7 @@ public class BoardByIdResponseForMember {
     GameMode gameMode;
     Position mainP;
     Position subP;
-    Position wantP;
+    List<Position> wantP;
     Integer recentGameCount;
     Double winRate;
     List<Long> gameStyles;

@@ -29,7 +29,7 @@ public class BoardListResponse {
     GameMode gameMode;
     Position mainP;
     Position subP;
-    Position wantP;
+    List<Position> wantP;
     List<ChampionResponse> championResponseList;
     Double winRate;
     LocalDateTime createdAt;
