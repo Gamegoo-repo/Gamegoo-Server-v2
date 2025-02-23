@@ -31,6 +31,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Optional<Board> findByIdAndDeleted(Long boardId, boolean b);
 
+    Optional<Board> findTopByMemberIdOrderByCreatedAtDesc(Long memberId);
+
 
     Page<Board> findByMemberIdAndDeletedFalse(Long memberId, Pageable pageable);
 
