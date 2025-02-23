@@ -92,3 +92,7 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+logging:
+  discord:
+    webhook: ${DISCORD_MONITORING_WEBHOOK_URL}
+

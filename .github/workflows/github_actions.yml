@@ -70,6 +70,7 @@ jobs:
             GMAIL_PWD= ${{ secrets.GMAIL_PWD }}
             RIOT_API= ${{ secrets.RIOT_API }}
             SOCKET_SERVER_URL= ${{ secrets.SOCKET_SERVER_URL }}
+            DISCORD_MONITORING_WEBHOOK_URL= ${{ secrets.DISCORD_MONITORING_WEBHOOK_URL }}
 
       ## CD (Continuous Deployment) 파트
       # 7. EC2에 SSH로 접속하여 Docker 컨테이너 실행
@@ -101,6 +102,7 @@ jobs:
             -e GMAIL_PWD=${{ secrets.GMAIL_PWD }} \
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
+            -e DISCORD_MONITORING_WEBHOOK_URL=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
 
       # 8. 기존 Docker 이미지 삭제
