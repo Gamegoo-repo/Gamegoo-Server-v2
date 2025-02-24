@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,14 @@ public class BoardService {
      */
     @Transactional
     public Board createAndSaveBoard(BoardInsertRequest request, Member member) {
+        Optional<Board> latestBoardOpt = boardRepository.findTopByMemberIdOrderByCreatedAtDesc(member.getId());
+        if (latestBoardOpt.isPresent()) {
+            Board latestBoard = latestBoardOpt.get();
+            Duration diff = Duration.between(latestBoard.getCreatedAt(), LocalDateTime.now());
+            if (diff.compareTo(Duration.ofMinutes(5)) < 0) {
+                throw new BoardException(ErrorCode.BOARD_CREATE_COOL_DOWN);
+            }
+        }
         int boardProfileImage = (request.getBoardProfileImage() != null)
                 ? request.getBoardProfileImage()
                 : member.getProfileImage();
