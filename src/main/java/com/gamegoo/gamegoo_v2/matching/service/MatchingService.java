@@ -162,7 +162,7 @@ public class MatchingService {
      * @param targetMatchingRecord 상대방 matchingRecord
      */
     @Transactional
-    public void setTargetMatchingMember(MatchingRecord matchingRecord, MatchingRecord targetMatchingRecord) {
+    public void setTargetMatchingRecord(MatchingRecord matchingRecord, MatchingRecord targetMatchingRecord) {
         matchingRecord.updateTargetMatchingRecord(targetMatchingRecord);
         targetMatchingRecord.updateTargetMatchingRecord(matchingRecord);
     }

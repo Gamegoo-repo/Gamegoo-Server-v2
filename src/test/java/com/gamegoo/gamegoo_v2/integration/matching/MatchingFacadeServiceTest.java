@@ -431,7 +431,7 @@ public class MatchingFacadeServiceTest {
 
         @DisplayName("실패: 두 회원이 동일한 경우 예외가 발생한다.")
         @Test
-        void startChatroomByMatching_shouldThrownWhenTargetMemberIsSelf() {
+        void matchingFoundFailWhenMemberDuplicate() {
             // given
             MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
@@ -445,13 +445,13 @@ public class MatchingFacadeServiceTest {
 
 
             // when // then
-            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.matchingFound(request))
                     .isInstanceOf(GlobalException.class);
         }
 
         @DisplayName("실패: 회원이 탈퇴한 경우 예외가 발생한다.")
         @Test
-        void startChatroomByMatching_shouldThrownWhenMemberIsBlind() {
+        void matchingFoundFailWhenMemberIsBlind() {
             MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
             MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
@@ -466,14 +466,14 @@ public class MatchingFacadeServiceTest {
             blindMember(targetMember);
 
             // when // then
-            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.matchingFound(request))
                     .isInstanceOf(MemberException.class)
                     .hasMessage(ErrorCode.TARGET_MEMBER_DEACTIVATED.getMessage());
         }
 
         @DisplayName("실패: 상대 회원을 차단한 경우 예외가 발생한다.")
         @Test
-        void startChatroomByMatching_shouldThrownWhenTargetIsBlocked() {
+        void matchingFoundFailWhenTargetMemberBlocked() {
             MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
             MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
@@ -488,14 +488,14 @@ public class MatchingFacadeServiceTest {
             blockMember(member, targetMember);
 
             // when // then
-            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.matchingFound(request))
                     .isInstanceOf(ChatException.class)
                     .hasMessage(ErrorCode.MATCHING_FOUND_FAILED_TARGET_IS_BLOCKED.getMessage());
         }
 
         @DisplayName("실패: 상대 회원에게 차단 당한 경우 예외가 발생한다.")
         @Test
-        void startChatroomByMatching_shouldThrownWhenBlockedByTarget() {
+        void matchingFoundFailWhenBlockedByTargetMember() {
             MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
             MatchingRecord targetMatchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC,
@@ -510,12 +510,12 @@ public class MatchingFacadeServiceTest {
             blockMember(targetMember, member);
 
             // when // then
-            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.matchingFound(request))
                     .isInstanceOf(ChatException.class)
                     .hasMessage(ErrorCode.MATCHING_FOUND_FAILED_BLOCKED_BY_TARGET.getMessage());
         }
 
-        @DisplayName("실패: 내 매칭 uuid없는 uuid일 경우")
+        @DisplayName("실패: 매칭 uuid에 해당하는 매칭 기록이 없는 경우")
         @Test
         void notFoundMatchingUuid() {
             // given
@@ -528,12 +528,12 @@ public class MatchingFacadeServiceTest {
                     .build();
 
             // when, then
-            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.matchingFound(request))
                     .isInstanceOf(MatchingException.class)
                     .hasMessage(ErrorCode.MATCHING_NOT_FOUND.getMessage());
         }
 
-        @DisplayName("실패: 상대 매칭 uuid없는 uuid일 경우")
+        @DisplayName("실패: 매칭 uuid에 해당하는 상대 매칭 기록이 없는 경우")
         @Test
         void notFoundTargetMatchingUuid() {
             // given
@@ -546,7 +546,7 @@ public class MatchingFacadeServiceTest {
                     .build();
 
             // when, then
-            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.matchingFound(request))
                     .isInstanceOf(MatchingException.class)
                     .hasMessage(ErrorCode.MATCHING_NOT_FOUND.getMessage());
         }
@@ -570,7 +570,7 @@ public class MatchingFacadeServiceTest {
             assertThat(targetMatchingRecord.getTargetMatchingRecord()).isNull();
             assertThat(matchingRecord.getStatus()).isEqualTo(MatchingStatus.FAIL);
             assertThat(targetMatchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
-            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.matchingFound(request))
                     .isInstanceOf(MatchingException.class)
                     .hasMessage(ErrorCode.MATCHING_STATUS_NOT_ALLOWED.getMessage());
         }
@@ -594,7 +594,7 @@ public class MatchingFacadeServiceTest {
             assertThat(targetMatchingRecord.getTargetMatchingRecord()).isNull();
             assertThat(matchingRecord.getStatus()).isEqualTo(MatchingStatus.PENDING);
             assertThat(targetMatchingRecord.getStatus()).isEqualTo(MatchingStatus.SUCCESS);
-            assertThatThrownBy(() -> matchingFacadeService.modifyTargetMatchingRecordAndStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.matchingFound(request))
                     .isInstanceOf(MatchingException.class)
                     .hasMessage(ErrorCode.MATCHING_TARGET_UNAVAILABLE.getMessage());
         }
@@ -615,7 +615,7 @@ public class MatchingFacadeServiceTest {
 
             // when
             MatchingFoundResponse matchingFoundResponse =
-                    matchingFacadeService.modifyTargetMatchingRecordAndStatus(request);
+                    matchingFacadeService.matchingFound(request);
 
             // then
             assertThat(matchingRecord.getStatus()).isEqualTo(MatchingStatus.FOUND);

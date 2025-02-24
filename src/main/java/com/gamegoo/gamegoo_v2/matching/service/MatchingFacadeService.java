@@ -139,7 +139,7 @@ public class MatchingFacadeService {
      * @return 나와 상대방의 매칭 정보
      */
     @Transactional
-    public MatchingFoundResponse modifyTargetMatchingRecordAndStatus(MatchingFoundRequest request) {
+    public MatchingFoundResponse matchingFound(MatchingFoundRequest request) {
         // 내 matching 조회
         MatchingRecord matchingRecord =
                 matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
@@ -161,11 +161,11 @@ public class MatchingFacadeService {
         // 서로의 차단 여부 검증
         validateBlockStatusWhenMatch(member, targetMember);
 
-        // 내 매칭 status가 올바른지 검증
+        // 두 매칭 status가 올바른지 검증
         validateMatchingStatus(MatchingStatus.PENDING, matchingRecord, targetMatchingRecord);
 
         // targetMatchingRecord 지정하기
-        matchingService.setTargetMatchingMember(matchingRecord, targetMatchingRecord);
+        matchingService.setTargetMatchingRecord(matchingRecord, targetMatchingRecord);
 
         // matchingStatus 변경
         matchingService.setMatchingStatus(MatchingStatus.FOUND, matchingRecord);
