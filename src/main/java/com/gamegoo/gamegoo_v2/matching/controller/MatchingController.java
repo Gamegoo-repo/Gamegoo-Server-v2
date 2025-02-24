@@ -4,7 +4,6 @@ import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
-import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingSuccessResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,7 +63,7 @@ public class MatchingController {
 
     @Operation(summary = "매칭 SUCCESS API", description = "API triggered when a match is succeed")
     @PatchMapping("/matching/success/{matchingUuid}/{targetMatchingUuid}")
-    public ApiResponse<MatchingSuccessResponse> SuccessMatching(
+    public ApiResponse<String> SuccessMatching(
             @PathVariable(name = "matchingUuid") String matchingUuid,
             @PathVariable(name = "targetMatchingUuid") String targetMatchingUuid
     ) {

@@ -71,8 +71,9 @@ public class MatchingRecord extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private MatchingStatus status = MatchingStatus.PENDING;
 
-    @Column
-    private Boolean mannerMessageSent = false;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
+    private MannerMessageStatus mannerMessageSent = MannerMessageStatus.NOT_REQUIRED;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -148,7 +149,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
         this.targetMatchingRecord = targetMatchingRecord;
     }
 
-    public void updateMannerMessageSent(Boolean mannerMessageSent) {
+    public void updateMannerMessageSent(MannerMessageStatus mannerMessageSent) {
         this.mannerMessageSent = mannerMessageSent;
     }
 

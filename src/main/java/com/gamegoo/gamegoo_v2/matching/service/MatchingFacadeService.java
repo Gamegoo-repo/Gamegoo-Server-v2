@@ -12,11 +12,11 @@ import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.MatchingException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.matching.domain.MannerMessageStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
-import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingSuccessResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import lombok.RequiredArgsConstructor;
@@ -178,12 +178,14 @@ public class MatchingFacadeService {
     }
 
     /**
+     * 매칭 성공 로직
+     *
      * @param matchingUuid       내 매칭 Uuid
      * @param targetMatchingUuid 상대 매칭 Uuid
      * @return 매칭 정보
      */
     @Transactional
-    public MatchingSuccessResponse matchingSuccess(String matchingUuid, String targetMatchingUuid) {
+    public String matchingSuccess(String matchingUuid, String targetMatchingUuid) {
         // 내 matching 조회
         MatchingRecord matchingRecord =
                 matchingService.getMatchingRecordByMatchingUuid(matchingUuid);
@@ -209,10 +211,24 @@ public class MatchingFacadeService {
         validateMatchingStatus(MatchingStatus.FOUND, matchingRecord, targetMatchingRecord);
 
         // matchingStatus 변경
-        matchingService.setMatchingStatus(MatchingStatus.FOUND, matchingRecord);
-        matchingService.setMatchingStatus(MatchingStatus.FOUND, targetMatchingRecord);
+        matchingService.setMatchingStatus(MatchingStatus.SUCCESS, matchingRecord);
+        matchingService.setMatchingStatus(MatchingStatus.SUCCESS, targetMatchingRecord);
 
-        return MatchingSuccessResponse.of(matchingRecord, targetMatchingRecord);
+        // mannerMessageSent 변경
+        matchingService.setMannerMessageSent(matchingRecord, MannerMessageStatus.NOT_SENT);
+        matchingService.setMannerMessageSent(targetMatchingRecord, MannerMessageStatus.NOT_SENT);
+
+        // 채팅방 조회, 생성 및 입장 처리
+        Chatroom chatroom = chatQueryService.findExistingChatroom(member, targetMember)
+                .orElseGet(() -> chatCommandService.createChatroom(member, targetMember));
+
+        chatCommandService.updateLastJoinDate(member, chatroom.getId(), LocalDateTime.now());
+        chatCommandService.updateLastJoinDate(targetMember, chatroom.getId(), LocalDateTime.now());
+
+        // 매칭 시스템 메시지 생성
+        chatCommandService.createMatchingSystemChat(member, targetMember, chatroom);
+
+        return chatroom.getUuid();
     }
 
     /**

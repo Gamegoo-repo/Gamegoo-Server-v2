@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.core.exception.MatchingException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import com.gamegoo.gamegoo_v2.matching.domain.MannerMessageStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
@@ -166,6 +167,17 @@ public class MatchingService {
     public void setTargetMatchingRecord(MatchingRecord matchingRecord, MatchingRecord targetMatchingRecord) {
         matchingRecord.updateTargetMatchingRecord(targetMatchingRecord);
         targetMatchingRecord.updateTargetMatchingRecord(matchingRecord);
+    }
+
+    /**
+     * 매너 메시지 전송 여부 변경
+     *
+     * @param matchingRecord      내 matchingRecord
+     * @param mannerMessageStatus 변경 후 mannerMessageStatus
+     */
+    @Transactional
+    public void setMannerMessageSent(MatchingRecord matchingRecord, MannerMessageStatus mannerMessageStatus) {
+        matchingRecord.updateMannerMessageSent(mannerMessageStatus);
     }
 
 }
