@@ -15,9 +15,9 @@ import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.request.MatchingFoundRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
+import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingSuccessResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import lombok.RequiredArgsConstructor;
@@ -136,18 +136,19 @@ public class MatchingFacadeService {
     /**
      * targetMatchingRecord 지정 및 status 변경
      *
-     * @param request 내 MatchingUuid, 상대 MatchingUuid
-     * @return 나와 상대방의 매칭 정보
+     * @param matchingUuid       내 매칭 Uuid
+     * @param targetMatchingUuid 상대 매칭 Uuid
+     * @return 나와 상대의 매칭 정보
      */
     @Transactional
-    public MatchingFoundResponse matchingFound(MatchingFoundRequest request) {
+    public MatchingFoundResponse matchingFound(String matchingUuid, String targetMatchingUuid) {
         // 내 matching 조회
         MatchingRecord matchingRecord =
-                matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
+                matchingService.getMatchingRecordByMatchingUuid(matchingUuid);
 
         // 상대방 matchingRecord 조회
         MatchingRecord targetMatchingRecord =
-                matchingService.getMatchingRecordByMatchingUuid(request.getTargetMatchingUuid());
+                matchingService.getMatchingRecordByMatchingUuid(targetMatchingUuid);
 
         Member member = matchingRecord.getMember();
         Member targetMember = targetMatchingRecord.getMember();
@@ -173,6 +174,44 @@ public class MatchingFacadeService {
         matchingService.setMatchingStatus(MatchingStatus.FOUND, targetMatchingRecord);
 
         return MatchingFoundResponse.of(matchingRecord, targetMatchingRecord);
+    }
+
+    /**
+     * @param matchingUuid       내 매칭 Uuid
+     * @param targetMatchingUuid 상대 매칭 Uuid
+     * @return 매칭 정보
+     */
+    @Transactional
+    public MatchingSuccessResponse matchingSuccess(String matchingUuid, String targetMatchingUuid) {
+        // 내 matching 조회
+        MatchingRecord matchingRecord =
+                matchingService.getMatchingRecordByMatchingUuid(matchingUuid);
+
+        // 상대방 matchingRecord 조회
+        MatchingRecord targetMatchingRecord =
+                matchingService.getMatchingRecordByMatchingUuid(targetMatchingUuid);
+
+        Member member = matchingRecord.getMember();
+        Member targetMember = targetMatchingRecord.getMember();
+
+        // 동일 인물인지 검증
+        memberValidator.throwIfEqual(member, targetMember);
+
+        // 탈퇴하지 않았는지 검증
+        memberValidator.throwIfBlind(member);
+        memberValidator.throwIfBlind(targetMember);
+
+        // 서로의 차단 여부 검증
+        validateBlockStatusWhenMatch(member, targetMember);
+
+        // 두 매칭 status가 올바른지 검증
+        validateMatchingStatus(MatchingStatus.FOUND, matchingRecord, targetMatchingRecord);
+
+        // matchingStatus 변경
+        matchingService.setMatchingStatus(MatchingStatus.FOUND, matchingRecord);
+        matchingService.setMatchingStatus(MatchingStatus.FOUND, targetMatchingRecord);
+
+        return MatchingSuccessResponse.of(matchingRecord, targetMatchingRecord);
     }
 
     /**

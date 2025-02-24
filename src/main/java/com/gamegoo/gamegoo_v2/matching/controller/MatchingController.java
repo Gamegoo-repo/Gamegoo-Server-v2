@@ -2,9 +2,9 @@ package com.gamegoo.gamegoo_v2.matching.controller;
 
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.request.MatchingFoundRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
+import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingSuccessResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,9 +48,21 @@ public class MatchingController {
     }
 
     @Operation(summary = "매칭 FOUND API", description = "API triggered when a match is found")
-    @PostMapping("/matching/found")
-    public ApiResponse<MatchingFoundResponse> FindMatching(@RequestBody @Valid MatchingFoundRequest request) {
-        return ApiResponse.ok(matchingFacadeService.matchingFound(request));
+    @PatchMapping("/matching/found/{matchingUuid}/{targetMatchingUuid}")
+    public ApiResponse<MatchingFoundResponse> FindMatching(
+            @PathVariable(name = "matchingUuid") String matchingUuid,
+            @PathVariable(name = "targetMatchingUuid") String targetMatchingUuid
+    ) {
+        return ApiResponse.ok(matchingFacadeService.matchingFound(matchingUuid, targetMatchingUuid));
+    }
+
+    @Operation(summary = "매칭 SUCCESS API", description = "API triggered when a match is succeed")
+    @PatchMapping("/matching/success/{matchingUuid}/{targetMatchingUuid}")
+    public ApiResponse<MatchingSuccessResponse> SuccessMatching(
+            @PathVariable(name = "matchingUuid") String matchingUuid,
+            @PathVariable(name = "targetMatchingUuid") String targetMatchingUuid
+    ) {
+        return ApiResponse.ok(matchingFacadeService.matchingSuccess(matchingUuid, targetMatchingUuid));
     }
 
 }
