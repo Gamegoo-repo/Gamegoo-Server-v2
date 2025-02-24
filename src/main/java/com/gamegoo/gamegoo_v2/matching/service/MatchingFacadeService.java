@@ -68,7 +68,8 @@ public class MatchingFacadeService {
                 request.getGameMode());
 
         // 현재 대기 중인 사용자 조회
-        List<MatchingRecord> pendingMatchingRecords = matchingService.getPendingMatchingRecords(request.getGameMode());
+        List<MatchingRecord> pendingMatchingRecords = matchingService.getPendingMatchingRecords(request.getGameMode()
+                , memberId);
 
         // 차단당한 사용자 제외
         List<Long> targetMemberIds = new ArrayList<>();

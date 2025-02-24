@@ -313,7 +313,8 @@ public class MatchingFacadeServiceTest {
 
         // 3. Priority 검증
         List<MatchingRecord> recentValidMatchingRecords =
-                matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now().minusMinutes(5), GameMode.SOLO);
+                matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now().minusMinutes(5), GameMode.SOLO,
+                        member.getId());
         PriorityListResponse expectedPriorityList = matchingService.calculatePriorityList(matchingRecord,
                 recentValidMatchingRecords);
 
