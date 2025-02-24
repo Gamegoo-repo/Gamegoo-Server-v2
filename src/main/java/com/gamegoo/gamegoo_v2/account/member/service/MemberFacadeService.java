@@ -30,11 +30,7 @@ public class MemberFacadeService {
      * @return 조회된 결과 DTO
      */
     public MyProfileResponse getMyProfile(Member member) {
-
-        // TODO: mannerRank 로직 추가
-        double mannerRank = 1.0;
-
-        return MyProfileResponse.of(member, mannerRank);
+        return MyProfileResponse.of(member);
     }
 
     /**
@@ -48,10 +44,6 @@ public class MemberFacadeService {
         // memberId로 targetMember 얻기
         Member targetMember = memberService.findMemberById(targetMemberId);
 
-        // TODO: mannerRank, mannerRatingCount 로직 추가
-        double mannerRank = 1.0;
-        long mannerRatingCount = 1L;
-
         // 친구 정보 얻기
         boolean isFriend = friendService.isFriend(member, targetMember);
         Long friendRequestMemberId = friendService.getFriendRequestMemberId(member, targetMember);
@@ -59,7 +51,7 @@ public class MemberFacadeService {
         // 차단된 사용자인지 확인
         boolean isBlocked = blockService.isBlocked(member, targetMember);
 
-        return OtherProfileResponse.of(targetMember, mannerRank, mannerRatingCount, isFriend, friendRequestMemberId,
+        return OtherProfileResponse.of(targetMember, isFriend, friendRequestMemberId,
                 isBlocked);
     }
 

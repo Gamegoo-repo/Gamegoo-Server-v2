@@ -123,7 +123,6 @@ class MemberServiceFacadeTest {
         assertThat(response.getIsAgree()).isEqualTo(member.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(member.isBlind());
         assertThat(response.getLoginType()).isEqualTo(member.getLoginType().name());
-        assertThat(response.getMannerLevel()).isEqualTo(member.getMannerLevel());
         assertThat(response.getChampionResponseList()).isNotNull();
 
         List<Champion> championList =
@@ -154,7 +153,6 @@ class MemberServiceFacadeTest {
         assertThat(response.getFreeTier()).isEqualTo(targetMember.getFreeTier());
         assertThat(response.getFreeRank()).isEqualTo(targetMember.getFreeRank());
         assertThat(response.getFreeWinrate()).isEqualTo(targetMember.getFreeWinRate());
-        assertThat(response.getMannerLevel()).isEqualTo(targetMember.getMannerLevel());
         assertThat(response.getMainP()).isEqualTo(targetMember.getMainP());
         assertThat(response.getSubP()).isEqualTo(targetMember.getSubP());
         assertThat(response.getWantP()).isEqualTo(targetMember.getWantP());
