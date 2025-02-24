@@ -30,19 +30,22 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
      *
      * @param createdAt 생성 시간
      * @param gameMode  게임 모드
+     * @param memberId  사용자 id
      * @return 매칭 기록
      */
     @Override
-    public List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode) {
+    public List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode, Long memberId) {
         return queryFactory.selectFrom(matchingRecord)
                 .where(
                         matchingRecord.createdAt.gt(createdAt),
                         matchingRecord.status.eq(MatchingStatus.PENDING),
                         matchingRecord.gameMode.eq(gameMode),
+                        matchingRecord.member.id.ne(memberId),
                         existsValidMatchSubquery(),
                         applyGameModeFilter(gameMode)
                 )
                 .orderBy(matchingRecord.member.id.asc(), matchingRecord.createdAt.desc())
+                .distinct()
                 .fetch();
     }
 

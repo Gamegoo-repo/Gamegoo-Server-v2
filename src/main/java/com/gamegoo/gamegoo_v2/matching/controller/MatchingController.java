@@ -50,7 +50,7 @@ public class MatchingController {
     @Operation(summary = "매칭 FOUND API", description = "API triggered when a match is found")
     @PostMapping("/matching/found")
     public ApiResponse<MatchingFoundResponse> FindMatching(@RequestBody @Valid MatchingFoundRequest request) {
-        return ApiResponse.ok(matchingFacadeService.modifyTargetMatchingRecordAndStatus(request));
+        return ApiResponse.ok(matchingFacadeService.matchingFound(request));
     }
 
 }

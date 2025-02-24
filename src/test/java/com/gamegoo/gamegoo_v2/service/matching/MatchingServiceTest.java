@@ -303,11 +303,12 @@ class MatchingServiceTest {
         }
 
         // when
-        List<MatchingRecord> matchingRecords = matchingService.getPendingMatchingRecords(gameMode);
+        List<MatchingRecord> matchingRecords = matchingService.getPendingMatchingRecords(gameMode, member.getId());
 
         // then
         List<MatchingRecord> expectedMatchingRecords =
-                matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now().minusMinutes(5), gameMode);
+                matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now().minusMinutes(5), gameMode,
+                        member.getId());
         assertThat(matchingRecords.size()).isEqualTo(expectedMatchingRecords.size());
     }
 

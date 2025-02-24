@@ -27,8 +27,6 @@ public class MyProfileResponse {
     Tier freeTier;
     Integer freeRank;
     Double freeWinrate;
-    Double mannerRank;
-    Integer mannerLevel;
     String updatedAt;
     Position mainP;
     Position subP;
@@ -39,7 +37,7 @@ public class MyProfileResponse {
     List<GameStyleResponse> gameStyleResponseList;
     List<ChampionResponse> championResponseList;
 
-    public static MyProfileResponse of(Member member, Double mannerRank) {
+    public static MyProfileResponse of(Member member) {
         List<GameStyleResponse> gameStyleResponseList = member.getMemberGameStyleList().stream()
                 .map(memberGameStyle -> GameStyleResponse.of(memberGameStyle.getGameStyle()))
                 .toList();
@@ -61,8 +59,6 @@ public class MyProfileResponse {
                 .freeRank(member.getFreeRank())
                 .freeWinrate(member.getFreeWinRate())
                 .profileImg(member.getProfileImage())
-                .mannerLevel(member.getMannerLevel())
-                .mannerRank(mannerRank)
                 .mainP(member.getMainP())
                 .subP(member.getSubP())
                 .wantP(member.getWantP())

@@ -15,9 +15,10 @@ public interface MatchingRecordRepositoryCustom {
      *
      * @param createdAt 생성 시간
      * @param gameMode  게임 모드
+     * @param memberId  사용자 id
      * @return 매칭 가능한 레코드 리스트
      */
-    List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode);
+    List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode, Long memberId);
 
     /**
      * 가장 최근 기록 불러오기 - member

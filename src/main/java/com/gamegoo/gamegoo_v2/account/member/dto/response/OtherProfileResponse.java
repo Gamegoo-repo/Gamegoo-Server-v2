@@ -26,9 +26,6 @@ public class OtherProfileResponse {
     Tier freeTier;
     Integer freeRank;
     Double freeWinrate;
-    Integer mannerLevel;
-    Double mannerRank;
-    Long mannerRatingCount;  // 매너 평가를 한 사람의 수
     String updatedAt;
     Position mainP;
     Position subP;
@@ -42,8 +39,7 @@ public class OtherProfileResponse {
     List<GameStyleResponse> gameStyleResponseList;
     List<ChampionResponse> championResponseList;
 
-    public static OtherProfileResponse of(Member targetMember, Double managerRank,
-                                          Long mannerRatingCount, Boolean isFriend, Long friendRequestMemberId,
+    public static OtherProfileResponse of(Member targetMember, Boolean isFriend, Long friendRequestMemberId,
                                           Boolean isBlocked) {
         List<GameStyleResponse> gameStyleResponseList = targetMember.getMemberGameStyleList().stream()
                 .map(memberGameStyle -> GameStyleResponse.of(memberGameStyle.getGameStyle()))
@@ -65,9 +61,6 @@ public class OtherProfileResponse {
                 .freeRank(targetMember.getFreeRank())
                 .freeWinrate(targetMember.getFreeWinRate())
                 .profileImg(targetMember.getProfileImage())
-                .mannerLevel(targetMember.getMannerLevel())
-                .mannerRank(managerRank)
-                .mannerRatingCount(mannerRatingCount)
                 .mainP(targetMember.getMainP())
                 .wantP(targetMember.getWantP())
                 .subP(targetMember.getSubP())
