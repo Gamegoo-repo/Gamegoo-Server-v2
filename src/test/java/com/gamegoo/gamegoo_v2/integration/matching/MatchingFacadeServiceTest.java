@@ -25,7 +25,6 @@ import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.repository.MatchingRecordRepository;
@@ -346,12 +345,9 @@ public class MatchingFacadeServiceTest {
             // given
             MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
-            ModifyMatchingStatusRequest request = ModifyMatchingStatusRequest.builder()
-                    .matchingUuid(matchingRecord.getMatchingUuid())
-                    .status(MatchingStatus.FAIL)
-                    .build();
+
             // when
-            matchingFacadeService.modifyMyMatchingStatus(request);
+            matchingFacadeService.modifyMyMatchingStatus(matchingRecord.getMatchingUuid(), MatchingStatus.FAIL);
 
             // then
             assertThat(matchingRecord.getStatus()).isEqualTo(MatchingStatus.FAIL);
@@ -363,12 +359,9 @@ public class MatchingFacadeServiceTest {
         void updateMatchingStatusFail() {
             // given
             createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member, MatchingStatus.PENDING);
-            ModifyMatchingStatusRequest request = ModifyMatchingStatusRequest.builder()
-                    .matchingUuid("wronguuid")
-                    .status(MatchingStatus.FAIL)
-                    .build();
+
             // when
-            assertThatThrownBy(() -> matchingFacadeService.modifyMyMatchingStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.modifyMyMatchingStatus("wrongUuid", MatchingStatus.FAIL))
                     .isInstanceOf(MatchingException.class)
                     .hasMessage(ErrorCode.MATCHING_NOT_FOUND.getMessage());
         }
@@ -391,13 +384,8 @@ public class MatchingFacadeServiceTest {
             matchingRecord.updateTargetMatchingRecord(targetMatchingRecord);
             targetMatchingRecord.updateTargetMatchingRecord(matchingRecord);
 
-            ModifyMatchingStatusRequest request = ModifyMatchingStatusRequest.builder()
-                    .matchingUuid(matchingRecord.getMatchingUuid())
-                    .status(MatchingStatus.FAIL)
-                    .build();
-
             // when
-            matchingFacadeService.modifyBothMatchingStatus(request);
+            matchingFacadeService.modifyBothMatchingStatus(matchingRecord.getMatchingUuid(), MatchingStatus.FAIL);
 
             // then
             assertThat(matchingRecord.getStatus()).isEqualTo(MatchingStatus.FAIL);
@@ -411,13 +399,10 @@ public class MatchingFacadeServiceTest {
             // given
             MatchingRecord matchingRecord = createMatchingRecord(GameMode.SOLO, MatchingType.BASIC, member,
                     MatchingStatus.PENDING);
-            ModifyMatchingStatusRequest request = ModifyMatchingStatusRequest.builder()
-                    .matchingUuid(matchingRecord.getMatchingUuid())
-                    .status(MatchingStatus.FAIL)
-                    .build();
 
             // when
-            assertThatThrownBy(() -> matchingFacadeService.modifyBothMatchingStatus(request))
+            assertThatThrownBy(() -> matchingFacadeService.modifyBothMatchingStatus(matchingRecord.getMatchingUuid(),
+                    MatchingStatus.FAIL))
                     .isInstanceOf(MatchingException.class)
                     .hasMessage(ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND.getMessage());
         }

@@ -1,8 +1,8 @@
 package com.gamegoo.gamegoo_v2.matching.controller;
 
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingSuccessResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
@@ -36,15 +36,21 @@ public class MatchingController {
     }
 
     @Operation(summary = "내 매칭 status 변경", description = "API for updating my matching status")
-    @PatchMapping("/matching/status")
-    public ApiResponse<String> UpdateMatchingStatus(@RequestBody @Valid ModifyMatchingStatusRequest request) {
-        return ApiResponse.ok(matchingFacadeService.modifyMyMatchingStatus(request));
+    @PatchMapping("/matching/status/{matchingUuid}/{status}")
+    public ApiResponse<String> UpdateMatchingStatus(
+            @PathVariable(name = "matchingUuid") String matchingUuid,
+            @PathVariable(name = "status") MatchingStatus status
+    ) {
+        return ApiResponse.ok(matchingFacadeService.modifyMyMatchingStatus(matchingUuid, status));
     }
 
     @Operation(summary = "나와 상대방 매칭 status 변경", description = "API for updating both matching status")
-    @PatchMapping("/matching/status/target")
-    public ApiResponse<String> UpdateBothMatchingStatus(@RequestBody @Valid ModifyMatchingStatusRequest request) {
-        return ApiResponse.ok(matchingFacadeService.modifyBothMatchingStatus(request));
+    @PatchMapping("/matching/status/target/{matchingUuid}/{status}")
+    public ApiResponse<String> UpdateBothMatchingStatus(
+            @PathVariable(name = "matchingUuid") String matchingUuid,
+            @PathVariable(name = "status") MatchingStatus status
+    ) {
+        return ApiResponse.ok(matchingFacadeService.modifyBothMatchingStatus(matchingUuid, status));
     }
 
     @Operation(summary = "매칭 FOUND API", description = "API triggered when a match is found")

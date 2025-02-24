@@ -15,7 +15,6 @@ import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingSuccessResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
@@ -96,39 +95,41 @@ public class MatchingFacadeService {
     /**
      * 나의 matching Status 변경
      *
-     * @param request request
+     * @param matchingUuid 내 매칭 Uuid
+     * @param status       변경 후 status
      * @return 성공 메시지
      */
     @Transactional
-    public String modifyMyMatchingStatus(ModifyMatchingStatusRequest request) {
+    public String modifyMyMatchingStatus(String matchingUuid, MatchingStatus status) {
         // matching 조회
         MatchingRecord matchingRecordByMatchingUuid =
-                matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
+                matchingService.getMatchingRecordByMatchingUuid(matchingUuid);
 
         // 변경
-        matchingService.setMatchingStatus(request.getStatus(), matchingRecordByMatchingUuid);
+        matchingService.setMatchingStatus(status, matchingRecordByMatchingUuid);
 
         return "status 변경이 완료되었습니다.";
     }
 
     /**
-     * 나와 상대방 matching Status 변경
+     * 나와 상대방 status 변경
      *
-     * @param request request
+     * @param matchingUuid 내 매칭 Uuid
+     * @param status       변경 후 status
      * @return 성공 메시지
      */
     @Transactional
-    public String modifyBothMatchingStatus(ModifyMatchingStatusRequest request) {
+    public String modifyBothMatchingStatus(String matchingUuid, MatchingStatus status) {
         // 내 matching 조회
         MatchingRecord matchingRecord =
-                matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
+                matchingService.getMatchingRecordByMatchingUuid(matchingUuid);
 
         // 상대방 matchingRecord 조회
         MatchingRecord targetMatchingRecord = matchingService.getTargetMatchingRecord(matchingRecord);
 
         // 변경
-        matchingService.setMatchingStatus(request.getStatus(), matchingRecord);
-        matchingService.setMatchingStatus(request.getStatus(), targetMatchingRecord);
+        matchingService.setMatchingStatus(status, matchingRecord);
+        matchingService.setMatchingStatus(status, targetMatchingRecord);
 
         return "status 변경이 완료되었습니다.";
     }
