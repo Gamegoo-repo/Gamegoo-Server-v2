@@ -1,9 +1,8 @@
 package com.gamegoo.gamegoo_v2.matching.controller;
 
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.request.MatchingFoundRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
@@ -36,21 +35,39 @@ public class MatchingController {
     }
 
     @Operation(summary = "내 매칭 status 변경", description = "API for updating my matching status")
-    @PatchMapping("/matching/status")
-    public ApiResponse<String> UpdateMatchingStatus(@RequestBody @Valid ModifyMatchingStatusRequest request) {
-        return ApiResponse.ok(matchingFacadeService.modifyMyMatchingStatus(request));
+    @PatchMapping("/matching/status/{matchingUuid}/{status}")
+    public ApiResponse<String> UpdateMatchingStatus(
+            @PathVariable(name = "matchingUuid") String matchingUuid,
+            @PathVariable(name = "status") MatchingStatus status
+    ) {
+        return ApiResponse.ok(matchingFacadeService.modifyMyMatchingStatus(matchingUuid, status));
     }
 
     @Operation(summary = "나와 상대방 매칭 status 변경", description = "API for updating both matching status")
-    @PatchMapping("/matching/status/target")
-    public ApiResponse<String> UpdateBothMatchingStatus(@RequestBody @Valid ModifyMatchingStatusRequest request) {
-        return ApiResponse.ok(matchingFacadeService.modifyBothMatchingStatus(request));
+    @PatchMapping("/matching/status/target/{matchingUuid}/{status}")
+    public ApiResponse<String> UpdateBothMatchingStatus(
+            @PathVariable(name = "matchingUuid") String matchingUuid,
+            @PathVariable(name = "status") MatchingStatus status
+    ) {
+        return ApiResponse.ok(matchingFacadeService.modifyBothMatchingStatus(matchingUuid, status));
     }
 
     @Operation(summary = "매칭 FOUND API", description = "API triggered when a match is found")
-    @PostMapping("/matching/found")
-    public ApiResponse<MatchingFoundResponse> FindMatching(@RequestBody @Valid MatchingFoundRequest request) {
-        return ApiResponse.ok(matchingFacadeService.matchingFound(request));
+    @PatchMapping("/matching/found/{matchingUuid}/{targetMatchingUuid}")
+    public ApiResponse<MatchingFoundResponse> FindMatching(
+            @PathVariable(name = "matchingUuid") String matchingUuid,
+            @PathVariable(name = "targetMatchingUuid") String targetMatchingUuid
+    ) {
+        return ApiResponse.ok(matchingFacadeService.matchingFound(matchingUuid, targetMatchingUuid));
+    }
+
+    @Operation(summary = "매칭 SUCCESS API", description = "API triggered when a match is succeed")
+    @PatchMapping("/matching/success/{matchingUuid}/{targetMatchingUuid}")
+    public ApiResponse<String> SuccessMatching(
+            @PathVariable(name = "matchingUuid") String matchingUuid,
+            @PathVariable(name = "targetMatchingUuid") String targetMatchingUuid
+    ) {
+        return ApiResponse.ok(matchingFacadeService.matchingSuccess(matchingUuid, targetMatchingUuid));
     }
 
 }

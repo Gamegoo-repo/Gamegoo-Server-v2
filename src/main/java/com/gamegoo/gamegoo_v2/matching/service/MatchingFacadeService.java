@@ -12,11 +12,10 @@ import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.MatchingException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.matching.domain.MannerMessageStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.request.MatchingFoundRequest;
-import com.gamegoo.gamegoo_v2.matching.dto.request.ModifyMatchingStatusRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
@@ -96,39 +95,41 @@ public class MatchingFacadeService {
     /**
      * 나의 matching Status 변경
      *
-     * @param request request
+     * @param matchingUuid 내 매칭 Uuid
+     * @param status       변경 후 status
      * @return 성공 메시지
      */
     @Transactional
-    public String modifyMyMatchingStatus(ModifyMatchingStatusRequest request) {
+    public String modifyMyMatchingStatus(String matchingUuid, MatchingStatus status) {
         // matching 조회
         MatchingRecord matchingRecordByMatchingUuid =
-                matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
+                matchingService.getMatchingRecordByMatchingUuid(matchingUuid);
 
         // 변경
-        matchingService.setMatchingStatus(request.getStatus(), matchingRecordByMatchingUuid);
+        matchingService.setMatchingStatus(status, matchingRecordByMatchingUuid);
 
         return "status 변경이 완료되었습니다.";
     }
 
     /**
-     * 나와 상대방 matching Status 변경
+     * 나와 상대방 status 변경
      *
-     * @param request request
+     * @param matchingUuid 내 매칭 Uuid
+     * @param status       변경 후 status
      * @return 성공 메시지
      */
     @Transactional
-    public String modifyBothMatchingStatus(ModifyMatchingStatusRequest request) {
+    public String modifyBothMatchingStatus(String matchingUuid, MatchingStatus status) {
         // 내 matching 조회
         MatchingRecord matchingRecord =
-                matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
+                matchingService.getMatchingRecordByMatchingUuid(matchingUuid);
 
         // 상대방 matchingRecord 조회
         MatchingRecord targetMatchingRecord = matchingService.getTargetMatchingRecord(matchingRecord);
 
         // 변경
-        matchingService.setMatchingStatus(request.getStatus(), matchingRecord);
-        matchingService.setMatchingStatus(request.getStatus(), targetMatchingRecord);
+        matchingService.setMatchingStatus(status, matchingRecord);
+        matchingService.setMatchingStatus(status, targetMatchingRecord);
 
         return "status 변경이 완료되었습니다.";
     }
@@ -136,18 +137,19 @@ public class MatchingFacadeService {
     /**
      * targetMatchingRecord 지정 및 status 변경
      *
-     * @param request 내 MatchingUuid, 상대 MatchingUuid
-     * @return 나와 상대방의 매칭 정보
+     * @param matchingUuid       내 매칭 Uuid
+     * @param targetMatchingUuid 상대 매칭 Uuid
+     * @return 나와 상대의 매칭 정보
      */
     @Transactional
-    public MatchingFoundResponse matchingFound(MatchingFoundRequest request) {
+    public MatchingFoundResponse matchingFound(String matchingUuid, String targetMatchingUuid) {
         // 내 matching 조회
         MatchingRecord matchingRecord =
-                matchingService.getMatchingRecordByMatchingUuid(request.getMatchingUuid());
+                matchingService.getMatchingRecordByMatchingUuid(matchingUuid);
 
         // 상대방 matchingRecord 조회
         MatchingRecord targetMatchingRecord =
-                matchingService.getMatchingRecordByMatchingUuid(request.getTargetMatchingUuid());
+                matchingService.getMatchingRecordByMatchingUuid(targetMatchingUuid);
 
         Member member = matchingRecord.getMember();
         Member targetMember = targetMatchingRecord.getMember();
@@ -173,6 +175,60 @@ public class MatchingFacadeService {
         matchingService.setMatchingStatus(MatchingStatus.FOUND, targetMatchingRecord);
 
         return MatchingFoundResponse.of(matchingRecord, targetMatchingRecord);
+    }
+
+    /**
+     * 매칭 성공 로직
+     *
+     * @param matchingUuid       내 매칭 Uuid
+     * @param targetMatchingUuid 상대 매칭 Uuid
+     * @return 매칭 정보
+     */
+    @Transactional
+    public String matchingSuccess(String matchingUuid, String targetMatchingUuid) {
+        // 내 matching 조회
+        MatchingRecord matchingRecord =
+                matchingService.getMatchingRecordByMatchingUuid(matchingUuid);
+
+        // 상대방 matchingRecord 조회
+        MatchingRecord targetMatchingRecord =
+                matchingService.getMatchingRecordByMatchingUuid(targetMatchingUuid);
+
+        Member member = matchingRecord.getMember();
+        Member targetMember = targetMatchingRecord.getMember();
+
+        // 동일 인물인지 검증
+        memberValidator.throwIfEqual(member, targetMember);
+
+        // 탈퇴하지 않았는지 검증
+        memberValidator.throwIfBlind(member);
+        memberValidator.throwIfBlind(targetMember);
+
+        // 서로의 차단 여부 검증
+        validateBlockStatusWhenMatch(member, targetMember);
+
+        // 두 매칭 status가 올바른지 검증
+        validateMatchingStatus(MatchingStatus.FOUND, matchingRecord, targetMatchingRecord);
+
+        // matchingStatus 변경
+        matchingService.setMatchingStatus(MatchingStatus.SUCCESS, matchingRecord);
+        matchingService.setMatchingStatus(MatchingStatus.SUCCESS, targetMatchingRecord);
+
+        // mannerMessageSent 변경
+        matchingService.setMannerMessageSent(matchingRecord, MannerMessageStatus.NOT_SENT);
+        matchingService.setMannerMessageSent(targetMatchingRecord, MannerMessageStatus.NOT_SENT);
+
+        // 채팅방 조회, 생성 및 입장 처리
+        Chatroom chatroom = chatQueryService.findExistingChatroom(member, targetMember)
+                .orElseGet(() -> chatCommandService.createChatroom(member, targetMember));
+
+        chatCommandService.updateLastJoinDate(member, chatroom.getId(), LocalDateTime.now());
+        chatCommandService.updateLastJoinDate(targetMember, chatroom.getId(), LocalDateTime.now());
+
+        // 매칭 시스템 메시지 생성
+        chatCommandService.createMatchingSystemChat(member, targetMember, chatroom);
+
+        return chatroom.getUuid();
     }
 
     /**
