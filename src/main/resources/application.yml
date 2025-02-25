@@ -78,6 +78,9 @@ ssh:
 
 ---
 # 개발 환경
+server:
+  port: 8081
+
 spring:
   config:
     activate:
@@ -87,7 +90,26 @@ spring:
       ddl-auto: update
     show-sql: false
   datasource:
-    url: jdbc:mysql://${RDS_PRIVATE_IP}:${RDS_PORT}/${DB_SCHEMA_NAME}?useSSL=true
+    url: jdbc:mysql://${RDS_PRIVATE_IP}:${RDS_PORT}/${DEV_DB_SCHEMA_NAME}?useSSL=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+---
+# 운영 환경
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  datasource:
+    url: jdbc:mysql://${RDS_PRIVATE_IP}:${RDS_PORT}/${PROD_DB_SCHEMA_NAME}?useSSL=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -95,4 +117,3 @@ spring:
 logging:
   discord:
     webhook: ${DISCORD_MONITORING_WEBHOOK_URL}
-
