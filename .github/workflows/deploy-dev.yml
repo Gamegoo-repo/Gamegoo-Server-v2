@@ -96,7 +96,7 @@ jobs:
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e RDS_PRIVATE_IP=${{ secrets.RDS_PRIVATE_IP }} \
             -e RDS_PORT=${{ secrets.RDS_PORT }} \
-            -e DB_SCHEMA_NAME=${{ secrets.DB_SCHEMA_NAME }} \
+            -e DEV_DB_SCHEMA_NAME=${{ secrets.DEV_DB_SCHEMA_NAME }} \
             -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             -e GMAIL_PWD=${{ secrets.GMAIL_PWD }} \
