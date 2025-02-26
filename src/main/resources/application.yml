@@ -84,7 +84,7 @@ spring:
     url: jdbc:mysql://${DEV_DB_HOST}:${RDS_PORT}/${DEV_DB_SCHEMA_NAME}?useSSL=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    password: ${DEV_DB_PASSWORD}
 
 ---
 # 운영 환경
