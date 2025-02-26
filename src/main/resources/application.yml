@@ -79,7 +79,7 @@ ssh:
 ---
 # 개발 환경
 server:
-  port: 8081
+  port: 8080
 
 spring:
   config:
@@ -90,7 +90,7 @@ spring:
       ddl-auto: update
     show-sql: false
   datasource:
-    url: jdbc:mysql://${RDS_PRIVATE_IP}:${RDS_PORT}/${DEV_DB_SCHEMA_NAME}?useSSL=true
+    url: jdbc:mysql://${DEV_DB_HOST}:${RDS_PORT}/${DEV_DB_SCHEMA_NAME}?useSSL=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
