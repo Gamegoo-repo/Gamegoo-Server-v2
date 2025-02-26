@@ -47,7 +47,6 @@ email:
   report_email_to: gamegoo2025@gmail.com
   report_email_template_path: templates/new-report.html
 
-
 ---
 # 로컬 환경
 spring:
@@ -63,23 +62,15 @@ spring:
         show_sql: true
 
   datasource:
-    url: jdbc:mysql://127.0.0.1:[forwardedPort]/${DB_SCHEMA_NAME}?useSSL=true
+    url: jdbc:mysql://${DB_URL}:${RDS_PORT}/${DB_SCHEMA_NAME}?useSSL=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
-ssh:
-  remote_jump_host: ${EC2_IP}
-  ssh_port: 22
-  user: ubuntu
-  private_key: ${EC2_PRIVATE_KEY_PATH}
-  database_url: ${DB_URL}
-  database_port: 3306
-
 ---
 # 개발 환경
 server:
-  port: 8081
+  port: 8080
 
 spring:
   config:
@@ -90,10 +81,10 @@ spring:
       ddl-auto: update
     show-sql: false
   datasource:
-    url: jdbc:mysql://${RDS_PRIVATE_IP}:${RDS_PORT}/${DEV_DB_SCHEMA_NAME}?useSSL=true
+    url: jdbc:mysql://${DEV_DB_HOST}:${RDS_PORT}/${DEV_DB_SCHEMA_NAME}?useSSL=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    password: ${DEV_DB_PASSWORD}
 
 ---
 # 운영 환경
