@@ -7,9 +7,13 @@ import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
+import com.gamegoo.gamegoo_v2.core.exception.ReportException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +35,13 @@ public class ReportFacadeService {
     @Transactional
     public ReportInsertResponse addReport(Member member, Long targetMemberId, ReportRequest request) {
         Member targetMember = memberService.findMemberById(targetMemberId);
+
+        // 오늘 날짜에 해당 회원에게 신고 내역이 존재하는 경우 쿨타임 적용
+        boolean exists = reportService.existsByMemberAndCreatedAt(member, targetMember, LocalDate.now());
+
+        if (exists) {
+            throw new ReportException(ErrorCode.REPORT_ALREADY_EXISTS);
+        }
 
         Board board = (request.getBoardId() != null) ? boardService.findBoard(request.getBoardId()) : null;
 
