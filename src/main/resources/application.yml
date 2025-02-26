@@ -1,0 +1,119 @@
+spring:
+  profiles:
+    default: local
+
+  # excluded-paths.yml 파일 import
+  config:
+    import: "optional:classpath:excluded-paths.yml"
+
+  # Gmail 설정
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: gamegoo0707@gmail.com
+    password: ${GMAIL_PWD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # RIOT 설정
+  riot:
+    api:
+      key: ${RIOT_API}
+
+# batch size 설정
+batch_size:
+  manner_rank: 30
+
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha            # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
+    operations-sorter: alpha      # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
+    enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  access_expiration_time: 600000 # 10분 (10 * 60 * 1000 밀리초)
+  refresh_expiration_day: 14 # 2주
+
+socket:
+  server:
+    url: ${SOCKET_SERVER_URL}
+
+email:
+  report_email_to: gamegoo2025@gmail.com
+  report_email_template_path: templates/new-report.html
+
+
+---
+# 로컬 환경
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+
+  datasource:
+    url: jdbc:mysql://127.0.0.1:[forwardedPort]/${DB_SCHEMA_NAME}?useSSL=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+ssh:
+  remote_jump_host: ${EC2_IP}
+  ssh_port: 22
+  user: ubuntu
+  private_key: ${EC2_PRIVATE_KEY_PATH}
+  database_url: ${DB_URL}
+  database_port: 3306
+
+---
+# 개발 환경
+server:
+  port: 8081
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  datasource:
+    url: jdbc:mysql://${RDS_PRIVATE_IP}:${RDS_PORT}/${DEV_DB_SCHEMA_NAME}?useSSL=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+---
+# 운영 환경
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  datasource:
+    url: jdbc:mysql://${RDS_PRIVATE_IP}:${RDS_PORT}/${PROD_DB_SCHEMA_NAME}?useSSL=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+logging:
+  discord:
+    webhook: ${DISCORD_MONITORING_WEBHOOK_URL}

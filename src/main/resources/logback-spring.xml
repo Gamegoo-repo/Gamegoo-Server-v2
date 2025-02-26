@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <!-- base.xml default.xml 에 존재하는 Log 메시지의 Color 설정 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <!-- 콘솔에 출력되는 로그 패턴 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) - %msg%n"/>
+    <!-- Log파일에 기록되는 로그 패턴 -->
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n"/>
+    <!-- 디스코드 출력 로그 패턴 -->
+    <property name="DISCORD_LOG_PATTERN" value="**🚨 Springboot Error Alert 🚨** \n**Logger:** `%logger{36} - %msg` \n**Timestamp:** `%d{yyyy-MM-dd HH:mm:ss}` \n**Stack Trace** \n```%ex{short}```"/>
+
+    <!-- 로그 파일 저장 경로 -->
+    <property name="LOG_PATH" value="/app/logs"/>
+    <!-- 디스코드 웹훅 -->
+    <springProperty name="DISCORD_WEBHOOK_URL" source="logging.discord.webhook"/>
+
+    <!-- 콘솔로그 Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 파일 INFO 로그 Appender -->
+    <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <!-- 로그파일을 크기, 시간 기반으로 관리하기 위한 SizeAndTimeBasedRollingPolicy -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 로그파일명 패턴 -->
+            <!-- 날짜별로 기록, maxFileSize를 넘기면 인덱스(i)를 증가시켜 새로운 파일로 저장 -->
+            <fileNamePattern>${LOG_PATH}/api.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 로그파일 최대사이즈 -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- 생성한 로그파일 관리 일수 -->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 파일 ERROR 로그 Appender -->
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- error 전용 파일명 패턴 -->
+            <fileNamePattern>${LOG_PATH}/api.error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+        <!-- ERROR 이상만 수용하는 필터 추가 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- discord ERROR 로그 Appender -->
+    <appender name="DISCORD" class="com.github.napstr.logback.DiscordAppender">
+        <webhookUri>${DISCORD_WEBHOOK_URL}</webhookUri>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${DISCORD_LOG_PATTERN}</pattern>
+        </layout>
+        <username>Logback</username>
+        <tts>false</tts>
+    </appender>
+
+    <!-- 비동기 Discord Webhook Appender -->
+    <appender name="ASYNC_DISCORD" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="DISCORD"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- local Profile에서의 로그 설정 -->
+    <springProfile name="local">
+        <root level="INFO">
+            <!-- CONSOLE 로그만 등록 -->
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+    <!-- dev Profile에서의 로그 설정 -->
+    <springProfile name="dev">
+        <root level="INFO">
+            <!-- CONSOLE 로그만 등록 -->
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+    <!-- prod Profile에서의 로그 설정 -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <!-- CONSOLE, FILE_INFO, FILE_ERROR 등록-->
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE_INFO"/>
+            <appender-ref ref="FILE_ERROR"/>
+            <appender-ref ref="ASYNC_DISCORD"/>
+        </root>
+    </springProfile>
+
+</configuration>

@@ -1,0 +1,45 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:~/GamegooV2Application
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # Gmail 설정
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: gamegoo0707@gmail.com
+    password: pwd
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # RIOT 설정
+  riot:
+    api:
+      key: key
+
+# batch size 설정
+batch_size:
+  manner_rank: 30
+
+jwt:
+  secret: "secretjwttestjwtsecretsecretjwttestjwtsecretsecretjwttestjwtsecretsecretjwttestjwtsecretsecretjwttestjwtsecret"
+  access_expiration_time: 600000 # 10분 (10 * 60 * 1000 밀리초)
+  refresh_expiration_day: 14 # 2주
+
+socket:
+  server:
+    url: socket_url
+
+email:
+  report_email_to: gamegoo2025@gmail.com
+  report_email_template_path: templates/new-report.html
