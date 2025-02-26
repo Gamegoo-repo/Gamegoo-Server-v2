@@ -1,11 +1,14 @@
-name: Gamegoo v2 API CI/CD Pipeline
+name: Gamegoo v2 API PROD CI/CD
 
 on:
   pull_request:
     types: [ closed ]
     branches:
-      - develop
-  workflow_dispatch: # 수동 실행 가능
+      - main
+  push:
+    branches:
+      - main  # main 브랜치에 직접 푸시될 때도 실행
+  workflow_dispatch:
 
 jobs:
   build-and-deploy: # Job 이름
@@ -15,7 +18,7 @@ jobs:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       RDS_PRIVATE_IP: ${{ secrets.RDS_PRIVATE_IP }}
       RDS_PORT: ${{ secrets.RDS_PORT }}
-      DB_SCHEMA_NAME: ${{ secrets.DB_SCHEMA_NAME }}
+      PROD_DB_SCHEMA_NAME: ${{ secrets.PROD_DB_SCHEMA_NAME }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       GMAIL_PWD: ${{ secrets.GMAIL_PWD }}
@@ -55,16 +58,16 @@ jobs:
       - name: Docker 이미지 생성 및 push
         uses: docker/build-push-action@v6
         with:
-          context: . # Dockerfile 위치
-          file: ./Dockerfile # Dockerfile 경로
+          context: . # Dockerfile-prod 위치
+          file: ./Dockerfile-prod # Dockerfile-prod 경로
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }} # 이미지 태그
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-prod:${{ github.sha }} # 이미지 태그
           platforms: linux/amd64
           build-args: |  # Dockerfile에서 사용할 환경 변수 전달
             JWT_SECRET= ${{ secrets.JWT_SECRET }}
             RDS_PRIVATE_IP= ${{ secrets.RDS_PRIVATE_IP }}
             RDS_PORT= ${{ secrets.RDS_PORT }}
-            DB_SCHEMA_NAME= ${{ secrets.DB_SCHEMA_NAME }}
+            PROD_DB_SCHEMA_NAME= ${{ secrets.PROD_DB_SCHEMA_NAME }}
             DB_USERNAME= ${{ secrets.DB_USERNAME }}
             DB_PASSWORD= ${{ secrets.DB_PASSWORD }}
             GMAIL_PWD= ${{ secrets.GMAIL_PWD }}
@@ -84,26 +87,26 @@ jobs:
           script: |
             sudo fuser -k -n tcp 8080 || true
 
-            docker rm -f gamegoo-api-v2
+            docker rm -f gamegoo-api-v2-prod
 
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-prod:${{ github.sha }}
 
             docker run -d \
             -p 8080:8080 \
-            --name gamegoo-api-v2 \
+            --name gamegoo-api-v2-prod \
             -v ${{ secrets.EC2_LOG_PATH }}:/app/logs \
-            -e SPRING_PROFILES_ACTIVE=dev \
+            -e SPRING_PROFILES_ACTIVE=prod \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e RDS_PRIVATE_IP=${{ secrets.RDS_PRIVATE_IP }} \
             -e RDS_PORT=${{ secrets.RDS_PORT }} \
-            -e DB_SCHEMA_NAME=${{ secrets.DB_SCHEMA_NAME }} \
+            -e PROD_DB_SCHEMA_NAME=${{ secrets.PROD_DB_SCHEMA_NAME }} \
             -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
             -e GMAIL_PWD=${{ secrets.GMAIL_PWD }} \
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
             -e DISCORD_MONITORING_WEBHOOK_URL=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-prod:${{ github.sha }}
 
       # 8. 기존 Docker 이미지 삭제
       - name: 기존 Docker 이미지 삭제
@@ -118,5 +121,5 @@ jobs:
           PR_AUTHOR="${{ github.event.pull_request.user.login }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
           curl -X POST -H "Content-Type: application/json" \
-          -d "{\"content\": \"🚨 **Gamegoo v2 API 배포 실패** 🚨\nPR 번호: ${PR_NUMBER}\nPR 제목: ${PR_TITLE}\nPR 작성자: ${PR_AUTHOR}\n[PR 보기](${PR_URL})\"}" \
+          -d "{\"content\": \"🚨 **Gamegoo v2 API 운영 서버 배포 실패** 🚨\nPR 번호: ${PR_NUMBER}\nPR 제목: ${PR_TITLE}\nPR 작성자: ${PR_AUTHOR}\n[PR 보기](${PR_URL})\"}" \
           $DISCORD_WEBHOOK_URL
