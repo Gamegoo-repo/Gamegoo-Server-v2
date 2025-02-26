@@ -19,7 +19,7 @@ jobs:
       RDS_PORT: ${{ secrets.RDS_PORT }}
       DEV_DB_SCHEMA_NAME: ${{ secrets.DEV_DB_SCHEMA_NAME }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DEV_DB_PASSWORD: ${{ secrets.DEV_DB_PASSWORD }}
       GMAIL_PWD: ${{ secrets.GMAIL_PWD }}
       RIOT_API: ${{ secrets.RIOT_API }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -68,7 +68,7 @@ jobs:
             RDS_PORT= ${{ secrets.RDS_PORT }}
             DEV_DB_SCHEMA_NAME= ${{ secrets.DEV_DB_SCHEMA_NAME }}
             DB_USERNAME= ${{ secrets.DB_USERNAME }}
-            DB_PASSWORD= ${{ secrets.DB_PASSWORD }}
+            DEV_DB_PASSWORD= ${{ secrets.DEV_DB_PASSWORD }}
             GMAIL_PWD= ${{ secrets.GMAIL_PWD }}
             RIOT_API= ${{ secrets.RIOT_API }}
             SOCKET_SERVER_URL= ${{ secrets.SOCKET_SERVER_URL }}
@@ -98,7 +98,7 @@ jobs:
             -e RDS_PORT=${{ secrets.RDS_PORT }} \
             -e DEV_DB_SCHEMA_NAME=${{ secrets.DEV_DB_SCHEMA_NAME }} \
             -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e DEV_DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }} \
             -e GMAIL_PWD=${{ secrets.GMAIL_PWD }} \
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
