@@ -40,26 +40,29 @@ public class AuthFacadeService {
      */
     @Transactional
     public String join(JoinRequest request) {
-        // 1. [Member] 중복확인
+        // [Member] 이메일 중복확인
         memberService.checkDuplicateMemberByEmail(request.getEmail());
 
-        // 2. [Riot] 존재하는 소환사인지 검증 & puuid 얻기
+        // [Member] gameName 중복확인
+        memberService.checkDuplicateMemberByGameName(request.getGameName());
+
+        // [Riot] 존재하는 소환사인지 검증 & puuid 얻기
         String puuid = riotAccountService.getPuuid(request.getGameName(), request.getTag());
 
-        // 3. [Riot] summonerId 얻기
+        // [Riot] summonerId 얻기
         String summonerId = riotAccountService.getSummonerId(puuid);
 
-        // 3. [Riot] tier, rank, winrate 얻기
+        // [Riot] tier, rank, winrate 얻기
         List<TierDetails> tierWinrateRank = riotInfoService.getTierWinrateRank(summonerId);
 
-        // 4. [Member] member DB에 저장
+        // [Member] member DB에 저장
         Member member = memberService.createMember(request, tierWinrateRank);
 
-        // 5. [Riot] 최근 사용한 챔피언 3개 가져오기
+        // [Riot] 최근 사용한 챔피언 3개 가져오기
         List<Long> preferChampionfromMatch = riotRecordService.getPreferChampionfromMatch(request.getGameName(),
                 puuid);
 
-        // 6. [Member] Member Champion DB에서 매핑하기
+        // [Member] Member Champion DB에서 매핑하기
         memberChampionService.saveMemberChampions(member, preferChampionfromMatch);
 
         return "회원가입이 완료되었습니다.";
