@@ -13,19 +13,23 @@ public class RiotApiHelper {
      */
     public void handleApiError(Exception e) {
         if (e instanceof HttpClientErrorException httpEx) {
-            if (httpEx.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                String responseBody = httpEx.getResponseBodyAsString();
-                if (responseBody.contains("Unknown apikey")) {
-                    throw new RiotException(ErrorCode.RIOT_INVALID_API_KEY);
-                }
-                throw new RiotException(ErrorCode.RIOT_API_BAD_REQUEST);
+            if (httpEx.getStatusCode() == HttpStatus.BAD_REQUEST||httpEx.getStatusCode() == HttpStatus.UNAUTHORIZED||httpEx.getStatusCode() == HttpStatus.FORBIDDEN) {
+                throw new RiotException(ErrorCode.RIOT_INVALID_API_KEY);
             }
 
             if (httpEx.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new RiotException(ErrorCode.RIOT_NOT_FOUND);
             }
 
-            throw new RiotException(ErrorCode.RIOT_API_ERROR, httpEx.getMessage());
+            throw new RiotException(ErrorCode.RIOT_API_ERROR,httpEx.getMessage());
+        }
+
+        if (e instanceof HttpServerErrorException) {
+            throw new RiotException(ErrorCode.RIOT_SERVER_ERROR);
+        }
+
+        if (e instanceof ResourceAccessException) {
+            throw new RiotException(ErrorCode.RIOT_NETWORK_ERROR);
         }
 
         throw new RiotException(ErrorCode.RIOT_UNKNOWN_ERROR, e.getMessage());
