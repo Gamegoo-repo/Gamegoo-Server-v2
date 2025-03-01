@@ -32,13 +32,12 @@ public class RiotRecordService {
     private String riotAPIKey;
 
     private static final String MATCH_IDS_URL_TEMPLATE = "https://asia.api.riotgames" +
-            ".com/lol/match/v5/matches/by-puuid/%s/ids?start=0&count=%s&api_key=%s";
+            ".com/lol/match/v5/matches/by-puuid/%s/ids?start%s0&count=%s&api_key=%s";
     private static final String MATCH_INFO_URL_TEMPLATE = "https://asia.api.riotgames" +
             ".com/lol/match/v5/matches/%s?api_key=%s";
 
     private static final int INITIAL_MATCH_COUNT = 20;
     private static final int MAX_MATCH_COUNT = 100;
-    private static final int MATCH_INCREMENT = 20;
     private static final int MAX_CHAMPIONS_REQUIRED = 3;
 
     /**
@@ -72,22 +71,25 @@ public class RiotRecordService {
     private List<Long> fetchRecentChampionIds(String gameName, String puuid) {
         List<Long> championIds = new ArrayList<>();
         int count = INITIAL_MATCH_COUNT;
+        int start = 0;
 
-        // 최소 3개 이상의 챔피언 데이터를 가져올 때까지 반복
-        while (championIds.size() < MAX_CHAMPIONS_REQUIRED && count <= MAX_MATCH_COUNT) {
-            List<String> matchIds = Optional.ofNullable(fetchMatchIds(puuid, count))
+        while (championIds.size() < MAX_CHAMPIONS_REQUIRED && start + count <= MAX_MATCH_COUNT) {
+            List<String> matchIds = Optional.ofNullable(fetchMatchIds(puuid, start, count))
                     .orElseGet(List::of);
 
-            // 매칭 ID 리스트를 기반으로 특정 게임 이름에 해당하는 챔피언 ID를 추출
-            championIds = matchIds.stream()
+            // 새롭게 가져온 챔피언 ID 리스트
+            List<Long> newChampionIds = matchIds.stream()
                     .map(matchId -> fetchChampionIdFromMatch(matchId, gameName))
                     .flatMap(Optional::stream)
                     .filter(ChampionIdStore::contains) // 주어진 챔피언 ID 목록에 존재하는지 확인
                     .toList();
 
-            // 챔피언 수가 부족하면 더 많은 매칭 데이터를 가져옴
+            // 기존 리스트에 추가
+            championIds.addAll(newChampionIds);
+
+            // 챔피언 수가 부족하면 더 많은 데이터를 요청하기 위해 start 증가
             if (championIds.size() < MAX_CHAMPIONS_REQUIRED) {
-                count += MATCH_INCREMENT;
+                start += 20; // 추가 데이터 요청을 위해 start 값을 증가
             }
         }
         return championIds;
@@ -100,8 +102,8 @@ public class RiotRecordService {
      * @param count 가져올 매칭 개수
      * @return      매칭 ID 리스트
      */
-    private List<String> fetchMatchIds(String puuid, int count) {
-        String url = String.format(MATCH_IDS_URL_TEMPLATE, puuid, count, riotAPIKey);
+    private List<String> fetchMatchIds(String puuid, int start, int count) {
+        String url = String.format(MATCH_IDS_URL_TEMPLATE, puuid, start, count, riotAPIKey);
         try {
             // Riot API로부터 매칭 ID 리스트 가져오기
             String[] matchIds = restTemplate.getForObject(url, String[].class);
