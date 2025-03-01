@@ -1,7 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
 import com.gamegoo.gamegoo_v2.external.riot.dto.RiotMatchResponse;
-import com.gamegoo.gamegoo_v2.game.repository.ChampionRepository;
+import com.gamegoo.gamegoo_v2.utils.ChampionIdStore;
 import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,6 @@ public class RiotRecordService {
 
     private final RestTemplate restTemplate;
     private final RiotApiHelper riotApiHelper;
-    private final ChampionRepository championRepository;
 
     @Value("${spring.riot.api.key}")
     private String riotAPIKey;
@@ -76,14 +75,14 @@ public class RiotRecordService {
 
         // 최소 3개 이상의 챔피언 데이터를 가져올 때까지 반복
         while (championIds.size() < MAX_CHAMPIONS_REQUIRED && count <= MAX_MATCH_COUNT) {
-            List<String> matchIds = fetchMatchIds(puuid, count);
+            List<String> matchIds = Optional.ofNullable(fetchMatchIds(puuid, count))
+                    .orElseGet(List::of);
 
             // 매칭 ID 리스트를 기반으로 특정 게임 이름에 해당하는 챔피언 ID를 추출
-            championIds = Objects.requireNonNull(matchIds).stream()
+            championIds = matchIds.stream()
                     .map(matchId -> fetchChampionIdFromMatch(matchId, gameName))
-                    .filter(Objects::nonNull)
                     .flatMap(Optional::stream)
-                    .filter(championRepository::existsById)
+                    .filter(ChampionIdStore::contains) // 주어진 챔피언 ID 목록에 존재하는지 확인
                     .toList();
 
             // 챔피언 수가 부족하면 더 많은 매칭 데이터를 가져옴
