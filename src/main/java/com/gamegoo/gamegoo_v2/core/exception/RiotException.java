@@ -9,4 +9,7 @@ public class RiotException extends GlobalException {
         super(errorCode);
     }
 
+    public RiotException(ErrorCode errorCode,String message) {
+        super(errorCode,message);
+    }
 }

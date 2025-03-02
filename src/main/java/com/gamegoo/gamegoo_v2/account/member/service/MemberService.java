@@ -103,6 +103,18 @@ public class MemberService {
     }
 
     /**
+     * GameName 중복 확인하기
+     *
+     * @param gameName 소환사명
+     */
+    public void checkDuplicateMemberByGameName(String gameName) {
+        if (memberRepository.existsByGameName(gameName)) {
+            throw new MemberException(ErrorCode.RIOT_ACCOUNT_CONFLICT);
+        }
+    }
+
+
+    /**
      * DB에 없는 사용자일 경우 예외 발생
      *
      * @param email email

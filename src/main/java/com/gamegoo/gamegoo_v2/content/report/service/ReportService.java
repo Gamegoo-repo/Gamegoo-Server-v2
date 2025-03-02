@@ -17,6 +17,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -70,6 +73,22 @@ public class ReportService {
                 .build());
 
         return report;
+    }
+
+    /**
+     * 해당 fromMember가 toMember에게 해당 date에 등록한 신고 내역의 존재 여부 반환
+     *
+     * @param fromMember 신고 등록한 회원
+     * @param toMember   신고 대상 회원
+     * @param date       날짜
+     * @return 신고 내역 존재 여부
+     */
+    public boolean existsByMemberAndCreatedAt(Member fromMember, Member toMember, LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+        return reportRepository.existsByFromMemberIdAndToMemberIdAndCreatedAtBetween(fromMember.getId(),
+                toMember.getId(), startOfDay, endOfDay);
     }
 
     /**
