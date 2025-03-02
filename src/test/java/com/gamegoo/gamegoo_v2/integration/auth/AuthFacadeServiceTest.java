@@ -208,6 +208,82 @@ class AuthFacadeServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("회원 탈퇴")
+    class BlindMemberTest {
+
+        @DisplayName("성공: 회원의 blind가 true로 변경 되어야 한다.")
+        @Test
+        void blindMemberSucceedsBlindTrue() {
+            // given
+
+            // when
+
+            // then
+        }
+
+        @DisplayName("성공: 해당 회원이 속한 모든 채팅방에서 퇴장 처리 되어야 한다.")
+        @Test
+        void blindMemberSucceedsExitChatrooms() {
+            // given
+
+            // when
+
+            // then
+        }
+
+        @DisplayName("성공: 해당 회원이 보낸 모든 친구 요청이 취소 처리 되어야 한다.")
+        @Test
+        void blindMemberSucceedsCancelSendFriendRequests() {
+            // given
+
+            // when
+
+            // then
+        }
+
+        @DisplayName("성공: 해당 회원이 받은 모든 친구 요청이 취소 처리 되어야 한다.")
+        @Test
+        void blindMemberSucceedsCancelReceivedFriendRequests() {
+            // given
+
+            // when
+
+            // then
+        }
+
+        @DisplayName("성공: 해당 회원이 작성한 모든 게시글이 삭제 처리 되어야 한다.")
+        @Test
+        void blindMemberSucceedsDeletePosts() {
+            // given
+
+            // when
+
+            // then
+        }
+
+        @DisplayName("성공: 해당 회원이 남긴 모든 매너평가가 삭제 처리 되어야 한다.")
+        @Test
+        void blindMemberSucceedsDeleteMannerRatings() {
+            // given
+
+            // when
+
+            // then
+        }
+
+        @DisplayName("성공: 해당 회원의 refresh token이 삭제 되어야 한다.")
+        @Test
+        void blindMemberSucceedsDeleteRefreshToken() {
+            // given
+
+            // when
+
+            // then
+        }
+
+    }
+
     private Member createMember(String email, String gameName, String password) {
         return memberRepository.save(Member.builder()
                 .email(email)
