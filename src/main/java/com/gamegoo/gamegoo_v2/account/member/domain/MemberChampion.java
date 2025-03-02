@@ -33,18 +33,28 @@ public class MemberChampion extends BaseDateTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public static MemberChampion create(Champion champion, Member member) {
+    @Column(nullable = false)
+    private int wins;
+
+    @Column(nullable = false)
+    private int games;
+
+    public static MemberChampion create(Champion champion, Member member, int wins, int games) {
         MemberChampion memberChampion = MemberChampion.builder()
                 .champion(champion)
+                .wins(wins)
+                .games(games)
                 .build();
         memberChampion.setMember(member);
         return memberChampion;
     }
 
     @Builder
-    private MemberChampion(Champion champion, Member member) {
+    private MemberChampion(Champion champion, Member member, int wins, int games) {
         this.champion = champion;
         this.member = member;
+        this.wins = wins;
+        this.games = games;
     }
 
     public void setMember(Member member) {

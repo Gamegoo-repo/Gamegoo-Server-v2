@@ -9,6 +9,7 @@ import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
+import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
@@ -56,11 +57,11 @@ public class AuthFacadeService {
         Member member = memberService.createMember(request, tierWinrateRank);
 
         // 5. [Riot] 최근 사용한 챔피언 3개 가져오기
-        List<Long> preferChampionfromMatch = riotRecordService.getPreferChampionfromMatch(request.getGameName(),
+        List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(request.getGameName(),
                 puuid);
 
         // 6. [Member] Member Champion DB에서 매핑하기
-        memberChampionService.saveMemberChampions(member, preferChampionfromMatch);
+        memberChampionService.saveMemberChampions(member, preferChampionStats);
 
         return "회원가입이 완료되었습니다.";
     }

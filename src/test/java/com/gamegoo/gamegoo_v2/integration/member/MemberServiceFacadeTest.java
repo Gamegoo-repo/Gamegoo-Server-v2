@@ -347,7 +347,7 @@ class MemberServiceFacadeTest {
         top3ChampionIds.forEach(championId -> {
             Champion champion = championRepository.findById(championId)
                     .orElseThrow(() -> new RiotException(ErrorCode.CHAMPION_NOT_FOUND));
-            MemberChampion memberChampion = MemberChampion.create(champion, member);
+            MemberChampion memberChampion = MemberChampion.create(champion, member, 1, 10);
             memberChampionRepository.save(memberChampion);
         });
 
