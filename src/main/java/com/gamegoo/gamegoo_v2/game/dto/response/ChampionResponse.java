@@ -10,11 +10,16 @@ public class ChampionResponse {
 
     Long championId;
     String championName;
+    Double winRate;
+    Integer games;
 
-    public static ChampionResponse of(Champion champion) {
+    public static ChampionResponse of(Champion champion, int wins, int games) {
+        double winRate = games > 0 ? (double) wins / games : 0.0;
         return ChampionResponse.builder()
                 .championId(champion.getId())
                 .championName(champion.getName())
+                .winRate(winRate)
+                .games(games)
                 .build();
     }
 
