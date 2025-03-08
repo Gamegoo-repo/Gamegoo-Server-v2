@@ -57,7 +57,7 @@ public class MatchingService {
 
         // PriorityListResponse 반환
         return PriorityListResponse.of(myPriorityList, otherPriorityList, myMatchingRecord.getMember(),
-                myMatchingRecord.getMatchingUuid());
+                myMatchingRecord.getMatchingUuid(), myMatchingRecord.getGameMode());
     }
 
     /**

@@ -79,7 +79,7 @@ class MatchingServiceTest {
 
             // then
             MatchingMemberInfoResponse matchingMemberInfoResponse = MatchingMemberInfoResponse.of(member,
-                    matchingRecord.getMatchingUuid());
+                    matchingRecord.getMatchingUuid(),matchingRecord.getGameMode());
 
 
             assertThat(priorityListResponse.getMyPriorityList()).isEqualTo(new ArrayList<>());
