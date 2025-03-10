@@ -2,7 +2,6 @@ package com.gamegoo.gamegoo_v2.utils;
 
 import com.gamegoo.gamegoo_v2.core.exception.EmailException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
@@ -10,7 +9,6 @@ import org.springframework.util.FileCopyUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-@Slf4j
 @Component
 public class EmailTemplateProcessor {
 
