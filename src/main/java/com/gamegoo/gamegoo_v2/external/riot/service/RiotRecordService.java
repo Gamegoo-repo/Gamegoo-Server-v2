@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
+import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.dto.RiotMatchResponse;
 import com.gamegoo.gamegoo_v2.utils.ChampionIdStore;
 import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
@@ -10,9 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,56 +45,57 @@ public class RiotRecordService {
     /**
      * Riot API: 최근 선호 챔피언 3개 리스트 조회
      *
-     * @param gameName  게임 이름
-     * @param puuid     Riot PUUID
-     * @return          선호 챔피언 ID 리스트
+     * @param gameName 게임 이름
+     * @param puuid    Riot PUUID
+     * @return 선호 챔피언 ID 리스트
      */
-    public List<Long> getPreferChampionfromMatch(String gameName, String puuid) {
+    public List<ChampionStats> getPreferChampionfromMatch(String gameName, String puuid) {
         // 1. 최근 플레이한 챔피언 ID 리스트 가져오기
-        List<Long> recentChampionIds = fetchRecentChampionIds(gameName, puuid);
+        Map<Long, ChampionStats> championStatsMap = fetchRecentChampionStats(gameName, puuid);
 
         // 2. 많이 사용한 챔피언 상위 최대 3개 계산
-        return recentChampionIds.stream()
-                .collect(Collectors.groupingBy(championId -> championId, Collectors.counting()))
-                .entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+        return championStatsMap.values().stream()
+                .filter(stats -> stats.getGames() > 0)
+                .sorted(Comparator.comparingDouble(ChampionStats::getWinRate).reversed()
+                        .thenComparing(ChampionStats::getGames).reversed())
                 .limit(MAX_CHAMPIONS_REQUIRED)
-                .map(Map.Entry::getKey)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
      * 최근 플레이한 챔피언 ID 리스트를 Riot API에서 가져오는 메서드
      *
-     * @param gameName  게임 이름
-     * @param puuid     Riot PUUID
-     * @return          챔피언 ID 리스트
+     * @param gameName 게임 이름
+     * @param puuid    Riot PUUID
+     * @return 챔피언 ID 리스트
      */
-    private List<Long> fetchRecentChampionIds(String gameName, String puuid) {
-        List<Long> championIds = new ArrayList<>();
+    private Map<Long, ChampionStats> fetchRecentChampionStats(String gameName, String puuid) {
+        Map<Long, ChampionStats> championStatsMap = new HashMap<>();
         int count = INITIAL_MATCH_COUNT;
         int start = 0;
 
-        while (championIds.size() < MAX_CHAMPIONS_REQUIRED && start + count <= MAX_MATCH_COUNT) {
+        while (championStatsMap.size() < MAX_CHAMPIONS_REQUIRED && start + count <= MAX_MATCH_COUNT) {
             List<String> matchIds = Optional.ofNullable(fetchMatchIds(puuid, start, count))
-                    .orElseGet(List::of);
+                    .orElseGet(Collections::emptyList);
 
-            // 새롭게 가져온 챔피언 ID 리스트
-            List<Long> newChampionIds = matchIds.stream()
-                    .map(matchId -> fetchChampionIdFromMatch(matchId, gameName))
-                    .flatMap(Optional::stream)
-                    .filter(ChampionIdStore::contains) // 주어진 챔피언 ID 목록에 존재하는지 확인
-                    .toList();
-
-            // 기존 리스트에 추가
-            championIds.addAll(newChampionIds);
+            for (String matchId : matchIds) {
+                Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, gameName);
+                championStatsOpt.ifPresent(stats -> {
+                    if (ChampionIdStore.contains(stats.getChampionId())) {
+                        championStatsMap.merge(stats.getChampionId(), stats, (oldStats, newStats) -> {
+                            oldStats.merge(newStats);
+                            return oldStats;
+                        });
+                    }
+                });
+            }
 
             // 챔피언 수가 부족하면 더 많은 데이터를 요청하기 위해 start 증가
-            if (championIds.size() < MAX_CHAMPIONS_REQUIRED) {
+            if (championStatsMap.size() < MAX_CHAMPIONS_REQUIRED) {
                 start += 20; // 추가 데이터 요청을 위해 start 값을 증가
             }
         }
-        return championIds;
+        return championStatsMap;
     }
 
     /**
@@ -100,7 +103,7 @@ public class RiotRecordService {
      *
      * @param puuid Riot PUUID
      * @param count 가져올 매칭 개수
-     * @return      매칭 ID 리스트
+     * @return 매칭 ID 리스트
      */
     private List<String> fetchMatchIds(String puuid, int start, int count) {
         String url = String.format(MATCH_IDS_URL_TEMPLATE, puuid, start, count, riotAPIKey);
@@ -108,9 +111,9 @@ public class RiotRecordService {
             // Riot API로부터 매칭 ID 리스트 가져오기
             String[] matchIds = restTemplate.getForObject(url, String[].class);
             return Arrays.asList(Objects.requireNonNull(matchIds));
-        } catch (Exception e){
+        } catch (Exception e) {
             riotApiHelper.handleApiError(e);
-            return null;
+            return Collections.emptyList();
         }
     }
 
@@ -121,19 +124,22 @@ public class RiotRecordService {
      * @param gameName 소환사명
      * @return 챔피언 ID
      */
-    private Optional<Long> fetchChampionIdFromMatch(String matchId, String gameName) {
+    private Optional<ChampionStats> fetchChampionStatsFromMatch(String matchId, String gameName) {
         String url = String.format(MATCH_INFO_URL_TEMPLATE, matchId, riotAPIKey);
 
         try {
             // Riot API로부터 매칭 정보를 가져오기
             RiotMatchResponse response = restTemplate.getForObject(url, RiotMatchResponse.class);
+            if (response == null || response.getInfo() == null || response.getInfo().getParticipants() == null) {
+                return Optional.empty();
+            }
 
-            return Objects.requireNonNull(response).getInfo().getParticipants().stream()
+            return response.getInfo().getParticipants().stream()
                     .filter(participant -> gameName.equals(participant.getRiotIdGameName()))
-                    .map(RiotMatchResponse.ParticipantDTO::getChampionId)
-                    .findFirst();
+                    .findFirst()
+                    .map(participant -> new ChampionStats(participant.getChampionId(), participant.isWin()));
 
-        } catch (Exception e){
+        } catch (Exception e) {
             riotApiHelper.handleApiError(e);
             return Optional.empty();
         }

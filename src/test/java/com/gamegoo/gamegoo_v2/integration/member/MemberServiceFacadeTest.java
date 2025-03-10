@@ -16,8 +16,6 @@ import com.gamegoo.gamegoo_v2.account.member.repository.MemberChampionRepository
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberGameStyleRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberFacadeService;
-import com.gamegoo.gamegoo_v2.core.exception.RiotException;
-import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.game.domain.Champion;
 import com.gamegoo.gamegoo_v2.game.domain.GameStyle;
 import com.gamegoo.gamegoo_v2.game.repository.ChampionRepository;
@@ -345,8 +343,9 @@ class MemberServiceFacadeTest {
 
     private void initMemberChampion(Member member, List<Long> top3ChampionIds) {
         top3ChampionIds.forEach(championId -> {
-            Champion champion = championRepository.findById(championId).isPresent() ? championRepository.findById(championId).get() : null;
-            MemberChampion memberChampion = MemberChampion.create(champion, member);
+            Champion champion = championRepository.findById(championId).isPresent() ?
+                    championRepository.findById(championId).get() : null;
+            MemberChampion memberChampion = MemberChampion.create(champion, member, 1, 10);
             memberChampionRepository.save(memberChampion);
         });
 

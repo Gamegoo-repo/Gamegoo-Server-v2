@@ -67,7 +67,6 @@ public class BoardController {
     @Operation(summary = "게시판 글 목록 조회 API",
             description = "게시판 글 목록을 조회하는 API 입니다. 필터링을 원하면 각 파라미터를 입력하세요.")
     @Parameters({
-            @Parameter(name = "pageIdx", description = "조회할 페이지 번호를 입력해주세요. 페이지 당 20개의 게시물을 볼 수 있습니다."),
             @Parameter(name = "gameMode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, " +
                     "칼바람 나락: ARAM >"),
             @Parameter(name = "tier", description = "(선택) 티어를 선택해주세요."),
