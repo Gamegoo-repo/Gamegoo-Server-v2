@@ -50,8 +50,8 @@ public class MatchingService {
 
                 // 상대방 관점에서 나의 우선순위 계산
                 int myPriority = calculatePriority(myMatchingRecord.getGameMode(), otherRecord, myMatchingRecord);
-                otherPriorityList.add(PriorityValue.of(myMatchingRecord.getMember().getId(),
-                        myMatchingRecord.getMatchingUuid(), myPriority));
+                otherPriorityList.add(PriorityValue.of(otherRecord.getMember().getId(),
+                        otherRecord.getMatchingUuid(), myPriority));
             }
         }
 

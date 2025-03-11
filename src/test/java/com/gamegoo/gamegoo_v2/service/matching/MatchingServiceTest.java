@@ -135,8 +135,8 @@ class MatchingServiceTest {
 
                     int myPriority = matchingService.calculatePriority(matchingRecord.getGameMode(), otherRecord,
                             matchingRecord);
-                    expectedOtherPriorityList.add(PriorityValue.of(matchingRecord.getMember().getId(),
-                            matchingRecord.getMatchingUuid(), myPriority));
+                    expectedOtherPriorityList.add(PriorityValue.of(otherRecord.getMember().getId(),
+                            otherRecord.getMatchingUuid(), myPriority));
                 }
             }
 
