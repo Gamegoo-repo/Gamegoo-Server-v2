@@ -41,7 +41,7 @@ public class BoardListResponse {
         Member member = board.getMember();
         List<ChampionResponse> championResponseList = (member.getMemberChampionList() != null) ?
                 member.getMemberChampionList().stream()
-                        .map(mc -> ChampionResponse.of(mc.getChampion()))
+                        .map(mc -> ChampionResponse.of(mc.getChampion(), mc.getWins(), mc.getGames()))
                         .collect(Collectors.toList())
                 : null;
 

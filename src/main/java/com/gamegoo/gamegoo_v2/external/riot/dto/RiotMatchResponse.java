@@ -22,6 +22,8 @@ public class RiotMatchResponse {
         private String riotIdGameName;
         private String gameMode;
         private Long championId;
+        private boolean win;
+
 
     }
 
