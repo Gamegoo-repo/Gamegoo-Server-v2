@@ -35,19 +35,36 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
      */
     @Override
     public List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode, Long memberId) {
-        return queryFactory.selectFrom(matchingRecord)
+        // 서브 쿼리에서 쓸 별칭
+        QMatchingRecord sub = new QMatchingRecord("sub");
+
+        return queryFactory
+                .selectFrom(matchingRecord)
                 .where(
                         matchingRecord.createdAt.gt(createdAt),
                         matchingRecord.status.eq(MatchingStatus.PENDING),
                         matchingRecord.gameMode.eq(gameMode),
                         matchingRecord.member.id.ne(memberId),
                         existsValidMatchSubquery(),
-                        applyGameModeFilter(gameMode)
+                        applyGameModeFilter(gameMode),
+
+                        matchingRecord.createdAt.eq(
+                                JPAExpressions
+                                        .select(sub.createdAt.max())
+                                        .from(sub)
+                                        .where(
+                                                sub.createdAt.gt(createdAt),
+                                                sub.status.eq(MatchingStatus.PENDING),
+                                                sub.gameMode.eq(gameMode),
+                                                sub.member.id.eq(matchingRecord.member.id)
+                                        )
+                        )
                 )
+                // memberId 오름차순, createdAt 내림차순
                 .orderBy(matchingRecord.member.id.asc(), matchingRecord.createdAt.desc())
-                .distinct()
                 .fetch();
     }
+
 
     /**
      * 해당 회원의 가장 최근 매칭

@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.matching.dto.response;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.dto.PriorityValue;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,8 +19,8 @@ public class PriorityListResponse {
     MatchingMemberInfoResponse myMatchingInfo;
 
     public static PriorityListResponse of(List<PriorityValue> mypriorityList, List<PriorityValue> otherpriorityList,
-                                          Member member, String matchingUuid) {
-        MatchingMemberInfoResponse matchingMemberInfoResponse = MatchingMemberInfoResponse.of(member, matchingUuid);
+                                          Member member, String matchingUuid, GameMode gameMode) {
+        MatchingMemberInfoResponse matchingMemberInfoResponse = MatchingMemberInfoResponse.of(member, matchingUuid,gameMode);
 
         return PriorityListResponse.builder()
                 .myPriorityList(mypriorityList)
