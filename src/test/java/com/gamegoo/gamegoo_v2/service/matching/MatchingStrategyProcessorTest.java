@@ -37,14 +37,13 @@ class MatchingStrategyProcessorTest {
     }
 
     @Test
-    @DisplayName("정밀 매칭 우선순위 계산")
+    @DisplayName("정밀 매칭 우선순위 계산(SOLO)")
     void testCalculatePrecisePriority() {
         // given
-        // 랭크 점수 차이 : 0 점
         Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
         Member member2 = createMember("user2@gmail.com", Tier.GOLD, false);
 
-        // 매너 점수 차이 : 8점
+        // 매너 점수 차이: 4*2점
         member1.updateMannerLevel(4);
         member2.updateMannerLevel(2);
 
@@ -55,9 +54,77 @@ class MatchingStrategyProcessorTest {
         int result = matchingStrategyProcessor.calculatePrecisePriority(record1, record2);
 
         // then
-        int expectedPriority = 16 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4);
+        int expectedPriority = 67 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4);
         assertThat(result).isEqualTo(expectedPriority);
     }
+
+    @Test
+    @DisplayName("정밀 매칭 우선순위 계산(FAST)")
+    void testCalculatePrecisePriority_FAST() {
+        // given
+        // Tier 같음(가정)
+        Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
+        Member member2 = createMember("user2@gmail.com", Tier.GOLD, false);
+
+        // 매너 점수 차이: 3*4점
+        member1.updateMannerLevel(3);
+        member2.updateMannerLevel(0);
+
+        MatchingRecord record1 = createMatchingRecord(GameMode.FAST, MatchingType.PRECISE, member1);
+        MatchingRecord record2 = createMatchingRecord(GameMode.FAST, MatchingType.BASIC, member2);
+
+        // when
+        int result = matchingStrategyProcessor.calculatePrecisePriority(record1, record2);
+
+        // then
+        int expectedPriority = 25 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4);
+        assertThat(result).isEqualTo(expectedPriority);
+    }
+
+    @Test
+    @DisplayName("정밀 매칭 우선순위 계산(FREE)")
+    void testCalculatePrecisePriority_FREE() {
+        // given
+        Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
+        Member member2 = createMember("user2@gmail.com", Tier.GOLD, false);
+
+        // 매너 점수 차이: 3*4점
+        member1.updateMannerLevel(3);
+        member2.updateMannerLevel(0);
+
+        MatchingRecord record1 = createMatchingRecord(GameMode.FREE, MatchingType.PRECISE, member1);
+        MatchingRecord record2 = createMatchingRecord(GameMode.FREE, MatchingType.BASIC, member2);
+
+        // when
+        int result = matchingStrategyProcessor.calculatePrecisePriority(record1, record2);
+
+        // then
+        int expectedPriority = 65 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4);
+        assertThat(result).isEqualTo(expectedPriority);
+    }
+
+    @Test
+    @DisplayName("정밀 매칭 우선순위 계산(ARAM)")
+    void testCalculatePrecisePriority_ARAM() {
+        // given
+        Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
+        Member member2 = createMember("user2@gmail.com", Tier.GOLD, false);
+
+        // 매너 점수 차이: 3*4점
+        member1.updateMannerLevel(3);
+        member2.updateMannerLevel(0);
+
+        MatchingRecord record1 = createMatchingRecord(GameMode.ARAM, MatchingType.PRECISE, member1);
+        MatchingRecord record2 = createMatchingRecord(GameMode.ARAM, MatchingType.BASIC, member2);
+
+        // when
+        int result = matchingStrategyProcessor.calculatePrecisePriority(record1, record2);
+
+        // then
+        int expectedPriority = 19 - (Math.abs(record1.getMannerLevel() - record2.getMannerLevel()) * 4);
+        assertThat(result).isEqualTo(expectedPriority);
+    }
+
 
     @Test
     @DisplayName("개인랭크 우선순위 계산")

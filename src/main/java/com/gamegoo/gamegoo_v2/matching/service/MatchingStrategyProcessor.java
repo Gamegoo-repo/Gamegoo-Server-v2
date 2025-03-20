@@ -16,8 +16,25 @@ public class MatchingStrategyProcessor {
      * @return 우선순위 점수
      */
     public int calculatePrecisePriority(MatchingRecord myRecord, MatchingRecord otherRecord) {
-        return MatchingScoreCalculator.getMannerPriority(
-                otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
+        switch (myRecord.getGameMode()) {
+            case FAST -> {
+                return MatchingScoreCalculator.getMannerPriority(
+                        otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 25, 4);
+            }
+            case SOLO -> {
+                return MatchingScoreCalculator.getMannerPriority(
+                        otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 67, 4);
+            }
+            case FREE -> {
+                return MatchingScoreCalculator.getMannerPriority(
+                        otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 65, 4);
+            }
+            case ARAM -> {
+                return MatchingScoreCalculator.getMannerPriority(
+                        otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 19, 4);
+            }
+        }
+        return 0;
     }
 
     /**
