@@ -5,14 +5,12 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
-import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -30,21 +28,15 @@ public class BoardListResponse {
     Position mainP;
     Position subP;
     List<Position> wantP;
-    List<ChampionResponse> championResponseList;
+    private List<ChampionStatsResponse> championStatsResponseList;
     Double winRate;
     LocalDateTime createdAt;
     LocalDateTime bumpTime;
     String contents;
     Mike mike;
 
-    public static BoardListResponse of(Board board) {
+    public static BoardListResponse of(Board board, List<ChampionStatsResponse> championStatsResponseList) {
         Member member = board.getMember();
-        List<ChampionResponse> championResponseList = (member.getMemberChampionList() != null) ?
-                member.getMemberChampionList().stream()
-                        .map(mc -> ChampionResponse.of(mc.getChampion(), mc.getWins(), mc.getGames()))
-                        .collect(Collectors.toList())
-                : null;
-
         Tier tier;
         int rank;
         Double winRate;
@@ -71,7 +63,7 @@ public class BoardListResponse {
                 .mainP(board.getMainP())
                 .subP(board.getSubP())
                 .wantP(board.getWantP())
-                .championResponseList(championResponseList)
+                .championStatsResponseList(championStatsResponseList)
                 .winRate(winRate)
                 .createdAt(board.getCreatedAt())
                 .bumpTime(board.getBumpTime())

@@ -13,6 +13,7 @@ public class RiotMatchResponse {
     public static class InfoDTO {
 
         private List<ParticipantDTO> participants;
+        private int gameDuration;
 
     }
 
@@ -23,6 +24,7 @@ public class RiotMatchResponse {
         private String gameMode;
         private Long championId;
         private boolean win;
+        private int totalMinionsKilled;
 
 
     }
