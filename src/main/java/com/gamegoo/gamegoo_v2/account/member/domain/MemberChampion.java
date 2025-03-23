@@ -39,22 +39,27 @@ public class MemberChampion extends BaseDateTimeEntity {
     @Column(nullable = false)
     private int games;
 
-    public static MemberChampion create(Champion champion, Member member, int wins, int games) {
+    @Column(nullable = false)
+    private double csPerMinute;
+
+    public static MemberChampion create(Champion champion, Member member, int wins, int games, double csPerMinute) {
         MemberChampion memberChampion = MemberChampion.builder()
                 .champion(champion)
                 .wins(wins)
                 .games(games)
+                .csPerMinute(csPerMinute)
                 .build();
         memberChampion.setMember(member);
         return memberChampion;
     }
 
     @Builder
-    private MemberChampion(Champion champion, Member member, int wins, int games) {
+    private MemberChampion(Champion champion, Member member, int wins, int games, double csPerMinute) {
         this.champion = champion;
         this.member = member;
         this.wins = wins;
         this.games = games;
+        this.csPerMinute = csPerMinute;
     }
 
     public void setMember(Member member) {
