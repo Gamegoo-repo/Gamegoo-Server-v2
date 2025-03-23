@@ -32,7 +32,7 @@ public class MemberChampionService {
             // 챔피언이 존재하지 않으면 스킵
             championRepository.findById(championId).ifPresent(champion -> {
                 MemberChampion memberChampion = MemberChampion.create(champion, member, stats.getGames(),
-                        stats.getWins());
+                        stats.getWins(), stats.getCsPerMinute());
                 memberChampionRepository.save(memberChampion);
             });
         });

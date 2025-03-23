@@ -134,10 +134,17 @@ public class RiotRecordService {
                 return Optional.empty();
             }
 
+            int gameDuration = response.getInfo().getGameDuration();
+
             return response.getInfo().getParticipants().stream()
                     .filter(participant -> gameName.equals(participant.getRiotIdGameName()))
                     .findFirst()
-                    .map(participant -> new ChampionStats(participant.getChampionId(), participant.isWin()));
+                    .map(participant -> {
+                        ChampionStats stats = new ChampionStats(participant.getChampionId(), participant.isWin());
+                        stats.setGameTime(gameDuration);
+                        stats.setTotalMinionsKilled(participant.getTotalMinionsKilled());
+                        return stats;
+                    });
 
         } catch (Exception e) {
             riotApiHelper.handleApiError(e);

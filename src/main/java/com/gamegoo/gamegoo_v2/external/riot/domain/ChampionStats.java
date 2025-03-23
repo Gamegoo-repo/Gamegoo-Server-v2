@@ -8,6 +8,8 @@ public class ChampionStats {
     private final long championId;
     private int wins;
     private int games;
+    private int gameTime; // 경기시간(초)
+    private int totalMinionsKilled; // cs
 
     /**
      * 한 경기의 결과로 객체를 생성
@@ -19,6 +21,8 @@ public class ChampionStats {
         this.championId = championId;
         this.games = 1;
         this.wins = win ? 1 : 0;
+        this.gameTime = 0;
+        this.totalMinionsKilled = 0;
     }
 
     /**
@@ -41,6 +45,8 @@ public class ChampionStats {
     public void merge(ChampionStats other) {
         this.games += other.games;
         this.wins += other.wins;
+        this.gameTime += other.gameTime;
+        this.totalMinionsKilled += other.totalMinionsKilled;
     }
 
     /**
@@ -62,6 +68,36 @@ public class ChampionStats {
 
     public int getGames() {
         return games;
+    }
+
+    public int getGameTime() {
+        return gameTime;
+    }
+
+    public void setGameTime(int gameTime) {
+        this.gameTime = gameTime;
+    }
+
+    public int getTotalMinionsKilled() {
+        return totalMinionsKilled;
+    }
+
+    public void setTotalMinionsKilled(int totalMinionsKilled) {
+        this.totalMinionsKilled = totalMinionsKilled;
+    }
+
+    /**
+     * 분당 CS 계산
+     * gameTime이 0이면 안됨
+     *
+     * @return 분당 CS
+     */
+
+    public double getCsPerMinute() {
+        if (gameTime > 0) {
+            return totalMinionsKilled / (gameTime / 60.0);
+        }
+        return 0;
     }
 
 }
