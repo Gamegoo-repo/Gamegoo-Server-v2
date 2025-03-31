@@ -5,7 +5,6 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
-import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +29,7 @@ public class BoardListResponse {
     Position mainP;
     Position subP;
     List<Position> wantP;
-    List<ChampionResponse> championResponseList;
+    private List<ChampionStatsResponse> championStatsResponseList;
     Double winRate;
     LocalDateTime createdAt;
     LocalDateTime bumpTime;
@@ -39,12 +38,6 @@ public class BoardListResponse {
 
     public static BoardListResponse of(Board board) {
         Member member = board.getMember();
-        List<ChampionResponse> championResponseList = (member.getMemberChampionList() != null) ?
-                member.getMemberChampionList().stream()
-                        .map(mc -> ChampionResponse.of(mc.getChampion()))
-                        .collect(Collectors.toList())
-                : null;
-
         Tier tier;
         int rank;
         Double winRate;
@@ -57,6 +50,18 @@ public class BoardListResponse {
             rank = member.getSoloRank();
             winRate = member.getSoloWinRate();
         }
+
+        List<ChampionStatsResponse> championStatsResponseList = member.getMemberChampionList().stream()
+                .map(mc -> ChampionStatsResponse.builder()
+                        .championId(mc.getChampion().getId())
+                        .championName(mc.getChampion().getName())
+                        .wins(mc.getWins())
+                        .games(mc.getGames())
+                        // 승률은 games가 0이 아니면 계산, 아니면 0
+                        .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
+                        .csPerMinute(mc.getCsPerMinute())
+                        .build())
+                .collect(Collectors.toList());
 
         return BoardListResponse.builder()
                 .boardId(board.getId())
@@ -71,7 +76,7 @@ public class BoardListResponse {
                 .mainP(board.getMainP())
                 .subP(board.getSubP())
                 .wantP(board.getWantP())
-                .championResponseList(championResponseList)
+                .championStatsResponseList(championStatsResponseList)
                 .winRate(winRate)
                 .createdAt(board.getCreatedAt())
                 .bumpTime(board.getBumpTime())

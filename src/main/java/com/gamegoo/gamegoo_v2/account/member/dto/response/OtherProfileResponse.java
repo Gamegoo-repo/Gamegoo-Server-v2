@@ -46,7 +46,10 @@ public class OtherProfileResponse {
                 .toList();
 
         List<ChampionResponse> championResponseList = targetMember.getMemberChampionList().stream()
-                .map(memberChampion -> ChampionResponse.of(memberChampion.getChampion()))
+                .map(memberChampion -> ChampionResponse.of(
+                        memberChampion.getChampion(),
+                        memberChampion.getWins(),
+                        memberChampion.getGames()))
                 .toList();
 
         return OtherProfileResponse.builder()

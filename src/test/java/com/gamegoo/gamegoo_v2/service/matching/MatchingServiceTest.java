@@ -79,7 +79,7 @@ class MatchingServiceTest {
 
             // then
             MatchingMemberInfoResponse matchingMemberInfoResponse = MatchingMemberInfoResponse.of(member,
-                    matchingRecord.getMatchingUuid());
+                    matchingRecord.getMatchingUuid(),matchingRecord.getGameMode());
 
 
             assertThat(priorityListResponse.getMyPriorityList()).isEqualTo(new ArrayList<>());
@@ -135,8 +135,8 @@ class MatchingServiceTest {
 
                     int myPriority = matchingService.calculatePriority(matchingRecord.getGameMode(), otherRecord,
                             matchingRecord);
-                    expectedOtherPriorityList.add(PriorityValue.of(matchingRecord.getMember().getId(),
-                            matchingRecord.getMatchingUuid(), myPriority));
+                    expectedOtherPriorityList.add(PriorityValue.of(otherRecord.getMember().getId(),
+                            otherRecord.getMatchingUuid(), myPriority));
                 }
             }
 

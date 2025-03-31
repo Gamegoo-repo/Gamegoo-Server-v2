@@ -1,11 +1,11 @@
 package com.gamegoo.gamegoo_v2.account.member.dto.response;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
+import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -43,7 +43,10 @@ public class MyProfileResponse {
                 .toList();
 
         List<ChampionResponse> championResponseList = member.getMemberChampionList().stream()
-                .map(memberChampion -> ChampionResponse.of(memberChampion.getChampion()))
+                .map(memberChampion -> ChampionResponse.of(
+                        memberChampion.getChampion(),
+                        memberChampion.getWins(),
+                        memberChampion.getGames()))
                 .toList();
 
         return MyProfileResponse.builder()
