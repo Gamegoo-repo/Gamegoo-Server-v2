@@ -30,7 +30,7 @@ public class BoardByIdResponse {
     Tier freeTier;
     int freeRank;
     Mike mike;
-    List<ChampionResponse> championResponseList;
+    List<ChampionStatsResponse> championResponseList;
     GameMode gameMode;
     Position mainP;
     Position subP;
@@ -42,10 +42,17 @@ public class BoardByIdResponse {
 
     public static BoardByIdResponse of(Board board) {
         Member poster = board.getMember();
-        List<ChampionResponse> championResponseList = poster.getMemberChampionList() == null
+        List<ChampionStatsResponse> championResponseList = poster.getMemberChampionList() == null
                 ? List.of()
                 : poster.getMemberChampionList().stream()
-                .map(mc -> ChampionResponse.of(mc.getChampion()))
+                .map(mc -> ChampionStatsResponse.builder()
+                        .championId(mc.getChampion().getId())
+                        .championName(mc.getChampion().getName())
+                        .wins(mc.getWins())
+                        .games(mc.getGames())
+                        .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
+                        .csPerMinute(mc.getCsPerMinute())
+                        .build())
                 .collect(Collectors.toList());
 
         List<Long> gameStyleIds = board.getBoardGameStyles().stream()
