@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import lombok.Builder;
 import lombok.Getter;
 
