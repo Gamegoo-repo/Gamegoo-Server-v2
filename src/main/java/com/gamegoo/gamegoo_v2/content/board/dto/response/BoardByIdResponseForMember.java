@@ -7,6 +7,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
+import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +31,8 @@ public class BoardByIdResponseForMember {
     String gameName;
     String tag;
     Integer mannerLevel;
-    List<MannerKeyword> mannerKeywords;
+    Double mannerRank;
+    Integer mannerRatingCount;
     Tier soloTier;
     int soloRank;
     Tier freeTier;
@@ -51,7 +53,8 @@ public class BoardByIdResponseForMember {
             Board board,
             boolean isBlocked,
             boolean isFriend,
-            Long friendRequestMemberId
+            Long friendRequestMemberId,
+            MannerService mannerService
     ) {
         Member poster = board.getMember();
 
@@ -95,6 +98,8 @@ public class BoardByIdResponseForMember {
                 .gameName(poster.getGameName())
                 .tag(poster.getTag())
                 .mannerLevel(poster.getMannerLevel())
+                .mannerRank(poster.getMannerRank())
+                .mannerRatingCount(mannerService.countMannerRatingByMember(poster, true))
                 .soloTier(poster.getSoloTier())
                 .soloRank(poster.getSoloRank())
                 .freeTier(poster.getFreeTier())
