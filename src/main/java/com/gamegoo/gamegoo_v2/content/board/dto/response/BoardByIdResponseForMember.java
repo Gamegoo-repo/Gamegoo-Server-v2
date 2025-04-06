@@ -7,6 +7,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -35,7 +36,7 @@ public class BoardByIdResponseForMember {
     Tier freeTier;
     int freeRank;
     Mike mike;
-    List<ChampionResponse> championResponseDTOList;
+    List<ChampionStatsResponse> championResponseDTOList;
     GameMode gameMode;
     Position mainP;
     Position subP;
@@ -54,10 +55,17 @@ public class BoardByIdResponseForMember {
     ) {
         Member poster = board.getMember();
 
-        List<ChampionResponse> championResponseList = poster.getMemberChampionList() == null
+        List<ChampionStatsResponse> championResponseList = poster.getMemberChampionList() == null
                 ? List.of()
                 : poster.getMemberChampionList().stream()
-                .map(mc -> ChampionResponse.of(mc.getChampion()))
+                .map(mc -> ChampionStatsResponse.builder()
+                        .championId(mc.getChampion().getId())
+                        .championName(mc.getChampion().getName())
+                        .wins(mc.getWins())
+                        .games(mc.getGames())
+                        .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
+                        .csPerMinute(mc.getCsPerMinute())
+                        .build())
                 .collect(Collectors.toList());
 
 
@@ -83,7 +91,7 @@ public class BoardByIdResponseForMember {
                 .isFriend(isFriend)
                 .friendRequestMemberId(friendRequestMemberId)
                 .createdAt(board.getCreatedAt())
-                .profileImage(board.getBoardProfileImage())
+                .profileImage(poster.getProfileImage())
                 .gameName(poster.getGameName())
                 .tag(poster.getTag())
                 .mannerLevel(poster.getMannerLevel())
