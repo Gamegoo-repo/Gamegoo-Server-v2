@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
+import com.gamegoo.gamegoo_v2.external.riot.dto.RiotAuthTokenResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.RiotVerifyExistUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RiotFacadeService {
 
     private final RiotAuthService riotAccountService;
+    private final RiotOAuthService riotOAuthService;
 
     /**
      * 사용가능한 riot 계정인지 검증
@@ -20,10 +22,14 @@ public class RiotFacadeService {
     public String verifyRiotAccount(RiotVerifyExistUserRequest request) {
         // 1. puuid 발급 가능한지 검증
         String puuid = riotAccountService.getPuuid(request.getGameName(), request.getTag());
-        
+
         // 2. summonerid 발급 가능한지 검증
         riotAccountService.getSummonerId(puuid);
         return "해당 Riot 계정은 존재합니다";
+    }
+
+    public RiotAuthTokenResponse processOAuthCallback(String code) {
+        return riotOAuthService.exchangeCodeForTokens(code);
     }
 
 }
