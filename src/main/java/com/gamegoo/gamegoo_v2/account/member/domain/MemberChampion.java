@@ -39,7 +39,7 @@ public class MemberChampion extends BaseDateTimeEntity {
     @Column(nullable = false)
     private int games;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "double default 0.0")
     private double csPerMinute;
 
     public static MemberChampion create(Champion champion, Member member, int wins, int games, double csPerMinute) {
