@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.chat.repository;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -31,5 +32,11 @@ public interface MemberChatroomRepository extends JpaRepository<MemberChatroom, 
             ORDER BY COALESCE(c.lastChatAt, mc.lastJoinDate) DESC
             """)
     List<MemberChatroom> findAllActiveMemberChatroomByMemberId(@Param("memberId") Long memberId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE MemberChatroom mc SET mc.lastJoinDate = null where mc.member = :member")
+    void updateLastJoinDateToNullByMember(@Param("member") Member member);
+
+    List<MemberChatroom> findAllByMemberId(Long memberId);
 
 }
