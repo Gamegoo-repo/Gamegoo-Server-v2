@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -59,7 +61,13 @@ public class RiotFacadeService {
 
         // 사용자가 아예 없을 경우, 회원가입 요청
         if (memberList.isEmpty()) {
-            return String.format("%s/rso/callback?isMember=false&state=%s", frontUrl, state);
+            String encodedGameName = URLEncoder.encode(accountByPuuid.getGameName(), StandardCharsets.UTF_8);
+            String encodedTag = URLEncoder.encode(accountByPuuid.getTagLine(), StandardCharsets.UTF_8);
+            String encodedState = URLEncoder.encode(state, StandardCharsets.UTF_8);
+            String encodedPuuid = URLEncoder.encode(accountByPuuid.getPuuid(), StandardCharsets.UTF_8);
+
+            return String.format("%s/rso/callback?puuid=%s&gameName=%s&tag=%s&state=%s",
+                    frontUrl, encodedPuuid, encodedGameName, encodedTag, encodedState);
         }
 
         // 사용자가 있을 경우, 로그인 진행
