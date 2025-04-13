@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
+import com.gamegoo.gamegoo_v2.account.auth.service.AuthService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotAuthTokenResponse;
@@ -25,6 +26,7 @@ public class RiotFacadeService {
     private final RiotOAuthService riotOAuthService;
     private final RiotAuthService riotAuthService;
     private final MemberService memberService;
+    private final AuthService authService;
     private final JwtProvider jwtProvider;
 
     @Value(value = "${spring.front_url}")
@@ -73,8 +75,13 @@ public class RiotFacadeService {
         // 사용자가 있을 경우, 로그인 진행
         Member member = memberList.get(0);
         String accessToken = jwtProvider.createAccessToken(member.getId());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId());
 
-        return String.format("%s/rso/callback?accessToken=%s&state=%s", frontUrl, accessToken, state);
+        // refresh token DB에 저장
+        authService.addRefreshToken(member, refreshToken);
+        
+        return String.format("%s/rso/callback?accessToken=%s&refreshToken=%s&state=%s", frontUrl, accessToken,
+                refreshToken, state);
     }
 
 }
