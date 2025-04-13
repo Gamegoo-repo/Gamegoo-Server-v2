@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.social.friend.domain.FriendRequest;
 import com.gamegoo.gamegoo_v2.social.friend.domain.FriendRequestStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -46,5 +47,17 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, Lo
             @Param("targetMemberIds") List<Long> targetMemberIds,
             @Param("status") FriendRequestStatus status
     );
+
+    List<FriendRequest> findAllByFromMember(Member fromMember);
+
+    List<FriendRequest> findAllByToMember(Member toMember);
+    
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE FriendRequest fr SET fr.status = :status where fr.fromMember = :member")
+    void updateAllStatusByFromMember(@Param("member") Member member, @Param("status") FriendRequestStatus status);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE FriendRequest fr SET fr.status = :status where fr.toMember = :member")
+    void updateAllStatusByToMember(@Param("member") Member member, @Param("status") FriendRequestStatus status);
 
 }

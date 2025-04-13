@@ -263,6 +263,16 @@ public class ChatCommandService {
     }
 
     /**
+     * 해당 회원의 모든 채팅방에서 퇴장 처리
+     * 해당 회원의 모든 memberChatroom의 lastJoinDate를 null로 업데이트
+     *
+     * @param member 회원
+     */
+    public void exitAllChatroom(Member member) {
+        memberChatroomRepository.updateLastJoinDateToNullByMember(member);
+    }
+
+    /**
      * chatroom 엔티티의 lastChatId와 lastChatAt 업데이트 메소드
      *
      * @param chat     채팅

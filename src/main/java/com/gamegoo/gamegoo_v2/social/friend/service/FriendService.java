@@ -148,6 +148,21 @@ public class FriendService {
         return friendRequest;
     }
 
+    /**
+     * 해당 회원이 보낸 모든 친구 요청 취소 처리 메소드
+     *
+     * @param member 회원
+     */
+    @Transactional
+    public void cancelAllFriendRequestsByFromMember(Member member) {
+        friendRequestRepository.updateAllStatusByFromMember(member, FriendRequestStatus.CANCELLED);
+    }
+
+    @Transactional
+    public void cancelAllFriendRequestsByToMember(Member member) {
+        friendRequestRepository.updateAllStatusByToMember(member, FriendRequestStatus.CANCELLED);
+    }
+
 
     /**
      * targetMember를 즐겨찾기 설정 또는 해제 처리 메소드
