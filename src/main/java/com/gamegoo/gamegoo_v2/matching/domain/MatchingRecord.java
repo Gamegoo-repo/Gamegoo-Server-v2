@@ -36,15 +36,15 @@ public class MatchingRecord extends BaseDateTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20)")
-    private Position mainPosition;
+    private Position mainP;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20)")
-    private Position subPosition;
+    private Position subP;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20)")
-    private Position wantPosition;
+    private Position wantP;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20)")
@@ -71,43 +71,64 @@ public class MatchingRecord extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private MatchingStatus status = MatchingStatus.PENDING;
 
-    @Column
-    private Boolean mannerMessageSent = false;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
+    private MannerMessageStatus mannerMessageSent = MannerMessageStatus.NOT_REQUIRED;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_id")
-    private Member targetMember;
+    @JoinColumn(name = "target_matching_uuid")
+    private MatchingRecord targetMatchingRecord;
 
-    // MatchingRecord 생성 메서드
     public static MatchingRecord create(GameMode gameMode, MatchingType matchingType, Member member) {
         return MatchingRecord.builder()
                 .gameMode(gameMode)
-                .mainPosition(member.getMainPosition())
-                .subPosition(member.getSubPosition())
-                .wantPosition(member.getWantPosition())
+                .mainP(member.getMainP())
+                .subP(member.getSubP())
+                .wantP(member.getWantP())
                 .mike(member.getMike())
-                .tier(member.getSoloTier()) // TODO:
-                .gameRank(member.getSoloRank()) // TODO:
-                .winrate(member.getSoloWinRate()) // TODO:
+                .tier(getTierByGameMode(gameMode, member))
+                .gameRank(getGameRankByGameMode(gameMode, member))
+                .winrate(getWinRateByGameMode(gameMode, member))
                 .matchingType(matchingType)
                 .mannerLevel(member.getMannerLevel())
                 .member(member)
                 .build();
     }
 
+    private static Tier getTierByGameMode(GameMode gameMode, Member member) {
+        if (gameMode == GameMode.FREE) {
+            return member.getFreeTier();
+        }
+        return member.getSoloTier();
+    }
+
+    private static int getGameRankByGameMode(GameMode gameMode, Member member) {
+        if (gameMode == GameMode.FREE) {
+            return member.getFreeRank();
+        }
+        return member.getSoloRank();
+    }
+
+    private static double getWinRateByGameMode(GameMode gameMode, Member member) {
+        if (gameMode == GameMode.FREE) {
+            return member.getFreeWinRate();
+        }
+        return member.getSoloWinRate();
+    }
+
     // MatchingRecord Builder
     @Builder
-    private MatchingRecord(GameMode gameMode, Position mainPosition, Position subPosition, Position wantPosition,
+    private MatchingRecord(GameMode gameMode, Position mainP, Position subP, Position wantP,
                            Mike mike, Tier tier, int gameRank, double winrate, MatchingType matchingType,
                            int mannerLevel, Member member) {
         this.gameMode = gameMode;
-        this.mainPosition = mainPosition;
-        this.subPosition = subPosition;
-        this.wantPosition = wantPosition;
+        this.mainP = mainP;
+        this.subP = subP;
+        this.wantP = wantP;
         this.mike = mike;
         this.tier = tier;
         this.gameRank = gameRank;
@@ -115,7 +136,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
         this.matchingType = matchingType;
         this.mannerLevel = mannerLevel;
         this.member = member;
-        this.targetMember = null;
+        this.targetMatchingRecord = null;
     }
 
     // status 변경
@@ -124,11 +145,11 @@ public class MatchingRecord extends BaseDateTimeEntity {
     }
 
     // targetMember 설정
-    public void updateTargetMember(Member member) {
-        this.targetMember = member;
+    public void updateTargetMatchingRecord(MatchingRecord targetMatchingRecord) {
+        this.targetMatchingRecord = targetMatchingRecord;
     }
 
-    public void updateMannerMessageSent(Boolean mannerMessageSent) {
+    public void updateMannerMessageSent(MannerMessageStatus mannerMessageSent) {
         this.mannerMessageSent = mannerMessageSent;
     }
 

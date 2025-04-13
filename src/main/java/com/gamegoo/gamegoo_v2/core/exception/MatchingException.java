@@ -3,13 +3,10 @@ package com.gamegoo.gamegoo_v2.core.exception;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.core.exception.common.GlobalException;
 
-public class RiotException extends GlobalException {
+public class MatchingException extends GlobalException {
 
-    public RiotException(ErrorCode errorCode) {
+    public MatchingException(ErrorCode errorCode) {
         super(errorCode);
     }
 
-    public RiotException(ErrorCode errorCode,String message) {
-        super(errorCode,message);
-    }
 }

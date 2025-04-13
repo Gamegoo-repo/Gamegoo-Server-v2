@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+import static org.springframework.http.HttpStatus.BAD_GATEWAY;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Getter
@@ -47,29 +49,38 @@ public enum ErrorCode {
     /**
      * 이메일 관련 에러
      */
-    EMAIL_CONTENT_LOAD_FAIL(NOT_FOUND, "EMAIL401", "이메일 본문을 읽어오는데 실패했습니다."),
-    EMAIL_SEND_FAIL(NOT_FOUND, "EMAIL402", "이메일 전송에 실패했습니다"),
+    EMAIL_CONTENT_LOAD_FAIL(NOT_FOUND, "EMAIL_401", "이메일 본문을 읽어오는데 실패했습니다."),
+    EMAIL_SEND_FAIL(NOT_FOUND, "EMAIL_402", "이메일 전송에 실패했습니다"),
     EMAIL_LIMIT_EXCEEDED(BAD_REQUEST, "EMAIL_403", "3분 이내 3개 이상 이메일을 보냈습니다."),
     EMAIL_RECORD_NOT_FOUND(NOT_FOUND, "EMAIL_404", "해당 이메일을 가진 기록이 없습니다."),
     INVALID_VERIFICATION_CODE(BAD_REQUEST, "EMAIL_405", "인증 코드가 틀렸습니다"),
     EMAIL_VERIFICATION_TIME_EXCEED(BAD_REQUEST, "EMAIL_406", "인증 코드 검증 시간을 초과했습니다."),
+
+    /**
+     * 게임스타일 관련 에러
+     */
     GAMESTYLE_NOT_FOUND(NOT_FOUND, "GAMESTYLE401", "해당 게임 스타일을 찾을 수 없습니다."),
 
     /**
      * Riot 관련 에러
      */
+    RIOT_UNKNOWN_ERROR(INTERNAL_SERVER_ERROR, "RIOT_501", "Riot API에서 알 수 없는 오류가 발생했습니다."),
+    RIOT_NETWORK_ERROR(SERVICE_UNAVAILABLE, "RIOT_502", "네트워크 오류로 Riot API 요청이 실패했습니다."),
+    RIOT_SERVER_ERROR(BAD_GATEWAY, "RIOT_503", "Riot API 서버에서 오류가 발생했습니다"),
+    RIOT_API_ERROR(INTERNAL_SERVER_ERROR, "RIOT_504", "Riot API 요청 중 에러가 발생했습니다."),
+    RIOT_INVALID_API_KEY(BAD_REQUEST, "RIOT_401", "잘못된 Riot API 키입니다."),
     RIOT_NOT_FOUND(NOT_FOUND, "RIOT_401", "해당 Riot 계정이 존재하지 않습니다."),
-    RIOT_MEMBER_CONFLICT(CONFLICT, "RIOT_402", "해당 이메일 계정은 이미 다른 RIOT 계정과 연동되었습니다."),
-    RIOT_ACCOUNT_CONFLICT(CONFLICT, "RIOT403", "해당 RIOT 계정은 이미 다른 이메일과 연동되어있습니다."),
-    RIOT_INSUFFICIENT_MATCHES(NOT_FOUND, "RIOT404",
-            "해당 RIOT 계정은 최근 100판 이내에 솔로랭크, 자유랭크, 일반게임, 칼바람을 플레이한 적이 없기 때문에 선호하는 챔피언 3명을 정할 수 없습니다."),
-    RIOT_ERROR(INTERNAL_SERVER_ERROR, "RIOT405", "RIOT API 연동 중 에러가 발생했습니다."),
-    RIOT_MATCH_NOT_FOUND(NOT_FOUND, "RIOTMATCH_401",
-            "해당 Riot 계정의 매칭을 불러오는 도중 에러가 발생했습니다. 최근 100판 이내 이벤트 매칭 제외, 일반 매칭(일반게임,랭크게임,칼바람)을 많이 한 계정으로 다시 시도하세요."),
-    RIOT_MATCH_IDS_NOT_FOUND(NOT_FOUND, "RIOTMATCH_402", "Riot 매칭 id 들을 불러오는 도중 에러가 발생했습니다."),
-    RIOT_PREFER_CHAMPION_ERROR(INTERNAL_SERVER_ERROR, "RIOTCHAMPION_401", "선호 챔피언을 연동하는 도중 에러가 발생했습니다"),
-    RIOT_MATCH_CHAMPION_NOT_FOUND(NOT_FOUND, "RIOTCHAMPION_402", "매칭 정보에서 챔피언 정보를 불러오는 도중 에러가 발생했습니다."),
-    CHAMPION_NOT_FOUND(NOT_FOUND, "CHAMPION_401", "해당 챔피언이 존재하지 않습니다."),
+    RIOT_ACCOUNT_CONFLICT(CONFLICT, "RIOT403", "해당 Riot 계정은 이미 다른 이메일과 연동되어있습니다."),
+
+    /**
+     * 매칭 관련 에러
+     */
+    MATCHING_NOT_FOUND(NOT_FOUND, "MATCH_401", "해당 매칭이 존재하지 않습니다."),
+    TARGET_MATCHING_MEMBER_NOT_FOUND(NOT_FOUND, "MATCH_402", "해당 회원과 매칭된 회원이 없습니다"),
+    MATCHING_STATUS_NOT_ALLOWED(BAD_REQUEST, "MATCH_403", "현재 매칭 상태에서는 요청할 수 없습니다."),
+    MATCHING_TARGET_UNAVAILABLE(BAD_REQUEST, "MATCH_404", "상대방이 다른 매칭 로직을 진행 중입니다."),
+    MATCHING_FOUND_FAILED_TARGET_IS_BLOCKED(FORBIDDEN, "MATCH_405", "매칭 상대 회원을 차단한 상태입니다. 매칭 FOUND 처리가 불가능합니다."),
+    MATCHING_FOUND_FAILED_BLOCKED_BY_TARGET(FORBIDDEN, "MATCH_406", "매칭 상대 회원이 나를 차단했습니다. 매칭 FOUND 처리가 불가능합니다."),
 
     /**
      * 차단 관련 에러
@@ -132,6 +143,9 @@ public enum ErrorCode {
     BOARD_FORBIDDEN_WORD_LOAD_FAILED(INTERNAL_SERVER_ERROR, "BOARD_409", "금지어 파일을 읽어오는데 실패했습니다."),
     BUMP_ACCESS_DENIED(FORBIDDEN, "BOARD_410", "게시글 끌어올리기 권한이 없습니다."),
     BUMP_TIME_LIMIT(BAD_REQUEST, "BOARD_411", "게시글 끌어올리기는 24시간에 1회만 가능합니다."),
+    BOARD_CREATE_COOL_DOWN(BAD_REQUEST, "BOARD_412", "게시글 작성 쿨타임이 적용되었습니다. 5분 후 다시 시도해주세요."),
+
+
     /**
      * 매너평가 관련 에러
      */
@@ -147,6 +161,7 @@ public enum ErrorCode {
     REPORT_CODE_BAD_REQUEST(BAD_REQUEST, "REPORT_401", "잘못된 신고 타입 요청입니다."),
     REPORT_NOT_FOUND(NOT_FOUND, "REPORT_402", "해당 신고 건을 찾을 수 없습니다."),
     REPORT_PATH_NOT_FOUND(INTERNAL_SERVER_ERROR, "REPORT_403", "신고 접수 경로 정보를 찾을 수 없습니다. 관리자에게 문의 바랍니다."),
+    REPORT_ALREADY_EXISTS(BAD_REQUEST, "REPORT_404", "해당 회원에 대한 신고가 이미 등록되었습니다. 내일 다시 시도해주세요."),
 
     /**
      * socket 서버 관련 에러

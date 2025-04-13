@@ -15,11 +15,12 @@ import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-    @Query("SELECT b From Board b JOIN b.member m WHERE" +
-            "(b.deleted = false) AND " +
+    @Query("SELECT b FROM Board b JOIN b.member m WHERE " +
+            "b.deleted = false AND " +
             "(:mode IS NULL OR b.gameMode = :mode) AND " +
-            "(:tier IS NULL OR m.soloTier = :tier) AND " +
-            "(:mainP IS NULL OR :mainP = 'ANY' OR b.mainP = :mainP ) AND " +
+            "(:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m" +
+            ".freeTier ELSE m.soloTier END) = :tier) AND " +
+            "(:mainP IS NULL OR :mainP = 'ANY' OR b.mainP = :mainP) AND " +
             "(:mike IS NULL OR b.mike = :mike)")
     Page<Board> findByFilters(@Param("mode") GameMode gameMode,
                               @Param("tier") Tier tier,
@@ -29,6 +30,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
 
     Optional<Board> findByIdAndDeleted(Long boardId, boolean b);
+
+    Optional<Board> findTopByMemberIdOrderByCreatedAtDesc(Long memberId);
 
 
     Page<Board> findByMemberIdAndDeletedFalse(Long memberId, Pageable pageable);

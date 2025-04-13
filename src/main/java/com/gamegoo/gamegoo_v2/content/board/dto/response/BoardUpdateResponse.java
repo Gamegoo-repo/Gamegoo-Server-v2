@@ -26,7 +26,7 @@ public class BoardUpdateResponse {
     GameMode gameMode;
     Position mainP;
     Position subP;
-    Position wantP;
+    List<Position> wantP;
     Mike mike;
     List<Long> gameStyles;
     String contents;
@@ -37,14 +37,24 @@ public class BoardUpdateResponse {
                 .map(bgs -> bgs.getGameStyle().getId())
                 .collect(Collectors.toList());
 
+        Tier tier;
+        int rank;
+        if (board.getGameMode() == GameMode.FREE) {
+            tier = member.getFreeTier();
+            rank = member.getFreeRank();
+        } else {
+            tier = member.getSoloTier();
+            rank = member.getSoloRank();
+        }
+
         return BoardUpdateResponse.builder()
                 .boardId(board.getId())
                 .memberId(member.getId())
                 .profileImage(board.getBoardProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getSoloTier())
-                .rank(member.getSoloRank())
+                .tier(tier)
+                .rank(rank)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())

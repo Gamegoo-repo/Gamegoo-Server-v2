@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.core.exception.RiotException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.external.riot.dto.RiotAuthResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.RiotSummonerResponse;
+import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 public class RiotAuthService {
 
     private final RestTemplate restTemplate;
+    private final RiotApiHelper riotApiHelper;
 
     @Value("${spring.riot.api.key}")
     private String riotAPIKey;
@@ -43,8 +45,8 @@ public class RiotAuthService {
 
             return response.getPuuid();
         } catch (Exception e) {
-            throw new RiotException(ErrorCode.RIOT_NOT_FOUND);
-        }
+            riotApiHelper.handleApiError(e);
+            return null;        }
     }
 
     /**
@@ -64,8 +66,8 @@ public class RiotAuthService {
 
             return summonerResponse.getId();
         } catch (Exception e) {
-            throw new RiotException(ErrorCode.RIOT_NOT_FOUND);
-        }
+            riotApiHelper.handleApiError(e);
+            return null;        }
     }
 
 }

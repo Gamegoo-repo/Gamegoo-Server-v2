@@ -93,6 +93,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/swagger-ui/**",
                         "/v3/api-docs/**").permitAll()
+                .requestMatchers("healthcheck").permitAll()
                 .anyRequest().authenticated());
 
         // 커스텀 필터 추가
@@ -119,6 +120,7 @@ public class SecurityConfig {
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedOrigin("http://local.mydomain.com");
         config.addAllowedOrigin("https://api.gamegoo.co.kr");
+        config.addAllowedOrigin("https://dev.gamegoo.co.kr");
         config.addAllowedOrigin("https://socket.gamegoo.co.kr");
         config.addAllowedOrigin("https://www.gamegoo.co.kr");
         config.addAllowedHeader("*");

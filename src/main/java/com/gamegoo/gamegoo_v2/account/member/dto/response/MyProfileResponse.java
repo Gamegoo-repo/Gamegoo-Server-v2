@@ -1,11 +1,11 @@
 package com.gamegoo.gamegoo_v2.account.member.dto.response;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
+import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,10 +21,12 @@ public class MyProfileResponse {
     String email;
     String gameName;
     String tag;
-    Tier tier;
-    Integer gameRank;
-    Double mannerRank;
-    Integer mannerLevel;
+    Tier soloTier;
+    Integer soloRank;
+    Double soloWinrate;
+    Tier freeTier;
+    Integer freeRank;
+    Double freeWinrate;
     String updatedAt;
     Position mainP;
     Position subP;
@@ -32,17 +34,19 @@ public class MyProfileResponse {
     Boolean isAgree;
     Boolean isBlind;
     String loginType;
-    Double winrate;
     List<GameStyleResponse> gameStyleResponseList;
     List<ChampionResponse> championResponseList;
 
-    public static MyProfileResponse of(Member member, Double mannerRank) {
+    public static MyProfileResponse of(Member member) {
         List<GameStyleResponse> gameStyleResponseList = member.getMemberGameStyleList().stream()
                 .map(memberGameStyle -> GameStyleResponse.of(memberGameStyle.getGameStyle()))
                 .toList();
 
         List<ChampionResponse> championResponseList = member.getMemberChampionList().stream()
-                .map(memberChampion -> ChampionResponse.of(memberChampion.getChampion()))
+                .map(memberChampion -> ChampionResponse.of(
+                        memberChampion.getChampion(),
+                        memberChampion.getWins(),
+                        memberChampion.getGames()))
                 .toList();
 
         return MyProfileResponse.builder()
@@ -51,17 +55,18 @@ public class MyProfileResponse {
                 .email(member.getEmail())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getSoloTier())
-                .gameRank(member.getSoloRank())
+                .soloTier(member.getSoloTier())
+                .soloRank(member.getSoloRank())
+                .soloWinrate(member.getSoloWinRate())
+                .freeTier(member.getFreeTier())
+                .freeRank(member.getFreeRank())
+                .freeWinrate(member.getFreeWinRate())
                 .profileImg(member.getProfileImage())
-                .mannerLevel(member.getMannerLevel())
-                .mannerRank(mannerRank)
-                .mainP(member.getMainPosition())
-                .subP(member.getSubPosition())
-                .wantP(member.getWantPosition())
+                .mainP(member.getMainP())
+                .subP(member.getSubP())
+                .wantP(member.getWantP())
                 .isAgree(member.isAgree())
                 .isBlind(member.isBlind())
-                .winrate(member.getSoloWinRate())
                 .loginType(String.valueOf(member.getLoginType()))
                 .updatedAt(String.valueOf(member.getUpdatedAt()))
                 .gameStyleResponseList(gameStyleResponseList)

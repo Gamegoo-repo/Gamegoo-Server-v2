@@ -1131,7 +1131,7 @@ class ChatFacadeServiceTest {
                 .gameMode(GameMode.SOLO)
                 .mainP(Position.ADC)
                 .subP(Position.JUNGLE)
-                .wantP(Position.ADC)
+                .wantP(List.of(Position.ADC))
                 .mike(Mike.AVAILABLE)
                 .content("content")
                 .boardProfileImage(1)

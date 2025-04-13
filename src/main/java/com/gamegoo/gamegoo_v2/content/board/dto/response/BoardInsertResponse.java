@@ -25,20 +25,31 @@ public class BoardInsertResponse {
     private GameMode gameMode;
     private Position mainP;
     private Position subP;
-    private Position wantP;
+    private List<Position> wantP;
     private Mike mike;
     private List<Long> gameStyles;
     private String contents;
 
     public static BoardInsertResponse of(Board board, Member member) {
+
+        Tier tier;
+        int rank;
+        if (board.getGameMode() == GameMode.FREE) {
+            tier = member.getFreeTier();
+            rank = member.getFreeRank();
+        } else {
+            tier = member.getSoloTier();
+            rank = member.getSoloRank();
+        }
+
         return BoardInsertResponse.builder()
                 .boardId(board.getId())
                 .memberId(member.getId())
                 .profileImage(board.getBoardProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getSoloTier())
-                .rank(member.getSoloRank())
+                .tier(tier)
+                .rank(rank)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())

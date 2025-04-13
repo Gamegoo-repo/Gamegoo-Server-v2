@@ -8,8 +8,13 @@
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) - %msg%n"/>
     <!-- Log파일에 기록되는 로그 패턴 -->
     <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n"/>
+    <!-- 디스코드 출력 로그 패턴 -->
+    <property name="DISCORD_LOG_PATTERN" value="**🚨 Springboot Error Alert 🚨** \n**Logger:** `%logger{36} - %msg` \n**Timestamp:** `%d{yyyy-MM-dd HH:mm:ss}` \n**Stack Trace** \n```%ex{short}```"/>
+
     <!-- 로그 파일 저장 경로 -->
     <property name="LOG_PATH" value="/app/logs"/>
+    <!-- 디스코드 웹훅 -->
+    <springProperty name="DISCORD_WEBHOOK_URL" source="logging.discord.webhook"/>
 
     <!-- 콘솔로그 Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -53,6 +58,24 @@
         </filter>
     </appender>
 
+    <!-- discord ERROR 로그 Appender -->
+    <appender name="DISCORD" class="com.github.napstr.logback.DiscordAppender">
+        <webhookUri>${DISCORD_WEBHOOK_URL}</webhookUri>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${DISCORD_LOG_PATTERN}</pattern>
+        </layout>
+        <username>Logback</username>
+        <tts>false</tts>
+    </appender>
+
+    <!-- 비동기 Discord Webhook Appender -->
+    <appender name="ASYNC_DISCORD" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="DISCORD"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
     <!-- local Profile에서의 로그 설정 -->
     <springProfile name="local">
         <root level="INFO">
@@ -63,10 +86,18 @@
     <!-- dev Profile에서의 로그 설정 -->
     <springProfile name="dev">
         <root level="INFO">
+            <!-- CONSOLE 로그만 등록 -->
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+    <!-- prod Profile에서의 로그 설정 -->
+    <springProfile name="prod">
+        <root level="INFO">
             <!-- CONSOLE, FILE_INFO, FILE_ERROR 등록-->
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE_INFO"/>
             <appender-ref ref="FILE_ERROR"/>
+            <appender-ref ref="ASYNC_DISCORD"/>
         </root>
     </springProfile>
 

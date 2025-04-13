@@ -20,6 +20,7 @@ import com.gamegoo.gamegoo_v2.core.event.SendReportEmailEvent;
 import com.gamegoo.gamegoo_v2.core.event.listener.EmailEventListener;
 import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
+import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.core.exception.common.GlobalException;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
@@ -155,6 +156,27 @@ class ReportFacadeServiceTest {
             assertThatThrownBy(() -> reportFacadeService.addReport(member, targetMember.getId(), request))
                     .isInstanceOf(MemberException.class)
                     .hasMessage(ErrorCode.TARGET_MEMBER_DEACTIVATED.getMessage());
+        }
+
+        @DisplayName("실패: 대상 회원에게 오늘 날짜로 등록된 신고 내역이 이미 존재하는 경우 쿨타임이 적용된다.")
+        @Test
+        void addReport_shouldThrownWhenCoolTime() {
+            // given
+            List<Integer> reportCodes = List.of(1, 2, 3);
+            ReportRequest request = ReportRequest.builder()
+                    .reportCodeList(reportCodes)
+                    .contents("contents")
+                    .pathCode(1)
+                    .boardId(null)
+                    .build();
+
+            reportRepository.save(Report.create(member, targetMember, "content", ReportPath.CHAT, null));
+
+            // when // then
+            assertThatThrownBy(() -> reportFacadeService.addReport(member, targetMember.getId(), request))
+                    .isInstanceOf(ReportException.class)
+                    .hasMessage(ErrorCode.REPORT_ALREADY_EXISTS.getMessage());
+
         }
 
         @DisplayName("성공: boardId가 없는 경우")
@@ -304,7 +326,7 @@ class ReportFacadeServiceTest {
                 .gameMode(GameMode.SOLO)
                 .mainP(Position.ADC)
                 .subP(Position.JUNGLE)
-                .wantP(Position.ADC)
+                .wantP(List.of(Position.ADC))
                 .mike(Mike.AVAILABLE)
                 .content("content")
                 .boardProfileImage(1)

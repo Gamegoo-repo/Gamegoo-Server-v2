@@ -7,6 +7,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -30,14 +31,16 @@ public class BoardByIdResponseForMember {
     String tag;
     Integer mannerLevel;
     List<MannerKeyword> mannerKeywords;
-    Tier tier;
-    int rank;
+    Tier soloTier;
+    int soloRank;
+    Tier freeTier;
+    int freeRank;
     Mike mike;
-    List<ChampionResponse> championResponseDTOList;
+    List<ChampionStatsResponse> championResponseDTOList;
     GameMode gameMode;
     Position mainP;
-    Position subPosition;
-    Position wantPosition;
+    Position subP;
+    List<Position> wantP;
     Integer recentGameCount;
     Double winRate;
     List<Long> gameStyles;
@@ -52,16 +55,34 @@ public class BoardByIdResponseForMember {
     ) {
         Member poster = board.getMember();
 
-        List<ChampionResponse> championResponseList = poster.getMemberChampionList() == null
+        List<ChampionStatsResponse> championResponseList = poster.getMemberChampionList() == null
                 ? List.of()
                 : poster.getMemberChampionList().stream()
-                .map(mc -> ChampionResponse.of(mc.getChampion()))
+                .map(mc -> ChampionStatsResponse.builder()
+                        .championId(mc.getChampion().getId())
+                        .championName(mc.getChampion().getName())
+                        .wins(mc.getWins())
+                        .games(mc.getGames())
+                        .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
+                        .csPerMinute(mc.getCsPerMinute())
+                        .build())
                 .collect(Collectors.toList());
 
 
         List<Long> gameStyleIds = board.getBoardGameStyles().stream()
                 .map(bgs -> bgs.getGameStyle().getId())
                 .collect(Collectors.toList());
+
+        Integer recentGameCount;
+        Double winRate;
+
+        if (board.getGameMode() == GameMode.FREE) {
+            recentGameCount = poster.getFreeGameCount();
+            winRate = poster.getFreeWinRate();
+        } else {
+            recentGameCount = poster.getSoloGameCount();
+            winRate = poster.getSoloWinRate();
+        }
 
         return BoardByIdResponseForMember.builder()
                 .boardId(board.getId())
@@ -70,20 +91,22 @@ public class BoardByIdResponseForMember {
                 .isFriend(isFriend)
                 .friendRequestMemberId(friendRequestMemberId)
                 .createdAt(board.getCreatedAt())
-                .profileImage(board.getBoardProfileImage())
+                .profileImage(poster.getProfileImage())
                 .gameName(poster.getGameName())
                 .tag(poster.getTag())
                 .mannerLevel(poster.getMannerLevel())
-                .tier(poster.getSoloTier())
-                .rank(poster.getSoloRank())
+                .soloTier(poster.getSoloTier())
+                .soloRank(poster.getSoloRank())
+                .freeTier(poster.getFreeTier())
+                .freeRank(poster.getFreeRank())
                 .mike(board.getMike())
                 .championResponseDTOList(championResponseList)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
-                .subPosition(board.getSubP())
-                .wantPosition(board.getWantP())
-                .recentGameCount(poster.getSoloGameCount())
-                .winRate(poster.getSoloWinRate())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
+                .recentGameCount(recentGameCount)
+                .winRate(winRate)
                 .gameStyles(gameStyleIds)
                 .contents(board.getContent())
                 .build();

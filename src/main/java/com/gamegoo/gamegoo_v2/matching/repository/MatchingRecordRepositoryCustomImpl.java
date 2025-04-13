@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.gamegoo.gamegoo_v2.matching.domain.QMatchingRecord.matchingRecord;
 
@@ -24,30 +25,65 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
 
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * 생성 시간 내 만들어진 매칭 기록 조회
+     *
+     * @param createdAt 생성 시간
+     * @param gameMode  게임 모드
+     * @param memberId  사용자 id
+     * @return 매칭 기록
+     */
     @Override
-    public List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode) {
-        return queryFactory.selectFrom(matchingRecord)
-                .where(
-                        matchingRecord.createdAt.gt(createdAt),    // 5분 이내
-                        matchingRecord.status.eq(MatchingStatus.PENDING),  // 상태 PENDING
-                        matchingRecord.gameMode.eq(gameMode),   // 특정 게임 모드
-                        existsValidMatchSubquery(),  // 유효한 매칭만 가져오기
-                        applyGameModeFilter(gameMode) // 게임모드별 추가 필터 적용 (SOLO, FREE)
-                )
-                .orderBy(matchingRecord.member.id.asc(), matchingRecord.createdAt.desc()) // 최신순 정렬
-                .fetch();
-    }
-
-    @Override
-    public MatchingRecord findLatestByMember(Member member) {
-        QMatchingRecord matchingRecord = QMatchingRecord.matchingRecord;
+    public List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode, Long memberId) {
+        // 서브 쿼리에서 쓸 별칭
+        QMatchingRecord sub = new QMatchingRecord("sub");
 
         return queryFactory
                 .selectFrom(matchingRecord)
-                .where(matchingRecord.member.eq(member))
+                .where(
+                        matchingRecord.createdAt.gt(createdAt),
+                        matchingRecord.status.eq(MatchingStatus.PENDING),
+                        matchingRecord.gameMode.eq(gameMode),
+                        matchingRecord.member.id.ne(memberId),
+                        existsValidMatchSubquery(),
+                        applyGameModeFilter(gameMode),
+
+                        matchingRecord.createdAt.eq(
+                                JPAExpressions
+                                        .select(sub.createdAt.max())
+                                        .from(sub)
+                                        .where(
+                                                sub.createdAt.gt(createdAt),
+                                                sub.status.eq(MatchingStatus.PENDING),
+                                                sub.gameMode.eq(gameMode),
+                                                sub.member.id.eq(matchingRecord.member.id)
+                                        )
+                        )
+                )
+                // memberId 오름차순, createdAt 내림차순
+                .orderBy(matchingRecord.member.id.asc(), matchingRecord.createdAt.desc())
+                .fetch();
+    }
+
+
+    /**
+     * 해당 회원의 가장 최근 매칭
+     *
+     * @param member 사용자
+     * @return 매칭 기록
+     */
+    @Override
+    public Optional<MatchingRecord> findLatestByMember(Member member) {
+        QMatchingRecord matchingRecord = QMatchingRecord.matchingRecord;
+
+        MatchingRecord record = queryFactory
+                .selectFrom(matchingRecord)
+                .where(member == null ? matchingRecord.member.isNull() : matchingRecord.member.eq(member))
                 .orderBy(matchingRecord.createdAt.desc())
                 .limit(1)
                 .fetchOne();
+
+        return Optional.ofNullable(record);
     }
 
     /**
@@ -97,26 +133,26 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
      * 매칭 가능한 포지션 조건
      */
     private BooleanExpression isValidMatchingPosition(QMatchingRecord myRecord, QMatchingRecord otherRecord) {
-        BooleanExpression condition1 = myRecord.mainPosition.ne(Position.ANY)
-                .and(otherRecord.subPosition.ne(Position.ANY))
-                .and(myRecord.mainPosition.eq(otherRecord.subPosition)
-                        .or(otherRecord.mainPosition.eq(myRecord.subPosition)))
-                .and(myRecord.wantPosition.eq(otherRecord.subPosition));
+        BooleanExpression condition1 = myRecord.mainP.ne(Position.ANY)
+                .and(otherRecord.subP.ne(Position.ANY))
+                .and(myRecord.mainP.eq(otherRecord.subP)
+                        .or(otherRecord.mainP.eq(myRecord.subP)))
+                .and(myRecord.wantP.eq(otherRecord.subP));
 
-        BooleanExpression condition2 = myRecord.subPosition.ne(Position.ANY)
-                .and(otherRecord.wantPosition.ne(Position.ANY))
-                .and(otherRecord.wantPosition.eq(myRecord.subPosition))
-                .and(otherRecord.mainPosition.eq(myRecord.subPosition)
-                        .or(myRecord.mainPosition.eq(otherRecord.subPosition)));
+        BooleanExpression condition2 = myRecord.subP.ne(Position.ANY)
+                .and(otherRecord.wantP.ne(Position.ANY))
+                .and(otherRecord.wantP.eq(myRecord.subP))
+                .and(otherRecord.mainP.eq(myRecord.subP)
+                        .or(myRecord.mainP.eq(otherRecord.subP)));
 
-        BooleanExpression condition3 = myRecord.mainPosition.ne(Position.ANY)
-                .and(myRecord.subPosition.ne(Position.ANY))
-                .and(otherRecord.mainPosition.ne(Position.ANY))
-                .and(otherRecord.subPosition.ne(Position.ANY))
-                .and(myRecord.mainPosition.eq(otherRecord.mainPosition)
-                        .or(myRecord.mainPosition.eq(otherRecord.subPosition)))
-                .and(myRecord.subPosition.eq(otherRecord.mainPosition)
-                        .or(myRecord.subPosition.eq(otherRecord.subPosition)))
+        BooleanExpression condition3 = myRecord.mainP.ne(Position.ANY)
+                .and(myRecord.subP.ne(Position.ANY))
+                .and(otherRecord.mainP.ne(Position.ANY))
+                .and(otherRecord.subP.ne(Position.ANY))
+                .and(myRecord.mainP.eq(otherRecord.mainP)
+                        .or(myRecord.mainP.eq(otherRecord.subP)))
+                .and(myRecord.subP.eq(otherRecord.mainP)
+                        .or(myRecord.subP.eq(otherRecord.subP)))
                 .not();
 
         return condition1.or(condition2).or(condition3);

@@ -16,8 +16,25 @@ public class MatchingStrategyProcessor {
      * @return 우선순위 점수
      */
     public int calculatePrecisePriority(MatchingRecord myRecord, MatchingRecord otherRecord) {
-        return MatchingScoreCalculator.getMannerPriority(
-                otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
+        switch (myRecord.getGameMode()) {
+            case FAST -> {
+                return MatchingScoreCalculator.getMannerPriority(
+                        otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 25, 4);
+            }
+            case SOLO -> {
+                return MatchingScoreCalculator.getMannerPriority(
+                        otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 67, 4);
+            }
+            case FREE -> {
+                return MatchingScoreCalculator.getMannerPriority(
+                        otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 65, 4);
+            }
+            case ARAM -> {
+                return MatchingScoreCalculator.getMannerPriority(
+                        otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 19, 4);
+            }
+        }
+        return 0;
     }
 
     /**
@@ -34,15 +51,11 @@ public class MatchingStrategyProcessor {
         priority += MatchingScoreCalculator.getMannerPriority(
                 otherRecord.getMannerLevel(), myRecord.getMannerLevel(), 16, 4);
 
-        // TODO: 티어 및 랭킹 점수 계산
-        priority += MatchingScoreCalculator.getTierRankPriority(myRecord.getTier(), myRecord.getGameRank(),
-                otherRecord.getTier(), otherRecord.getGameRank(), 40, 4);
-
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
-                myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(), 3, 2, 1);
+                myRecord.getWantP(), otherRecord.getMainP(), otherRecord.getSubP(), 3, 2, 1);
         priority += MatchingScoreCalculator.getPositionPriority(
-                otherRecord.getWantPosition(), myRecord.getMainPosition(), myRecord.getSubPosition(), 3, 2, 1);
+                otherRecord.getWantP(), myRecord.getMainP(), myRecord.getSubP(), 3, 2, 1);
 
         // 마이크 우선순위
         priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
@@ -71,9 +84,9 @@ public class MatchingStrategyProcessor {
 
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
-                myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(), 3, 2, 1);
+                myRecord.getWantP(), otherRecord.getMainP(), otherRecord.getSubP(), 3, 2, 1);
         priority += MatchingScoreCalculator.getPositionPriority(
-                otherRecord.getWantPosition(), myRecord.getMainPosition(), myRecord.getSubPosition(), 3, 2, 1);
+                otherRecord.getWantP(), myRecord.getMainP(), myRecord.getSubP(), 3, 2, 1);
 
         // 마이크 우선순위
         priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 5);
@@ -102,9 +115,9 @@ public class MatchingStrategyProcessor {
 
         // 포지션 우선순위
         priority += MatchingScoreCalculator.getPositionPriority(
-                myRecord.getWantPosition(), otherRecord.getMainPosition(), otherRecord.getSubPosition(), 3, 2, 1);
+                myRecord.getWantP(), otherRecord.getMainP(), otherRecord.getSubP(), 3, 2, 1);
         priority += MatchingScoreCalculator.getPositionPriority(
-                otherRecord.getWantPosition(), myRecord.getMainPosition(), myRecord.getSubPosition(), 3, 2, 1);
+                otherRecord.getWantP(), myRecord.getMainP(), myRecord.getSubP(), 3, 2, 1);
 
         // 마이크 우선순위
         priority += MatchingScoreCalculator.getMikePriority(myRecord.getMike(), otherRecord.getMike(), 3);
@@ -146,8 +159,8 @@ public class MatchingStrategyProcessor {
         }
 
         // 내가 원하는 포지션이 상대 포지션이 아닐 경우 매칭 실패
-        if (!otherRecord.getMainPosition().equals(myRecord.getWantPosition()) &&
-                !otherRecord.getSubPosition().equals(myRecord.getWantPosition())) {
+        if (!otherRecord.getMainP().equals(myRecord.getWantP()) &&
+                !otherRecord.getSubP().equals(myRecord.getWantP())) {
             return false;
         }
 

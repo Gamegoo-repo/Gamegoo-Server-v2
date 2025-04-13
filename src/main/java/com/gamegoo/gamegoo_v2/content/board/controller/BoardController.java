@@ -50,7 +50,10 @@ public class BoardController {
      */
     @PostMapping
     @Operation(summary = "게시판 글 작성 API",
-            description = "게시판에서 글을 작성하는 API 입니다. 게임 모드 1~4, 포지션을 입력하세요. 게임스타일은 최대 3개까지 입력가능합니다.")
+            description = "게시판에서 글을 작성하는 API 입니다. 프로필이미지 값: 1~8, gameMode: < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, 칼바람 " +
+                    "나락: ARAM >, " +
+                    "주 포지션, 부포지션, 희망 포지션: < TOP, JUNGLE, MID, ADC, SUP, ANY >, 마이크 여부: < AVAILABLE, UNAVAILABLE >, 게임" +
+                    " 스타일 리스트: 1~3개 선택 가능")
     public ApiResponse<BoardInsertResponse> boardInsert(
             @AuthMember Member member,
             @Valid @RequestBody BoardInsertRequest request) {
@@ -64,7 +67,6 @@ public class BoardController {
     @Operation(summary = "게시판 글 목록 조회 API",
             description = "게시판 글 목록을 조회하는 API 입니다. 필터링을 원하면 각 파라미터를 입력하세요.")
     @Parameters({
-            @Parameter(name = "pageIdx", description = "조회할 페이지 번호를 입력해주세요. 페이지 당 20개의 게시물을 볼 수 있습니다."),
             @Parameter(name = "gameMode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, " +
                     "칼바람 나락: ARAM >"),
             @Parameter(name = "tier", description = "(선택) 티어를 선택해주세요."),
@@ -119,7 +121,6 @@ public class BoardController {
 
     @GetMapping("/my")
     @Operation(summary = "내가 작성한 게시판 글 목록 조회 API", description = "내가 작성한 게시판 글을 조회하는 API 입니다. 페이지 당 10개의 게시물이 표시됩니다.")
-    @Parameter(name = "pageIdx", description = "조회할 페이지 번호를 입력해주세요.")
     public ApiResponse<MyBoardResponse> getMyBoardList(@ValidPage @RequestParam(name = "page") Integer page,
                                                        @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.getMyBoardList(member, page));

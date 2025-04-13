@@ -63,7 +63,8 @@ public class BoardFacadeService {
             mainP = Position.ANY;
         }
 
-        Page<Board> boardPage = boardService.getBoardsWithPagination(gameMode, tier, mainP, mike, pageIdx);
+        Page<Board> boardPage = boardService.getBoardsWithPagination(gameMode, tier, mainP, mike,
+                pageIdx);
 
         return BoardResponse.of(boardPage);
     }

@@ -72,4 +72,11 @@ public class MemberController {
         return ApiResponse.ok(memberFacadeService.setGameStyle(member, request));
     }
 
+    @Operation(summary = "챔피언 통계 새로고침 API 입니다.", description = "API for refreshing champion statistics")
+    @PutMapping("/champion-stats/refresh")
+    public ApiResponse<String> refreshChampionStats(@AuthMember Member member) {
+        return ApiResponse.ok(memberFacadeService.refreshChampionStats(member));
+    }
+
+
 }

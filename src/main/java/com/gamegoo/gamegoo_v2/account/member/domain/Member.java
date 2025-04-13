@@ -82,15 +82,15 @@ public class Member extends BaseDateTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
-    private Position mainPosition = Position.ANY;
+    private Position mainP = Position.ANY;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Position subPosition = Position.ANY;
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
+    private Position subP = Position.ANY;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
-    private Position wantPosition = Position.ANY;
+    private Position wantP = Position.ANY;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(50)")
@@ -175,9 +175,9 @@ public class Member extends BaseDateTimeEntity {
     }
 
     public void updatePosition(Position mainPosition, Position subPosition, Position wantPosition) {
-        this.mainPosition = mainPosition;
-        this.subPosition = subPosition;
-        this.wantPosition = wantPosition;
+        this.mainP = mainPosition;
+        this.subP = subPosition;
+        this.wantP = wantPosition;
     }
 
     public void updatePassword(String password) {
@@ -201,9 +201,9 @@ public class Member extends BaseDateTimeEntity {
 
     public void updateMemberByMatchingRecord(Mike mike, Position mainP, Position subP, Position wantP) {
         this.mike = mike;
-        this.mainPosition = mainP;
-        this.subPosition = subP;
-        this.wantPosition = wantP;
+        this.mainP = mainP;
+        this.subP = subP;
+        this.wantP = wantP;
     }
 
     public void deactiveMember() {

@@ -1,5 +1,4 @@
-name: Gamegoo v2 API CI/CD Pipeline
-
+name: Gamegoo v2 API DEV CI/CD
 on:
   pull_request:
     types: [ closed ]
@@ -13,11 +12,11 @@ jobs:
 
     env: # 전체 job에서 사용할 환경 변수 설정
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      RDS_PRIVATE_IP: ${{ secrets.RDS_PRIVATE_IP }}
+      DEV_DB_HOST: ${{ secrets.DEV_DB_HOST }}
       RDS_PORT: ${{ secrets.RDS_PORT }}
-      DB_SCHEMA_NAME: ${{ secrets.DB_SCHEMA_NAME }}
+      DEV_DB_SCHEMA_NAME: ${{ secrets.DEV_DB_SCHEMA_NAME }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DEV_DB_PASSWORD: ${{ secrets.DEV_DB_PASSWORD }}
       GMAIL_PWD: ${{ secrets.GMAIL_PWD }}
       RIOT_API: ${{ secrets.RIOT_API }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -55,18 +54,18 @@ jobs:
       - name: Docker 이미지 생성 및 push
         uses: docker/build-push-action@v6
         with:
-          context: . # Dockerfile 위치
-          file: ./Dockerfile # Dockerfile 경로
+          context: . # Dockerfile-dev 위치
+          file: ./Dockerfile-dev # Dockerfile-dev 경로
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }} # 이미지 태그
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }} # 이미지 태그
           platforms: linux/amd64
           build-args: |  # Dockerfile에서 사용할 환경 변수 전달
             JWT_SECRET= ${{ secrets.JWT_SECRET }}
-            RDS_PRIVATE_IP= ${{ secrets.RDS_PRIVATE_IP }}
+            DEV_DB_HOST= ${{ secrets.DEV_DB_HOST }}
             RDS_PORT= ${{ secrets.RDS_PORT }}
-            DB_SCHEMA_NAME= ${{ secrets.DB_SCHEMA_NAME }}
+            DEV_DB_SCHEMA_NAME= ${{ secrets.DEV_DB_SCHEMA_NAME }}
             DB_USERNAME= ${{ secrets.DB_USERNAME }}
-            DB_PASSWORD= ${{ secrets.DB_PASSWORD }}
+            DEV_DB_PASSWORD= ${{ secrets.DEV_DB_PASSWORD }}
             GMAIL_PWD= ${{ secrets.GMAIL_PWD }}
             RIOT_API= ${{ secrets.RIOT_API }}
             SOCKET_SERVER_URL= ${{ secrets.SOCKET_SERVER_URL }}
@@ -76,36 +75,31 @@ jobs:
       - name: EC2에 배포
         uses: appleboy/ssh-action@v1.1.0
         with:
-          host: ${{ secrets.EC2_HOST }} # EC2 퍼블릭 IP
+          host: ${{ secrets.DEV_EC2_HOST }} # EC2 퍼블릭 IP
           username: ubuntu # EC2 사용자 (기본은 ubuntu)
-          key: ${{ secrets.EC2_SSH_KEY }} # EC2 SSH Private Key
+          key: ${{ secrets.DEV_EC2_SSH_KEY }} # EC2 SSH Private Key
           script_stop: true # SSH 명령어 실행 중 에러가 발생하면 워크플로 중단
           script: |
             sudo fuser -k -n tcp 8080 || true
 
-            docker rm -f gamegoo-api-v2
+            docker rm -f gamegoo-api-v2-dev
 
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }}
 
             docker run -d \
             -p 8080:8080 \
-            --name gamegoo-api-v2 \
-            -v ${{ secrets.EC2_LOG_PATH }}:/app/logs \
+            --name gamegoo-api-v2-dev \
             -e SPRING_PROFILES_ACTIVE=dev \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            -e RDS_PRIVATE_IP=${{ secrets.RDS_PRIVATE_IP }} \
+            -e DEV_DB_HOST=${{ secrets.DEV_DB_HOST }} \
             -e RDS_PORT=${{ secrets.RDS_PORT }} \
-            -e DB_SCHEMA_NAME=${{ secrets.DB_SCHEMA_NAME }} \
+            -e DEV_DB_SCHEMA_NAME=${{ secrets.DEV_DB_SCHEMA_NAME }} \
             -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e DEV_DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }} \
             -e GMAIL_PWD=${{ secrets.GMAIL_PWD }} \
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2:${{ github.sha }}
-
-      # 8. 기존 Docker 이미지 삭제
-      - name: 기존 Docker 이미지 삭제
-        run: docker image prune -a
+            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }}
 
       # 실패 시 디스코드에 알림 보내기
       - name: 배포 실패 시 디스코드 알림 전송
@@ -116,5 +110,5 @@ jobs:
           PR_AUTHOR="${{ github.event.pull_request.user.login }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
           curl -X POST -H "Content-Type: application/json" \
-          -d "{\"content\": \"🚨 **Gamegoo v2 API 배포 실패** 🚨\nPR 번호: ${PR_NUMBER}\nPR 제목: ${PR_TITLE}\nPR 작성자: ${PR_AUTHOR}\n[PR 보기](${PR_URL})\"}" \
+          -d "{\"content\": \"🚨 **Gamegoo v2 API 개발 서버 배포 실패** 🚨\nPR 번호: ${PR_NUMBER}\nPR 제목: ${PR_TITLE}\nPR 작성자: ${PR_AUTHOR}\n[PR 보기](${PR_URL})\"}" \
           $DISCORD_WEBHOOK_URL

@@ -1,11 +1,10 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
-import com.gamegoo.gamegoo_v2.core.exception.RiotException;
-import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.external.riot.dto.RiotInfoResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +23,7 @@ import java.util.Map;
 public class RiotInfoService {
 
     private final RestTemplate restTemplate;
+    private final RiotApiHelper riotApiHelper;
 
     @Value("${spring.riot.api.key}")
     private String riotAPIKey;
@@ -61,8 +61,8 @@ public class RiotInfoService {
                 }
             }
         } catch (Exception e) {
-            log.error("RIOT API INTERNAL ERROR: ", e);
-            throw new RiotException(ErrorCode.RIOT_ERROR);
+            riotApiHelper.handleApiError(e);
+            return null;
         }
 
         return tierDetails;

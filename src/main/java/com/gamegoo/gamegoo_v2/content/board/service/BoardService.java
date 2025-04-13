@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,14 @@ public class BoardService {
      */
     @Transactional
     public Board createAndSaveBoard(BoardInsertRequest request, Member member) {
+        Optional<Board> latestBoardOpt = boardRepository.findTopByMemberIdOrderByCreatedAtDesc(member.getId());
+        if (latestBoardOpt.isPresent()) {
+            Board latestBoard = latestBoardOpt.get();
+            Duration diff = Duration.between(latestBoard.getCreatedAt(), LocalDateTime.now());
+            if (diff.compareTo(Duration.ofMinutes(5)) < 0) {
+                throw new BoardException(ErrorCode.BOARD_CREATE_COOL_DOWN);
+            }
+        }
         int boardProfileImage = (request.getBoardProfileImage() != null)
                 ? request.getBoardProfileImage()
                 : member.getProfileImage();
@@ -57,7 +66,8 @@ public class BoardService {
     /**
      * 게시글 목록 조회
      */
-    public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Mike mike, Pageable pageable) {
+    public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Mike mike,
+                                  Pageable pageable) {
         return boardRepository.findByFilters(gameMode, tier, mainP, mike, pageable);
     }
 
@@ -65,7 +75,8 @@ public class BoardService {
      * 게시글 목록 조회 (페이징 처리)
      */
 
-    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Mike mike,
+    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP,
+                                               Mike mike,
                                                int pageIdx) {
         Pageable pageable = PageRequest.of(pageIdx - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityTime"));
         return findBoards(gameMode, tier, mainP, mike, pageable);
