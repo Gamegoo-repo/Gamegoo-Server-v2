@@ -9,11 +9,15 @@ import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
+import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
+import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
+import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
+import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +34,10 @@ public class AuthFacadeService {
     private final RiotRecordService riotRecordService;
     private final RiotInfoService riotInfoService;
     private final MemberChampionService memberChampionService;
+    private final ChatCommandService chatCommandService;
+    private final FriendService friendService;
+    private final MannerService mannerService;
+    private final BoardService boardService;
     private final AuthService authService;
     private final JwtProvider jwtProvider;
     private final PasswordService passwordService;
@@ -129,19 +137,25 @@ public class AuthFacadeService {
         // Member 테이블에서 blind 처리
         memberService.deactivateMember(member);
 
-        // TODO: 해당 회원이 속한 모든 채팅방에서 퇴장 처리
+        // 해당 회원이 속한 모든 채팅방에서 퇴장 처리
+        chatCommandService.exitAllChatroom(member);
 
-        // TODO: 해당 회원이 보낸 모든 친구 요청 취소 처리
+        // 해당 회원이 보낸 모든 친구 요청 취소 처리
+        friendService.cancelAllFriendRequestsByFromMember(member);
 
-        // TODO: 해당 회원이 받은 모든 친구 요청 취소 처리
+        // 해당 회원이 받은 모든 친구 요청 취소 처리
+        friendService.cancelAllFriendRequestsByToMember(member);
 
-        // TODO: 게시판 글 삭제 처리 (deleted = true)
+        // 게시판 글 삭제 처리
+        boardService.deleteAllBoardByMember(member);
 
-        // TODO: 매너, 비매너 평가 기록 삭제 처리
+        // 매너, 비매너 평가 기록 삭제 처리
+        mannerService.deleteAllMannerRatingsByMember(member);
 
         // refresh Token 삭제하기
         authService.deleteRefreshToken(member);
 
         return "탈퇴처리가 완료되었습니다";
     }
+
 }
