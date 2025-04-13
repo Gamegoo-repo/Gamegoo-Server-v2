@@ -1,13 +1,14 @@
 package com.gamegoo.gamegoo_v2.external.riot.controller;
 
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
-import com.gamegoo.gamegoo_v2.external.riot.dto.response.RSOResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotVerifyExistUserRequest;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,9 +34,11 @@ public class RiotController {
 
     @GetMapping("/oauth/callback")
     @Operation(summary = "Riot OAuth 인증 코드 콜백 처리")
-    public ApiResponse<RSOResponse> handleOAuthCallback(@RequestParam("code") String code,
-                                                        @RequestParam(required = false) String state) {
-        return ApiResponse.ok(riotFacadeService.processOAuthCallback(code, state));
+    public ResponseEntity<Void> handleOAuthCallback(@RequestParam("code") String code,
+                                                    @RequestParam(required = false) String state) {
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", riotFacadeService.processOAuthCallback(code, state))
+                .build();
     }
 
 }

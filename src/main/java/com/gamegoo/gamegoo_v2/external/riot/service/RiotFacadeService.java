@@ -1,16 +1,14 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
-import com.gamegoo.gamegoo_v2.account.auth.dto.response.LoginResponse;
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
-import com.gamegoo.gamegoo_v2.account.auth.service.AuthService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
-import com.gamegoo.gamegoo_v2.external.riot.dto.response.RSOResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotAuthTokenResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotAccountIdResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotPuuidGameNameResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotVerifyExistUserRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +24,9 @@ public class RiotFacadeService {
     private final RiotAuthService riotAuthService;
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
-    private final AuthService authService;
+
+    @Value(value = "${spring.front_url}")
+    private String frontUrl;
 
     /**
      * 사용가능한 riot 계정인지 검증
@@ -43,7 +43,7 @@ public class RiotFacadeService {
     }
 
     @Transactional
-    public RSOResponse processOAuthCallback(String code, String state) {
+    public String processOAuthCallback(String code, String state) {
         // 1. 토큰 교환
         RiotAuthTokenResponse riotAuthTokenResponse = riotOAuthService.exchangeCodeForTokens(code);
 
@@ -59,26 +59,14 @@ public class RiotFacadeService {
 
         // 사용자가 아예 없을 경우, 회원가입 요청
         if (memberList.isEmpty()) {
-            return RSOResponse.builder()
-                    .isMember(false)
-                    .build();
+            return String.format("%s/rso/callback?isMember=false&state=%s", frontUrl, state);
         }
 
         // 사용자가 있을 경우, 로그인 진행
         Member member = memberList.get(0);
-
         String accessToken = jwtProvider.createAccessToken(member.getId());
-        String refreshToken = jwtProvider.createRefreshToken(member.getId());
 
-        // 5. refresh Token DB에 저장
-        authService.addRefreshToken(member, refreshToken);
-
-        // 4. 프론트 리다이렉트 주소 복원
-
-        return RSOResponse.builder()
-                .isMember(true)
-                .loginResponse(LoginResponse.of(member, accessToken, refreshToken))
-                .build();
+        return String.format("%s/rso/callback?accessToken=%s&state=%s", frontUrl, accessToken, state);
     }
 
 }
