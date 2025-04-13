@@ -1,4 +1,4 @@
-package com.gamegoo.gamegoo_v2.external.riot.dto;
+package com.gamegoo.gamegoo_v2.external.riot.dto.response;
 
 import lombok.Getter;
 

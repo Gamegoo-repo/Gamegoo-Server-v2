@@ -1,8 +1,8 @@
 package com.gamegoo.gamegoo_v2.external.riot.controller;
 
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
-import com.gamegoo.gamegoo_v2.external.riot.dto.RiotAuthTokenResponse;
-import com.gamegoo.gamegoo_v2.external.riot.dto.RiotVerifyExistUserRequest;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RSOResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotVerifyExistUserRequest;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,9 @@ public class RiotController {
 
     @GetMapping("/oauth/callback")
     @Operation(summary = "Riot OAuth 인증 코드 콜백 처리")
-    public ApiResponse<RiotAuthTokenResponse> handleOAuthCallback(@RequestParam("code") String code) {
-        return ApiResponse.ok(riotFacadeService.processOAuthCallback(code));
+    public ApiResponse<RSOResponse> handleOAuthCallback(@RequestParam("code") String code,
+                                                        @RequestParam(required = false) String state) {
+        return ApiResponse.ok(riotFacadeService.processOAuthCallback(code, state));
     }
+
 }

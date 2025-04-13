@@ -1,7 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.external.riot.dto.RiotInfoResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotInfoResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
