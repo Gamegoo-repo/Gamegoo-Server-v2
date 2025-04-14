@@ -69,6 +69,7 @@ jobs:
             DEV_DB_PASSWORD= ${{ secrets.DEV_DB_PASSWORD }}
             GMAIL_PWD= ${{ secrets.GMAIL_PWD }}
             RIOT_API= ${{ secrets.RIOT_API }}
+            FRONT_URL: ${{ secrets.FRONT_URL }}
             SOCKET_SERVER_URL= ${{ secrets.SOCKET_SERVER_URL }}
 
       ## CD (Continuous Deployment) 파트
@@ -100,6 +101,7 @@ jobs:
             -e GMAIL_PWD=${{ secrets.GMAIL_PWD }} \
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
+            -e FRONT_URL=${{ secrets.FRONT_URL }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }}
 
       # 실패 시 디스코드에 알림 보내기
