@@ -327,7 +327,7 @@ class MatchingStrategyProcessorTest {
     }
 
     private Member createMember(String email, Tier tier, boolean hasMike) {
-        Member member = Member.create(email, "password123", LoginType.GENERAL, "gameUser", "TAG",
+        Member member = Member.createForGeneral(email, "password123", LoginType.GENERAL, "gameUser", "TAG",
                 tier, 4, 55.0, tier, 4, 55.0, 100, 100, true);
 
         if (hasMike) {

@@ -11,9 +11,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     boolean existsByEmail(String email);
 
+    boolean existsByPuuid(String puuid);
+    
     Optional<Member> findByEmail(String email);
 
-    List<Member> findByGameNameAndTag(String gameName, String tag);
+    List<Member> findByPuuid(String puuid);
 
     @Query("SELECT m.id FROM Member m WHERE m.mannerScore IS NOT NULL ORDER BY m.mannerScore desc")
     List<Long> getMemberIdsOrderByMannerScoreIsNotNull();

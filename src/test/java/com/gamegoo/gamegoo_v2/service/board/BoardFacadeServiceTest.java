@@ -8,7 +8,6 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
-import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardGameStyleService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
@@ -26,10 +25,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,7 +60,7 @@ class BoardFacadeServiceTest {
     @DisplayName("게시글 상세 조회 시 매너 정보가 정상적으로 반환되는지 테스트")
     void getBoardByIdForMember_ShouldReturnMannerInfo() {
         // given
-        Member poster = Member.create(
+        Member poster = Member.createForGeneral(
                 "test@email.com",
                 "password",
                 LoginType.GENERAL,
@@ -83,7 +80,7 @@ class BoardFacadeServiceTest {
         ReflectionTestUtils.setField(poster, "mannerLevel", 3);
         ReflectionTestUtils.setField(poster, "mannerRank", 0.85);
 
-        Member viewer = Member.create(
+        Member viewer = Member.createForGeneral(
                 "viewer@email.com",
                 "password",
                 LoginType.GENERAL,
@@ -129,4 +126,5 @@ class BoardFacadeServiceTest {
         assertThat(response.getMannerRank()).isEqualTo(0.85);
         assertThat(response.getMannerRatingCount()).isEqualTo(10);
     }
-} 
+
+}
