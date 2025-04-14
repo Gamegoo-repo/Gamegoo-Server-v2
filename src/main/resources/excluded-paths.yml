@@ -31,3 +31,6 @@ security:
       - method: GET
         pattern: /api/v2/manner/level/* # 매너 레벨 정보 조회
       - pattern: /api/v2/riot/oauth/callback/** # RSO
+      - method: POST # riot 회원가입
+        pattern: /api/v2/riot/join
+

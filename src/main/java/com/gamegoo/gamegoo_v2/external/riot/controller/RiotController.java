@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.controller;
 
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotVerifyExistUserRequest;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,10 +33,16 @@ public class RiotController {
         return ApiResponse.ok(riotFacadeService.verifyRiotAccount(request));
     }
 
+    @PostMapping("/join")
+    @Operation(summary = "RSO 전용 회원가입 API", description = "API for RSO join")
+    public ApiResponse<String> joinByRSO(@RequestBody @Valid RiotJoinRequest request) {
+        return ApiResponse.ok(riotFacadeService.join(request));
+    }
+
     @GetMapping("/oauth/callback")
     @Operation(summary = "Riot OAuth 인증 코드 콜백 처리")
-    public ResponseEntity<Void> handleOAuthCallback(@RequestParam("code") String code,
-                                                    @RequestParam(required = false) String state) {
+    public ResponseEntity<Void> handleRSOCallback(@RequestParam("code") String code,
+                                                  @RequestParam(required = false) String state) {
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header("Location", riotFacadeService.processOAuthCallback(code, state))
                 .build();

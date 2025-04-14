@@ -10,6 +10,7 @@ import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
+import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.utils.PasswordUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Member createMember(JoinRequest request, List<TierDetails> tiers) {
+    public Member createMemberGeneral(JoinRequest request, List<TierDetails> tiers) {
 
         // 기본 값 설정
         Tier soloTier = Tier.UNRANKED;
@@ -55,12 +56,53 @@ public class MemberService {
         }
 
         // Member 생성
-        Member member = Member.create(
+        Member member = Member.createForGeneral(
                 request.getEmail(),
                 PasswordUtil.encodePassword(request.getPassword()),
                 LoginType.GENERAL,
                 request.getGameName(),
                 request.getTag(),
+                soloTier, soloRank, soloWinRate,
+                freeTier, freeRank, freeWinRate,
+                soloGameCount, freeGameCount, true
+        );
+
+        memberRepository.save(member);
+        return member;
+    }
+
+    @Transactional
+    public Member createMemberRiot(RiotJoinRequest request, String gameName, String tag, List<TierDetails> tiers) {
+
+        // 기본 값 설정
+        Tier soloTier = Tier.UNRANKED;
+        int soloRank = 0;
+        double soloWinRate = 0.0;
+        int soloGameCount = 0;
+
+        Tier freeTier = Tier.UNRANKED;
+        int freeRank = 0;
+        double freeWinRate = 0.0;
+        int freeGameCount = 0;
+
+        // 티어 정보 설정
+        for (TierDetails tierDetail : tiers) {
+            if (tierDetail.getGameMode() == GameMode.SOLO) {
+                soloTier = tierDetail.getTier();
+                soloRank = tierDetail.getRank();
+                soloWinRate = tierDetail.getWinrate();
+                soloGameCount = tierDetail.getGameCount();
+            } else if (tierDetail.getGameMode() == GameMode.FREE) {
+                freeTier = tierDetail.getTier();
+                freeRank = tierDetail.getRank();
+                freeWinRate = tierDetail.getWinrate();
+                freeGameCount = tierDetail.getGameCount();
+            }
+        }
+
+        // Member 생성
+        Member member = Member.createForRiot(
+                request.getPuuid(), LoginType.RSO, gameName, tag,
                 soloTier, soloRank, soloWinRate,
                 freeTier, freeRank, freeWinRate,
                 soloGameCount, freeGameCount, true
@@ -101,6 +143,18 @@ public class MemberService {
             throw new MemberException(ErrorCode.MEMBER_ALREADY_EXISTS);
         }
     }
+
+    /**
+     * Puuid 중복 확인하기
+     *
+     * @param puuid puuid
+     */
+    public void checkDuplicateMemberByPuuid(String puuid) {
+        if (memberRepository.existsByPuuid(puuid)) {
+            throw new MemberException(ErrorCode.MEMBER_ALREADY_EXISTS);
+        }
+    }
+
 
     /**
      * DB에 없는 사용자일 경우 예외 발생
@@ -149,14 +203,24 @@ public class MemberService {
     }
 
 
+    /**
+     * 마이크, 포지션 수정
+     *
+     * @param member 회원
+     * @param mike   마이크 유무
+     * @param mainP  주 포지션
+     * @param subP   부 포지션
+     * @param wantP  원하는 포지션
+     */
     @Transactional
     public void updateMikePosition(Member member, Mike mike, Position mainP, Position subP, Position wantP) {
-        // 마이크, 포지션 수정
         member.updateMemberByMatchingRecord(mike, mainP, subP, wantP);
     }
 
+
     @Transactional
-    public List<Member> findMemberByGameNameAndTag(String gameName, String tag) {
-        return memberRepository.findByGameNameAndTag(gameName, tag);
+    public List<Member> findMemberByPuuid(String puuid) {
+        return memberRepository.findByPuuid(puuid);
     }
+
 }
