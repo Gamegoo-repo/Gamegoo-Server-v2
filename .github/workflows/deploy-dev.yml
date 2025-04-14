@@ -21,6 +21,7 @@ jobs:
       RIOT_API: ${{ secrets.RIOT_API }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       SOCKET_SERVER_URL: ${{ secrets.SOCKET_SERVER_URL }}
+      FRONT_URL: ${{secrets.FRONT_URL}}
 
     steps:
       # 1. GitHub Repository 파일 불러오기
