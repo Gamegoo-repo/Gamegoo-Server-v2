@@ -155,6 +155,7 @@ public class Member extends BaseDateTimeEntity {
 
         return Member.builder()
                 .profileImage(randomProfileImage)
+                .puuid(puuid)
                 .loginType(loginType)
                 .gameName(gameName)
                 .tag(tag)
