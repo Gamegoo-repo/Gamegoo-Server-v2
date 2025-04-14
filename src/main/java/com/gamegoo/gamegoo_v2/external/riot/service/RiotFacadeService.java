@@ -72,7 +72,7 @@ public class RiotFacadeService {
 
         // 5. [Riot] 최근 사용한 챔피언 3개 가져오기
         List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(response.getGameName()
-                , response.getTagLine());
+                , response.getPuuid());
 
         // 6. [Member] Member Champion DB 에서 매핑하기
         memberChampionService.saveMemberChampions(member, preferChampionStats);
