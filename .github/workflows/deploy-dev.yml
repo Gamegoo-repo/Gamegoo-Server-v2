@@ -22,6 +22,8 @@ jobs:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       SOCKET_SERVER_URL: ${{ secrets.SOCKET_SERVER_URL }}
       FRONT_URL: ${{ secrets.FRONT_URL }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
     steps:
       # 1. GitHub Repository 파일 불러오기
@@ -70,6 +72,8 @@ jobs:
             GMAIL_PWD= ${{ secrets.GMAIL_PWD }}
             RIOT_API= ${{ secrets.RIOT_API }}
             FRONT_URL= ${{ secrets.FRONT_URL }}
+            CLIENT_ID= ${{ secrets.CLIENT_ID }}
+            CLIENT_SECRET= ${{ secrets.CLIENT_SECRET }}
             SOCKET_SERVER_URL= ${{ secrets.SOCKET_SERVER_URL }}
 
       ## CD (Continuous Deployment) 파트
@@ -102,6 +106,8 @@ jobs:
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
             -e FRONT_URL=${{ secrets.FRONT_URL }} \
+            -e CLIENT_ID= ${{ secrets.CLIENT_ID }} \
+            -e CLIENT_SECRET= ${{ secrets.CLIENT_SECRET }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }}
 
       # 실패 시 디스코드에 알림 보내기
