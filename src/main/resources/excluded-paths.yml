@@ -30,3 +30,4 @@ security:
         pattern: /api/v2/manner/keyword/* # 매너 키워드 정보 조회
       - method: GET
         pattern: /api/v2/manner/level/* # 매너 레벨 정보 조회
+      - pattern: /api/v2/riot/oauth/callback/** # RSO

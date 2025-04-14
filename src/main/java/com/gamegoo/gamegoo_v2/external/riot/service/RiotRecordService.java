@@ -1,7 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
-import com.gamegoo.gamegoo_v2.external.riot.dto.RiotMatchResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotMatchResponse;
 import com.gamegoo.gamegoo_v2.utils.ChampionIdStore;
 import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
 import lombok.RequiredArgsConstructor;

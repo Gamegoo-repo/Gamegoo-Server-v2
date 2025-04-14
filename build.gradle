@@ -69,6 +69,9 @@ dependencies {
     // logback
     implementation 'com.github.napstr:logback-discord-appender:1.0.0'
 
+    // rso
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 }
