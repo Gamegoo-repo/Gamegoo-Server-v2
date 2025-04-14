@@ -23,6 +23,7 @@ spring:
             enable: true
 
   # RIOT 설정
+  front_url: ${"http://localhost:3000"}
   riot:
     api:
       key: key

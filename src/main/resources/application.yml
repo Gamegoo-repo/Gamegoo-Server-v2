@@ -20,11 +20,11 @@ spring:
             enable: true
 
   # RIOT 설정
+  front_url: ${FRONT_URL}
   riot:
     api:
       key: ${RIOT_API}
 
-  front_url: ${FRONT_URL}
 
 riot:
   client-id: ${RSO_CLIENT_ID}

@@ -79,7 +79,7 @@ public class RiotFacadeService {
 
         // refresh token DB에 저장
         authService.addRefreshToken(member, refreshToken);
-        
+
         return String.format("%s/rso/callback?accessToken=%s&refreshToken=%s&state=%s", frontUrl, accessToken,
                 refreshToken, state);
     }
