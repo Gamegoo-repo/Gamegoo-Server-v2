@@ -345,7 +345,7 @@ class MemberServiceFacadeTest {
         top3ChampionIds.forEach(championId -> {
             Champion champion = championRepository.findById(championId).isPresent() ?
                     championRepository.findById(championId).get() : null;
-            MemberChampion memberChampion = MemberChampion.create(champion, member, 1, 10);
+            MemberChampion memberChampion = MemberChampion.create(champion, member, 1, 10, 12);
             memberChampionRepository.save(memberChampion);
         });
 

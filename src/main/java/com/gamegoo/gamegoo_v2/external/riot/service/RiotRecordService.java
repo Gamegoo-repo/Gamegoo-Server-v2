@@ -53,6 +53,15 @@ public class RiotRecordService {
         // 1. 최근 플레이한 챔피언 ID 리스트 가져오기
         Map<Long, ChampionStats> championStatsMap = fetchRecentChampionStats(gameName, puuid);
 
+        // 데이터를 가져오는데 실패한 경우 기본 데이터 생성
+        if (championStatsMap.isEmpty()) {
+            log.warn("Failed to fetch champion stats for user: {}. Creating default stats.", gameName);
+            ChampionStats defaultStats = new ChampionStats(1L, false); // 기본 챔피언으로 사용
+            defaultStats.setGameTime(1800); // 30분을 기본 게임 시간으로 설정
+            defaultStats.setTotalMinionsKilled(0);
+            championStatsMap.put(1L, defaultStats);
+        }
+
         // 2. 많이 사용한 챔피언 상위 최대 3개 계산
         return championStatsMap.values().stream()
                 .filter(stats -> stats.getGames() > 0)
@@ -134,10 +143,25 @@ public class RiotRecordService {
                 return Optional.empty();
             }
 
+            int gameDuration = response.getInfo().getGameDuration();
+            // 게임 시간이 0이면 기본값 30분(1800초)으로 설정
+            if (gameDuration <= 0) {
+                gameDuration = 1800;
+            }
+
+            final int finalGameDuration = gameDuration;  
+
             return response.getInfo().getParticipants().stream()
                     .filter(participant -> gameName.equals(participant.getRiotIdGameName()))
                     .findFirst()
-                    .map(participant -> new ChampionStats(participant.getChampionId(), participant.isWin()));
+                    .map(participant -> {
+                        ChampionStats stats = new ChampionStats(participant.getChampionId(), participant.isWin());
+                        stats.setGameTime(finalGameDuration);
+                        // CS가 음수인 경우 0으로 설정
+                        int totalMinionsKilled = Math.max(0, participant.getTotalMinionsKilled());
+                        stats.setTotalMinionsKilled(totalMinionsKilled);
+                        return stats;
+                    });
 
         } catch (Exception e) {
             riotApiHelper.handleApiError(e);
