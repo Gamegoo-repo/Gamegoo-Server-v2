@@ -79,7 +79,7 @@ class MatchingServiceTest {
 
             // then
             MatchingMemberInfoResponse matchingMemberInfoResponse = MatchingMemberInfoResponse.of(member,
-                    matchingRecord.getMatchingUuid(),matchingRecord.getGameMode());
+                    matchingRecord.getMatchingUuid(), matchingRecord.getGameMode());
 
 
             assertThat(priorityListResponse.getMyPriorityList()).isEqualTo(new ArrayList<>());
@@ -327,7 +327,8 @@ class MatchingServiceTest {
 
     private Member createMember(String email, String gameName, String tag, Tier tier, int gameRank, Mike mike,
                                 Position mainP, Position subP, Position wantP, int mannerLevel) {
-        Member member = Member.create(email, "password123", LoginType.GENERAL, gameName, tag, tier, gameRank, 55.0,
+        Member member = Member.createForGeneral(email, "password123", LoginType.GENERAL, gameName, tag, tier,
+                gameRank, 55.0,
                 tier, gameRank, 55.0, 100, 100, true);
         member.updateMannerLevel(mannerLevel);
         member.updateMike(mike);

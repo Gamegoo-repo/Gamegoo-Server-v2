@@ -20,9 +20,15 @@ spring:
             enable: true
 
   # RIOT 설정
+  front_url: ${FRONT_URL}
   riot:
     api:
       key: ${RIOT_API}
+
+
+riot:
+  client-id: ${RSO_CLIENT_ID}
+  client-secret: ${RSO_CLIENT_SECRET}
 
 # batch size 설정
 batch_size:

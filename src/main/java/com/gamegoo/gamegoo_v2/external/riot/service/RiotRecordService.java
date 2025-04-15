@@ -1,7 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
-import com.gamegoo.gamegoo_v2.external.riot.dto.RiotMatchResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotMatchResponse;
 import com.gamegoo.gamegoo_v2.utils.ChampionIdStore;
 import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class RiotRecordService {
     private String riotAPIKey;
 
     private static final String MATCH_IDS_URL_TEMPLATE = "https://asia.api.riotgames" +
-            ".com/lol/match/v5/matches/by-puuid/%s/ids?start%s0&count=%s&api_key=%s";
+            ".com/lol/match/v5/matches/by-puuid/%s/ids?start=%s&count=%s&api_key=%s";
     private static final String MATCH_INFO_URL_TEMPLATE = "https://asia.api.riotgames" +
             ".com/lol/match/v5/matches/%s?api_key=%s";
 
@@ -149,7 +149,7 @@ public class RiotRecordService {
                 gameDuration = 1800;
             }
 
-            final int finalGameDuration = gameDuration;  
+            final int finalGameDuration = gameDuration;
 
             return response.getInfo().getParticipants().stream()
                     .filter(participant -> gameName.equals(participant.getRiotIdGameName()))

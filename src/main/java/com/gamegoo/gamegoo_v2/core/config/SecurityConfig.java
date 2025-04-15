@@ -77,7 +77,9 @@ public class SecurityConfig {
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/api/v2/internal/**").permitAll() // internal
                 .requestMatchers("/api/v2/password/reset").permitAll() // password
-                .requestMatchers("/api/v2/riot/verify").permitAll() // riot
+                .requestMatchers("/api/v2/riot/verify",
+                        "/api/v2/riot/oauth/callback",
+                        "/api/v2/riot/join").permitAll() // riot
                 .requestMatchers("/api/v2/posts/list/**").permitAll() // board
                 .requestMatchers(
                         "/api/v2/auth/token/**",
