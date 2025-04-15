@@ -106,8 +106,8 @@ jobs:
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
             -e FRONT_URL=${{ secrets.FRONT_URL }} \
-            -e CLIENT_ID= ${{ secrets.CLIENT_ID }} \
-            -e CLIENT_SECRET= ${{ secrets.CLIENT_SECRET }} \
+            -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
+            -e CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }}
 
       # 실패 시 디스코드에 알림 보내기

@@ -112,8 +112,8 @@ jobs:
             -e RIOT_API=${{ secrets.RIOT_API }} \
             -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
             -e FRONT_URL=${{ secrets.FRONT_URL }} \
-            -e CLIENT_ID= ${{ secrets.CLIENT_ID }} \
-            -e CLIENT_SECRET= ${{ secrets.CLIENT_SECRET }} \
+            -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
+            -e CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
             -e DISCORD_MONITORING_WEBHOOK_URL=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-prod:${{ github.sha }}
 
