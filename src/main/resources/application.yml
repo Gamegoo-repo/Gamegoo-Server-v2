@@ -24,11 +24,9 @@ spring:
   riot:
     api:
       key: ${RIOT_API}
-
-
-riot:
-  client-id: ${RSO_CLIENT_ID}
-  client-secret: ${RSO_CLIENT_SECRET}
+    redirect-uri: ${RSO_REDIRECT_URI}
+    client-id: ${CLIENT_ID}
+    client-secret: ${CLIENT_SECRET}
 
 # batch size 설정
 batch_size:
