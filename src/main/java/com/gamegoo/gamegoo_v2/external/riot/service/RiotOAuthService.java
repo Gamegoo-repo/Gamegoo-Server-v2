@@ -1,5 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
+import com.gamegoo.gamegoo_v2.core.exception.RiotException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotAuthTokenResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotAccountIdResponse;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -67,30 +70,34 @@ public class RiotOAuthService {
      */
     public RiotAccountIdResponse getSummonerInfo(String accessToken) {
         String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/me";
-
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
-
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                new ParameterizedTypeReference<>() {
-                }
-        );
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    }
+            );
 
-        Map<String, Object> body = response.getBody();
+            Map<String, Object> body = response.getBody();
+            return RiotAccountIdResponse.builder()
+                    .id((String) body.get("id"))
+                    .accountId((String) body.get("accountId"))
+                    .puuid((String) body.get("puuid"))
+                    .profileIconId((Integer) body.get("profileIconId"))
+                    .revisionDate(((Number) body.get("revisionDate")).longValue())
+                    .summonerLevel(((Number) body.get("summonerLevel")).longValue())
+                    .build();
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new RiotException(ErrorCode.RIOT_SUMMONER_NOT_FOUND);
+        } catch (Exception e) {
+            throw new RiotException(ErrorCode.RIOT_API_ERROR);
+        }
 
-        return RiotAccountIdResponse.builder()
-                .id((String) body.get("id"))
-                .accountId((String) body.get("accountId"))
-                .puuid((String) body.get("puuid"))
-                .profileIconId((Integer) body.get("profileIconId"))
-                .revisionDate(((Number) body.get("revisionDate")).longValue())
-                .summonerLevel(((Number) body.get("summonerLevel")).longValue())
-                .build();
     }
 
 }

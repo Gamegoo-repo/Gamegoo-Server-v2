@@ -69,8 +69,9 @@ public enum ErrorCode {
     RIOT_SERVER_ERROR(BAD_GATEWAY, "RIOT_503", "Riot API 서버에서 오류가 발생했습니다"),
     RIOT_API_ERROR(INTERNAL_SERVER_ERROR, "RIOT_504", "Riot API 요청 중 에러가 발생했습니다."),
     RIOT_INVALID_API_KEY(BAD_REQUEST, "RIOT_401", "잘못된 Riot API 키입니다."),
-    RIOT_NOT_FOUND(NOT_FOUND, "RIOT_401", "해당 Riot 계정이 존재하지 않습니다."),
-    RIOT_ACCOUNT_CONFLICT(CONFLICT, "RIOT403", "해당 Riot 계정은 이미 다른 이메일과 연동되어있습니다."),
+    RIOT_NOT_FOUND(NOT_FOUND, "RIOT_402", "해당 Riot 계정이 존재하지 않습니다."),
+    RIOT_ACCOUNT_CONFLICT(CONFLICT, "RIOT_403", "해당 Riot 계정은 이미 다른 이메일과 연동되어있습니다."),
+    RIOT_SUMMONER_NOT_FOUND(NOT_FOUND, "RIOT_404", "해당 Riot 계정은 league of legend에서 소환사를 생성하지 않았습니다"),
 
     /**
      * 매칭 관련 에러
