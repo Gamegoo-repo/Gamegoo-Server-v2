@@ -24,6 +24,8 @@ jobs:
       FRONT_URL: ${{ secrets.FRONT_URL }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      RSO_REDIRECT_URI: ${{ secrets.RSO_REDIRECT_URI }}
+
 
     steps:
       # 1. GitHub Repository 파일 불러오기
@@ -75,6 +77,7 @@ jobs:
             CLIENT_ID= ${{ secrets.CLIENT_ID }}
             CLIENT_SECRET= ${{ secrets.CLIENT_SECRET }}
             SOCKET_SERVER_URL= ${{ secrets.SOCKET_SERVER_URL }}
+            RSO_REDIRECT_URI= ${{ secrets.RSO_REDIRECT_URI }}
 
       ## CD (Continuous Deployment) 파트
       # 7. EC2에 SSH로 접속하여 Docker 컨테이너 실행
@@ -108,6 +111,7 @@ jobs:
             -e FRONT_URL=${{ secrets.FRONT_URL }} \
             -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
             -e CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
+            -e RSO_REDIRECT_URI=${{ secrets.RSO_REDIRECT_URI }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }}
 
       # 실패 시 디스코드에 알림 보내기
