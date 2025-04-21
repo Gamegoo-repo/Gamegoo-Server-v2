@@ -103,7 +103,7 @@ public class RiotFacadeService {
             String encodedState = URLEncoder.encode(state, StandardCharsets.UTF_8);
             String encodedPuuid = URLEncoder.encode(summonerInfo.getPuuid(), StandardCharsets.UTF_8);
 
-            return String.format("%s/rso/callback?puuid=%s&state=%s", frontUrl, encodedPuuid, encodedState);
+            return String.format("%s/riot/callback?puuid=%s&state=%s", frontUrl, encodedPuuid, encodedState);
         }
 
         // 사용자가 있을 경우, 로그인 진행
@@ -114,7 +114,7 @@ public class RiotFacadeService {
         // refresh token DB에 저장
         authService.addRefreshToken(member, refreshToken);
 
-        return String.format("%s/rso/callback?accessToken=%s&refreshToken=%s&state=%s", frontUrl, accessToken,
+        return String.format("%s/riot/callback?accessToken=%s&refreshToken=%s&state=%s", frontUrl, accessToken,
                 refreshToken, state);
     }
 
