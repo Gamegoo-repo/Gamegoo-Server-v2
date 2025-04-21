@@ -28,6 +28,7 @@ jobs:
       FRONT_URL: ${{ secrets.FRONT_URL }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      RSO_REDIRECT_URI: ${{ secrets.RSO_REDIRECT_URI }}
 
     steps:
       # 1. GitHub Repository 파일 불러오기
@@ -79,6 +80,7 @@ jobs:
             FRONT_URL= ${{ secrets.FRONT_URL }}
             CLIENT_ID= ${{ secrets.CLIENT_ID }}
             CLIENT_SECRET= ${{ secrets.CLIENT_SECRET }}
+            RSO_REDIRECT_URI= ${{ secrets.RSO_REDIRECT_URI }}
             DISCORD_MONITORING_WEBHOOK_URL= ${{ secrets.DISCORD_MONITORING_WEBHOOK_URL }}
 
       ## CD (Continuous Deployment) 파트
@@ -114,6 +116,7 @@ jobs:
             -e FRONT_URL=${{ secrets.FRONT_URL }} \
             -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
             -e CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
+            -e RSO_REDIRECT_URI=${{ secrets.RSO_REDIRECT_URI }} \
             -e DISCORD_MONITORING_WEBHOOK_URL=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-prod:${{ github.sha }}
 
