@@ -70,9 +70,9 @@ public class MemberChatroomRepositoryTest extends RepositoryTestSupport {
         // given
         for (int i = 0; i < 3; i++) {
             Member targetMember = createMember("targetMember" + i + "@gmail.com", "targetMember" + i);
-            Chatroom chatroom = createChatroom();
-            createMemberChatroom(member, chatroom);
-            createMemberChatroom(targetMember, chatroom);
+            Chatroom chatroom = createForGeneralChatroom();
+            createForGeneralMemberChatroom(member, chatroom);
+            createForGeneralMemberChatroom(targetMember, chatroom);
         }
 
         // when
