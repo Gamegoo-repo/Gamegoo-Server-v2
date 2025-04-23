@@ -13,6 +13,7 @@ ARG DB_PASSWORD
 ARG GMAIL_PWD
 ARG RIOT_API
 ARG SOCKET_SERVER_URL
+ARG FRONT_URL
 
 # Gradle 라이브러리 설치를 위한 초기 세팅
 COPY build.gradle settings.gradle ./

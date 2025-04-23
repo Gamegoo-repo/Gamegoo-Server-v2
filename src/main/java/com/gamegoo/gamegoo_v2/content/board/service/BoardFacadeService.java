@@ -19,6 +19,7 @@ import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
+import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class BoardFacadeService {
     private final FriendService friendService;
     private final BlockService blockService;
     private final ProfanityCheckService profanityCheckService;
+    private final MannerService mannerService;
 
     /**
      * 게시글 생성 (파사드)
@@ -71,7 +73,7 @@ public class BoardFacadeService {
 
     /**
      * 회원 게시판 글 단건 조회 (파사드)
-     * - “회원 전용” 조회 로직
+     * - "회원 전용" 조회 로직
      */
     public BoardByIdResponseForMember getBoardByIdForMember(Long boardId, Member viewer) {
 
@@ -81,12 +83,12 @@ public class BoardFacadeService {
         boolean isFriend = friendService.isFriend(viewer, board.getMember());
         Long friendRequestMemberId = friendService.getFriendRequestMemberId(viewer, board.getMember());
 
-        return BoardByIdResponseForMember.of(board, isBlocked, isFriend, friendRequestMemberId);
+        return BoardByIdResponseForMember.of(board, isBlocked, isFriend, friendRequestMemberId, mannerService);
     }
 
     /**
      * 비회원 게시판 글 단건 조회 (파사드)
-     * - “비회원 전용” 조회 로직
+     * - "비회원 전용" 조회 로직
      */
     public BoardByIdResponse getBoardById(Long boardId) {
 

@@ -46,9 +46,9 @@ public class MemberChatroomRepositoryTest extends RepositoryTestSupport {
 
         for (int i = 0; i < 3; i++) {
             Member targetMember = createMember("targetMember" + i + "@gmail.com", "targetMember" + i);
-            Chatroom chatroom = createChatroom();
-            createMemberChatroom(member, chatroom);
-            createMemberChatroom(targetMember, chatroom);
+            Chatroom chatroom = createForGeneralChatroom();
+            createForGeneralMemberChatroom(member, chatroom);
+            createForGeneralMemberChatroom(targetMember, chatroom);
             chatroomIds.add(chatroom.getId());
             targetMembers.add(targetMember);
         }
@@ -84,13 +84,13 @@ public class MemberChatroomRepositoryTest extends RepositoryTestSupport {
         assertThat(updatedList).allSatisfy(mc -> assertThat(mc.getLastJoinDate()).isNull());
     }
 
-    private Chatroom createChatroom() {
+    private Chatroom createForGeneralChatroom() {
         return em.persist(Chatroom.builder()
                 .uuid(UUID.randomUUID().toString())
                 .build());
     }
 
-    private MemberChatroom createMemberChatroom(Member member, Chatroom chatroom) {
+    private MemberChatroom createForGeneralMemberChatroom(Member member, Chatroom chatroom) {
         return em.persist(MemberChatroom.builder()
                 .chatroom(chatroom)
                 .member(member)

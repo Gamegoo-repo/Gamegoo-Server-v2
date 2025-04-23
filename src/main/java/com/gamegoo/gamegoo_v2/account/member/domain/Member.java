@@ -31,10 +31,13 @@ public class Member extends BaseDateTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String email;
 
-    @Column(nullable = false, length = 500)
+    @Column(length = 200)
+    private String puuid;
+
+    @Column(length = 500)
     private String password;
 
     @Column(nullable = false)
@@ -117,9 +120,11 @@ public class Member extends BaseDateTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberGameStyle> memberGameStyleList = new ArrayList<>();
 
-    public static Member create(String email, String password, LoginType loginType, String gameName, String tag,
-                                Tier soloTier, int soloRank, double soloWinRate, Tier freeTier, int freeRank,
-                                double freeWinRate, int soloGameCount, int freeGameCount, boolean isAgree) {
+    // puuid 전용
+    public static Member createForGeneral(String email, String password, LoginType loginType, String gameName,
+                                          String tag,
+                                          Tier soloTier, int soloRank, double soloWinRate, Tier freeTier, int freeRank,
+                                          double freeWinRate, int soloGameCount, int freeGameCount, boolean isAgree) {
         int randomProfileImage = ThreadLocalRandom.current().nextInt(1, 9);
 
         return Member.builder()
@@ -141,12 +146,38 @@ public class Member extends BaseDateTimeEntity {
                 .build();
     }
 
+    // RSO 전용
+    public static Member createForRiot(String puuid, LoginType loginType, String gameName,
+                                       String tag, Tier soloTier, int soloRank, double soloWinRate, Tier freeTier,
+                                       int freeRank,
+                                       double freeWinRate, int soloGameCount, int freeGameCount, boolean isAgree) {
+        int randomProfileImage = ThreadLocalRandom.current().nextInt(1, 9);
+
+        return Member.builder()
+                .profileImage(randomProfileImage)
+                .puuid(puuid)
+                .loginType(loginType)
+                .gameName(gameName)
+                .tag(tag)
+                .soloGameCount(soloGameCount)
+                .freeGameCount(freeGameCount)
+                .soloTier(soloTier)
+                .soloRank(soloRank)
+                .soloWinRate(soloWinRate)
+                .freeTier(freeTier)
+                .freeRank(freeRank)
+                .freeWinRate(freeWinRate)
+                .isAgree(isAgree)
+                .build();
+    }
+
     @Builder
-    private Member(String email, String password, int profileImage, LoginType loginType, String gameName,
+    private Member(String email, String puuid, String password, int profileImage, LoginType loginType, String gameName,
                    String tag, Tier soloTier, int soloRank, double soloWinRate, Tier freeTier, int freeRank,
                    double freeWinRate, int soloGameCount, int freeGameCount, boolean isAgree) {
         this.email = email;
         this.password = password;
+        this.puuid = puuid;
         this.profileImage = profileImage;
         this.loginType = loginType;
         this.gameName = gameName;

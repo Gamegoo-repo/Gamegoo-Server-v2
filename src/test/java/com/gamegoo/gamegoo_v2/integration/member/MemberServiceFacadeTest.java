@@ -69,8 +69,8 @@ class MemberServiceFacadeTest {
     @BeforeEach
     void setUp() {
         // Member 테스트용 객체 생성
-        member = createMember("test1@gmail.com", "test1");
-        targetMember = createMember("test2@gmail.com", "test2");
+        member = createForGeneralMember("test1@gmail.com", "test1");
+        targetMember = createForGeneralMember("test2@gmail.com", "test2");
 
         // Champion 테스트용 객체 생성
         annie = initChampion(1L, "Annie");
@@ -315,7 +315,7 @@ class MemberServiceFacadeTest {
     }
 
 
-    private Member createMember(String email, String gameName) {
+    private Member createForGeneralMember(String email, String gameName) {
         return memberRepository.save(Member.builder()
                 .email(email)
                 .password("testPassword")
