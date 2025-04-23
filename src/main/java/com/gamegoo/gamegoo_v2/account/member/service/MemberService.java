@@ -223,4 +223,13 @@ public class MemberService {
         return memberRepository.findByPuuid(puuid);
     }
 
+    /**
+     * Member blind 처리
+     * @param member 회원
+     */
+    @Transactional
+    public void deactivateMember(Member member) {
+        member.deactiveMember();
+    }
+
 }

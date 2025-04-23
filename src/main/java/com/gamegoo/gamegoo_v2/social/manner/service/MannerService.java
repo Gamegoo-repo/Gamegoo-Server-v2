@@ -201,6 +201,47 @@ public class MannerService {
     }
 
     /**
+     * 해당 회원이 등록한 모든 매너/비매너 평가 삭제
+     *
+     * @param member
+     */
+    @Transactional
+    public void deleteAllMannerRatingsByMember(Member member) {
+        // fromMember가 member인 모든 mannerRating 찾기
+        List<MannerRating> mannerRatings = mannerRatingRepository.findAllByFromMember(member);
+
+        for (MannerRating mannerRating : mannerRatings) {
+            Member targetMember = mannerRating.getToMember();
+
+            // 각 mannerRating에 딸린 MannerRatingKeyword 리스트 조회
+            List<MannerRatingKeyword> keywords = mannerRatingKeywordRepository.findByMannerRatingId(
+                    mannerRating.getId());
+
+            int keywordCount = keywords.size();
+
+            // mannerScore 업데이트
+            int currentScore = targetMember.getMannerScore();
+            if (mannerRating.isPositive()) {
+                currentScore -= keywordCount;
+            } else {
+                currentScore += keywordCount * 2;
+            }
+
+            targetMember.updateMannerScore(currentScore);
+
+            // mannerLevel 업데이트
+            targetMember.updateMannerLevel(calculateMannerLevel(currentScore));
+            memberRepository.save(targetMember); // 변경 사항 저장
+
+            // mannerRating에 딸린 MannerRatingKeyword 삭제
+            mannerRatingKeywordRepository.deleteAll(keywords);
+        }
+
+        // 각 mannerRating 삭제
+        mannerRatingRepository.deleteAll(mannerRatings);
+    }
+
+    /**
      * id에 해당하는 매너 키워드 list 조회
      *
      * @param mannerKeywordIdList 매너 키워드 id list

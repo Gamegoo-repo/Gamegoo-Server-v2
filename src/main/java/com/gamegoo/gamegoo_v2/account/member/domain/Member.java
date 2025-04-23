@@ -237,4 +237,7 @@ public class Member extends BaseDateTimeEntity {
         this.wantP = wantP;
     }
 
+    public void deactiveMember() {
+        this.blind = true;
+    }
 }
