@@ -9,11 +9,15 @@ import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
+import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
+import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
+import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
+import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +26,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class AuthFacadeService {
 
     private final MemberService memberService;
@@ -30,6 +34,10 @@ public class AuthFacadeService {
     private final RiotRecordService riotRecordService;
     private final RiotInfoService riotInfoService;
     private final MemberChampionService memberChampionService;
+    private final ChatCommandService chatCommandService;
+    private final FriendService friendService;
+    private final MannerService mannerService;
+    private final BoardService boardService;
     private final AuthService authService;
     private final JwtProvider jwtProvider;
     private final PasswordService passwordService;
@@ -39,7 +47,6 @@ public class AuthFacadeService {
      *
      * @param request 회원가입용 정보
      */
-    @Transactional
     public String join(JoinRequest request) {
         // 1. [Member] 중복확인
         memberService.checkDuplicateMemberByEmail(request.getEmail());
@@ -72,7 +79,6 @@ public class AuthFacadeService {
      * @param request 이메일,비밀번호
      * @return 사용자 정보
      */
-    @Transactional
     public LoginResponse login(LoginRequest request) {
         // email 검증
         Member member = memberService.findMemberByEmail(request.getEmail());
@@ -96,7 +102,6 @@ public class AuthFacadeService {
      * @param member 사용자
      * @return 메세지
      */
-    @Transactional
     public String logout(Member member) {
         authService.deleteRefreshToken(member);
         return "로그아웃이 완료되었습니다.";
@@ -108,7 +113,6 @@ public class AuthFacadeService {
      * @param request 리프레시 토큰
      * @return 사용자 정보
      */
-    @Transactional
     public RefreshTokenResponse updateToken(RefreshTokenRequest request) {
         // refresh 토큰 검증
         authService.verifyRefreshToken(request.getRefreshToken());
@@ -127,6 +131,31 @@ public class AuthFacadeService {
         authService.addRefreshToken(member, refreshToken);
 
         return RefreshTokenResponse.of(memberId, accessToken, refreshToken);
+    }
+
+    public String blindMember(Member member) {
+        // Member 테이블에서 blind 처리
+        memberService.deactivateMember(member);
+
+        // 해당 회원이 속한 모든 채팅방에서 퇴장 처리
+        chatCommandService.exitAllChatroom(member);
+
+        // 해당 회원이 보낸 모든 친구 요청 취소 처리
+        friendService.cancelAllFriendRequestsByFromMember(member);
+
+        // 해당 회원이 받은 모든 친구 요청 취소 처리
+        friendService.cancelAllFriendRequestsByToMember(member);
+
+        // 게시판 글 삭제 처리
+        boardService.deleteAllBoardByMember(member);
+
+        // 매너, 비매너 평가 기록 삭제 처리
+        mannerService.deleteAllMannerRatingsByMember(member);
+
+        // refresh Token 삭제하기
+        authService.deleteRefreshToken(member);
+
+        return "탈퇴처리가 완료되었습니다";
     }
 
 }

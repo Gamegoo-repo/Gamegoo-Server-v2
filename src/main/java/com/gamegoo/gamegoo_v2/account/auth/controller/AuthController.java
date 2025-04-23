@@ -13,6 +13,7 @@ import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,4 +59,9 @@ public class AuthController {
         return ApiResponse.ok(authFacadeService.updateToken(request));
     }
 
+    @DeleteMapping
+    @Operation(summary = "탈퇴 API입니다.", description = "API for Blinding Member")
+    public ApiResponse<String> blindMember(@AuthMember Member member) {
+        return ApiResponse.ok(authFacadeService.blindMember(member));
+    }
 }

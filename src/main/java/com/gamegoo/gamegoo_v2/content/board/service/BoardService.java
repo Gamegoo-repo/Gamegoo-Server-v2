@@ -86,7 +86,8 @@ public class BoardService {
      * 게시글 엔티티 조회
      */
     public Board findBoard(Long boardId) {
-        return boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+        return boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(
+                () -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     /**
@@ -96,7 +97,8 @@ public class BoardService {
     public Board updateBoard(BoardUpdateRequest request, Long memberId, Long boardId) {
 
         Board board =
-                boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+                boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(
+                        () -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
 
         if (!board.getMember().getId().equals(memberId)) {
             throw new BoardException(ErrorCode.UPDATE_BOARD_ACCESS_DENIED);
@@ -121,7 +123,8 @@ public class BoardService {
     @Transactional
     public void deleteBoard(Long boardId, Long memberId) {
         Board board =
-                boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+                boardRepository.findByIdAndDeleted(boardId, false).orElseThrow(
+                        () -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
 
         if (!board.getMember().getId().equals(memberId)) {
             throw new BoardException(ErrorCode.DELETE_BOARD_ACCESS_DENIED);
@@ -173,6 +176,16 @@ public class BoardService {
 
         board.bump(now);
         return boardRepository.save(board);
+    }
+
+    /**
+     * 해당 회원이 작성한 모든 글 삭제 처리
+     *
+     * @param member 회원
+     */
+    @Transactional
+    public void deleteAllBoardByMember(Member member) {
+        boardRepository.deleteAllByMember(member);
     }
 
 }

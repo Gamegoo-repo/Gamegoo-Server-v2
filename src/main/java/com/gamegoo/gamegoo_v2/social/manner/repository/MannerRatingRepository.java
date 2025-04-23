@@ -1,10 +1,12 @@
 package com.gamegoo.gamegoo_v2.social.manner.repository;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRating;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MannerRatingRepository extends JpaRepository<MannerRating, Long> {
@@ -21,5 +23,7 @@ public interface MannerRatingRepository extends JpaRepository<MannerRating, Long
             AND mr.positive = :positive
             """)
     int countFromMemberByToMemberIdAndPositive(@Param("memberId") Long memberId, @Param("positive") boolean positive);
+
+    List<MannerRating> findAllByFromMember(Member member);
 
 }

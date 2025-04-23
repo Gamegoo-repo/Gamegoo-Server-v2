@@ -64,6 +64,26 @@ public class MemberChatroomRepositoryTest extends RepositoryTestSupport {
         }
     }
 
+    @DisplayName("채팅방 lastJoinDate 배치 초기화")
+    @Test
+    void updateLastJoinDateToNullByMember() {
+        // given
+        for (int i = 0; i < 3; i++) {
+            Member targetMember = createMember("targetMember" + i + "@gmail.com", "targetMember" + i);
+            Chatroom chatroom = createForGeneralChatroom();
+            createForGeneralMemberChatroom(member, chatroom);
+            createForGeneralMemberChatroom(targetMember, chatroom);
+        }
+
+        // when
+        memberChatroomRepository.updateLastJoinDateToNullByMember(member);
+
+        // then
+        List<MemberChatroom> updatedList = memberChatroomRepository.findAllByMemberId(member.getId());
+        assertThat(updatedList).hasSize(3);
+        assertThat(updatedList).allSatisfy(mc -> assertThat(mc.getLastJoinDate()).isNull());
+    }
+
     private Chatroom createForGeneralChatroom() {
         return em.persist(Chatroom.builder()
                 .uuid(UUID.randomUUID().toString())
