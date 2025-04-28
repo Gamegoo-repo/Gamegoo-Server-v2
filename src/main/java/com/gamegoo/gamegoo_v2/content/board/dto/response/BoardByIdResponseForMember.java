@@ -38,7 +38,7 @@ public class BoardByIdResponseForMember {
     Tier freeTier;
     int freeRank;
     Mike mike;
-    List<ChampionStatsResponse> championResponseDTOList;
+    List<ChampionStatsResponse> championStatsResponseList;
     GameMode gameMode;
     Position mainP;
     Position subP;
@@ -58,7 +58,7 @@ public class BoardByIdResponseForMember {
     ) {
         Member poster = board.getMember();
 
-        List<ChampionStatsResponse> championResponseList = poster.getMemberChampionList() == null
+        List<ChampionStatsResponse> championStatsResponseList = poster.getMemberChampionList() == null
                 ? List.of()
                 : poster.getMemberChampionList().stream()
                 .map(mc -> ChampionStatsResponse.builder()
@@ -105,7 +105,7 @@ public class BoardByIdResponseForMember {
                 .freeTier(poster.getFreeTier())
                 .freeRank(poster.getFreeRank())
                 .mike(board.getMike())
-                .championResponseDTOList(championResponseList)
+                .championStatsResponseList(championStatsResponseList)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())

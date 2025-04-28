@@ -51,13 +51,14 @@ public class BoardListResponse {
             winRate = member.getSoloWinRate();
         }
 
-        List<ChampionStatsResponse> championStatsResponseList = member.getMemberChampionList().stream()
+        List<ChampionStatsResponse> championStatsResponseList = member.getMemberChampionList() == null
+                ? List.of()
+                : member.getMemberChampionList().stream()
                 .map(mc -> ChampionStatsResponse.builder()
                         .championId(mc.getChampion().getId())
                         .championName(mc.getChampion().getName())
                         .wins(mc.getWins())
                         .games(mc.getGames())
-                        // 승률은 games가 0이 아니면 계산, 아니면 0
                         .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
                         .csPerMinute(mc.getCsPerMinute())
                         .build())
@@ -66,7 +67,7 @@ public class BoardListResponse {
         return BoardListResponse.builder()
                 .boardId(board.getId())
                 .memberId(member.getId())
-                .profileImage(board.getBoardProfileImage())
+                .profileImage(member.getProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
                 .mannerLevel(member.getMannerLevel())

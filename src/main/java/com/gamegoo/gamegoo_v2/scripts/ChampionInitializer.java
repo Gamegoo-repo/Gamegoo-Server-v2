@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -39,8 +42,9 @@ public class ChampionInitializer implements ApplicationListener<ApplicationReady
     private void initializeChampions() throws IOException {
         // JSON 파일을 읽어 파싱합니다.
         ObjectMapper mapper = new ObjectMapper();
-        InputStream inputStream = new ClassPathResource("static/champion.json").getInputStream();
-        JsonNode rootNode = mapper.readTree(inputStream);
+        InputStream inputStream = new ClassPathResource("static/champion_ko.json").getInputStream();
+        Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        JsonNode rootNode = mapper.readTree(reader);
         JsonNode dataNode = rootNode.path("data");
 
         for (JsonNode championNode : dataNode) {

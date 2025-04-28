@@ -50,7 +50,7 @@ public class BoardUpdateResponse {
         return BoardUpdateResponse.builder()
                 .boardId(board.getId())
                 .memberId(member.getId())
-                .profileImage(board.getBoardProfileImage())
+                .profileImage(member.getProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
                 .tier(tier)
