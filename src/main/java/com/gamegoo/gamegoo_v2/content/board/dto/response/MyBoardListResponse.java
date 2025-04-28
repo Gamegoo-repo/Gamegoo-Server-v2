@@ -40,7 +40,7 @@ public class MyBoardListResponse {
         return MyBoardListResponse.builder()
                 .boardId(board.getId())
                 .memberId(member.getId())
-                .profileImage(board.getBoardProfileImage())
+                .profileImage(member.getProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
                 .tier(tier)
