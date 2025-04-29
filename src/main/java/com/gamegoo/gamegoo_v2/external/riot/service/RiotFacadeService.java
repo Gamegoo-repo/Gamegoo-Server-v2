@@ -95,6 +95,11 @@ public class RiotFacadeService {
         // 2. id_token 파싱 → Riot 사용자 정보 추출
         RiotAccountIdResponse summonerInfo = riotOAuthService.getSummonerInfo(riotAuthTokenResponse.getAccessToken());
 
+        // 만약 사용자 정보가 null 일 경우 롤과 연동되지 않은 사용자
+        if (summonerInfo == null) {
+            return String.format("%s/riot/callback?error=signup_disabled", frontUrl);
+        }
+
         // 3. DB에서 사용자 존재 여부 확인
         List<Member> memberList = memberService.findMemberByPuuid(summonerInfo.getPuuid());
 
