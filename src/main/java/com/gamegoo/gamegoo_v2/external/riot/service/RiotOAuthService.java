@@ -93,7 +93,7 @@ public class RiotOAuthService {
                     .summonerLevel(((Number) body.get("summonerLevel")).longValue())
                     .build();
         } catch (HttpClientErrorException.NotFound e) {
-            throw new RiotException(ErrorCode.RIOT_SUMMONER_NOT_FOUND);
+            return null;
         } catch (Exception e) {
             throw new RiotException(ErrorCode.RIOT_API_ERROR);
         }
