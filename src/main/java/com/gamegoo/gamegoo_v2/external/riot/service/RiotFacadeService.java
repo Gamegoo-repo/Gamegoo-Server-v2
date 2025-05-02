@@ -34,6 +34,7 @@ public class RiotFacadeService {
     private final MemberChampionService memberChampionService;
     private final AuthService authService;
     private final JwtProvider jwtProvider;
+    private final OAuthRedirectBuilder oAuthRedirectBuilder;
 
     @Value(value = "${spring.front_url}")
     private String frontUrl;
@@ -119,8 +120,7 @@ public class RiotFacadeService {
         // refresh token DB에 저장
         authService.addRefreshToken(member, refreshToken);
 
-        return String.format("%s/riot/callback?accessToken=%s&refreshToken=%s&state=%s", frontUrl, accessToken,
-                refreshToken, state);
+        return oAuthRedirectBuilder.buildRedirectUrl(member, state, frontUrl, accessToken, refreshToken);
     }
 
 }
