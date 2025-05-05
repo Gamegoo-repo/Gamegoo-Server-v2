@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class BoardResponse {
-
-    Integer totalPage;
-    Integer totalCount;
-    List<BoardListResponse> boards;
+    private List<BoardListResponse> boards;
+    private int totalPages;
+    private long totalElements;
+    private int currentPage;
 
     public static BoardResponse of(Page<Board> boardPage) {
         // 전체 페이지/개수 추출
@@ -28,10 +28,10 @@ public class BoardResponse {
 
         // DTO 생성
         return BoardResponse.builder()
-                .totalPage(totalPage)
-                .totalCount(totalCount)
+                .totalPages(totalPage)
+                .totalElements(totalCount)
                 .boards(boardList)
+                .currentPage(boardPage.getNumber())
                 .build();
     }
-
 }
