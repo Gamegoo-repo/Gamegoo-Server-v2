@@ -20,13 +20,13 @@ import java.util.Optional;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-    @Query("SELECT b FROM Board b WHERE " +
-            "b.gameMode = :gameMode AND " +
-            "b.member.soloTier = :tier AND " +
-            "b.mainP IN :mainPList AND " +
-            "b.subP IN :subPList AND " +
-            "b.mike = :mike AND " +
-            "b.deleted = false " +
+    @Query("SELECT b FROM Board b JOIN b.member m WHERE " +
+            "b.deleted = false AND " +
+            "(:gameMode IS NULL OR b.gameMode = :gameMode) AND " +
+            "(:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m.freeTier ELSE m.soloTier END) = :tier) AND " +
+            "(:mainPList IS NULL OR b.mainP IN :mainPList) AND " +
+            "(:subPList IS NULL OR b.subP IN :subPList) AND " +
+            "(:mike IS NULL OR b.mike = :mike) " +
             "ORDER BY b.createdAt DESC")
     Page<Board> findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
             @Param("gameMode") GameMode gameMode,
