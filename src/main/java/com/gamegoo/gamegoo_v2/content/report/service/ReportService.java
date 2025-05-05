@@ -116,4 +116,11 @@ public class ReportService {
         return String.join(", ", reportTypes);
     }
 
+    /**
+     * 전체 신고 목록 반환
+     */
+    public List<Report> getAllReports() {
+        return reportRepository.findAll();
+    }
+
 }

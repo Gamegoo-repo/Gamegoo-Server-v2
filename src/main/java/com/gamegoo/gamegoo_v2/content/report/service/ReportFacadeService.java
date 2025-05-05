@@ -7,6 +7,7 @@ import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +52,23 @@ public class ReportFacadeService {
                 request.getContents(), request.getPathCode(), board);
 
         return ReportInsertResponse.of(report);
+    }
+
+    /**
+     * 전체 신고 목록 조회 (관리자용)
+     */
+    public List<ReportListResponse> getAllReports() {
+        return reportService.getAllReports().stream()
+                .map(report -> ReportListResponse.builder()
+                        .reportId(report.getId())
+                        .fromMemberName(report.getFromMember().getGameName())
+                        .toMemberName(report.getToMember().getGameName())
+                        .content(report.getContent())
+                        .reportType(reportService.getReportTypeString(report.getId()))
+                        .path(report.getPath().name())
+                        .createdAt(report.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
 }
