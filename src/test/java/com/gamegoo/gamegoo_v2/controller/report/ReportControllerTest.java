@@ -4,15 +4,18 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.content.report.controller.ReportController;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
 import com.gamegoo.gamegoo_v2.content.report.service.ReportFacadeService;
 import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
 import com.gamegoo.gamegoo_v2.controller.WithCustomMockMember;
+import com.gamegoo.gamegoo_v2.controller.WithCustomMockAdmin;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
@@ -343,6 +346,55 @@ public class ReportControllerTest extends ControllerTestSupport {
                     .andExpect(jsonPath("$.data.message").value("신고가 정상적으로 접수 되었습니다."));
         }
 
+    }
+
+    @Nested
+    @DisplayName("신고 목록 조회 (관리자 전용)")
+    class GetReportListTest {
+        @WithCustomMockAdmin
+        @DisplayName("성공: 관리자 권한으로 신고 목록 전체 조회")
+        @Test
+        void getReportListAsAdmin() throws Exception {
+            // given
+            List<ReportListResponse> responseList = List.of(
+                    ReportListResponse.builder()
+                            .reportId(1L)
+                            .fromMemberName("신고자1")
+                            .toMemberName("피신고자1")
+                            .content("신고 내용1")
+                            .reportType("욕설/ 혐오/ 차별적 표현")
+                            .path("CHAT")
+                            .createdAt(java.time.LocalDateTime.now())
+                            .build(),
+                    ReportListResponse.builder()
+                            .reportId(2L)
+                            .fromMemberName("신고자2")
+                            .toMemberName("피신고자2")
+                            .content("신고 내용2")
+                            .reportType("불쾌한 표현")
+                            .path("BOARD")
+                            .createdAt(java.time.LocalDateTime.now())
+                            .build()
+            );
+            given(reportFacadeService.getAllReports()).willReturn(responseList);
+
+            // when // then
+            mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data").isArray())
+                    .andExpect(jsonPath("$.data[0].reportId").value(1L))
+                    .andExpect(jsonPath("$.data[0].fromMemberName").value("신고자1"))
+                    .andExpect(jsonPath("$.data[0].toMemberName").value("피신고자1"))
+                    .andExpect(jsonPath("$.data[0].content").value("신고 내용1"))
+                    .andExpect(jsonPath("$.data[0].reportType").value("욕설/ 혐오/ 차별적 표현"))
+                    .andExpect(jsonPath("$.data[0].path").value("CHAT"))
+                    .andExpect(jsonPath("$.data[1].reportId").value(2L))
+                    .andExpect(jsonPath("$.data[1].fromMemberName").value("신고자2"))
+                    .andExpect(jsonPath("$.data[1].toMemberName").value("피신고자2"))
+                    .andExpect(jsonPath("$.data[1].content").value("신고 내용2"))
+                    .andExpect(jsonPath("$.data[1].reportType").value("불쾌한 표현"))
+                    .andExpect(jsonPath("$.data[1].path").value("BOARD"));
+        }
     }
 
 }
