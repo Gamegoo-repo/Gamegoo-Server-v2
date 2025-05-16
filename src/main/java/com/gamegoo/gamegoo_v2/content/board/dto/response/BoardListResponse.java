@@ -62,6 +62,7 @@ public class BoardListResponse {
                         .games(mc.getGames())
                         .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
                         .csPerMinute(mc.getCsPerMinute())
+                        .kda(mc.getKDA())
                         .build())
                 .collect(Collectors.toList());
 

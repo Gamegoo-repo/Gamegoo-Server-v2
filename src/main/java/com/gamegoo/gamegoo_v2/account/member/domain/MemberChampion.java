@@ -42,24 +42,46 @@ public class MemberChampion extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "double default 0.0")
     private double csPerMinute;
 
-    public static MemberChampion create(Champion champion, Member member, int wins, int games, double csPerMinute) {
+    @Column(nullable = false)
+    private int kills;
+
+    @Column(nullable = false)
+    private int deaths;
+
+    @Column(nullable = false)
+    private int assists;
+
+    public double getKDA() {
+        if (deaths == 0) {
+            return kills + assists > 0 ? kills + assists : 0;
+        }
+        return (double) (kills + assists) / deaths;
+    }
+
+    public static MemberChampion create(Champion champion, Member member, int wins, int games, double csPerMinute, int kills, int deaths, int assists) {
         MemberChampion memberChampion = MemberChampion.builder()
                 .champion(champion)
                 .wins(wins)
                 .games(games)
                 .csPerMinute(csPerMinute)
+                .kills(kills)
+                .deaths(deaths)
+                .assists(assists)
                 .build();
         memberChampion.setMember(member);
         return memberChampion;
     }
 
     @Builder
-    private MemberChampion(Champion champion, Member member, int wins, int games, double csPerMinute) {
+    private MemberChampion(Champion champion, Member member, int wins, int games, double csPerMinute, int kills, int deaths, int assists) {
         this.champion = champion;
         this.member = member;
         this.wins = wins;
         this.games = games;
         this.csPerMinute = csPerMinute;
+        this.kills = kills;
+        this.deaths = deaths;
+        this.assists = assists;
     }
 
     public void setMember(Member member) {
