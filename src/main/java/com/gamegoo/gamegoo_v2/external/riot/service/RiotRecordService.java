@@ -160,6 +160,10 @@ public class RiotRecordService {
                         // CS가 음수인 경우 0으로 설정
                         int totalMinionsKilled = Math.max(0, participant.getTotalMinionsKilled());
                         stats.setTotalMinionsKilled(totalMinionsKilled);
+                        // KDA 정보 설정
+                        stats.setKills(participant.getKills());
+                        stats.setDeaths(participant.getDeaths());
+                        stats.setAssists(participant.getAssists());
                         return stats;
                     });
 

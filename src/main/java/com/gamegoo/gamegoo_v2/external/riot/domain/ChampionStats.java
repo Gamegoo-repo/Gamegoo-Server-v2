@@ -10,6 +10,9 @@ public class ChampionStats {
     private int games;
     private int gameTime; // 경기시간(초)
     private int totalMinionsKilled; // cs
+    private int kills; // 킬
+    private int deaths; // 데스
+    private int assists; // 어시스트
 
     /**
      * 한 경기의 결과로 객체를 생성
@@ -23,6 +26,9 @@ public class ChampionStats {
         this.wins = win ? 1 : 0;
         this.gameTime = 0;
         this.totalMinionsKilled = 0;
+        this.kills = 0;
+        this.deaths = 0;
+        this.assists = 0;
     }
 
     /**
@@ -47,6 +53,9 @@ public class ChampionStats {
         this.wins += other.wins;
         this.gameTime += other.gameTime;
         this.totalMinionsKilled += other.totalMinionsKilled;
+        this.kills += other.kills;
+        this.deaths += other.deaths;
+        this.assists += other.assists;
     }
 
     /**
@@ -56,6 +65,19 @@ public class ChampionStats {
      */
     public double getWinRate() {
         return games > 0 ? (double) wins / games : 0;
+    }
+
+    /**
+     * KDA 계산 ((킬 + 어시스트) / 데스)
+     * 데스가 0인 경우 킬 + 어시스트를 반환
+     *
+     * @return KDA
+     */
+    public double getKDA() {
+        if (deaths == 0) {
+            return kills + assists > 0 ? kills + assists : 0;
+        }
+        return (double) (kills + assists) / deaths;
     }
 
     public long getChampionId() {
@@ -98,6 +120,30 @@ public class ChampionStats {
             return totalMinionsKilled / (gameTime / 60.0);
         }
         return 0;
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public void setKills(int kills) {
+        this.kills = kills;
+    }
+
+    public int getDeaths() {
+        return deaths;
+    }
+
+    public void setDeaths(int deaths) {
+        this.deaths = deaths;
+    }
+
+    public int getAssists() {
+        return assists;
+    }
+
+    public void setAssists(int assists) {
+        this.assists = assists;
     }
 
 }

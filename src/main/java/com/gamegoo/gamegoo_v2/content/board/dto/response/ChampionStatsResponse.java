@@ -15,6 +15,7 @@ public class ChampionStatsResponse {
     private int wins;            // 승 수
     private int games;           // 판 수
     private double csPerMinute;  // 분당 CS
+    private double kda;          // KDA
 
     public static ChampionStatsResponse from(ChampionStats stats, Champion champion) {
         return ChampionStatsResponse.builder()
@@ -24,6 +25,7 @@ public class ChampionStatsResponse {
                 .wins(stats.getWins())
                 .games(stats.getGames())
                 .csPerMinute(stats.getCsPerMinute())
+                .kda(stats.getKDA())
                 .build();
     }
 
