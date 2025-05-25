@@ -4,13 +4,17 @@ import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -91,9 +95,11 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private Position subP = Position.ANY;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "member_want_positions", joinColumns = @JoinColumn(name = "member_id"))
+    @Column(name = "want_position", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
-    private Position wantP = Position.ANY;
+    private List<Position> wantPositions = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(50)")
@@ -205,10 +211,10 @@ public class Member extends BaseDateTimeEntity {
         this.mike = mike;
     }
 
-    public void updatePosition(Position mainPosition, Position subPosition, Position wantPosition) {
+    public void updatePosition(Position mainPosition, Position subPosition, List<Position> wantPositions) {
         this.mainP = mainPosition;
         this.subP = subPosition;
-        this.wantP = wantPosition;
+        this.wantPositions = wantPositions;
     }
 
     public void updatePassword(String password) {
@@ -230,14 +236,15 @@ public class Member extends BaseDateTimeEntity {
         return this.mannerRank;
     }
 
-    public void updateMemberByMatchingRecord(Mike mike, Position mainP, Position subP, Position wantP) {
+    public void updateMemberByMatchingRecord(Mike mike, Position mainP, Position subP, List<Position> wantPositions) {
         this.mike = mike;
         this.mainP = mainP;
         this.subP = subP;
-        this.wantP = wantP;
+        this.wantPositions = wantPositions;
     }
 
     public void deactiveMember() {
         this.blind = true;
     }
+
 }

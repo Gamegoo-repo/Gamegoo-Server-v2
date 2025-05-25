@@ -192,29 +192,30 @@ public class MemberService {
     /**
      * 포지션 수정
      *
-     * @param member       회원
-     * @param mainPosition 주 포지션
-     * @param subPosition  부 포지션
-     * @param wantPosition 원하는 포지션
+     * @param member        회원
+     * @param mainPosition  주 포지션
+     * @param subPosition   부 포지션
+     * @param wantPositions 원하는 포지션 리스트
      */
     @Transactional
-    public void setPosition(Member member, Position mainPosition, Position subPosition, Position wantPosition) {
-        member.updatePosition(mainPosition, subPosition, wantPosition);
+    public void setPosition(Member member, Position mainPosition, Position subPosition, List<Position> wantPositions) {
+        member.updatePosition(mainPosition, subPosition, wantPositions);
     }
 
 
     /**
      * 마이크, 포지션 수정
      *
-     * @param member 회원
-     * @param mike   마이크 유무
-     * @param mainP  주 포지션
-     * @param subP   부 포지션
-     * @param wantP  원하는 포지션
+     * @param member        회원
+     * @param mike          마이크 유무
+     * @param mainP         주 포지션
+     * @param subP          부 포지션
+     * @param wantPositions 원하는 포지션 리스트
      */
     @Transactional
-    public void updateMikePosition(Member member, Mike mike, Position mainP, Position subP, Position wantP) {
-        member.updateMemberByMatchingRecord(mike, mainP, subP, wantP);
+    public void updateMikePosition(Member member, Mike mike, Position mainP, Position subP,
+                                   List<Position> wantPositions) {
+        member.updateMemberByMatchingRecord(mike, mainP, subP, wantPositions);
     }
 
 
@@ -225,6 +226,7 @@ public class MemberService {
 
     /**
      * Member blind 처리
+     *
      * @param member 회원
      */
     @Transactional

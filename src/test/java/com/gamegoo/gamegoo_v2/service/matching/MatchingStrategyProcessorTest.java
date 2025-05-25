@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
@@ -138,8 +140,8 @@ class MatchingStrategyProcessorTest {
         member2.updateMike(Mike.UNAVAILABLE);
 
         // 포지션 점수 차이 : 2+3=5점
-        member1.updatePosition(Position.TOP, Position.MID, Position.ANY);
-        member2.updatePosition(Position.JUNGLE, Position.SUP, Position.MID);
+        member1.updatePosition(Position.TOP, Position.MID, List.of(Position.ANY));
+        member2.updatePosition(Position.JUNGLE, Position.SUP, List.of(Position.MID));
 
         // 매너 점수 차이 : 8점
         member1.updateMannerLevel(5);
@@ -169,8 +171,8 @@ class MatchingStrategyProcessorTest {
         Member member2 = createMember("user2@gmail.com", Tier.SILVER, true);
 
         // 포지션 점수 차이 : 6점
-        member1.updatePosition(Position.MID, Position.SUP, Position.ANY);
-        member2.updatePosition(Position.JUNGLE, Position.ADC, Position.MID);
+        member1.updatePosition(Position.MID, Position.SUP, List.of(Position.ANY));
+        member2.updatePosition(Position.JUNGLE, Position.ADC, List.of(Position.MID));
 
         // 매너 점수 차이 : 4점
         member1.updateMannerLevel(3);
@@ -203,8 +205,8 @@ class MatchingStrategyProcessorTest {
         Member member2 = createMember("user2@gmail.com", Tier.SILVER, true);
 
         // 포지션 점수 차이 : 6점
-        member1.updatePosition(Position.MID, Position.SUP, Position.ANY);
-        member2.updatePosition(Position.JUNGLE, Position.ADC, Position.MID);
+        member1.updatePosition(Position.MID, Position.SUP, List.of(Position.ANY));
+        member2.updatePosition(Position.JUNGLE, Position.ADC, List.of(Position.MID));
 
         // 매너 점수 차이 : 4점
         member1.updateMannerLevel(3);
@@ -259,9 +261,9 @@ class MatchingStrategyProcessorTest {
         @DisplayName("성공 케이스")
         void testValidatePreciseMatching_Success() {
             Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
-            member1.updatePosition(Position.TOP, Position.MID, Position.MID);
+            member1.updatePosition(Position.TOP, Position.MID, List.of(Position.MID));
             Member member2 = createMember("user2@gmail.com", Tier.GOLD, true);
-            member2.updatePosition(Position.MID, Position.JUNGLE, Position.MID);
+            member2.updatePosition(Position.MID, Position.JUNGLE, List.of(Position.MID));
             MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
             MatchingRecord record2 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member2);
 
@@ -291,9 +293,9 @@ class MatchingStrategyProcessorTest {
         void testValidatePreciseMatching_Fail_Position() {
             // given
             Member member1 = createMember("user1@gmail.com", Tier.GOLD, true);
-            member1.updatePosition(Position.TOP, Position.MID, Position.MID);
+            member1.updatePosition(Position.TOP, Position.MID, List.of(Position.MID));
             Member member2 = createMember("user2@gmail.com", Tier.GOLD, true);
-            member2.updatePosition(Position.JUNGLE, Position.SUP, Position.MID);
+            member2.updatePosition(Position.JUNGLE, Position.SUP, List.of(Position.MID));
 
             // when
             MatchingRecord record1 = createMatchingRecord(GameMode.SOLO, MatchingType.PRECISE, member1);
@@ -349,12 +351,12 @@ class MatchingStrategyProcessorTest {
         int positionPriority = 0;
 
         positionPriority += MatchingScoreCalculator.getPositionPriority(
-                member1.getWantP(), member2.getMainP(), member2.getSubP(),
+                member1.getWantPositions().get(0), member2.getMainP(), member2.getSubP(),
                 3, 2, 1
         );
 
         positionPriority += MatchingScoreCalculator.getPositionPriority(
-                member2.getWantP(), member1.getMainP(), member1.getSubP(),
+                member2.getWantPositions().get(0), member1.getMainP(), member1.getSubP(),
                 3, 2, 1
         );
         return positionPriority;

@@ -30,7 +30,7 @@ public class MyProfileResponse {
     String updatedAt;
     Position mainP;
     Position subP;
-    Position wantP;
+    List<Position> wantP;
     Boolean isAgree;
     Boolean isBlind;
     String loginType;
@@ -64,7 +64,7 @@ public class MyProfileResponse {
                 .profileImg(member.getProfileImage())
                 .mainP(member.getMainP())
                 .subP(member.getSubP())
-                .wantP(member.getWantP())
+                .wantP(member.getWantPositions())
                 .isAgree(member.isAgree())
                 .isBlind(member.isBlind())
                 .loginType(String.valueOf(member.getLoginType()))

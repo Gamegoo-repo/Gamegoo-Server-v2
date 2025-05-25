@@ -242,7 +242,7 @@ public class MatchingFacadeServiceTest {
         // given
         // 유저 정보 생성
         Member matchingMember = createMatchingMember("matchinguser@gmail.com", "User1", "Tag1", Tier.GOLD, 2,
-                Mike.AVAILABLE, Position.ADC, Position.MID, Position.SUP, 2);
+                Mike.AVAILABLE, Position.ADC, Position.MID, List.of(Position.SUP), 2);
 
         // dto 생성
         InitializingMatchingRequest request = InitializingMatchingRequest.builder()
@@ -274,7 +274,7 @@ public class MatchingFacadeServiceTest {
             MatchingStatus randomMatchingStatus = MatchingStatus.PENDING;
 
             Member targetMember = createMatchingMember(email, gameName, tag, tier, gameRank, mike, mainP, subP,
-                    wantP, mannerLevel);
+                    List.of(wantP), mannerLevel);
             createMatchingRecord(randomGameMode, randomMatchingType, targetMember, randomMatchingStatus);
         }
 
@@ -296,7 +296,7 @@ public class MatchingFacadeServiceTest {
         assertThat(updatedMember.getMike()).isEqualTo(request.getMike());
         assertThat(updatedMember.getMainP()).isEqualTo(request.getMainP());
         assertThat(updatedMember.getSubP()).isEqualTo(request.getSubP());
-        assertThat(updatedMember.getWantP()).isEqualTo(request.getWantP());
+        assertThat(updatedMember.getWantPositions().get(0)).isEqualTo(request.getWantP());
 
         // 2. 생성된 MatchingRecord 검증
         Optional<MatchingRecord> matchingRecordOptional = matchingRecordRepository.findLatestByMember(updatedMember);
@@ -864,7 +864,7 @@ public class MatchingFacadeServiceTest {
     }
 
     private Member createMatchingMember(String email, String gameName, String tag, Tier tier, int gameRank,
-                                        Mike mike, Position mainP, Position subP, Position wantP,
+                                        Mike mike, Position mainP, Position subP, java.util.List<Position> wantP,
                                         int mannerLevel) {
         Member member1 = Member.builder()
                 .email(email)

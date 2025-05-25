@@ -117,7 +117,7 @@ class MemberServiceFacadeTest {
         assertThat(response.getFreeWinrate()).isEqualTo(member.getFreeWinRate());
         assertThat(response.getMainP()).isEqualTo(member.getMainP());
         assertThat(response.getSubP()).isEqualTo(member.getSubP());
-        assertThat(response.getWantP()).isEqualTo(member.getWantP());
+        assertThat(response.getWantP()).isEqualTo(member.getWantPositions().get(0));
         assertThat(response.getIsAgree()).isEqualTo(member.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(member.isBlind());
         assertThat(response.getLoginType()).isEqualTo(member.getLoginType().name());
@@ -153,7 +153,7 @@ class MemberServiceFacadeTest {
         assertThat(response.getFreeWinrate()).isEqualTo(targetMember.getFreeWinRate());
         assertThat(response.getMainP()).isEqualTo(targetMember.getMainP());
         assertThat(response.getSubP()).isEqualTo(targetMember.getSubP());
-        assertThat(response.getWantP()).isEqualTo(targetMember.getWantP());
+        assertThat(response.getWantP()).isEqualTo(targetMember.getWantPositions().get(0));
         assertThat(response.getIsAgree()).isEqualTo(targetMember.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(targetMember.isBlind());
         assertThat(response.getLoginType()).isEqualTo(String.valueOf(targetMember.getLoginType()));
@@ -201,14 +201,14 @@ class MemberServiceFacadeTest {
         PositionRequest request = PositionRequest.builder()
                 .mainP(Position.valueOf("TOP"))
                 .subP(Position.valueOf("ANY"))
-                .wantP(Position.valueOf("MID"))
+                .wantP(List.of(Position.valueOf("MID")))
                 .build();
         // when
         memberFacadeService.setPosition(member, request);
         // then
         assertThat(member.getMainP()).isEqualTo(request.getMainP());
         assertThat(member.getSubP()).isEqualTo(request.getSubP());
-        assertThat(member.getWantP()).isEqualTo(request.getWantP());
+        assertThat(member.getWantPositions().get(0)).isEqualTo(request.getWantP().get(0));
     }
 
     @Nested

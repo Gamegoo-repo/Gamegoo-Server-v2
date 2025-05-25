@@ -29,7 +29,7 @@ public class OtherProfileResponse {
     String updatedAt;
     Position mainP;
     Position subP;
-    Position wantP;
+    List<Position> wantP;
     Boolean isAgree;
     Boolean isBlind;
     String loginType;
@@ -65,7 +65,7 @@ public class OtherProfileResponse {
                 .freeWinrate(targetMember.getFreeWinRate())
                 .profileImg(targetMember.getProfileImage())
                 .mainP(targetMember.getMainP())
-                .wantP(targetMember.getWantP())
+                .wantP(targetMember.getWantPositions())
                 .subP(targetMember.getSubP())
                 .isAgree(targetMember.isAgree())
                 .isBlind(targetMember.isBlind())
