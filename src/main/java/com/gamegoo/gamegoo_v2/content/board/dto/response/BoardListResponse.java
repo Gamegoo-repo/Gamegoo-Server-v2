@@ -25,7 +25,7 @@ public class BoardListResponse {
     private Position subP;
     private List<Position> wantP;
     private Mike mike;
-    private String content;
+    private String contents;
     private Integer boardProfileImage;
     private LocalDateTime createdAt;
     private Integer profileImage;
@@ -36,6 +36,10 @@ public class BoardListResponse {
     private Double winRate;
     private LocalDateTime bumpTime;
     private List<ChampionStatsResponse> championStatsResponseList;
+    private Tier freeTier;
+    private int freeRank;
+    private Tier soloTier;
+    private int soloRank;
 
     public static BoardListResponse of(Board board) {
         Member member = board.getMember();
@@ -75,7 +79,7 @@ public class BoardListResponse {
                 .subP(board.getSubP())
                 .wantP(board.getWantP())
                 .mike(board.getMike())
-                .content(board.getContent())
+                .contents(board.getContent())
                 .boardProfileImage(member.getProfileImage())
                 .createdAt(board.getCreatedAt())
                 .profileImage(member.getProfileImage())
@@ -86,6 +90,10 @@ public class BoardListResponse {
                 .winRate(winRate)
                 .bumpTime(board.getBumpTime())
                 .championStatsResponseList(championStatsResponseList)
+                .freeTier(member.getFreeTier())
+                .freeRank(member.getFreeRank())
+                .soloTier(member.getSoloTier())
+                .soloRank(member.getSoloRank())
                 .build();
     }
 
