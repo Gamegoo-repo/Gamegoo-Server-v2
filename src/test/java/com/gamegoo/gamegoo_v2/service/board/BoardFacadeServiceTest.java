@@ -185,6 +185,11 @@ class BoardFacadeServiceTest {
         assertThat(response.getBoards()).hasSize(1);
         assertThat(response.getBoards().get(0).getMainP()).isEqualTo(mainP);
         assertThat(response.getBoards().get(0).getSubP()).isEqualTo(subP);
+        assertThat(response.getBoards().get(0).getContents()).isEqualTo("test content");
+        assertThat(response.getBoards().get(0).getFreeTier()).isEqualTo(Tier.PLATINUM);
+        assertThat(response.getBoards().get(0).getFreeRank()).isEqualTo(2);
+        assertThat(response.getBoards().get(0).getSoloTier()).isEqualTo(Tier.GOLD);
+        assertThat(response.getBoards().get(0).getSoloRank()).isEqualTo(1);
     }
 
     @Test
