@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @Builder
 public class PositionRequest {
@@ -16,6 +18,6 @@ public class PositionRequest {
     private Position subP; // 서브 포지션
 
     @NotNull(message = "원하는 포지션은 null일 수 없습니다.")
-    private Position wantP; // 원하는 포지션
+    private List<Position> wantP; // 원하는 포지션
 
 }

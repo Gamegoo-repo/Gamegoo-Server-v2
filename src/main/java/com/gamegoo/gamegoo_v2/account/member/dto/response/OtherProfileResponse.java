@@ -29,7 +29,7 @@ public class OtherProfileResponse {
     String updatedAt;
     Position mainP;
     Position subP;
-    Position wantP;
+    List<Position> wantP;
     Boolean isAgree;
     Boolean isBlind;
     String loginType;

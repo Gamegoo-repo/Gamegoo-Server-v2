@@ -332,7 +332,7 @@ class MatchingServiceTest {
                 tier, gameRank, 55.0, 100, 100, true);
         member.updateMannerLevel(mannerLevel);
         member.updateMike(mike);
-        member.updatePosition(mainP, subP, wantP);
+        member.updatePosition(mainP, subP, List.of(wantP));
         return memberRepository.save(member);
     }
 
