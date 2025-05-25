@@ -25,7 +25,9 @@ public class RiotMatchResponse {
         private Long championId;
         private boolean win;
         private int totalMinionsKilled;
-
+        private int kills;
+        private int deaths;
+        private int assists;
 
     }
 

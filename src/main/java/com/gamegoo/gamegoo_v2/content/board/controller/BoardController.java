@@ -70,7 +70,10 @@ public class BoardController {
             @Parameter(name = "gameMode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, " +
                     "칼바람 나락: ARAM >"),
             @Parameter(name = "tier", description = "(선택) 티어를 선택해주세요."),
-            @Parameter(name = "mainP", description = "(선택) 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: " +
+            @Parameter(name = "mainP", description = "(선택) 주 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: " +
+                    "MID, 원딜: ADC, " +
+                    "서포터: SUP >"),
+            @Parameter(name = "subP", description = "(선택) 부 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: " +
                     "MID, 원딜: ADC, " +
                     "서포터: SUP >"),
             @Parameter(name = "mike", description = "(선택) 마이크 여부를 선택해주세요.")
@@ -80,9 +83,10 @@ public class BoardController {
             @RequestParam(required = false) GameMode gameMode,
             @RequestParam(required = false) Tier tier,
             @RequestParam(required = false) Position mainP,
+            @RequestParam(required = false) Position subP,
             @RequestParam(required = false) Mike mike) {
 
-        return ApiResponse.ok(boardFacadeService.getBoardList(gameMode, tier, mainP, mike, page));
+        return ApiResponse.ok(boardFacadeService.getBoardList(gameMode, tier, mainP, subP, mike, page));
 
 
     }

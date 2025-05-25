@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,6 +86,10 @@ class MemberServiceFacadeTest {
         for (long i = 1; i <= 16; i++) {
             gameStyleRepository.save(GameStyle.create("StyleName" + i));
         }
+
+        // 포지션 지정
+        member.updatePosition(Position.ADC, Position.TOP, List.of(Position.MID, Position.SUP));
+        targetMember.updatePosition(Position.TOP, Position.SUP, List.of(Position.ANY, Position.JUNGLE));
     }
 
     @AfterEach
@@ -134,10 +139,11 @@ class MemberServiceFacadeTest {
 
     @DisplayName("다른 사람 프로필 조회 성공")
     @Test
+    @Transactional
     void getOtherProfile() {
         // when
         OtherProfileResponse response = memberFacadeService.getOtherProfile(member, targetMember.getId());
-
+        
         // then
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(targetMember.getId());
@@ -201,14 +207,14 @@ class MemberServiceFacadeTest {
         PositionRequest request = PositionRequest.builder()
                 .mainP(Position.valueOf("TOP"))
                 .subP(Position.valueOf("ANY"))
-                .wantP(Position.valueOf("MID"))
+                .wantP(List.of(Position.valueOf("MID")))
                 .build();
         // when
         memberFacadeService.setPosition(member, request);
         // then
         assertThat(member.getMainP()).isEqualTo(request.getMainP());
         assertThat(member.getSubP()).isEqualTo(request.getSubP());
-        assertThat(member.getWantP()).isEqualTo(request.getWantP());
+        assertThat(member.getWantP().get(0)).isEqualTo(request.getWantP().get(0));
     }
 
     @Nested
@@ -345,7 +351,7 @@ class MemberServiceFacadeTest {
         top3ChampionIds.forEach(championId -> {
             Champion champion = championRepository.findById(championId).isPresent() ?
                     championRepository.findById(championId).get() : null;
-            MemberChampion memberChampion = MemberChampion.create(champion, member, 1, 10, 12);
+            MemberChampion memberChampion = MemberChampion.create(champion, member, 1, 10, 12, 0, 0, 0);
             memberChampionRepository.save(memberChampion);
         });
 

@@ -32,7 +32,7 @@ public class MatchingMemberInfoResponse {
     Mike mike;
     List<GameStyleResponse> gameStyleResponseList;
 
-    public static MatchingMemberInfoResponse of(Member member, String matchingUuid,GameMode gameMode) {
+    public static MatchingMemberInfoResponse of(Member member, String matchingUuid, GameMode gameMode) {
         List<GameStyleResponse> gameStyleResponseList = member.getMemberGameStyleList().stream()
                 .map(memberGameStyle -> GameStyleResponse.of(memberGameStyle.getGameStyle()))
                 .toList();
@@ -49,7 +49,7 @@ public class MatchingMemberInfoResponse {
                 .mannerLevel(member.getMannerLevel())
                 .mainP(member.getMainP())
                 .subP(member.getSubP())
-                .wantP(member.getWantP())
+                .wantP(member.getWantP().isEmpty() ? null : member.getWantP().get(0))
                 .gameMode(gameMode)
                 .gameStyleResponseList(gameStyleResponseList)
                 .build();

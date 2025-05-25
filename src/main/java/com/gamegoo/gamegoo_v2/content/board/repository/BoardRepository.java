@@ -12,24 +12,29 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query("SELECT b FROM Board b JOIN b.member m WHERE " +
             "b.deleted = false AND " +
-            "(:mode IS NULL OR b.gameMode = :mode) AND " +
-            "(:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m" +
-            ".freeTier ELSE m.soloTier END) = :tier) AND " +
-            "(:mainP IS NULL OR :mainP = 'ANY' OR b.mainP = :mainP) AND " +
-            "(:mike IS NULL OR b.mike = :mike)")
-    Page<Board> findByFilters(@Param("mode") GameMode gameMode,
-                              @Param("tier") Tier tier,
-                              @Param("mainP") Position mainP,
-                              @Param("mike") Mike mike,
-                              Pageable pageable);
-
+            "(:gameMode IS NULL OR b.gameMode = :gameMode) AND " +
+            "(:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m.freeTier ELSE m.soloTier END) = :tier) AND " +
+            "(:mainPList IS NULL OR b.mainP IN :mainPList) AND " +
+            "(:subPList IS NULL OR b.subP IN :subPList) AND " +
+            "(:mike IS NULL OR b.mike = :mike) " +
+            "ORDER BY b.createdAt DESC")
+    Page<Board> findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
+            @Param("gameMode") GameMode gameMode,
+            @Param("tier") Tier tier,
+            @Param("mainPList") List<Position> mainPList,
+            @Param("subPList") List<Position> subPList,
+            @Param("mike") Mike mike,
+            Pageable pageable);
 
     Optional<Board> findByIdAndDeleted(Long boardId, boolean b);
 

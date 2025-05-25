@@ -25,6 +25,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -57,17 +60,15 @@ public class BoardFacadeService {
     /**
      * 게시판 글 목록 조회 (파사드)
      */
-
-    public BoardResponse getBoardList(GameMode gameMode, Tier tier, Position mainP, Mike mike,
-                                      @ValidPage int pageIdx) {
-
+    public BoardResponse getBoardList(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike, int pageIdx) {
         if (mainP == null) {
             mainP = Position.ANY;
         }
+        if (subP == null) {
+            subP = Position.ANY;
+        }
 
-        Page<Board> boardPage = boardService.getBoardsWithPagination(gameMode, tier, mainP, mike,
-                pageIdx);
-
+        Page<Board> boardPage = boardService.getBoardsWithPagination(gameMode, tier, mainP, subP, mike, pageIdx);
         return BoardResponse.of(boardPage);
     }
 

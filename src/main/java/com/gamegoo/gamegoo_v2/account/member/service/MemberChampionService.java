@@ -31,8 +31,8 @@ public class MemberChampionService {
             Long championId = stats.getChampionId();
             // 챔피언이 존재하지 않으면 스킵
             championRepository.findById(championId).ifPresent(champion -> {
-                MemberChampion memberChampion = MemberChampion.create(champion, member, stats.getGames(),
-                        stats.getWins(), stats.getCsPerMinute());
+                MemberChampion memberChampion = MemberChampion.create(champion, member, stats.getWins(),
+                        stats.getGames(), stats.getCsPerMinute(), stats.getKills(), stats.getDeaths(), stats.getAssists());
                 memberChampionRepository.save(memberChampion);
             });
         });

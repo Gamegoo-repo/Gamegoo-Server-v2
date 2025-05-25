@@ -23,6 +23,7 @@ public class MyBoardListResponse {
     String contents;
     LocalDateTime createdAt;
     LocalDateTime bumpTime;
+    Integer mannerLevel;
 
     public static MyBoardListResponse of(Board board) {
         Member member = board.getMember();
@@ -48,6 +49,7 @@ public class MyBoardListResponse {
                 .contents(board.getContent())
                 .createdAt(board.getCreatedAt())
                 .bumpTime(board.getBumpTime())
+                .mannerLevel(member.getMannerLevel())
                 .build();
     }
 

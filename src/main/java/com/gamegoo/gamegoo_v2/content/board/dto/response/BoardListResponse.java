@@ -17,24 +17,25 @@ import java.util.stream.Collectors;
 @Builder
 public class BoardListResponse {
 
-    long boardId;
-    long memberId;
-    Integer profileImage;
-    String gameName;
-    String tag;
-    Integer mannerLevel;
-    Tier tier;
-    int rank;
-    GameMode gameMode;
-    Position mainP;
-    Position subP;
-    List<Position> wantP;
+    private Long boardId;
+    private Long memberId;
+    private String gameName;
+    private String tag;
+    private Position mainP;
+    private Position subP;
+    private List<Position> wantP;
+    private Mike mike;
+    private String content;
+    private Integer boardProfileImage;
+    private LocalDateTime createdAt;
+    private Integer profileImage;
+    private Integer mannerLevel;
+    private Tier tier;
+    private int rank;
+    private GameMode gameMode;
+    private Double winRate;
+    private LocalDateTime bumpTime;
     private List<ChampionStatsResponse> championStatsResponseList;
-    Double winRate;
-    LocalDateTime createdAt;
-    LocalDateTime bumpTime;
-    String contents;
-    Mike mike;
 
     public static BoardListResponse of(Board board) {
         Member member = board.getMember();
@@ -61,28 +62,30 @@ public class BoardListResponse {
                         .games(mc.getGames())
                         .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
                         .csPerMinute(mc.getCsPerMinute())
+                        .kda(mc.getKDA())
                         .build())
                 .collect(Collectors.toList());
 
         return BoardListResponse.builder()
                 .boardId(board.getId())
                 .memberId(member.getId())
-                .profileImage(member.getProfileImage())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
+                .mainP(board.getMainP())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
+                .mike(board.getMike())
+                .content(board.getContent())
+                .boardProfileImage(member.getProfileImage())
+                .createdAt(board.getCreatedAt())
+                .profileImage(member.getProfileImage())
                 .mannerLevel(member.getMannerLevel())
                 .tier(tier)
                 .rank(rank)
                 .gameMode(board.getGameMode())
-                .mainP(board.getMainP())
-                .subP(board.getSubP())
-                .wantP(board.getWantP())
-                .championStatsResponseList(championStatsResponseList)
                 .winRate(winRate)
-                .createdAt(board.getCreatedAt())
                 .bumpTime(board.getBumpTime())
-                .contents(board.getContent())
-                .mike(board.getMike())
+                .championStatsResponseList(championStatsResponseList)
                 .build();
     }
 
