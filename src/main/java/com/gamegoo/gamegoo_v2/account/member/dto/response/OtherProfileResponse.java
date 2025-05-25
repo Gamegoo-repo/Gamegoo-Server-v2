@@ -65,7 +65,7 @@ public class OtherProfileResponse {
                 .freeWinrate(targetMember.getFreeWinRate())
                 .profileImg(targetMember.getProfileImage())
                 .mainP(targetMember.getMainP())
-                .wantP(targetMember.getWantPositions())
+                .wantP(targetMember.getWantP())
                 .subP(targetMember.getSubP())
                 .isAgree(targetMember.isAgree())
                 .isBlind(targetMember.isBlind())

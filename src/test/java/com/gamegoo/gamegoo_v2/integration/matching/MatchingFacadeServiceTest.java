@@ -296,7 +296,7 @@ public class MatchingFacadeServiceTest {
         assertThat(updatedMember.getMike()).isEqualTo(request.getMike());
         assertThat(updatedMember.getMainP()).isEqualTo(request.getMainP());
         assertThat(updatedMember.getSubP()).isEqualTo(request.getSubP());
-        assertThat(updatedMember.getWantPositions().get(0)).isEqualTo(request.getWantP());
+        assertThat(updatedMember.getWantP().get(0)).isEqualTo(request.getWantP());
 
         // 2. 생성된 MatchingRecord 검증
         Optional<MatchingRecord> matchingRecordOptional = matchingRecordRepository.findLatestByMember(updatedMember);

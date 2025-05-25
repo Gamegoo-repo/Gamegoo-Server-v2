@@ -99,7 +99,7 @@ public class Member extends BaseDateTimeEntity {
     @CollectionTable(name = "member_want_positions", joinColumns = @JoinColumn(name = "member_id"))
     @Column(name = "want_position", nullable = false)
     @Enumerated(EnumType.STRING)
-    private List<Position> wantPositions = new ArrayList<>();
+    private List<Position> wantP = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(50)")
@@ -214,7 +214,7 @@ public class Member extends BaseDateTimeEntity {
     public void updatePosition(Position mainPosition, Position subPosition, List<Position> wantPositions) {
         this.mainP = mainPosition;
         this.subP = subPosition;
-        this.wantPositions = wantPositions;
+        this.wantP = wantPositions;
     }
 
     public void updatePassword(String password) {
@@ -240,7 +240,7 @@ public class Member extends BaseDateTimeEntity {
         this.mike = mike;
         this.mainP = mainP;
         this.subP = subP;
-        this.wantPositions = wantPositions;
+        this.wantP = wantPositions;
     }
 
     public void deactiveMember() {

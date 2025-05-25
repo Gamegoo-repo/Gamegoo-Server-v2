@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,6 +86,10 @@ class MemberServiceFacadeTest {
         for (long i = 1; i <= 16; i++) {
             gameStyleRepository.save(GameStyle.create("StyleName" + i));
         }
+
+        // 포지션 지정
+        member.updatePosition(Position.ADC, Position.TOP, List.of(Position.MID, Position.SUP));
+        targetMember.updatePosition(Position.TOP, Position.SUP, List.of(Position.ANY, Position.JUNGLE));
     }
 
     @AfterEach
@@ -117,7 +122,7 @@ class MemberServiceFacadeTest {
         assertThat(response.getFreeWinrate()).isEqualTo(member.getFreeWinRate());
         assertThat(response.getMainP()).isEqualTo(member.getMainP());
         assertThat(response.getSubP()).isEqualTo(member.getSubP());
-        assertThat(response.getWantP()).isEqualTo(member.getWantPositions().get(0));
+        assertThat(response.getWantP()).isEqualTo(member.getWantP());
         assertThat(response.getIsAgree()).isEqualTo(member.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(member.isBlind());
         assertThat(response.getLoginType()).isEqualTo(member.getLoginType().name());
@@ -134,10 +139,11 @@ class MemberServiceFacadeTest {
 
     @DisplayName("다른 사람 프로필 조회 성공")
     @Test
+    @Transactional
     void getOtherProfile() {
         // when
         OtherProfileResponse response = memberFacadeService.getOtherProfile(member, targetMember.getId());
-
+        
         // then
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(targetMember.getId());
@@ -153,7 +159,7 @@ class MemberServiceFacadeTest {
         assertThat(response.getFreeWinrate()).isEqualTo(targetMember.getFreeWinRate());
         assertThat(response.getMainP()).isEqualTo(targetMember.getMainP());
         assertThat(response.getSubP()).isEqualTo(targetMember.getSubP());
-        assertThat(response.getWantP()).isEqualTo(targetMember.getWantPositions().get(0));
+        assertThat(response.getWantP()).isEqualTo(targetMember.getWantP());
         assertThat(response.getIsAgree()).isEqualTo(targetMember.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(targetMember.isBlind());
         assertThat(response.getLoginType()).isEqualTo(String.valueOf(targetMember.getLoginType()));
@@ -208,7 +214,7 @@ class MemberServiceFacadeTest {
         // then
         assertThat(member.getMainP()).isEqualTo(request.getMainP());
         assertThat(member.getSubP()).isEqualTo(request.getSubP());
-        assertThat(member.getWantPositions().get(0)).isEqualTo(request.getWantP().get(0));
+        assertThat(member.getWantP().get(0)).isEqualTo(request.getWantP().get(0));
     }
 
     @Nested

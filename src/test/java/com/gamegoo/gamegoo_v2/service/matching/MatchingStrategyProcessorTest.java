@@ -351,12 +351,12 @@ class MatchingStrategyProcessorTest {
         int positionPriority = 0;
 
         positionPriority += MatchingScoreCalculator.getPositionPriority(
-                member1.getWantPositions().get(0), member2.getMainP(), member2.getSubP(),
+                member1.getWantP().get(0), member2.getMainP(), member2.getSubP(),
                 3, 2, 1
         );
 
         positionPriority += MatchingScoreCalculator.getPositionPriority(
-                member2.getWantPositions().get(0), member1.getMainP(), member1.getSubP(),
+                member2.getWantP().get(0), member1.getMainP(), member1.getSubP(),
                 3, 2, 1
         );
         return positionPriority;

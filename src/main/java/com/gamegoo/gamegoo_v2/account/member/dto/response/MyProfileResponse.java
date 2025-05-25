@@ -64,7 +64,7 @@ public class MyProfileResponse {
                 .profileImg(member.getProfileImage())
                 .mainP(member.getMainP())
                 .subP(member.getSubP())
-                .wantP(member.getWantPositions())
+                .wantP(member.getWantP())
                 .isAgree(member.isAgree())
                 .isBlind(member.isBlind())
                 .loginType(String.valueOf(member.getLoginType()))

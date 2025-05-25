@@ -88,7 +88,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
                 .gameMode(gameMode)
                 .mainP(member.getMainP())
                 .subP(member.getSubP())
-                .wantP(member.getWantPositions().isEmpty() ? null : member.getWantPositions().get(0))
+                .wantP(member.getWantP().isEmpty() ? null : member.getWantP().get(0))
                 .mike(member.getMike())
                 .tier(getTierByGameMode(gameMode, member))
                 .gameRank(getGameRankByGameMode(gameMode, member))
