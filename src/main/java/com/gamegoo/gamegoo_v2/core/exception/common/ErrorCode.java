@@ -143,7 +143,7 @@ public enum ErrorCode {
     BOARD_FORBIDDEN_WORD(BAD_REQUEST, "BOARD_408", "금지어가 포함되어 있습니다."),
     BOARD_FORBIDDEN_WORD_LOAD_FAILED(INTERNAL_SERVER_ERROR, "BOARD_409", "금지어 파일을 읽어오는데 실패했습니다."),
     BUMP_ACCESS_DENIED(FORBIDDEN, "BOARD_410", "게시글 끌어올리기 권한이 없습니다."),
-    BUMP_TIME_LIMIT(BAD_REQUEST, "BOARD_411", "게시글 끌어올리기는 24시간에 1회만 가능합니다."),
+    BUMP_TIME_LIMIT(BAD_REQUEST, "BOARD_411", "게시글 끌어올리기는 5분에 1회만 가능합니다."),
     BOARD_CREATE_COOL_DOWN(BAD_REQUEST, "BOARD_412", "게시글 작성 쿨타임이 적용되었습니다. 5분 후 다시 시도해주세요."),
 
 
