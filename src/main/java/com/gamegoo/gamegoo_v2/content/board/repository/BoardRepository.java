@@ -27,7 +27,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "(:mainPList IS NULL OR b.mainP IN :mainPList) AND " +
             "(:subPList IS NULL OR b.subP IN :subPList) AND " +
             "(:mike IS NULL OR b.mike = :mike) " +
-            "ORDER BY b.createdAt DESC")
+            "ORDER BY GREATEST(COALESCE(b.bumpTime, b.createdAt), b.createdAt) DESC")
     Page<Board> findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
             @Param("gameMode") GameMode gameMode,
             @Param("tier") Tier tier,
