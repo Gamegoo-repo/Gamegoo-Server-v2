@@ -34,7 +34,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     public static final int PAGE_SIZE = 20;
     public static final int MY_PAGE_SIZE = 10;
-    private static final Duration BUMP_INTERVAL = Duration.ofMinutes(1);
+    private static final Duration BUMP_INTERVAL = Duration.ofMinutes(5);
 
     /**
      * 게시글 엔티티 생성 및 저장
@@ -113,7 +113,7 @@ public class BoardService {
             subPList.add(subP);
         }
 
-        Pageable pageable = PageRequest.of(pageIdx - 1, 10, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(pageIdx - 1, 10, Sort.by("activityTime").descending());
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
                 gameMode, tier, mainPList, subPList, mike, pageable);
     }
@@ -178,7 +178,7 @@ public class BoardService {
             throw new IllegalArgumentException("pageIdx는 1 이상의 값이어야 합니다.");
         }
         // PageRequest.of의 첫 번째 인자(pageIdx - 1)는 0-based index
-        Pageable pageable = PageRequest.of(pageIdx - 1, MY_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(pageIdx - 1, MY_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityTime"));
         return boardRepository.findByMemberIdAndDeletedFalse(memberId, pageable);
     }
 
