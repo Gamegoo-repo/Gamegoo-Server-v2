@@ -47,7 +47,7 @@ public class NotificationResponse {
         }
 
         // sourceMember가 탈퇴한 회원인 경우 URL 생성하지 않음
-        if (notification.getSourceMember().isBlind()) {
+        if (notification.getSourceMember().getBlind()) {
             return null;
         }
 
@@ -64,7 +64,7 @@ public class NotificationResponse {
         }
 
         // sourceMember 닉네임 표시
-        if (notification.getSourceMember().isBlind()) { // sourceMember가 탈퇴한 회원인 경우
+        if (notification.getSourceMember().getBlind()) { // sourceMember가 탈퇴한 회원인 경우
             return "(탈퇴한 사용자)" + content;
         } else {
             return notification.getSourceMember().getGameName() + content;

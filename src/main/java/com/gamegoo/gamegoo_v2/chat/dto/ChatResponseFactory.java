@@ -60,7 +60,7 @@ public class ChatResponseFactory {
     public EnterChatroomResponse toEnterChatroomResponse(Member member, Member targetMember, String chatroomUuid,
                                                          Integer systemFlag, Long boardId,
                                                          ChatMessageListResponse chatMessageListResponse) {
-        String gameName = targetMember.isBlind()
+        String gameName = targetMember.getBlind()
                 ? "(탈퇴한 사용자)"
                 : targetMember.getGameName();
 
@@ -74,7 +74,7 @@ public class ChatResponseFactory {
                 .memberProfileImg(targetMember.getProfileImage())
                 .friend(friendService.isFriend(member, targetMember))
                 .blocked(blockService.isBlocked(member, targetMember))
-                .blind(targetMember.isBlind())
+                .blind(targetMember.getBlind())
                 .friendRequestMemberId(friendService.getFriendRequestMemberId(member, targetMember))
                 .system(systemFlagResponse)
                 .chatMessageListResponse(chatMessageListResponse)
@@ -83,7 +83,7 @@ public class ChatResponseFactory {
 
     public EnterChatroomResponse toEnterChatroomResponse(Member member, Member targetMember, String chatroomUuid,
                                                          ChatMessageListResponse chatMessageListResponse) {
-        String gameName = targetMember.isBlind()
+        String gameName = targetMember.getBlind()
                 ? "(탈퇴한 사용자)"
                 : targetMember.getGameName();
 
@@ -94,7 +94,7 @@ public class ChatResponseFactory {
                 .memberProfileImg(targetMember.getProfileImage())
                 .friend(friendService.isFriend(member, targetMember))
                 .blocked(blockService.isBlocked(member, targetMember))
-                .blind(targetMember.isBlind())
+                .blind(targetMember.getBlind())
                 .friendRequestMemberId(friendService.getFriendRequestMemberId(member, targetMember))
                 .system(null)
                 .chatMessageListResponse(chatMessageListResponse)
@@ -118,7 +118,7 @@ public class ChatResponseFactory {
     public ChatroomResponse toChatroomResponse(Chatroom chatroom, Member targetMember, boolean isFriend,
                                                boolean isBlocked, Long friendRequestMemberId, Chat lastChat,
                                                int unreadCnt) {
-        String gameName = targetMember.isBlind()
+        String gameName = targetMember.getBlind()
                 ? "(탈퇴한 사용자)"
                 : targetMember.getGameName();
 
@@ -140,7 +140,7 @@ public class ChatResponseFactory {
                 .targetMemberName(gameName)
                 .friend(isFriend)
                 .blocked(isBlocked)
-                .blind(targetMember.isBlind())
+                .blind(targetMember.getBlind())
                 .friendRequestMemberId(friendRequestMemberId)
                 .lastMsg(lastMsg)
                 .lastMsgAt(lastMsgAt)

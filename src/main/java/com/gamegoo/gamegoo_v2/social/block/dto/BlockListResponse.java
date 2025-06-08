@@ -28,12 +28,12 @@ public class BlockListResponse {
         boolean isBlind;
 
         public static BlockedMemberResponse of(Member member) {
-            String name = member.isBlind() ? "(탈퇴한 사용자)" : member.getGameName();
+            String name = member.getBlind() ? "(탈퇴한 사용자)" : member.getGameName();
             return BlockedMemberResponse.builder()
                     .memberId(member.getId())
                     .profileImg(member.getProfileImage())
                     .name(name)
-                    .isBlind(member.isBlind())
+                    .isBlind(member.getBlind())
                     .build();
         }
 

@@ -15,13 +15,13 @@ public class FriendInfoResponse {
     boolean isBlind;
 
     public static FriendInfoResponse of(Friend friend) {
-        String name = friend.getToMember().isBlind() ? "(탈퇴한 사용자)" : friend.getToMember().getGameName();
+        String name = friend.getToMember().getBlind() ? "(탈퇴한 사용자)" : friend.getToMember().getGameName();
         return FriendInfoResponse.builder()
                 .memberId(friend.getToMember().getId())
                 .profileImg(friend.getToMember().getProfileImage())
                 .name(name)
                 .isLiked(friend.isLiked())
-                .isBlind(friend.getToMember().isBlind())
+                .isBlind(friend.getToMember().getBlind())
                 .build();
     }
 
