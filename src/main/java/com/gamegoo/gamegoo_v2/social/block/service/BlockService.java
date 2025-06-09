@@ -102,7 +102,7 @@ public class BlockService {
                 .orElseThrow(() -> new BlockException(ErrorCode.TARGET_MEMBER_NOT_BLOCKED));
 
         // targetMember가 탈퇴한 회원이 맞는지 검증
-        if (!targetMember.isBlind()) {
+        if (!targetMember.getBlind()) {
             throw new BlockException(ErrorCode.DELETE_BLOCKED_MEMBER_FAILED);
         }
 

@@ -15,7 +15,7 @@ public class MemberValidator extends BaseValidator {
      * @param member 회원
      */
     public void throwIfBlind(Member member) {
-        if (member.isBlind()) {
+        if (member.getBlind()) {
             throw new MemberException(ErrorCode.TARGET_MEMBER_DEACTIVATED);
         }
     }
@@ -40,7 +40,7 @@ public class MemberValidator extends BaseValidator {
      * @param errorCode      에러 코드
      */
     public <T extends GlobalException> void throwIfBlind(Member member, Class<T> exceptionClass, ErrorCode errorCode) {
-        if (member.isBlind()) {
+        if (member.getBlind()) {
             throw createException(exceptionClass, errorCode);
         }
     }

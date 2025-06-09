@@ -17,7 +17,7 @@ public class ChatMessageResponse {
     Long timestamp;
 
     public static ChatMessageResponse of(Chat chat) {
-        String senderName = chat.getFromMember().isBlind()
+        String senderName = chat.getFromMember().getBlind()
                 ? "(탈퇴한 사용자)"
                 : chat.getFromMember().getGameName();
 
