@@ -68,7 +68,7 @@ public class OtherProfileResponse {
                 .wantP(targetMember.getWantP())
                 .subP(targetMember.getSubP())
                 .isAgree(targetMember.isAgree())
-                .isBlind(targetMember.isBlind())
+                .isBlind(targetMember.getBlind())
                 .loginType(String.valueOf(targetMember.getLoginType()))
                 .updatedAt(String.valueOf(targetMember.getUpdatedAt()))
                 .blocked(isBlocked)

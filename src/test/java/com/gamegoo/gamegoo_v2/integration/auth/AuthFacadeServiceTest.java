@@ -218,8 +218,10 @@ class AuthFacadeServiceTest {
             // given
 
             // when
+            authFacadeService.blindMember(member);
 
             // then
+            assertThat(member.getBlind()).isTrue();
         }
 
         @DisplayName("성공: 해당 회원이 속한 모든 채팅방에서 퇴장 처리 되어야 한다.")

@@ -1,8 +1,8 @@
 package com.gamegoo.gamegoo_v2.account.auth.security;
 
 import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
-import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.JwtAuthException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new JwtAuthException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 탈퇴한 회원인 경우 에러 발생
-        if (member.isBlind()) {
+        if (member.getBlind()) {
             throw new JwtAuthException(ErrorCode.INACTIVE_MEMBER);
         }
 

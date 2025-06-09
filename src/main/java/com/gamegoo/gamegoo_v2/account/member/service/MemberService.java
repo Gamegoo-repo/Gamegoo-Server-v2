@@ -13,6 +13,8 @@ import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.utils.PasswordUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,9 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+
+    @PersistenceContext
+    EntityManager em;
 
     @Transactional
     public Member createMemberGeneral(JoinRequest request, List<TierDetails> tiers) {
@@ -232,6 +237,7 @@ public class MemberService {
     @Transactional
     public void deactivateMember(Member member) {
         member.deactiveMember();
+        em.flush();
     }
 
 }

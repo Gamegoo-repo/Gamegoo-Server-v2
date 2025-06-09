@@ -124,7 +124,7 @@ class MemberServiceFacadeTest {
         assertThat(response.getSubP()).isEqualTo(member.getSubP());
         assertThat(response.getWantP()).isEqualTo(member.getWantP());
         assertThat(response.getIsAgree()).isEqualTo(member.isAgree());
-        assertThat(response.getIsBlind()).isEqualTo(member.isBlind());
+        assertThat(response.getIsBlind()).isEqualTo(member.getBlind());
         assertThat(response.getLoginType()).isEqualTo(member.getLoginType().name());
         assertThat(response.getChampionResponseList()).isNotNull();
 
@@ -143,7 +143,7 @@ class MemberServiceFacadeTest {
     void getOtherProfile() {
         // when
         OtherProfileResponse response = memberFacadeService.getOtherProfile(member, targetMember.getId());
-        
+
         // then
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(targetMember.getId());
@@ -161,7 +161,7 @@ class MemberServiceFacadeTest {
         assertThat(response.getSubP()).isEqualTo(targetMember.getSubP());
         assertThat(response.getWantP()).isEqualTo(targetMember.getWantP());
         assertThat(response.getIsAgree()).isEqualTo(targetMember.isAgree());
-        assertThat(response.getIsBlind()).isEqualTo(targetMember.isBlind());
+        assertThat(response.getIsBlind()).isEqualTo(targetMember.getBlind());
         assertThat(response.getLoginType()).isEqualTo(String.valueOf(targetMember.getLoginType()));
         assertThat(response.getChampionResponseList()).isNotNull();
 

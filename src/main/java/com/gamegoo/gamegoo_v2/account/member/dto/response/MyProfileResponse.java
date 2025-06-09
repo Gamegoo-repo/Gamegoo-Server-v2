@@ -66,7 +66,7 @@ public class MyProfileResponse {
                 .subP(member.getSubP())
                 .wantP(member.getWantP())
                 .isAgree(member.isAgree())
-                .isBlind(member.isBlind())
+                .isBlind(member.getBlind())
                 .loginType(String.valueOf(member.getLoginType()))
                 .updatedAt(String.valueOf(member.getUpdatedAt()))
                 .gameStyleResponseList(gameStyleResponseList)

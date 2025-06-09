@@ -20,12 +20,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
+@DynamicUpdate
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseDateTimeEntity {
@@ -55,7 +57,7 @@ public class Member extends BaseDateTimeEntity {
     private Double mannerRank;
 
     @Column(nullable = false)
-    private boolean blind = false;
+    private Boolean blind = false;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(50)")
