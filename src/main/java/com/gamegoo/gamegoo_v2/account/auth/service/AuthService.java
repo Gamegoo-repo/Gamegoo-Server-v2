@@ -25,10 +25,7 @@ public class AuthService {
      */
     @Transactional
     public void deleteRefreshToken(Member member) {
-        RefreshToken refreshToken = refreshTokenRepository.findByMember(member)
-                .orElseThrow(); // 리프레시 토큰이 없을 경우 에러를 발생시킬 필요가 없음. 이미 삭제된 상태
-
-        refreshTokenRepository.delete(refreshToken);
+        refreshTokenRepository.findByMember(member).ifPresent(refreshTokenRepository::delete);
     }
 
     /**
@@ -60,4 +57,5 @@ public class AuthService {
         // JWT 검증
         jwtProvider.validateToken(refreshToken);
     }
+
 }
