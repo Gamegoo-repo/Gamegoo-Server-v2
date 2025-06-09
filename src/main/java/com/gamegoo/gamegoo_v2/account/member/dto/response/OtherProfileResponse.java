@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -37,7 +38,7 @@ public class OtherProfileResponse {
     Boolean friend; // 해당 회원과의 친구 여부
     Long friendRequestMemberId; // 해당 회원과의 친구 요청 상태
     List<GameStyleResponse> gameStyleResponseList;
-    List<ChampionResponse> championResponseList;
+    List<ChampionStatsResponse> championStatsResponseList;
 
     public static OtherProfileResponse of(Member targetMember, Boolean isFriend, Long friendRequestMemberId,
                                           Boolean isBlocked) {
@@ -45,11 +46,8 @@ public class OtherProfileResponse {
                 .map(memberGameStyle -> GameStyleResponse.of(memberGameStyle.getGameStyle()))
                 .toList();
 
-        List<ChampionResponse> championResponseList = targetMember.getMemberChampionList().stream()
-                .map(memberChampion -> ChampionResponse.of(
-                        memberChampion.getChampion(),
-                        memberChampion.getWins(),
-                        memberChampion.getGames()))
+        List<ChampionStatsResponse> championStatsResponseList = targetMember.getMemberChampionList().stream()
+                .map(ChampionStatsResponse::from)
                 .toList();
 
         return OtherProfileResponse.builder()
@@ -75,7 +73,7 @@ public class OtherProfileResponse {
                 .friend(isFriend)
                 .friendRequestMemberId(friendRequestMemberId)
                 .gameStyleResponseList(gameStyleResponseList)
-                .championResponseList(championResponseList)
+                .championStatsResponseList(championStatsResponseList)
                 .build();
     }
 

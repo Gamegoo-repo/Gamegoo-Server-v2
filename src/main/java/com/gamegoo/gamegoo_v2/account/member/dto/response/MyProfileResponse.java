@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -35,18 +36,15 @@ public class MyProfileResponse {
     Boolean isBlind;
     String loginType;
     List<GameStyleResponse> gameStyleResponseList;
-    List<ChampionResponse> championResponseList;
+    List<ChampionStatsResponse> championStatsResponseList;
 
     public static MyProfileResponse of(Member member) {
         List<GameStyleResponse> gameStyleResponseList = member.getMemberGameStyleList().stream()
                 .map(memberGameStyle -> GameStyleResponse.of(memberGameStyle.getGameStyle()))
                 .toList();
 
-        List<ChampionResponse> championResponseList = member.getMemberChampionList().stream()
-                .map(memberChampion -> ChampionResponse.of(
-                        memberChampion.getChampion(),
-                        memberChampion.getWins(),
-                        memberChampion.getGames()))
+        List<ChampionStatsResponse> championStatsResponseList = member.getMemberChampionList().stream()
+                .map(ChampionStatsResponse::from)
                 .toList();
 
         return MyProfileResponse.builder()
@@ -70,7 +68,7 @@ public class MyProfileResponse {
                 .loginType(String.valueOf(member.getLoginType()))
                 .updatedAt(String.valueOf(member.getUpdatedAt()))
                 .gameStyleResponseList(gameStyleResponseList)
-                .championResponseList(championResponseList)
+                .championStatsResponseList(championStatsResponseList)
                 .build();
     }
 
