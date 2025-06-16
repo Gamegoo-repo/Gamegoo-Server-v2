@@ -1,15 +1,15 @@
 package com.gamegoo.gamegoo_v2.core.event.listener;
 
-import com.gamegoo.gamegoo_v2.account.email.service.EmailService;
+import com.gamegoo.gamegoo_v2.account.email.service.EmailAsyncService;
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.service.ReportService;
 import com.gamegoo.gamegoo_v2.core.event.SendReportEmailEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmailEventListener {
 
-    private final EmailService emailService;
+    private final EmailAsyncService emailAsyncService;
     private final ReportService reportService;
 
     @Value("${email.report_email_to}")
@@ -30,8 +30,7 @@ public class EmailEventListener {
 
     private static final String REPORT_EMAIL_SUBJECT = "%s%s 님이 신고를 접수했습니다.";
 
-    @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSendReportEmailEvent(SendReportEmailEvent event) {
         try {
             Report report = reportService.findById(event.getReportId());
@@ -48,7 +47,8 @@ public class EmailEventListener {
             placeholders.put("REPORT_TYPE", reportService.getReportTypeString(event.getReportId()));
             placeholders.put("REPORT_CONTENT", report.getContent() != null ? report.getContent() : "null");
 
-            emailService.sendEmail(reportEmailTo, subject, reportTemplatePath, placeholders);
+            // 비동기로 메일 전송 요청
+            emailAsyncService.sendEmailAsync(reportEmailTo, subject, reportTemplatePath, placeholders);
 
         } catch (Exception e) {
             log.error("Failed to send report email", e);
