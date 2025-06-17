@@ -103,7 +103,6 @@ class MemberServiceFacadeTest {
 
     @DisplayName("내 프로필 조회 성공")
     @Test
-    @Transactional
     void getProfile() {
         // when
         MyProfileResponse response = memberFacadeService.getMyProfile(member);
