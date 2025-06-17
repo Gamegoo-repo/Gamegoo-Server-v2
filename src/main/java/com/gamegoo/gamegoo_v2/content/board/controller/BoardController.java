@@ -7,15 +7,10 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardBumpResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardUpdateResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.MyBoardResponse;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.*;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.common.annotation.ValidCursor;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -129,6 +124,15 @@ public class BoardController {
                                                        @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.getMyBoardList(member, page));
     }
+
+    @GetMapping("/my/cursor")
+    @Operation(summary = "내가 작성한 게시판 글 목록 조회 API/모바일", description = "모바일에서 내가 작성한 게시판 글을 조회하는 API 입니다.")
+    @Parameter(name = "cursor", description = "페이징을 위한 커서, Long 타입 boardId를 보내주세요. " + "보내지 않으면 가장 최근 게시물 10개를 조회합니다.")
+    public ApiResponse<MyBoardCursorResponse> getMyBoardCursorList(@ValidCursor @RequestParam(name = "cursor", required = false) Long cursor,
+                                                                   @AuthMember Member member) {
+        return ApiResponse.ok(boardFacadeService.getMyBoardCursorList(member, cursor));
+    }
+
 
     /**
      * 게시글 끌올(bump) API

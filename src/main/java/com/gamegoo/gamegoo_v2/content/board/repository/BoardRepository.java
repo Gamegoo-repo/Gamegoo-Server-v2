@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -41,6 +42,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Optional<Board> findTopByMemberIdOrderByCreatedAtDesc(Long memberId);
 
     Page<Board> findByMemberIdAndDeletedFalse(Long memberId, Pageable pageable);
+    Slice<Board> findByMemberIdAndDeletedFalseAndIdLessThan(Long memberId, Long cursor, Pageable pageable);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Board b SET b.deleted = true where b.member = :member")

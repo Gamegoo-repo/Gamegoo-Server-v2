@@ -12,10 +12,7 @@ import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -180,6 +177,17 @@ public class BoardService {
         // PageRequest.of의 첫 번째 인자(pageIdx - 1)는 0-based index
         Pageable pageable = PageRequest.of(pageIdx - 1, MY_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityTime"));
         return boardRepository.findByMemberIdAndDeletedFalse(memberId, pageable);
+    }
+
+    /**
+     * 내가 작성한 게시글(cursor) 조회
+     */
+    public Slice<Board> getMyBoards(Long memberId, Long cursor) {
+        if (cursor == null) {
+            throw new IllegalArgumentException("cursor는 null이 아닙니다.");
+        }
+        Pageable pageable = PageRequest.of(0, MY_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityTime"));
+        return boardRepository.findByMemberIdAndDeletedFalseAndIdLessThan(memberId, cursor, pageable);
     }
 
     /**

@@ -8,13 +8,7 @@ import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardBumpResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardUpdateResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.MyBoardResponse;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.*;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
@@ -22,6 +16,7 @@ import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,6 +129,14 @@ public class BoardFacadeService {
     public MyBoardResponse getMyBoardList(Member member, int pageIdx) {
         Page<Board> boardPage = boardService.getMyBoards(member.getId(), pageIdx);
         return MyBoardResponse.of(boardPage);
+    }
+
+    /**
+     * 내가 작성한 게시글 목록 조회(커서)
+     */
+    public MyBoardCursorResponse getMyBoardCursorList(Member member, Long cursor) {
+        Slice<Board> boardSlice = boardService.getMyBoards(member.getId(), cursor);
+        return MyBoardCursorResponse.of(boardSlice);
     }
 
     /**
