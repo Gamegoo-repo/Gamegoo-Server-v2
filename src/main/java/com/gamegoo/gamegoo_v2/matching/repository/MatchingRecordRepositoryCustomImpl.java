@@ -133,34 +133,22 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
      * 매칭 가능한 포지션 조건
      */
     private BooleanExpression isValidMatchingPosition(QMatchingRecord myRecord, QMatchingRecord otherRecord) {
-        BooleanExpression condition1 = myRecord.mainP.ne(Position.ANY)
-                .and(otherRecord.subP.ne(Position.ANY))
-                .and(myRecord.mainP.eq(otherRecord.subP)
-                        .or(otherRecord.mainP.eq(myRecord.subP)))
-                .and(myRecord.wantP.eq(otherRecord.subP));
+        // ANY가 하나라도 포함되어 있으면 무조건 매칭 허용
+        BooleanExpression hasAny = myRecord.mainP.eq(Position.ANY)
+                .or(myRecord.subP.eq(Position.ANY))
+                .or(otherRecord.mainP.eq(Position.ANY))
+                .or(otherRecord.subP.eq(Position.ANY));
 
-        BooleanExpression condition2 = myRecord.subP.ne(Position.ANY)
-                .and(otherRecord.wantP.ne(Position.ANY))
-                .and(otherRecord.wantP.eq(myRecord.subP))
-                .and(otherRecord.mainP.eq(myRecord.subP)
-                        .or(myRecord.mainP.eq(otherRecord.subP)));
+        // mainP와 subP가 모두 겹치는 경우 (매칭 불가 조건)
+        BooleanExpression exactConflict = myRecord.mainP.eq(otherRecord.mainP)
+                .and(myRecord.subP.eq(otherRecord.subP));
 
-        BooleanExpression condition3 = myRecord.mainP.ne(Position.ANY)
-                .and(myRecord.subP.ne(Position.ANY))
-                .and(otherRecord.mainP.ne(Position.ANY))
-                .and(otherRecord.subP.ne(Position.ANY))
-                .and(myRecord.mainP.eq(otherRecord.mainP)
-                        .or(myRecord.mainP.eq(otherRecord.subP)))
-                .and(myRecord.subP.eq(otherRecord.mainP)
-                        .or(myRecord.subP.eq(otherRecord.subP)))
-                .not();
-
-        return condition1.or(condition2).or(condition3);
+        // 매칭은 ANY가 포함되거나, 포지션이 완전히 같지 않은 경우만 허용
+        return hasAny.or(exactConflict.not());
     }
 
-
     /**
-     * 개인 랭크 제한 검증 (SOLO 모드 전용) - QueryDSL에서 적용 가능하도록 수정
+     * 개인 랭크 제한 검증 (SOLO 모드 전용)
      */
     private BooleanExpression validateSoloRankRange(EnumPath<Tier> tierPath) {
         return tierPath.eq(Tier.IRON).or(tierPath.eq(Tier.BRONZE)).and(matchingRecord.tier.in(Tier.IRON,
@@ -172,7 +160,8 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
                 .or(tierPath.eq(Tier.EMERALD).and(matchingRecord.tier.in(Tier.PLATINUM, Tier.EMERALD,
                         Tier.DIAMOND)))
                 .or(tierPath.eq(Tier.DIAMOND).and(matchingRecord.tier.in(Tier.EMERALD, Tier.DIAMOND)))
-                .or(Expressions.FALSE); // 마스터 이상 필터 적용 안 함
+                .or(tierPath.eq(Tier.MASTER).and(matchingRecord.tier.in(Tier.MASTER, Tier.GRANDMASTER)))
+                .or(tierPath.eq(Tier.GRANDMASTER).and(matchingRecord.tier.in(Tier.MASTER, Tier.GRANDMASTER)));
     }
 
 
