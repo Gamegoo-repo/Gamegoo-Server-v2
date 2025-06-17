@@ -12,6 +12,12 @@ public class ChampionResponse {
     String championName;
     Double winRate;
     Integer games;
+    Integer wins;
+    Double csPerMinute;
+    Double kda;
+    Integer kills;
+    Integer deaths;
+    Integer assists;
 
     public static ChampionResponse of(Champion champion, int wins, int games) {
         double winRate = games > 0 ? (double) wins / games : 0.0;
@@ -19,7 +25,13 @@ public class ChampionResponse {
                 .championId(champion.getId())
                 .championName(champion.getName())
                 .winRate(winRate)
+                .wins(wins)
                 .games(games)
+                .csPerMinute(0.0)
+                .kda(0.0)
+                .kills(0)
+                .deaths(0)
+                .assists(0)
                 .build();
     }
 

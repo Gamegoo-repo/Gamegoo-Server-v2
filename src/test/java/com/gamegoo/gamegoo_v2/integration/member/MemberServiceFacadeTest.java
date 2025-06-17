@@ -20,6 +20,7 @@ import com.gamegoo.gamegoo_v2.game.domain.Champion;
 import com.gamegoo.gamegoo_v2.game.domain.GameStyle;
 import com.gamegoo.gamegoo_v2.game.repository.ChampionRepository;
 import com.gamegoo.gamegoo_v2.game.repository.GameStyleRepository;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -126,14 +127,27 @@ class MemberServiceFacadeTest {
         assertThat(response.getIsAgree()).isEqualTo(member.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(member.getBlind());
         assertThat(response.getLoginType()).isEqualTo(member.getLoginType().name());
-        assertThat(response.getChampionResponseList()).isNotNull();
+        assertThat(response.getChampionStatsResponseList()).isNotNull();
 
-        List<Champion> championList =
-                targetMember.getMemberChampionList().stream().map(MemberChampion::getChampion).toList();
-        List<Long> championIds = championList.stream().map(Champion::getId).toList();
+        List<MemberChampion> memberChampionList = member.getMemberChampionList();
+        List<ChampionStatsResponse> championStatsResponseList = response.getChampionStatsResponseList();
 
-        for (int i = 0; i < championIds.size(); i++) {
-            assertThat(response.getChampionResponseList().get(i).getChampionId()).isEqualTo(championIds.get(i));
+        assertThat(championStatsResponseList).hasSize(memberChampionList.size());
+
+        for (int i = 0; i < memberChampionList.size(); i++) {
+            MemberChampion memberChampion = memberChampionList.get(i);
+            ChampionStatsResponse championResponse = championStatsResponseList.get(i);
+
+            assertThat(championResponse.getChampionId()).isEqualTo(memberChampion.getChampion().getId());
+            assertThat(championResponse.getChampionName()).isEqualTo(memberChampion.getChampion().getName());
+            assertThat(championResponse.getWins()).isEqualTo(memberChampion.getWins());
+            assertThat(championResponse.getGames()).isEqualTo(memberChampion.getGames());
+            assertThat(championResponse.getWinRate()).isEqualTo(memberChampion.getWins() / (double) memberChampion.getGames());
+            assertThat(championResponse.getCsPerMinute()).isEqualTo(memberChampion.getCsPerMinute());
+            assertThat(championResponse.getKda()).isEqualTo(memberChampion.getKDA());
+            assertThat(championResponse.getKills()).isEqualTo(memberChampion.getKills());
+            assertThat(championResponse.getDeaths()).isEqualTo(memberChampion.getDeaths());
+            assertThat(championResponse.getAssists()).isEqualTo(memberChampion.getAssists());
         }
     }
 
@@ -163,14 +177,27 @@ class MemberServiceFacadeTest {
         assertThat(response.getIsAgree()).isEqualTo(targetMember.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(targetMember.getBlind());
         assertThat(response.getLoginType()).isEqualTo(String.valueOf(targetMember.getLoginType()));
-        assertThat(response.getChampionResponseList()).isNotNull();
+        assertThat(response.getChampionStatsResponseList()).isNotNull();
 
-        List<Champion> championList =
-                targetMember.getMemberChampionList().stream().map(MemberChampion::getChampion).toList();
-        List<Long> championIds = championList.stream().map(Champion::getId).toList();
+        List<MemberChampion> memberChampionList = targetMember.getMemberChampionList();
+        List<ChampionStatsResponse> championStatsResponseList = response.getChampionStatsResponseList();
 
-        for (int i = 0; i < championIds.size(); i++) {
-            assertThat(response.getChampionResponseList().get(i).getChampionId()).isEqualTo(championIds.get(i));
+        assertThat(championStatsResponseList).hasSize(memberChampionList.size());
+
+        for (int i = 0; i < memberChampionList.size(); i++) {
+            MemberChampion memberChampion = memberChampionList.get(i);
+            ChampionStatsResponse championResponse = championStatsResponseList.get(i);
+
+            assertThat(championResponse.getChampionId()).isEqualTo(memberChampion.getChampion().getId());
+            assertThat(championResponse.getChampionName()).isEqualTo(memberChampion.getChampion().getName());
+            assertThat(championResponse.getWins()).isEqualTo(memberChampion.getWins());
+            assertThat(championResponse.getGames()).isEqualTo(memberChampion.getGames());
+            assertThat(championResponse.getWinRate()).isEqualTo(memberChampion.getWins() / (double) memberChampion.getGames());
+            assertThat(championResponse.getCsPerMinute()).isEqualTo(memberChampion.getCsPerMinute());
+            assertThat(championResponse.getKda()).isEqualTo(memberChampion.getKDA());
+            assertThat(championResponse.getKills()).isEqualTo(memberChampion.getKills());
+            assertThat(championResponse.getDeaths()).isEqualTo(memberChampion.getDeaths());
+            assertThat(championResponse.getAssists()).isEqualTo(memberChampion.getAssists());
         }
     }
 
