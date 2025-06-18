@@ -19,6 +19,14 @@ public class LoggingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String uri = request.getRequestURI();
+
+        // /healthcheck 경로는 로그 출력 제외
+        if ("/healthcheck".equals(uri)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 요청 로그 출력
         logUtil.apiRequest(request);
         long startTime = System.currentTimeMillis();
