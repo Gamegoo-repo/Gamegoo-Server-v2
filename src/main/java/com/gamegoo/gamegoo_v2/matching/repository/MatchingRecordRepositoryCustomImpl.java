@@ -1,17 +1,17 @@
 package com.gamegoo.gamegoo_v2.matching.repository;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
+import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
-import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.matching.domain.QMatchingRecord;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EnumPath;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -84,6 +84,27 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
                 .fetchOne();
 
         return Optional.ofNullable(record);
+    }
+
+    /**
+     * 해당 matchingRecord의 매칭 상대 회원 엔티티 조회
+     *
+     * @param uuid matchingRecord UUID
+     * @return 매칭 상대 회원, 매칭 상대가 존재하지 않으면 Optional empty를 리턴
+     */
+    @Override
+    public Optional<Member> findTargetMemberByUuid(String uuid) {
+        QMatchingRecord mr1 = QMatchingRecord.matchingRecord;
+        QMatchingRecord mr2 = new QMatchingRecord("mr2");
+
+        Member targetMember = queryFactory
+                .select(mr2.member)
+                .from(mr1)
+                .join(mr1.targetMatchingRecord, mr2)
+                .where(mr1.matchingUuid.eq(uuid))
+                .fetchOne();
+
+        return Optional.ofNullable(targetMember);
     }
 
     /**
