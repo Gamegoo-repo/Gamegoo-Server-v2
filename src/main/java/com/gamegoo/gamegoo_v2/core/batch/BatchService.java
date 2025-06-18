@@ -21,15 +21,17 @@ public class BatchService {
      * @param batch 배치로 처리할 데이터
      */
     @Transactional
-    public void batchUpdateMannerRanks(List<Map.Entry<Long, Double>> batch) {
+    public int batchUpdateMannerRanks(List<Map.Entry<Long, Double>> batch) {
         if (batch == null || batch.isEmpty()) {
             return;
         }
 
         String query = buildMannerRankBatchUpdateQuery(batch);
-        entityManager.createNativeQuery(query).executeUpdate();
+        int executed = entityManager.createNativeQuery(query).executeUpdate();
         entityManager.flush();
         entityManager.clear();
+
+        return executed;
     }
 
     /**
