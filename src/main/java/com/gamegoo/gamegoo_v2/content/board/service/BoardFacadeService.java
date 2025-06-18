@@ -152,4 +152,18 @@ public class BoardFacadeService {
         return BoardBumpResponse.of(board.getId(), board.getBumpTime());
     }
 
+    /**
+     * 전체 게시글 커서 기반 조회 (Secondary Cursor)
+     */
+    public BoardCursorResponse getAllBoardsWithCursor(
+            LocalDateTime cursor,
+            Long cursorId,
+            GameMode gameMode,
+            Tier tier,
+            Position position1,
+            Position position2) {
+        Slice<Board> boardSlice = boardService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2);
+        return BoardCursorResponse.of(boardSlice);
+    }
+
 }

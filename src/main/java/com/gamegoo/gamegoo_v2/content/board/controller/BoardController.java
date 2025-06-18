@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -146,6 +147,18 @@ public class BoardController {
     public ApiResponse<BoardBumpResponse> bumpBoard(@PathVariable Long boardId,
                                                     @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.bumpBoard(boardId, member));
+    }
+
+    @GetMapping("/cursor")
+    public ResponseEntity<ApiResponse<BoardCursorResponse>> getBoardsWithCursor(
+            @RequestParam(required = false) LocalDateTime cursor,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false) GameMode gameMode,
+            @RequestParam(required = false) Tier tier,
+            @RequestParam(required = false) Position position1,
+            @RequestParam(required = false) Position position2) {
+        BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
 }

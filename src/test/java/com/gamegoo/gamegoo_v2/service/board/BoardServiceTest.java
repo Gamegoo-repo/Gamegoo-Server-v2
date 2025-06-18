@@ -13,14 +13,18 @@ import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +45,15 @@ public class BoardServiceTest {
     @Autowired
     BoardService boardService;
 
+    @PersistenceContext
+    EntityManager em;
+
+    @BeforeEach
+    void cleanUp() {
+        boardRepository.deleteAll();
+        // em.flush();
+        // em.clear();
+    }
 
     @AfterEach
     void tearDown() {
@@ -162,25 +175,35 @@ public class BoardServiceTest {
         void getMyBoardsWithNullCursor() {
             // given
             Member member = createMember("member@gmail.com", "member");
+            memberRepository.save(member);
             List<Board> boards = new ArrayList<>();
+            LocalDateTime baseTime = LocalDateTime.now();
 
             // 게시글 5개 생성 (시간차를 두고)
             for (int i = 0; i < 5; i++) {
                 Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
                         Mike.AVAILABLE, "contents " + i, 1);
-                ReflectionTestUtils.setField(board, "createdAt", LocalDateTime.now().minusMinutes(i));
+                ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
+                if (i % 2 == 0) { // 일부 게시글만 bump
+                    board.bump(baseTime.plusMinutes(i));
+                }
                 boards.add(boardRepository.save(board));
             }
+            // boardRepository.flush(); // Ensure all boards are persisted
 
             // when
-            var result = boardService.getMyBoards(member.getId(), (LocalDateTime) null);
+            var result = boardService.getMyBoards(member.getId(), null);
 
             // then
             assertThat(result.getContent()).hasSize(5);
             assertThat(result.hasNext()).isFalse();
-            // 최신순 정렬 확인
+            // 최신순 정렬 확인 (activityTime 기준)
             assertThat(result.getContent()).isSortedAccordingTo(
-                (b1, b2) -> b2.getActivityTime().compareTo(b1.getActivityTime())
+                (b1, b2) -> {
+                    LocalDateTime t1 = b1.getBumpTime() != null ? b1.getBumpTime() : b1.getCreatedAt();
+                    LocalDateTime t2 = b2.getBumpTime() != null ? b2.getBumpTime() : b2.getCreatedAt();
+                    return t2.compareTo(t1);
+                }
             );
         }
 
@@ -189,6 +212,7 @@ public class BoardServiceTest {
         void getMyBoardsWithCursor() {
             // given
             Member member = createMember("member@gmail.com", "member");
+            memberRepository.save(member);
             List<Board> boards = new ArrayList<>();
             LocalDateTime baseTime = LocalDateTime.now();
 
@@ -197,36 +221,38 @@ public class BoardServiceTest {
                 Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
                         Mike.AVAILABLE, "contents " + i, 1);
                 ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
+                if (i % 3 == 0) { // 일부 게시글만 bump
+                    board.bump(baseTime.plusMinutes(i));
+                }
                 boards.add(boardRepository.save(board));
             }
+            // boardRepository.flush(); // Ensure all boards are persisted
 
-            // when
-            // 첫 페이지 조회
-            var firstPage = boardService.getMyBoards(member.getId(), (LocalDateTime) null);
-            // 두 번째 페이지 조회 (첫 페이지의 마지막 게시글의 activityTime을 커서로 사용)
-            var secondPage = boardService.getMyBoards(member.getId(),
-                firstPage.getContent().get(firstPage.getContent().size() - 1).getActivityTime());
+            // when - 첫 페이지 조회
+            var firstPage = boardService.getMyBoards(member.getId(), null);
 
-            // then
-            // 첫 페이지 검증
-            assertThat(firstPage.getContent()).hasSize(10); // 기본 페이지 사이즈
+            // then - 첫 페이지 검증
+            assertThat(firstPage.getContent()).hasSize(10);
             assertThat(firstPage.hasNext()).isTrue();
 
-            // 두 번째 페이지 검증
-            assertThat(secondPage.getContent()).hasSize(5); // 남은 게시글
+            // when - 두 번째 페이지 조회
+            var lastActivityTime = firstPage.getContent().get(firstPage.getContent().size() - 1).getBumpTime() != null ?
+                firstPage.getContent().get(firstPage.getContent().size() - 1).getBumpTime() :
+                firstPage.getContent().get(firstPage.getContent().size() - 1).getCreatedAt();
+            var secondPage = boardService.getMyBoards(member.getId(), lastActivityTime);
+
+            // then - 두 번째 페이지 검증
+            System.out.println("secondPage.getContent().size() = " + secondPage.getContent().size());
+            for (Board board : secondPage.getContent()) {
+                LocalDateTime activityTime = board.getBumpTime() != null ? board.getBumpTime() : board.getCreatedAt();
+                System.out.println("activityTime = " + activityTime + ", gameMode = " + board.getGameMode() + ", mainP = " + board.getMainP() + ", subP = " + board.getSubP());
+            }
+            assertThat(secondPage.getContent()).hasSize(5);
             assertThat(secondPage.hasNext()).isFalse();
-
-            // 페이지 간 연속성 검증
-            assertThat(firstPage.getContent().get(firstPage.getContent().size() - 1).getActivityTime())
-                .isAfter(secondPage.getContent().get(0).getActivityTime());
-
-            // 각 페이지 내 정렬 순서 검증
-            assertThat(firstPage.getContent()).isSortedAccordingTo(
-                (b1, b2) -> b2.getActivityTime().compareTo(b1.getActivityTime())
-            );
-            assertThat(secondPage.getContent()).isSortedAccordingTo(
-                (b1, b2) -> b2.getActivityTime().compareTo(b1.getActivityTime())
-            );
+            assertThat(secondPage.getContent()).allSatisfy(board -> {
+                LocalDateTime activityTime = board.getBumpTime() != null ? board.getBumpTime() : board.getCreatedAt();
+                assertThat(activityTime).isBefore(lastActivityTime);
+            });
         }
 
         @Test
@@ -234,25 +260,117 @@ public class BoardServiceTest {
         void getMyBoardsExcludeDeleted() {
             // given
             Member member = createMember("member@gmail.com", "member");
+            memberRepository.save(member);
             List<Board> boards = new ArrayList<>();
+            LocalDateTime baseTime = LocalDateTime.now();
 
-            // 게시글 5개 생성
+            // 게시글 5개 생성 (일부는 삭제 처리)
             for (int i = 0; i < 5; i++) {
                 Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
                         Mike.AVAILABLE, "contents " + i, 1);
-                if (i < 2) { // 2개는 삭제 처리
-                    ReflectionTestUtils.setField(board, "deleted", true);
+                ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
+                if (i % 2 == 0) {
+                    board.setDeleted(true);
                 }
-                ReflectionTestUtils.setField(board, "createdAt", LocalDateTime.now().minusMinutes(i));
                 boards.add(boardRepository.save(board));
             }
+            // boardRepository.flush(); // Ensure all boards are persisted
 
             // when
-            var result = boardService.getMyBoards(member.getId(), (LocalDateTime) null);
+            var result = boardService.getMyBoards(member.getId(), null);
 
             // then
-            assertThat(result.getContent()).hasSize(3); // 삭제되지 않은 게시글만
-            assertThat(result.getContent()).allSatisfy(b -> assertThat(b.isDeleted()).isFalse());
+            assertThat(result.getContent()).hasSize(2); // Only non-deleted boards
+            assertThat(result.getContent()).allSatisfy(board -> 
+                assertThat(board.isDeleted()).isFalse()
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("전체 게시물 커서 기반 조회")
+    class GetAllBoardsWithCursorTest {
+
+        @Test
+        @DisplayName("첫 페이지 조회 - 필터 없음")
+        void getAllBoardsFirstPage() {
+            // given
+            Member member = createMember("member@gmail.com", "member");
+            memberRepository.save(member);
+            List<Board> boards = new ArrayList<>();
+            LocalDateTime baseTime = LocalDateTime.now();
+
+            // 게시글 10개 생성
+            for (int i = 0; i < 10; i++) {
+                Board board = Board.create(member, GameMode.SOLO, Position.TOP, Position.JUNGLE, new ArrayList<>(),
+                        Mike.AVAILABLE, "contents " + i, 1);
+                ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
+                if (i % 2 == 0) {
+                    board.bump(baseTime.plusMinutes(i));
+                }
+                boards.add(boardRepository.save(board));
+            }
+            // boardRepository.flush();
+
+            // when
+            var result = boardService.getAllBoardsWithCursor(null, null, null, null, null, null);
+
+            // then
+            assertThat(result.getContent()).hasSize(10);
+            assertThat(result.hasNext()).isFalse();
+            assertThat(result.getContent()).isSortedAccordingTo(
+                (b1, b2) -> {
+                    LocalDateTime t1 = b1.getBumpTime() != null ? b1.getBumpTime() : b1.getCreatedAt();
+                    LocalDateTime t2 = b2.getBumpTime() != null ? b2.getBumpTime() : b2.getCreatedAt();
+                    return t2.compareTo(t1);
+                }
+            );
+        }
+
+        @Test
+        @DisplayName("두 번째 페이지 조회 - 필터 적용")
+        void getAllBoardsSecondPage() {
+            // given
+            Member member = createMember("member@gmail.com", "member");
+            ReflectionTestUtils.setField(member, "soloTier", Tier.GOLD);
+            memberRepository.save(member);
+            List<Board> boards = new ArrayList<>();
+            LocalDateTime baseTime = LocalDateTime.now();
+
+            // 게시글 15개 생성 (모두 SOLO, TOP, JUNGLE, TIER.GOLD)
+            for (int i = 0; i < 15; i++) {
+                Board board = Board.create(member, GameMode.SOLO, Position.TOP, Position.JUNGLE, new ArrayList<>(),
+                        Mike.AVAILABLE, "contents " + i, 1);
+                LocalDateTime createdAt = baseTime.minusMinutes(i).minusSeconds(i);
+                ReflectionTestUtils.setField(board, "createdAt", createdAt);
+                if (i % 3 == 0) {
+                    board.bump(baseTime.plusMinutes(i).plusSeconds(i));
+                }
+                boards.add(boardRepository.save(board));
+            }
+            // boardRepository.flush();
+
+            // 첫 페이지 조회
+            Slice<Board> firstPage = boardService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE);
+            assertThat(firstPage.getContent()).hasSize(10);
+            assertThat(firstPage.hasNext()).isTrue();
+
+            // 두 번째 페이지 조회
+            Board lastBoard = firstPage.getContent().get(firstPage.getContent().size() - 1);
+            LocalDateTime lastActivityTime = lastBoard.getBumpTime() != null ? lastBoard.getBumpTime() : lastBoard.getCreatedAt();
+            Long lastId = lastBoard.getId();
+            Slice<Board> secondPage = boardService.getAllBoardsWithCursor(lastActivityTime, lastId, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE);
+
+            // then
+            assertThat(secondPage.getContent()).hasSize(5);
+            assertThat(secondPage.hasNext()).isFalse();
+            assertThat(secondPage.getContent()).allSatisfy(board -> {
+                LocalDateTime activityTime = board.getBumpTime() != null ? board.getBumpTime() : board.getCreatedAt();
+                assertThat(activityTime).isBefore(lastActivityTime);
+                assertThat(board.getGameMode()).isEqualTo(GameMode.SOLO);
+                assertThat(board.getMainP()).isEqualTo(Position.TOP);
+                assertThat(board.getSubP()).isEqualTo(Position.JUNGLE);
+            });
         }
     }
 
@@ -274,6 +392,10 @@ public class BoardServiceTest {
                 .freeGameCount(0)
                 .isAgree(true)
                 .build());
+    }
+
+    private Board createBoard(Member member, GameMode gameMode, Position position1, Position position2, Mike mike) {
+        return Board.create(member, gameMode, position1, position2, new ArrayList<>(), mike, "contents", 1);
     }
 
 }

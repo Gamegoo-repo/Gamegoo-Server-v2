@@ -8,8 +8,10 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardCursorResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardListResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
+import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardGameStyleService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
@@ -18,7 +20,9 @@ import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,10 +41,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 @ExtendWith(MockitoExtension.class)
+@org.springframework.transaction.annotation.Transactional
 class BoardFacadeServiceTest {
 
     @Mock
@@ -64,8 +73,61 @@ class BoardFacadeServiceTest {
     @Mock
     private MannerService mannerService;
 
+    @Mock
+    private BoardRepository boardRepository;
+
     @InjectMocks
     private BoardFacadeService boardFacadeService;
+
+    @PersistenceContext
+    EntityManager em;
+
+    @BeforeEach
+    void cleanUp() {
+        if (boardRepository != null) {
+            boardRepository.deleteAll();
+        }
+        if (em != null) {
+            em.flush();
+            em.clear();
+        }
+    }
+
+    private Member createMember(String email, String gameName) {
+        Member member = Member.createForGeneral(
+                email,
+                "password",
+                LoginType.GENERAL,
+                gameName,
+                "TAG",
+                Tier.GOLD,
+                4,
+                55.0,
+                Tier.GOLD,
+                4,
+                55.0,
+                100,
+                100,
+                true
+        );
+        ReflectionTestUtils.setField(member, "id", 1L);
+        return member;
+    }
+
+    private Board createBoard(Member member, GameMode gameMode, Position position1, Position position2, Mike mike) {
+        Board board = Board.create(
+                member,
+                gameMode,
+                position1,
+                position2,
+                Arrays.asList(Position.TOP, Position.MID),
+                mike,
+                "test content",
+                1
+        );
+        ReflectionTestUtils.setField(board, "id", 1L);
+        return board;
+    }
 
     @Test
     @DisplayName("게시글 상세 조회 시 매너 정보가 정상적으로 반환되는지 테스트")
@@ -590,62 +652,117 @@ class BoardFacadeServiceTest {
                 .containsExactlyInAnyOrder(Position.TOP, Position.ADC);
     }
 
+    @Nested
+    @DisplayName("전체 게시물 커서 기반 조회")
+    class GetAllBoardsWithCursorTest {
+
+        @Test
+        @DisplayName("첫 페이지 조회 - 필터 없음")
+        void getAllBoardsFirstPage() {
+            // given
+            LocalDateTime baseTime = LocalDateTime.now();
+            List<Board> boards = new ArrayList<>();
+            Member member = createMember("test@test.com", "testUser");
+
+            for (int i = 0; i < 10; i++) {
+                Board board = createBoard(member, GameMode.SOLO, Position.TOP, Position.JUNGLE, Mike.AVAILABLE);
+                ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
+                if (i % 2 == 0) {
+                    board.bump(baseTime.plusMinutes(i));
+                }
+                boards.add(board);
+            }
+
+            when(boardService.getAllBoardsWithCursor(
+                eq(null), eq(null), eq(null), eq(null), eq(null), eq(null)
+            )).thenReturn(new SliceImpl<>(boards, PageRequest.of(0, 10), false));
+
+            // when
+            BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(null, null, null, null, null, null);
+
+            // then
+            assertThat(response.getBoards()).hasSize(10);
+            assertThat(response.isHasNext()).isFalse();
+            assertThat(response.getBoards()).isSortedAccordingTo(
+                (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
+            );
+        }
+
+        @Test
+        @DisplayName("두 번째 페이지 조회 - 필터 적용")
+        void getAllBoardsSecondPage() {
+            // given
+            LocalDateTime baseTime = LocalDateTime.now();
+            List<Board> boards = new ArrayList<>();
+            Member member = createMember("test@test.com", "testUser");
+
+            // 15개의 게시물 생성 (SOLO, TOP, JUNGLE, TIER.GOLD)
+            for (int i = 0; i < 15; i++) {
+                Board board = createBoard(member, GameMode.SOLO, Position.TOP, Position.JUNGLE, Mike.AVAILABLE);
+                LocalDateTime createdAt = baseTime.minusMinutes(i).minusSeconds(i);
+                ReflectionTestUtils.setField(board, "createdAt", createdAt);
+                if (i % 3 == 0) {
+                    board.bump(baseTime.plusMinutes(i).plusSeconds(i));
+                }
+                boards.add(board);
+            }
+
+            when(boardService.getAllBoardsWithCursor(
+                eq(null), eq(null), eq(GameMode.SOLO), eq(Tier.GOLD), eq(Position.TOP), eq(Position.JUNGLE)
+            )).thenReturn(new SliceImpl<>(boards.subList(0, 10), PageRequest.of(0, 10), true));
+
+            // 첫 페이지 조회
+            BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE);
+            assertThat(response.getBoards()).hasSize(10);
+            assertThat(response.isHasNext()).isTrue();
+
+            // 두 번째 페이지 조회
+            Board lastBoard = boards.get(9);
+            LocalDateTime lastActivityTime = lastBoard.getBumpTime() != null ? lastBoard.getBumpTime() : lastBoard.getCreatedAt();
+            Long lastId = lastBoard.getId();
+            when(boardService.getAllBoardsWithCursor(
+                eq(lastActivityTime), eq(lastId), eq(GameMode.SOLO), eq(Tier.GOLD), eq(Position.TOP), eq(Position.JUNGLE)
+            )).thenReturn(new SliceImpl<>(boards.subList(10, 15), PageRequest.of(0, 10), false));
+            BoardCursorResponse response2 = boardFacadeService.getAllBoardsWithCursor(lastActivityTime, lastId, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE);
+
+            // then
+            assertThat(response2.getBoards()).hasSize(5);
+            assertThat(response2.isHasNext()).isFalse();
+            assertThat(response2.getBoards()).allSatisfy(board -> {
+                assertThat(board.getGameMode()).isEqualTo(GameMode.SOLO);
+                assertThat(board.getPosition1()).isEqualTo(Position.TOP);
+                assertThat(board.getPosition2()).isEqualTo(Position.JUNGLE);
+            });
+        }
+    }
+
     @Test
     @DisplayName("내가 작성한 게시글 커서 기반 조회가 정상 동작하는지 테스트")
     void getMyBoardCursorList() {
         // given
-        Member member = Member.createForGeneral(
-                "test@email.com",
-                "password",
-                LoginType.GENERAL,
-                "testGameName",
-                "testTag",
-                Tier.GOLD,
-                1,
-                60.0,
-                Tier.PLATINUM,
-                2,
-                55.0,
-                100,
-                50,
-                true
-        );
-        ReflectionTestUtils.setField(member, "id", 1L);
-
+        Member member = createMember("test@test.com", "testUser");
         LocalDateTime baseTime = LocalDateTime.now();
-        LocalDateTime cursor = baseTime.minusMinutes(10);
-
         List<Board> boards = new ArrayList<>();
+
         for (int i = 0; i < 10; i++) {
-            Board board = Board.builder()
-                    .gameMode(GameMode.SOLO)
-                    .mainP(Position.TOP)
-                    .subP(Position.JUNGLE)
-                    .wantP(List.of(Position.TOP))
-                    .mike(Mike.AVAILABLE)
-                    .member(member)
-                    .content("test content " + i)
-                    .boardProfileImage(1)
-                    .deleted(false)
-                    .build();
-            ReflectionTestUtils.setField(board, "id", (long) (i + 1));
+            Board board = createBoard(member, GameMode.SOLO, Position.TOP, Position.JUNGLE, Mike.AVAILABLE);
             ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
+            if (i % 2 == 0) {
+                board.bump(baseTime.plusMinutes(i));
+            }
             boards.add(board);
         }
 
-        Slice<Board> expectedSlice = new SliceImpl<>(boards, PageRequest.of(0, 10), false);
-
-        when(boardService.getMyBoards(eq(member.getId()), eq(cursor)))
-                .thenReturn(expectedSlice);
+        when(boardService.getMyBoards(eq(member.getId()), eq(null)))
+            .thenReturn(new SliceImpl<>(boards, PageRequest.of(0, 10), false));
 
         // when
-        var result = boardFacadeService.getMyBoardCursorList(member, cursor);
+        var response = boardFacadeService.getMyBoardCursorList(member, null);
 
         // then
-        assertThat(result.getMyBoards()).hasSize(10);
-        assertThat(result.isHasNext()).isFalse();
-        // 시간순 정렬 검증
-        assertThat(result.getMyBoards()).isSortedAccordingTo(
+        assertThat(response.getMyBoards()).hasSize(10);
+        assertThat(response.isHasNext()).isFalse();
+        assertThat(response.getMyBoards()).isSortedAccordingTo(
             (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
         );
     }

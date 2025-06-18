@@ -29,7 +29,7 @@ import java.util.Optional;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    public static final int PAGE_SIZE = 20;
+    public static final int PAGE_SIZE = 10;
     public static final int MY_PAGE_SIZE = 10;
     private static final Duration BUMP_INTERVAL = Duration.ofMinutes(5);
 
@@ -227,6 +227,38 @@ public class BoardService {
     @Transactional
     public void deleteAllBoardByMember(Member member) {
         boardRepository.deleteAllByMember(member);
+    }
+
+    /**
+     * 전체 게시글 커서 기반 조회 (Secondary Cursor)
+     */
+    public Slice<Board> getAllBoardsWithCursor(
+            LocalDateTime cursor,
+            Long cursorId,
+            GameMode gameMode,
+            Tier tier,
+            Position mainP,
+            Position subP) {
+        Pageable pageable = PageRequest.of(0, PAGE_SIZE);
+
+        // 페이지 기반과 동일하게 null이면 ANY로 대체
+        if (mainP == null) mainP = Position.ANY;
+        if (subP == null) subP = Position.ANY;
+
+        List<Position> mainPList = new ArrayList<>();
+        List<Position> subPList = new ArrayList<>();
+        if (mainP == Position.ANY) {
+            mainPList = Arrays.asList(Position.values());
+        } else {
+            mainPList.add(mainP);
+        }
+        if (subP == Position.ANY) {
+            subPList = Arrays.asList(Position.values());
+        } else {
+            subPList.add(subP);
+        }
+
+        return boardRepository.findAllBoardsWithCursor(cursor, cursorId, gameMode, tier, mainPList, subPList, pageable);
     }
 
 }
