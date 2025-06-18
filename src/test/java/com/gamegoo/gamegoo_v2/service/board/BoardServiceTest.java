@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -149,6 +150,112 @@ public class BoardServiceTest {
             assertThatThrownBy(() -> boardService.bumpBoard(999L, member.getId()))
                     .isInstanceOf(BoardException.class)
                     .hasFieldOrPropertyWithValue("code", ErrorCode.BOARD_NOT_FOUND.getCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("내가 작성한 게시글 커서 기반 조회")
+    class GetMyBoardsWithCursorTest {
+
+        @Test
+        @DisplayName("커서가 null일 경우 최신 게시글부터 조회")
+        void getMyBoardsWithNullCursor() {
+            // given
+            Member member = createMember("member@gmail.com", "member");
+            List<Board> boards = new ArrayList<>();
+
+            // 게시글 5개 생성 (시간차를 두고)
+            for (int i = 0; i < 5; i++) {
+                Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
+                        Mike.AVAILABLE, "contents " + i, 1);
+                ReflectionTestUtils.setField(board, "createdAt", LocalDateTime.now().minusMinutes(i));
+                boards.add(boardRepository.save(board));
+            }
+
+            // when
+            var result = boardService.getMyBoards(member.getId(), null);
+
+            // then
+            assertThat(result.getContent()).hasSize(5);
+            assertThat(result.hasNext()).isFalse();
+            // 최신순 정렬 확인
+            assertThat(result.getContent()).isSortedAccordingTo(
+                (b1, b2) -> b2.getActivityTime().compareTo(b1.getActivityTime())
+            );
+        }
+
+        @Test
+        @DisplayName("커서 기반 페이징이 정상 동작하는지 확인")
+        void getMyBoardsWithCursor() {
+            // given
+            Member member = createMember("member@gmail.com", "member");
+            List<Board> boards = new ArrayList<>();
+
+            // 게시글 15개 생성 (시간차를 두고)
+            for (int i = 0; i < 15; i++) {
+                Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
+                        Mike.AVAILABLE, "contents " + i, 1);
+                ReflectionTestUtils.setField(board, "createdAt", LocalDateTime.now().minusMinutes(i));
+                boards.add(boardRepository.save(board));
+            }
+
+            // when
+            // 첫 페이지 조회
+            var firstPage = boardService.getMyBoards(member.getId(), null);
+            // 두 번째 페이지 조회 (첫 페이지의 마지막 게시글 ID를 커서로 사용)
+            var secondPage = boardService.getMyBoards(member.getId(),
+                firstPage.getContent().get(firstPage.getContent().size() - 1).getId());
+
+            // then
+            // 첫 페이지 검증
+            assertThat(firstPage.getContent()).hasSize(10); // 기본 페이지 사이즈
+            assertThat(firstPage.hasNext()).isTrue();
+
+            // 두 번째 페이지 검증
+            assertThat(secondPage.getContent()).hasSize(5); // 남은 게시글
+            assertThat(secondPage.hasNext()).isFalse();
+
+            // 페이지 간 연속성 검증
+            assertThat(firstPage.getContent().get(firstPage.getContent().size() - 1).getId())
+                .isGreaterThan(secondPage.getContent().get(0).getId());
+
+            // 각 페이지 내 정렬 순서 검증
+            assertThat(firstPage.getContent()).isSortedAccordingTo(
+                (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
+            );
+            assertThat(secondPage.getContent()).isSortedAccordingTo(
+                (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
+            );
+        }
+
+        @Test
+        @DisplayName("삭제된 게시글은 조회되지 않아야 함")
+        void getMyBoardsExcludeDeleted() {
+            // given
+            Member member = createMember("member@gmail.com", "member");
+            List<Board> boards = new ArrayList<>();
+
+            // 게시글 5개 생성
+            for (int i = 0; i < 5; i++) {
+                Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
+                        Mike.AVAILABLE, "contents " + i, 1);
+                if (i < 2) { // 2개는 삭제 처리
+                    ReflectionTestUtils.setField(board, "deleted", true);
+                }
+                ReflectionTestUtils.setField(board, "createdAt", LocalDateTime.now().minusMinutes(i));
+                boards.add(boardRepository.save(board));
+            }
+
+            // when
+            var result = boardService.getMyBoards(member.getId(), null);
+
+            // then
+            assertThat(result.getContent()).hasSize(3); // 삭제되지 않은 게시글만
+            assertThat(result.getContent()).allMatch(board -> !board.isDeleted());
+            // 정렬 순서 검증
+            assertThat(result.getContent()).isSortedAccordingTo(
+                (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
+            );
         }
     }
 

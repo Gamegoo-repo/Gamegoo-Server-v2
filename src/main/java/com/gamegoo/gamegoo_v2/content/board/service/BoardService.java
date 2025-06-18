@@ -183,10 +183,10 @@ public class BoardService {
      * 내가 작성한 게시글(cursor) 조회
      */
     public Slice<Board> getMyBoards(Long memberId, Long cursor) {
-        if (cursor == null) {
-            throw new IllegalArgumentException("cursor는 null이 아닙니다.");
-        }
         Pageable pageable = PageRequest.of(0, MY_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityTime"));
+        if (cursor == null) {
+            return boardRepository.findByMemberIdAndDeletedFalse(memberId, pageable);
+        }
         return boardRepository.findByMemberIdAndDeletedFalseAndIdLessThan(memberId, cursor, pageable);
     }
 

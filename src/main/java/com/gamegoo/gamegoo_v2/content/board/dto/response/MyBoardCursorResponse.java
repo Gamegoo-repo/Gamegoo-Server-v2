@@ -3,7 +3,6 @@ package com.gamegoo.gamegoo_v2.content.board.dto.response;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 
 import java.util.List;
