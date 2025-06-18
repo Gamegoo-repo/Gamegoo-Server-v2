@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,19 +16,17 @@ public class MyBoardCursorResponse {
     List<MyBoardListResponse> myBoards;
     int size;
     boolean hasNext;
-    Long nextCursor;
-
+    LocalDateTime nextCursor;
 
     public static MyBoardCursorResponse of(Slice<Board> boardSlice) {
-
         // Board -> MyBoardListResponse 변환
         List<MyBoardListResponse> boardList = boardSlice.getContent().stream()
                 .map(MyBoardListResponse::of)
                 .collect(Collectors.toList());
 
-        Long nextCursor = boardSlice.hasNext() && !boardList.isEmpty()
-                ? boardList.get(boardList.size() - 1).getBoardId()
-                :null;
+        LocalDateTime nextCursor = boardSlice.hasNext() && !boardList.isEmpty()
+                ? boardSlice.getContent().get(boardSlice.getContent().size() - 1).getActivityTime()
+                : null;
 
         // DTO 생성
         return MyBoardCursorResponse.builder()
@@ -37,5 +36,4 @@ public class MyBoardCursorResponse {
                 .nextCursor(nextCursor)
                 .build();
     }
-
 }

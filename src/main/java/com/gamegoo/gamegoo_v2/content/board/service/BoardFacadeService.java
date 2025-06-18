@@ -20,6 +20,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -134,7 +135,7 @@ public class BoardFacadeService {
     /**
      * 내가 작성한 게시글 목록 조회(커서)
      */
-    public MyBoardCursorResponse getMyBoardCursorList(Member member, Long cursor) {
+    public MyBoardCursorResponse getMyBoardCursorList(Member member, LocalDateTime cursor) {
         Slice<Board> boardSlice = boardService.getMyBoards(member.getId(), cursor);
         return MyBoardCursorResponse.of(boardSlice);
     }

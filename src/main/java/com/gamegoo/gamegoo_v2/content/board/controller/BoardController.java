@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -127,9 +128,10 @@ public class BoardController {
 
     @GetMapping("/my/cursor")
     @Operation(summary = "내가 작성한 게시판 글 목록 조회 API/모바일", description = "모바일에서 내가 작성한 게시판 글을 조회하는 API 입니다.")
-    @Parameter(name = "cursor", description = "페이징을 위한 커서, Long 타입 boardId를 보내주세요. " + "보내지 않으면 가장 최근 게시물 10개를 조회합니다.")
-    public ApiResponse<MyBoardCursorResponse> getMyBoardCursorList(@ValidCursor @RequestParam(name = "cursor", required = false) Long cursor,
-                                                                   @AuthMember Member member) {
+    @Parameter(name = "cursor", description = "페이징을 위한 커서, ISO 8601 형식의 LocalDateTime을 보내주세요. " + "보내지 않으면 가장 최근 게시물 10개를 조회합니다.")
+    public ApiResponse<MyBoardCursorResponse> getMyBoardCursorList(
+            @ValidCursor @RequestParam(name = "cursor", required = false) LocalDateTime cursor,
+            @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.getMyBoardCursorList(member, cursor));
     }
 

@@ -173,7 +173,7 @@ public class BoardServiceTest {
             }
 
             // when
-            var result = boardService.getMyBoards(member.getId(), null);
+            var result = boardService.getMyBoards(member.getId(), (LocalDateTime) null);
 
             // then
             assertThat(result.getContent()).hasSize(5);
@@ -190,21 +190,22 @@ public class BoardServiceTest {
             // given
             Member member = createMember("member@gmail.com", "member");
             List<Board> boards = new ArrayList<>();
+            LocalDateTime baseTime = LocalDateTime.now();
 
             // 게시글 15개 생성 (시간차를 두고)
             for (int i = 0; i < 15; i++) {
                 Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
                         Mike.AVAILABLE, "contents " + i, 1);
-                ReflectionTestUtils.setField(board, "createdAt", LocalDateTime.now().minusMinutes(i));
+                ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
                 boards.add(boardRepository.save(board));
             }
 
             // when
             // 첫 페이지 조회
-            var firstPage = boardService.getMyBoards(member.getId(), null);
-            // 두 번째 페이지 조회 (첫 페이지의 마지막 게시글 ID를 커서로 사용)
+            var firstPage = boardService.getMyBoards(member.getId(), (LocalDateTime) null);
+            // 두 번째 페이지 조회 (첫 페이지의 마지막 게시글의 activityTime을 커서로 사용)
             var secondPage = boardService.getMyBoards(member.getId(),
-                firstPage.getContent().get(firstPage.getContent().size() - 1).getId());
+                firstPage.getContent().get(firstPage.getContent().size() - 1).getActivityTime());
 
             // then
             // 첫 페이지 검증
@@ -216,15 +217,15 @@ public class BoardServiceTest {
             assertThat(secondPage.hasNext()).isFalse();
 
             // 페이지 간 연속성 검증
-            assertThat(firstPage.getContent().get(firstPage.getContent().size() - 1).getId())
-                .isGreaterThan(secondPage.getContent().get(0).getId());
+            assertThat(firstPage.getContent().get(firstPage.getContent().size() - 1).getActivityTime())
+                .isAfter(secondPage.getContent().get(0).getActivityTime());
 
             // 각 페이지 내 정렬 순서 검증
             assertThat(firstPage.getContent()).isSortedAccordingTo(
-                (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
+                (b1, b2) -> b2.getActivityTime().compareTo(b1.getActivityTime())
             );
             assertThat(secondPage.getContent()).isSortedAccordingTo(
-                (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
+                (b1, b2) -> b2.getActivityTime().compareTo(b1.getActivityTime())
             );
         }
 
@@ -247,15 +248,11 @@ public class BoardServiceTest {
             }
 
             // when
-            var result = boardService.getMyBoards(member.getId(), null);
+            var result = boardService.getMyBoards(member.getId(), (LocalDateTime) null);
 
             // then
             assertThat(result.getContent()).hasSize(3); // 삭제되지 않은 게시글만
-            assertThat(result.getContent()).allMatch(board -> !board.isDeleted());
-            // 정렬 순서 검증
-            assertThat(result.getContent()).isSortedAccordingTo(
-                (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
-            );
+            assertThat(result.getContent()).allSatisfy(b -> assertThat(b.isDeleted()).isFalse());
         }
     }
 

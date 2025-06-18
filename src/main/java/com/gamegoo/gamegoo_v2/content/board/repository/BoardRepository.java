@@ -15,6 +15,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +43,16 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Optional<Board> findTopByMemberIdOrderByCreatedAtDesc(Long memberId);
 
     Page<Board> findByMemberIdAndDeletedFalse(Long memberId, Pageable pageable);
-    Slice<Board> findByMemberIdAndDeletedFalseAndIdLessThan(Long memberId, Long cursor, Pageable pageable);
+
+    @Query("SELECT b FROM Board b " +
+           "WHERE b.member.id = :memberId " +
+           "AND b.deleted = false " +
+           "AND (:activityTime IS NULL OR GREATEST(COALESCE(b.bumpTime, b.createdAt), b.createdAt) < :activityTime) " +
+           "ORDER BY GREATEST(COALESCE(b.bumpTime, b.createdAt), b.createdAt) DESC")
+    Slice<Board> findByMemberIdAndActivityTimeLessThan(
+            @Param("memberId") Long memberId,
+            @Param("activityTime") LocalDateTime activityTime,
+            Pageable pageable);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Board b SET b.deleted = true where b.member = :member")

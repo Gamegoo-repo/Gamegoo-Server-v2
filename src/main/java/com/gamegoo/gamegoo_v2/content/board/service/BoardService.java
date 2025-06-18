@@ -182,12 +182,9 @@ public class BoardService {
     /**
      * 내가 작성한 게시글(cursor) 조회
      */
-    public Slice<Board> getMyBoards(Long memberId, Long cursor) {
-        Pageable pageable = PageRequest.of(0, MY_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityTime"));
-        if (cursor == null) {
-            return boardRepository.findByMemberIdAndDeletedFalse(memberId, pageable);
-        }
-        return boardRepository.findByMemberIdAndDeletedFalseAndIdLessThan(memberId, cursor, pageable);
+    public Slice<Board> getMyBoards(Long memberId, LocalDateTime cursor) {
+        Pageable pageable = PageRequest.of(0, MY_PAGE_SIZE);
+        return boardRepository.findByMemberIdAndActivityTimeLessThan(memberId, cursor, pageable);
     }
 
     /**

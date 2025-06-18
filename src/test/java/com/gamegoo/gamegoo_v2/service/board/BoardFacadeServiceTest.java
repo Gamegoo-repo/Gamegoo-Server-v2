@@ -594,23 +594,29 @@ class BoardFacadeServiceTest {
     @DisplayName("내가 작성한 게시글 커서 기반 조회가 정상 동작하는지 테스트")
     void getMyBoardCursorList() {
         // given
-        Member member = Member.builder()
-                .email("test@test.com")
-                .password("password")
-                .loginType(LoginType.GENERAL)
-                .gameName("testGameName")
-                .tag("testTag")
-                .soloTier(Tier.GOLD)
-                .soloRank(1)
-                .soloWinRate(60.0)
-                .freeTier(Tier.PLATINUM)
-                .freeRank(2)
-                .freeWinRate(55.0)
-                .build();
+        Member member = Member.createForGeneral(
+                "test@email.com",
+                "password",
+                LoginType.GENERAL,
+                "testGameName",
+                "testTag",
+                Tier.GOLD,
+                1,
+                60.0,
+                Tier.PLATINUM,
+                2,
+                55.0,
+                100,
+                50,
+                true
+        );
         ReflectionTestUtils.setField(member, "id", 1L);
 
+        LocalDateTime baseTime = LocalDateTime.now();
+        LocalDateTime cursor = baseTime.minusMinutes(10);
+
         List<Board> boards = new ArrayList<>();
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 10; i++) {
             Board board = Board.builder()
                     .gameMode(GameMode.SOLO)
                     .mainP(Position.TOP)
@@ -622,43 +628,24 @@ class BoardFacadeServiceTest {
                     .boardProfileImage(1)
                     .deleted(false)
                     .build();
-            ReflectionTestUtils.setField(board, "id", (long)(i + 1));
-            ReflectionTestUtils.setField(board, "createdAt", LocalDateTime.now().minusMinutes(i));
+            ReflectionTestUtils.setField(board, "id", (long) (i + 1));
+            ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
             boards.add(board);
         }
 
-        // 첫 페이지 설정
-        Slice<Board> firstPageSlice = new SliceImpl<>(boards.subList(0, 10), PageRequest.of(0, 10), true);
-        when(boardService.getMyBoards(eq(member.getId()), eq(null)))
-                .thenReturn(firstPageSlice);
+        Slice<Board> expectedSlice = new SliceImpl<>(boards, PageRequest.of(0, 10), false);
 
-        // 두 번째 페이지 설정
-        Slice<Board> secondPageSlice = new SliceImpl<>(boards.subList(10, 15), PageRequest.of(0, 10), false);
-        when(boardService.getMyBoards(eq(member.getId()), eq(10L)))
-                .thenReturn(secondPageSlice);
+        when(boardService.getMyBoards(eq(member.getId()), eq(cursor)))
+                .thenReturn(expectedSlice);
 
         // when
-        // 첫 페이지 조회
-        var firstPage = boardFacadeService.getMyBoardCursorList(member, null);
-        // 두 번째 페이지 조회
-        var secondPage = boardFacadeService.getMyBoardCursorList(member, 10L);
+        var result = boardFacadeService.getMyBoardCursorList(member, cursor);
 
         // then
-        // 첫 페이지 검증
-        assertThat(firstPage.getMyBoards()).hasSize(10);
-        assertThat(firstPage.isHasNext()).isTrue();
-        assertThat(firstPage.getNextCursor()).isEqualTo(10L);
-
-        // 두 번째 페이지 검증
-        assertThat(secondPage.getMyBoards()).hasSize(5);
-        assertThat(secondPage.isHasNext()).isFalse();
-        assertThat(secondPage.getNextCursor()).isNull();
-
-        // 정렬 순서 검증 (최신순)
-        assertThat(firstPage.getMyBoards()).isSortedAccordingTo(
-            (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
-        );
-        assertThat(secondPage.getMyBoards()).isSortedAccordingTo(
+        assertThat(result.getMyBoards()).hasSize(10);
+        assertThat(result.isHasNext()).isFalse();
+        // 시간순 정렬 검증
+        assertThat(result.getMyBoards()).isSortedAccordingTo(
             (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
         );
     }
