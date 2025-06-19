@@ -75,6 +75,10 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+logging:
+  discord:
+    webhook: ${DISCORD_SCHEDULER_WEBHOOK}
+
 ---
 # 개발 환경
 server:

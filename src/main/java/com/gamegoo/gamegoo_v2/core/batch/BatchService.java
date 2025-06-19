@@ -23,7 +23,7 @@ public class BatchService {
     @Transactional
     public int batchUpdateMannerRanks(List<Map.Entry<Long, Double>> batch) {
         if (batch == null || batch.isEmpty()) {
-            return;
+            return 0;
         }
 
         String query = buildMannerRankBatchUpdateQuery(batch);
