@@ -5,17 +5,13 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardCursorResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardListResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
-import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
-import com.gamegoo.gamegoo_v2.content.board.service.BoardGameStyleService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
-import com.gamegoo.gamegoo_v2.content.board.service.ProfanityCheckService;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
@@ -31,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -41,7 +36,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -56,15 +50,6 @@ class BoardFacadeServiceTest {
     private BoardService boardService;
 
     @Mock
-    private BoardGameStyleService boardGameStyleService;
-
-    @Mock
-    private ProfanityCheckService profanityCheckService;
-
-    @Mock
-    private MemberService memberService;
-
-    @Mock
     private FriendService friendService;
 
     @Mock
@@ -72,9 +57,6 @@ class BoardFacadeServiceTest {
 
     @Mock
     private MannerService mannerService;
-
-    @Mock
-    private BoardRepository boardRepository;
 
     @InjectMocks
     private BoardFacadeService boardFacadeService;
@@ -84,9 +66,6 @@ class BoardFacadeServiceTest {
 
     @BeforeEach
     void cleanUp() {
-        if (boardRepository != null) {
-            boardRepository.deleteAll();
-        }
         if (em != null) {
             em.flush();
             em.clear();

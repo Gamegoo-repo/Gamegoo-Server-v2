@@ -23,8 +23,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,14 +43,9 @@ public class BoardServiceTest {
     @Autowired
     BoardService boardService;
 
-    @PersistenceContext
-    EntityManager em;
-
     @BeforeEach
     void cleanUp() {
         boardRepository.deleteAll();
-        // em.flush();
-        // em.clear();
     }
 
     @AfterEach
@@ -189,7 +182,6 @@ public class BoardServiceTest {
                 }
                 boards.add(boardRepository.save(board));
             }
-            // boardRepository.flush(); // Ensure all boards are persisted
 
             // when
             var result = boardService.getMyBoards(member.getId(), null);
@@ -216,7 +208,7 @@ public class BoardServiceTest {
             List<Board> boards = new ArrayList<>();
             LocalDateTime baseTime = LocalDateTime.now();
 
-            // 게시글 15개 생성 (시간차를 두고)
+            // 게시글 15개 생성
             for (int i = 0; i < 15; i++) {
                 Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
                         Mike.AVAILABLE, "contents " + i, 1);
@@ -226,7 +218,7 @@ public class BoardServiceTest {
                 }
                 boards.add(boardRepository.save(board));
             }
-            // boardRepository.flush(); // Ensure all boards are persisted
+
 
             // when - 첫 페이지 조회
             var firstPage = boardService.getMyBoards(member.getId(), null);
@@ -274,14 +266,13 @@ public class BoardServiceTest {
                 }
                 boards.add(boardRepository.save(board));
             }
-            // boardRepository.flush(); // Ensure all boards are persisted
 
             // when
             var result = boardService.getMyBoards(member.getId(), null);
 
             // then
-            assertThat(result.getContent()).hasSize(2); // Only non-deleted boards
-            assertThat(result.getContent()).allSatisfy(board -> 
+            assertThat(result.getContent()).hasSize(2);
+            assertThat(result.getContent()).allSatisfy(board ->
                 assertThat(board.isDeleted()).isFalse()
             );
         }
@@ -310,7 +301,6 @@ public class BoardServiceTest {
                 }
                 boards.add(boardRepository.save(board));
             }
-            // boardRepository.flush();
 
             // when
             var result = boardService.getAllBoardsWithCursor(null, null, null, null, null, null);
@@ -348,7 +338,6 @@ public class BoardServiceTest {
                 }
                 boards.add(boardRepository.save(board));
             }
-            // boardRepository.flush();
 
             // 첫 페이지 조회
             Slice<Board> firstPage = boardService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE);
@@ -394,8 +383,6 @@ public class BoardServiceTest {
                 .build());
     }
 
-    private Board createBoard(Member member, GameMode gameMode, Position position1, Position position2, Mike mike) {
-        return Board.create(member, gameMode, position1, position2, new ArrayList<>(), mike, "contents", 1);
-    }
+
 
 }
