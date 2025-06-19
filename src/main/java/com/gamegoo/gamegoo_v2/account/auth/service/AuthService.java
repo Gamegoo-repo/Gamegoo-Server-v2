@@ -36,9 +36,6 @@ public class AuthService {
      */
     @Transactional
     public void addRefreshToken(Member member, String refreshToken) {
-        // 이전에 있던 refreshToken 전부 지우기
-        refreshTokenRepository.findByMember(member).ifPresent(refreshTokenRepository::delete);
-
         // refresh token DB에 저장하기
         refreshTokenRepository.save(RefreshToken.create(refreshToken, member));
     }

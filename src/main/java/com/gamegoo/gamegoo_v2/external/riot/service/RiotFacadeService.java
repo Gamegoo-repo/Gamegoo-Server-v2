@@ -118,6 +118,7 @@ public class RiotFacadeService {
         String refreshToken = jwtProvider.createRefreshToken(member.getId());
 
         // refresh token DB에 저장
+        authService.deleteRefreshToken(member);
         authService.addRefreshToken(member, refreshToken);
 
         return oAuthRedirectBuilder.buildRedirectUrl(member, state, frontUrl, accessToken, refreshToken);
