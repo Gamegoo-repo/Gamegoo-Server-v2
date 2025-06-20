@@ -28,4 +28,12 @@ public interface MatchingRecordRepositoryCustom {
      */
     Optional<MatchingRecord> findLatestByMember(Member member);
 
+    /**
+     * 해당 matchingRecord의 매칭 상대 회원 엔티티 조회
+     *
+     * @param uuid matchingRecord UUID
+     * @return 매칭 상대 회원, 매칭 상대가 존재하지 않으면 Optional empty를 리턴
+     */
+    Optional<Member> findTargetMemberByUuid(String uuid);
+
 }
