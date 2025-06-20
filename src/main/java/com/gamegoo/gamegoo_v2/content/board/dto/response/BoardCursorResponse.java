@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class BoardCursorResponse {
-    private final List<BoardResponse> boards;
+    private final List<BoardListResponse> boards;
     private final boolean hasNext;
     private final LocalDateTime nextCursor;
     private Long cursorId;
 
     public static BoardCursorResponse of(Slice<Board> boardSlice) {
-        List<BoardResponse> boards = boardSlice.getContent().stream()
-                .map(BoardResponse::of)
+        List<BoardListResponse> boards = boardSlice.getContent().stream()
+                .map(BoardListResponse::of)
                 .collect(Collectors.toList());
         Long cursorId = null;
         if (!boardSlice.isEmpty()) {

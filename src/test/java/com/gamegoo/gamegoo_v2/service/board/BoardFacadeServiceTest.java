@@ -709,8 +709,8 @@ class BoardFacadeServiceTest {
             assertThat(response2.isHasNext()).isFalse();
             assertThat(response2.getBoards()).allSatisfy(board -> {
                 assertThat(board.getGameMode()).isEqualTo(GameMode.SOLO);
-                assertThat(board.getPosition1()).isEqualTo(Position.TOP);
-                assertThat(board.getPosition2()).isEqualTo(Position.JUNGLE);
+                assertThat(board.getMainP()).isEqualTo(Position.TOP);
+                assertThat(board.getSubP()).isEqualTo(Position.JUNGLE);
             });
         }
     }

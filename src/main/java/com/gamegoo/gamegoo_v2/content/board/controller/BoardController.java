@@ -150,6 +150,18 @@ public class BoardController {
     }
 
     @GetMapping("/cursor")
+    @Operation(
+        summary = "커서 기반 게시판 글 목록 조회 API",
+        description = "커서 기반(무한 스크롤)으로 게시판 글 목록을 조회하는 API 입니다. 최신 글부터 순차적으로 내려가며, 커서와 cursorId를 이용해 다음 페이지를 조회할 수 있습니다. 필터링을 원하면 각 파라미터를 입력하세요."
+    )
+    @Parameters({
+        @Parameter(name = "cursor", description = "(선택) 페이징을 위한 커서, ISO 8601 형식의 LocalDateTime을 보내주세요. 없으면 최신글부터 조회합니다."),
+        @Parameter(name = "cursorId", description = "(선택) 커서와 동일한 activityTime을 가진 게시글 중 마지막 게시글의 id. 커서 페이징에 사용됩니다."),
+        @Parameter(name = "gameMode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, 칼바람 나락: ARAM >"),
+        @Parameter(name = "tier", description = "(선택) 티어를 선택해주세요."),
+        @Parameter(name = "position1", description = "(선택) 주 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: MID, 원딜: ADC, 서포터: SUP >"),
+        @Parameter(name = "position2", description = "(선택) 부 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: MID, 원딜: ADC, 서포터: SUP >")
+    })
     public ResponseEntity<ApiResponse<BoardCursorResponse>> getBoardsWithCursor(
             @RequestParam(required = false) LocalDateTime cursor,
             @RequestParam(required = false) Long cursorId,
