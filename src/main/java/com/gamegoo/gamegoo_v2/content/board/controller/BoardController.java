@@ -7,15 +7,10 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardBumpResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardUpdateResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.MyBoardResponse;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.*;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.common.annotation.ValidCursor;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -130,6 +127,16 @@ public class BoardController {
         return ApiResponse.ok(boardFacadeService.getMyBoardList(member, page));
     }
 
+    @GetMapping("/my/cursor")
+    @Operation(summary = "내가 작성한 게시판 글 목록 조회 API/모바일", description = "모바일에서 내가 작성한 게시판 글을 조회하는 API 입니다.")
+    @Parameter(name = "cursor", description = "페이징을 위한 커서, ISO 8601 형식의 LocalDateTime을 보내주세요. " + "보내지 않으면 가장 최근 게시물 10개를 조회합니다.")
+    public ApiResponse<MyBoardCursorResponse> getMyBoardCursorList(
+            @ValidCursor @RequestParam(name = "cursor", required = false) LocalDateTime cursor,
+            @AuthMember Member member) {
+        return ApiResponse.ok(boardFacadeService.getMyBoardCursorList(member, cursor));
+    }
+
+
     /**
      * 게시글 끌올(bump) API
      * 사용자가 "끌올" 버튼을 누르면 해당 게시글의 bumpTime이 업데이트되어 상단으로 노출됩니다.
@@ -140,6 +147,30 @@ public class BoardController {
     public ApiResponse<BoardBumpResponse> bumpBoard(@PathVariable Long boardId,
                                                     @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.bumpBoard(boardId, member));
+    }
+
+    @GetMapping("/cursor")
+    @Operation(
+        summary = "커서 기반 게시판 글 목록 조회 API",
+        description = "커서 기반(무한 스크롤)으로 게시판 글 목록을 조회하는 API 입니다. 최신 글부터 순차적으로 내려가며, 커서와 cursorId를 이용해 다음 페이지를 조회할 수 있습니다. 필터링을 원하면 각 파라미터를 입력하세요."
+    )
+    @Parameters({
+        @Parameter(name = "cursor", description = "(선택) 페이징을 위한 커서, ISO 8601 형식의 LocalDateTime을 보내주세요. 없으면 최신글부터 조회합니다."),
+        @Parameter(name = "cursorId", description = "(선택) 커서와 동일한 activityTime을 가진 게시글 중 마지막 게시글의 id. 커서 페이징에 사용됩니다."),
+        @Parameter(name = "gameMode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, 칼바람 나락: ARAM >"),
+        @Parameter(name = "tier", description = "(선택) 티어를 선택해주세요."),
+        @Parameter(name = "position1", description = "(선택) 주 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: MID, 원딜: ADC, 서포터: SUP >"),
+        @Parameter(name = "position2", description = "(선택) 부 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: MID, 원딜: ADC, 서포터: SUP >")
+    })
+    public ResponseEntity<ApiResponse<BoardCursorResponse>> getBoardsWithCursor(
+            @RequestParam(required = false) LocalDateTime cursor,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false) GameMode gameMode,
+            @RequestParam(required = false) Tier tier,
+            @RequestParam(required = false) Position position1,
+            @RequestParam(required = false) Position position2) {
+        BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
 }

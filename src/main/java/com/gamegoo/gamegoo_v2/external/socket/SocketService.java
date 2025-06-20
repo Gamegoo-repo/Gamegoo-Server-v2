@@ -24,15 +24,15 @@ public class SocketService {
     private String SOCKET_SERVER_URL;
 
     private static final String JOIN_CHATROOM_URL = "/socket/room/join";
+    private static final String SYS_MESSAGE_URL = "/socket/sysmessage";
 
     /**
-     * SOCKET서버로 해당 회원의 socket을 room에 join 요청하는 API 전송
+     * SOCKET 서버로 해당 회원의 socket을 room에 join 요청하는 API 전송
      *
      * @param memberId 회원 id
      * @param uuid     채팅방 uuid
      */
     public void joinSocketToChatroom(Long memberId, String uuid) {
-
         String url = SOCKET_SERVER_URL + JOIN_CHATROOM_URL;
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("memberId", memberId);
@@ -50,6 +50,38 @@ public class SocketService {
             }
         } catch (Exception e) {
             log.error("Error occurred while joinSocketToChatroom method", e);
+            throw new SocketException(ErrorCode.SOCKET_API_RESPONSE_ERROR);
+        }
+    }
+
+    /**
+     * SOCKET 서버로 해당 회원의 socket에 시스템 메시지 전송을 요청하는 API 전송
+     *
+     * @param memberId     회원 id
+     * @param chatroomUuid 채팅방 uuid
+     * @param content      메시지 내용
+     * @param timestamp    메시지 전송 시각
+     */
+    public void sendSystemMessage(Long memberId, String chatroomUuid, String content, Long timestamp) {
+        String url = SOCKET_SERVER_URL + SYS_MESSAGE_URL;
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("memberId", memberId);
+        requestBody.put("chatroomUuid", chatroomUuid);
+        requestBody.put("content", content);
+        requestBody.put("timestamp", timestamp);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, requestBody, String.class);
+
+            log.info("response of joinSocketToChatroom: {}", response.getStatusCode());
+            if (!response.getStatusCode().equals(HttpStatus.OK)) {
+                log.error("joinSocketToChatroom API call FAIL: {}", response.getBody());
+                throw new SocketException(ErrorCode.SOCKET_API_RESPONSE_ERROR);
+            } else {
+                log.info("joinSocketToChatroom API call SUCCESS: {}", response.getBody());
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while sendSystemMessage method", e);
             throw new SocketException(ErrorCode.SOCKET_API_RESPONSE_ERROR);
         }
     }

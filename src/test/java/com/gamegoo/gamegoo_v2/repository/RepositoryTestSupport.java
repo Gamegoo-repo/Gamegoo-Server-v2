@@ -1,10 +1,10 @@
 package com.gamegoo.gamegoo_v2.repository;
 
-import com.gamegoo.gamegoo_v2.core.config.JpaAuditingConfig;
-import com.gamegoo.gamegoo_v2.core.config.QuerydslConfig;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.core.config.JpaAuditingConfig;
+import com.gamegoo.gamegoo_v2.core.config.QuerydslConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
