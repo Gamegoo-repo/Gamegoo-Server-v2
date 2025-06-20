@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.chat.service.ChatQueryService;
 import com.gamegoo.gamegoo_v2.external.socket.SocketService;
 import com.gamegoo.gamegoo_v2.matching.domain.MannerMessageStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
+import com.gamegoo.gamegoo_v2.matching.repository.MatchingRecordRepository;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ public class MannerMessageHandler {
     private final ChatCommandService chatCommandService;
     private final MatchingService matchingService;
     private final SocketService socketService;
+    private final MatchingRecordRepository matchingRecordRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void process(MatchingRecord matchingRecord) {
@@ -37,6 +39,7 @@ public class MannerMessageHandler {
 
                             // 매너평가 메시지 전송 여부 변경
                             matchingRecord.updateMannerMessageSent(MannerMessageStatus.SENT);
+                            matchingRecordRepository.save(matchingRecord);
 
                             socketService.sendSystemMessage(matchingRecord.getMember().getId(), chatroom.getUuid(),
                                     SystemMessageType.MANNER_MESSAGE.getMessage(), createdChat.getTimestamp());
