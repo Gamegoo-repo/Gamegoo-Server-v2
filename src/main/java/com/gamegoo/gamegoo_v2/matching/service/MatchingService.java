@@ -180,4 +180,10 @@ public class MatchingService {
         matchingRecord.updateMannerMessageSent(mannerMessageStatus);
     }
 
+    public void validateSenderAndReceiverMatchingUuid(String senderMatchingUuid, String receiverMatchingUuid) {
+        if (senderMatchingUuid.equals(receiverMatchingUuid)) {
+            throw new MatchingException(ErrorCode.MATCHING_FOUND_FAILED_BY_CONFLICT_MATCHINGUUID);
+        }
+    }
+
 }
