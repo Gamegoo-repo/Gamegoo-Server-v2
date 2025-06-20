@@ -25,7 +25,7 @@ public class BatchFacadeService {
     /**
      * mannerScore가 null인 모든 회원의 mannerRank를 null로 업데이트하는 facade 메소드
      */
-    public void resetMannerRanks() {
+    public int resetMannerRanks() {
         List<Long> memberIds = mannerService.getMannerRankResetTargets();
 
         // mannerRank를 null로 설정하는 Map 생성
@@ -35,19 +35,23 @@ public class BatchFacadeService {
         // 전체 데이터 list 생성
         List<Map.Entry<Long, Double>> entries = new ArrayList<>(mannerRankMap.entrySet());
 
+        int totalUpdated = 0;
+
         // batch로 나누어 업데이트 처리
         for (int i = 0; i < entries.size(); i += BATCH_SIZE) {
             int end = Math.min(i + BATCH_SIZE, entries.size());
             List<Map.Entry<Long, Double>> batch = entries.subList(i, end);
 
-            batchService.batchUpdateMannerRanks(batch);
+            totalUpdated += batchService.batchUpdateMannerRanks(batch);
         }
+
+        return totalUpdated;
     }
 
     /**
      * mannerScore가 null이 아닌 모든 회원의 mannerRank를 계산해 업데이트하는 facade 메소드
      */
-    public void updateMannerRanks() {
+    public int updateMannerRanks() {
         List<Long> memberIds = mannerService.getMannerRankUpdateTargets();
 
         int totalMembers = memberIds.size();
@@ -63,14 +67,17 @@ public class BatchFacadeService {
         // 전체 데이터 list 생성
         List<Map.Entry<Long, Double>> entries = new ArrayList<>(mannerRankMap.entrySet());
 
+        int totalUpdated = 0;
+
         // batch로 나누어 업데이트 처리
         for (int i = 0; i < entries.size(); i += BATCH_SIZE) {
             int end = Math.min(i + BATCH_SIZE, entries.size());
             List<Map.Entry<Long, Double>> batch = entries.subList(i, end);
 
-            batchService.batchUpdateMannerRanks(batch);
+            totalUpdated += batchService.batchUpdateMannerRanks(batch);
         }
 
+        return totalUpdated;
     }
 
 }

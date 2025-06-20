@@ -81,7 +81,8 @@ jobs:
             CLIENT_ID= ${{ secrets.CLIENT_ID }}
             CLIENT_SECRET= ${{ secrets.CLIENT_SECRET }}
             RSO_REDIRECT_URI= ${{ secrets.RSO_REDIRECT_URI }}
-            DISCORD_MONITORING_WEBHOOK_URL= ${{ secrets.DISCORD_MONITORING_WEBHOOK_URL }}
+            DISCORD_MONITORING_WEBHOOK_URL_PROD= ${{ secrets.DISCORD_MONITORING_WEBHOOK_URL_PROD }}
+            DISCORD_SCHEDULER_WEBHOOK= ${{ secrets.DISCORD_SCHEDULER_WEBHOOK }}
 
       ## CD (Continuous Deployment) 파트
       # 7. EC2에 SSH로 접속하여 Docker 컨테이너 실행
@@ -117,7 +118,8 @@ jobs:
             -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
             -e CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
             -e RSO_REDIRECT_URI=${{ secrets.RSO_REDIRECT_URI }} \
-            -e DISCORD_MONITORING_WEBHOOK_URL=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL }} \
+            -e DISCORD_MONITORING_WEBHOOK_URL_PROD=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL_PROD }} \
+            -e DISCORD_SCHEDULER_WEBHOOK=${{ secrets.DISCORD_SCHEDULER_WEBHOOK }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-prod:${{ github.sha }}
 
       # 8. 기존 Docker 이미지 삭제

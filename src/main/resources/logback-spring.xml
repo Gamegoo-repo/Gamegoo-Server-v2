@@ -86,8 +86,9 @@
     <!-- dev Profile에서의 로그 설정 -->
     <springProfile name="dev">
         <root level="INFO">
-            <!-- CONSOLE 로그만 등록 -->
+            <!-- CONSOLE, DISCORD 로그만 등록 -->
             <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_DISCORD"/>
         </root>
     </springProfile>
     <!-- prod Profile에서의 로그 설정 -->
