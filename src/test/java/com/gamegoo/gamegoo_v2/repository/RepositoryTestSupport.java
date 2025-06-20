@@ -14,7 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @DataJpaTest(showSql = false)
-//@DataJpaTest
 @Import({QuerydslConfig.class, JpaAuditingConfig.class})
 public abstract class RepositoryTestSupport {
 
