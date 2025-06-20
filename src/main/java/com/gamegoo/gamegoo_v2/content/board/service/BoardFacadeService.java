@@ -4,29 +4,21 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardBumpResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardUpdateResponse;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.MyBoardResponse;
-import com.gamegoo.gamegoo_v2.core.common.annotation.ValidPage;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.*;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +27,6 @@ public class BoardFacadeService {
 
     private final BoardService boardService;
     private final BoardGameStyleService boardGameStyleService;
-    private final MemberService memberService;
     private final FriendService friendService;
     private final BlockService blockService;
     private final ProfanityCheckService profanityCheckService;
@@ -137,6 +128,14 @@ public class BoardFacadeService {
     }
 
     /**
+     * 내가 작성한 게시글 목록 조회(커서)
+     */
+    public MyBoardCursorResponse getMyBoardCursorList(Member member, LocalDateTime cursor) {
+        Slice<Board> boardSlice = boardService.getMyBoards(member.getId(), cursor);
+        return MyBoardCursorResponse.of(boardSlice);
+    }
+
+    /**
      * 게시글 끌올(bump) 기능 (파사드)
      * 사용자가 "끌올" 버튼을 누르면 해당 게시글의 bumpTime을 업데이트합니다.
      * 단, 마지막 끌올 후 1시간이 지나지 않았다면 예외를 발생시킵니다.
@@ -146,6 +145,20 @@ public class BoardFacadeService {
     public BoardBumpResponse bumpBoard(Long boardId, Member member) {
         Board board = boardService.bumpBoard(boardId, member.getId());
         return BoardBumpResponse.of(board.getId(), board.getBumpTime());
+    }
+
+    /**
+     * 전체 게시글 커서 기반 조회 (Secondary Cursor)
+     */
+    public BoardCursorResponse getAllBoardsWithCursor(
+            LocalDateTime cursor,
+            Long cursorId,
+            GameMode gameMode,
+            Tier tier,
+            Position position1,
+            Position position2) {
+        Slice<Board> boardSlice = boardService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2);
+        return BoardCursorResponse.of(boardSlice);
     }
 
 }
