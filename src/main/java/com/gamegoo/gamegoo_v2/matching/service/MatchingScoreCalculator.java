@@ -4,6 +4,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 
+import java.util.List;
+
 public class MatchingScoreCalculator {
 
     /**
@@ -56,7 +58,7 @@ public class MatchingScoreCalculator {
     /**
      * 포지션 우선순위 점수 계산
      *
-     * @param myWantPosition          내가 원하는 포지션
+     * @param myWantPositions         내가 원하는 포지션 리스트
      * @param otherMainPosition       타겟 주포지션
      * @param otherSubPosition        타겟 부포지션
      * @param mainPositionPriority    높은 추가 점수
@@ -64,19 +66,28 @@ public class MatchingScoreCalculator {
      * @param defaultPositionPriority 낮은 추가 점수
      * @return 포지션 우선순위 점수
      */
-    public static int getPositionPriority(Position myWantPosition, Position otherMainPosition, Position otherSubPosition,
-                                          int mainPositionPriority, int subPositionPriority, int defaultPositionPriority) {
-        int priority = 0;
-
-        if (myWantPosition == otherMainPosition || myWantPosition == Position.ANY || otherMainPosition == Position.ANY) {
-            priority += mainPositionPriority;
-        } else if (myWantPosition == otherSubPosition || otherSubPosition == Position.ANY) {
-            priority += subPositionPriority;
-        } else {
-            priority += defaultPositionPriority;
+    public static int getPositionPriority(List<Position> myWantPositions, Position otherMainPosition,
+                                          Position otherSubPosition,
+                                          int mainPositionPriority, int subPositionPriority,
+                                          int defaultPositionPriority) {
+        if (myWantPositions == null || myWantPositions.isEmpty()) {
+            return mainPositionPriority;
         }
 
-        return priority;
+        int maxPriority = 0;
+        for (Position wantPosition : myWantPositions) {
+            int currentPriority;
+            if (wantPosition == otherMainPosition || wantPosition == Position.ANY || otherMainPosition == Position.ANY) {
+                currentPriority = mainPositionPriority;
+            } else if (wantPosition == otherSubPosition || otherSubPosition == Position.ANY) {
+                currentPriority = subPositionPriority;
+            } else {
+                currentPriority = defaultPositionPriority;
+            }
+            maxPriority = Math.max(maxPriority, currentPriority);
+        }
+
+        return maxPriority;
     }
 
     /**

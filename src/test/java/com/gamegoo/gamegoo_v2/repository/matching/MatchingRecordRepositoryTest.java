@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,8 +76,7 @@ public class MatchingRecordRepositoryTest extends RepositoryTestSupport {
                 .gameMode(gameMode)
                 .mainP(member.getMainP())
                 .subP(member.getSubP())
-                .wantP(member.getWantP().isEmpty() ? null : member.getWantP().get(0))
-                .mike(member.getMike())
+                .wantP(new ArrayList<>(member.getWantP())).mike(member.getMike())
                 .tier(member.getSoloTier())
                 .gameRank(member.getSoloRank())
                 .winrate(member.getSoloWinRate())

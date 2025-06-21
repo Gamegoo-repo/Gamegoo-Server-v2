@@ -27,7 +27,7 @@ public class InitializingMatchingRequest {
 
     Position subP;
 
-    Position wantP;
+    List<Position> wantP;
 
     List<Long> gameStyleIdList;
 

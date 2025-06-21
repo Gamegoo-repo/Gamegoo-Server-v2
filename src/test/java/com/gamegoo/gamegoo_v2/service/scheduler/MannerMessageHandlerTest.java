@@ -139,7 +139,7 @@ public class MannerMessageHandlerTest {
                 .gameMode(gameMode)
                 .mainP(member.getMainP())
                 .subP(member.getSubP())
-                .wantP(member.getWantP().isEmpty() ? null : member.getWantP().get(0))
+                .wantP(member.getWantP())
                 .mike(member.getMike())
                 .tier(member.getSoloTier())
                 .gameRank(member.getSoloRank())

@@ -250,7 +250,7 @@ public class MatchingFacadeServiceTest {
                 .matchingType(MatchingType.BASIC)
                 .mainP(Position.TOP)
                 .subP(Position.ADC)
-                .wantP(Position.JUNGLE)
+                .wantP(List.of(Position.JUNGLE))
                 .gameMode(GameMode.SOLO)
                 .gameStyleIdList(List.of())
                 .build();
@@ -296,7 +296,7 @@ public class MatchingFacadeServiceTest {
         assertThat(updatedMember.getMike()).isEqualTo(request.getMike());
         assertThat(updatedMember.getMainP()).isEqualTo(request.getMainP());
         assertThat(updatedMember.getSubP()).isEqualTo(request.getSubP());
-        assertThat(updatedMember.getWantP().get(0)).isEqualTo(request.getWantP());
+        assertThat(updatedMember.getWantP()).containsExactlyElementsOf(request.getWantP());
 
         // 2. 생성된 MatchingRecord 검증
         Optional<MatchingRecord> matchingRecordOptional = matchingRecordRepository.findLatestByMember(updatedMember);
@@ -307,7 +307,7 @@ public class MatchingFacadeServiceTest {
         assertThat(actualMatchingRecord.getMember().getId()).isEqualTo(updatedMember.getId());
         assertThat(actualMatchingRecord.getMainP()).isEqualTo(request.getMainP());
         assertThat(actualMatchingRecord.getSubP()).isEqualTo(request.getSubP());
-        assertThat(actualMatchingRecord.getWantP()).isEqualTo(request.getWantP());
+        assertThat(actualMatchingRecord.getWantP()).containsExactlyElementsOf(request.getWantP());
         assertThat(actualMatchingRecord.getMike()).isEqualTo(request.getMike());
 
         // 3. Priority 검증
