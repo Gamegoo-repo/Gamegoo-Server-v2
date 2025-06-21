@@ -182,6 +182,18 @@ public class MatchingService {
     }
 
     /**
+     * 매칭 sender, receiver matchingUuid 동일한지 확인
+     *
+     * @param senderMatchingUuid    sender의 MatchingUuid
+     * @param receiverMatchingUuid  receiver의 MatchingUuid
+     * @return 
+     */
+    public void validateSenderAndReceiverMatchingUuid(String senderMatchingUuid, String receiverMatchingUuid) {
+        if (senderMatchingUuid.equals(receiverMatchingUuid)) {
+            throw new MatchingException(ErrorCode.MATCHING_FOUND_FAILED_BY_CONFLICT_MATCHINGUUID);
+        }
+
+    /**
      * 매칭 상대 회원 엔티티 조회
      *
      * @param matchingUuid 내 matchingRecord의 uuid
@@ -190,6 +202,7 @@ public class MatchingService {
     public Member getTargetMemberByMatchingUuid(String matchingUuid) {
         return matchingRecordRepository.findTargetMemberByUuid(matchingUuid).orElseThrow(
                 () -> new MatchingException(ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND));
+
     }
 
 }

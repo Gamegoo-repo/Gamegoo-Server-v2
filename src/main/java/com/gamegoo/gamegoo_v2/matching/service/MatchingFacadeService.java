@@ -143,6 +143,9 @@ public class MatchingFacadeService {
      */
     @Transactional
     public MatchingFoundResponse matchingFound(String matchingUuid, String targetMatchingUuid) {
+        // matchingUuid 검증
+        matchingService.validateSenderAndReceiverMatchingUuid(matchingUuid, targetMatchingUuid);
+
         // 내 matching 조회
         MatchingRecord matchingRecord =
                 matchingService.getMatchingRecordByMatchingUuid(matchingUuid);

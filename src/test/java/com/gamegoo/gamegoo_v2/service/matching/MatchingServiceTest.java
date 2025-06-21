@@ -6,6 +6,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
+import com.gamegoo.gamegoo_v2.core.exception.MatchingException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
@@ -32,6 +34,8 @@ import java.util.List;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -324,6 +328,39 @@ class MatchingServiceTest {
         assertThat(matchingRecord.getMatchingType()).isEqualTo(MatchingType.BASIC);
         assertThat(matchingRecord.getMember()).isEqualTo(member);
     }
+
+    @DisplayName("receiver, sender matchingUuid 검증")
+    @Nested
+    class ValidateMatchingUuidTest {
+
+        @DisplayName("sender와 receiver UUID가 같으면 예외 발생")
+        @Test
+        void throwsExceptionWhenSenderAndReceiverUuidAreSame() {
+            // given
+            String matchingUuid = "same-uuid";
+
+            // when & then
+            assertThatThrownBy(() ->
+                    matchingService.validateSenderAndReceiverMatchingUuid(matchingUuid, matchingUuid))
+                    .isInstanceOf(MatchingException.class)
+                    .hasMessageContaining(ErrorCode.MATCHING_FOUND_FAILED_BY_CONFLICT_MATCHINGUUID.getMessage());
+        }
+
+        @DisplayName("sender와 receiver UUID가 다르면 정상 작동")
+        @Test
+        void doesNotThrowExceptionWhenSenderAndReceiverUuidAreDifferent() {
+            // given
+            String senderMatchingUuid = "uuid-1";
+            String receiverMatchingUuid = "uuid-2";
+
+            // when & then
+            assertThatCode(() ->
+                    matchingService.validateSenderAndReceiverMatchingUuid(senderMatchingUuid, receiverMatchingUuid))
+                    .doesNotThrowAnyException();
+        }
+
+    }
+
 
     private Member createMember(String email, String gameName, String tag, Tier tier, int gameRank, Mike mike,
                                 Position mainP, Position subP, Position wantP, int mannerLevel) {
