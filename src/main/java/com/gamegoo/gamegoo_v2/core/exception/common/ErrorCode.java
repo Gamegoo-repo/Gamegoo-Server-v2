@@ -82,6 +82,7 @@ public enum ErrorCode {
     MATCHING_TARGET_UNAVAILABLE(BAD_REQUEST, "MATCH_404", "상대방이 다른 매칭 로직을 진행 중입니다."),
     MATCHING_FOUND_FAILED_TARGET_IS_BLOCKED(FORBIDDEN, "MATCH_405", "매칭 상대 회원을 차단한 상태입니다. 매칭 FOUND 처리가 불가능합니다."),
     MATCHING_FOUND_FAILED_BLOCKED_BY_TARGET(FORBIDDEN, "MATCH_406", "매칭 상대 회원이 나를 차단했습니다. 매칭 FOUND 처리가 불가능합니다."),
+    MATCHING_FOUND_FAILED_BY_CONFLICT_MATCHINGUUID(BAD_REQUEST, "MATCH_407", "sender와 receiver의 matchingUuid가 동일합니다."),
 
     /**
      * 차단 관련 에러
