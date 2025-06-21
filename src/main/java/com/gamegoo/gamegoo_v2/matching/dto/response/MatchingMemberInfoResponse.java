@@ -21,8 +21,10 @@ public class MatchingMemberInfoResponse {
     String matchingUuid;
     String gameName;
     String tag;
-    Tier tier;
-    Integer rank;
+    Tier soloTier;
+    Integer soloRank;
+    Tier freeTier;
+    Integer freeRank;
     Integer mannerLevel;
     Integer profileImg;
     GameMode gameMode;
@@ -43,8 +45,10 @@ public class MatchingMemberInfoResponse {
                 .mike(member.getMike())
                 .gameName(member.getGameName())
                 .tag(member.getTag())
-                .tier(member.getSoloTier())
-                .rank(member.getSoloRank())
+                .soloTier(member.getSoloTier())
+                .soloRank(member.getSoloRank())
+                .freeTier(member.getFreeTier())
+                .freeRank(member.getFreeRank())
                 .profileImg(member.getProfileImage())
                 .mannerLevel(member.getMannerLevel())
                 .mainP(member.getMainP())
