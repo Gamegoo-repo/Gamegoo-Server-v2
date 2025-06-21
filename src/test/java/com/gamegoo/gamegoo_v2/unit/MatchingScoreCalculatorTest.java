@@ -8,6 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
@@ -44,23 +46,37 @@ class MatchingScoreCalculatorTest {
     @Test
     @DisplayName("포지션 우선순위 점수 계산: 내가 원하는 포지션이 상대방 부포지션")
     void testGetPositionPriority_SameMainPosition() {
-        int result = MatchingScoreCalculator.getPositionPriority(Position.TOP, Position.TOP, Position.MID, 3, 2, 1);
+        int result = MatchingScoreCalculator.getPositionPriority(List.of(Position.TOP), Position.TOP, Position.MID, 3
+                , 2, 1);
         assertThat(result).isEqualTo(3);
     }
 
     @Test
     @DisplayName("포지션 우선순위 점수 계산: 내가 원하는 포지션이 상대방 부 포지션")
     void testGetPositionPriority_SubPositionMatch() {
-        int result = MatchingScoreCalculator.getPositionPriority(Position.MID, Position.TOP, Position.MID, 3, 2, 1);
+        int result = MatchingScoreCalculator.getPositionPriority(List.of(Position.MID), Position.TOP, Position.MID, 3
+                , 2, 1);
         assertThat(result).isEqualTo(2);
     }
 
     @Test
     @DisplayName("포지션 우선순위 점수 계산: ANY 포지션 포함")
     void testGetPositionPriority_AnyPosition() {
-        int result = MatchingScoreCalculator.getPositionPriority(Position.ANY, Position.JUNGLE, Position.MID, 50, 30,
+        int result = MatchingScoreCalculator.getPositionPriority(List.of(Position.ANY), Position.JUNGLE, Position.MID
+                , 50, 30,
                 10);
         assertThat(result).isEqualTo(50);
+    }
+
+    @Test
+    @DisplayName("포지션 우선순위 점수 계산: 내가 원하는 포지션이 두 개일 때 최대값 반환")
+    void testGetPositionPriority_TwoPreferredPositions() {
+        List<Position> wantPositions = List.of(Position.SUP, Position.MID);
+        Position targetMain = Position.MID;
+        Position targetSub = Position.JUNGLE;
+
+        int result = MatchingScoreCalculator.getPositionPriority(wantPositions, targetMain, targetSub, 3, 2, 1);
+        assertThat(result).isEqualTo(3); // MID는 주 포지션과 일치하므로 +3
     }
 
     @Test

@@ -58,7 +58,7 @@ public class MatchingFacadeService {
         // 매칭 정보로 member 업데이트
         // 마이크, 포지션 변경
         memberService.updateMikePosition(member, request.getMike(), request.getMainP(), request.getSubP(),
-                List.of(request.getWantP()));
+                request.getWantP());
         // 게임스타일 변경
         memberGameStyleService.updateGameStyle(member, request.getGameStyleIdList());
 
