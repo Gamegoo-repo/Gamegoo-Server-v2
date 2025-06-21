@@ -143,6 +143,20 @@ public class ChatCommandService {
     }
 
     /**
+     * 해당 회원에게 매너 평가 시스템 메시지 생성 및 저장 메소드
+     *
+     * @param member   회원
+     * @param chatroom 채팅방
+     * @return 저장된 시스템 메시지
+     */
+    public Chat createMannerSystemChat(Member member, Chatroom chatroom) {
+        SystemMessageType systemMessageType = SystemMessageType.MANNER_MESSAGE;
+        String message = systemMessageType.getMessage();
+
+        return createAndSaveSystemChat(chatroom, member, message, null, systemMessageType.getCode());
+    }
+
+    /**
      * 회원의 lastViewDate 업데이트 메소드
      *
      * @param member       회원

@@ -32,6 +32,10 @@ public class RefreshToken extends BaseDateTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    public void updateToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+    
     public static RefreshToken create(String refreshToken, Member member) {
         return RefreshToken.builder()
                 .refreshToken(refreshToken)

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class BoardResponse {
+
     private List<BoardListResponse> boards;
     private int totalPages;
     private long totalElements;

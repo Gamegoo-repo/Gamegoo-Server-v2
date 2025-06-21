@@ -91,7 +91,7 @@ public class AuthFacadeService {
         String refreshToken = jwtProvider.createRefreshToken(member.getId());
 
         // DB에 저장
-        authService.addRefreshToken(member, refreshToken);
+        authService.updateRefreshToken(member, refreshToken);
 
         return LoginResponse.of(member, accessToken, refreshToken);
     }
@@ -128,7 +128,7 @@ public class AuthFacadeService {
         Member member = memberService.findMemberById(memberId);
 
         // refreshToken 저장
-        authService.addRefreshToken(member, refreshToken);
+        authService.updateRefreshToken(member, refreshToken);
 
         return RefreshTokenResponse.of(memberId, accessToken, refreshToken);
     }
