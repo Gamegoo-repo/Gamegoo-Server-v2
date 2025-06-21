@@ -30,7 +30,7 @@ public class MatchingMemberInfoResponse {
     GameMode gameMode;
     Position mainP;
     Position subP;
-    Position wantP;
+    List<Position> wantP;
     Mike mike;
     List<GameStyleResponse> gameStyleResponseList;
 
@@ -53,7 +53,7 @@ public class MatchingMemberInfoResponse {
                 .mannerLevel(member.getMannerLevel())
                 .mainP(member.getMainP())
                 .subP(member.getSubP())
-                .wantP(member.getWantP().isEmpty() ? null : member.getWantP().get(0))
+                .wantP(member.getWantP())
                 .gameMode(gameMode)
                 .gameStyleResponseList(gameStyleResponseList)
                 .build();

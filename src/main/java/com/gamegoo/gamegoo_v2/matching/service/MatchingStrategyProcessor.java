@@ -159,8 +159,10 @@ public class MatchingStrategyProcessor {
         }
 
         // 내가 원하는 포지션이 상대 포지션이 아닐 경우 매칭 실패
-        if (!otherRecord.getMainP().equals(myRecord.getWantP()) &&
-                !otherRecord.getSubP().equals(myRecord.getWantP())) {
+        boolean matches = myRecord.getWantP().isEmpty() ||
+                myRecord.getWantP().contains(otherRecord.getMainP()) ||
+                myRecord.getWantP().contains(otherRecord.getSubP());
+        if (!matches) {
             return false;
         }
 

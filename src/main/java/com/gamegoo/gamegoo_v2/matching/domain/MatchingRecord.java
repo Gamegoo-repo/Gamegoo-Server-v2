@@ -6,6 +6,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,6 +17,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,9 +48,11 @@ public class MatchingRecord extends BaseDateTimeEntity {
     @Column(columnDefinition = "VARCHAR(20)")
     private Position subP;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "matching_record_want_positions", joinColumns = @JoinColumn(name = "matching_uuid"))
+    @Column(name = "want_position", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "VARCHAR(20)")
-    private Position wantP;
+    private List<Position> wantP = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(20)")
@@ -88,7 +96,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
                 .gameMode(gameMode)
                 .mainP(member.getMainP())
                 .subP(member.getSubP())
-                .wantP(member.getWantP().isEmpty() ? null : member.getWantP().get(0))
+                .wantP(new ArrayList<>(member.getWantP()))
                 .mike(member.getMike())
                 .tier(getTierByGameMode(gameMode, member))
                 .gameRank(getGameRankByGameMode(gameMode, member))
@@ -122,7 +130,7 @@ public class MatchingRecord extends BaseDateTimeEntity {
 
     // MatchingRecord Builder
     @Builder
-    private MatchingRecord(GameMode gameMode, Position mainP, Position subP, Position wantP,
+    private MatchingRecord(GameMode gameMode, Position mainP, Position subP, List<Position> wantP,
                            Mike mike, Tier tier, int gameRank, double winrate, MatchingType matchingType,
                            int mannerLevel, Member member) {
         this.gameMode = gameMode;
