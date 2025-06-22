@@ -4,9 +4,6 @@ on:
     types: [ closed ]
     branches:
       - develop
-  push:
-    branches:
-      - feat/321
   workflow_dispatch: # 수동 실행 가능
 
 jobs:
@@ -66,22 +63,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }} # 이미지 태그
           platforms: linux/amd64
-      #          build-args: |  # Dockerfile에서 사용할 환경 변수 전달
-      #            JWT_SECRET= ${{ secrets.JWT_SECRET }}
-      #            DEV_DB_HOST= ${{ secrets.DEV_DB_HOST }}
-      #            RDS_PORT= ${{ secrets.RDS_PORT }}
-      #            DEV_DB_SCHEMA_NAME= ${{ secrets.DEV_DB_SCHEMA_NAME }}
-      #            DB_USERNAME= ${{ secrets.DB_USERNAME }}
-      #            DEV_DB_PASSWORD= ${{ secrets.DEV_DB_PASSWORD }}
-      #            GMAIL_PWD= ${{ secrets.GMAIL_PWD }}
-      #            RIOT_API= ${{ secrets.RIOT_API }}
-      #            FRONT_URL= ${{ secrets.FRONT_URL }}
-      #            CLIENT_ID= ${{ secrets.CLIENT_ID }}
-      #            CLIENT_SECRET= ${{ secrets.CLIENT_SECRET }}
-      #            SOCKET_SERVER_URL= ${{ secrets.SOCKET_SERVER_URL }}
-      #            RSO_REDIRECT_URI= ${{ secrets.RSO_REDIRECT_URI }}
-      #            DISCORD_MONITORING_WEBHOOK_URL_DEV= ${{ secrets.DISCORD_MONITORING_WEBHOOK_URL_DEV }}
-      #            DISCORD_SCHEDULER_WEBHOOK= ${{ secrets.DISCORD_SCHEDULER_WEBHOOK }}
 
       ## CD (Continuous Deployment) 파트
       # 7. EC2에 SSH로 접속하여 Docker 컨테이너 실행
