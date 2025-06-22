@@ -3,17 +3,19 @@ FROM gradle:8.11.1-jdk17 AS build
 
 WORKDIR /app
 
-# 빌드 시 전달받은 ARG(환경변수)
-ARG JWT_SECRET
-ARG DEV_DB_HOST
-ARG RDS_PORT
-ARG DEV_DB_SCHEMA_NAME
-ARG DB_USERNAME
-ARG DEV_DB_PASSWORD
-ARG GMAIL_PWD
-ARG RIOT_API
-ARG SOCKET_SERVER_URL
-ARG FRONT_URL
+## 빌드 시 전달받은 ARG(환경변수)
+#ARG JWT_SECRET
+#ARG DEV_DB_HOST
+#ARG RDS_PORT
+#ARG DEV_DB_SCHEMA_NAME
+#ARG DB_USERNAME
+#ARG DEV_DB_PASSWORD
+#ARG GMAIL_PWD
+#ARG RIOT_API
+#ARG SOCKET_SERVER_URL
+#ARG FRONT_URL
+#ARG PINPOINT_AGENT_ID
+#ARG PINPOINT_APP_NAME
 
 # Gradle 라이브러리 설치를 위한 초기 세팅
 COPY build.gradle settings.gradle ./
@@ -39,4 +41,10 @@ RUN apt-get update && apt-get install -y tzdata \
 COPY --from=build /app/build/libs/*SNAPSHOT.jar /app/gamegoov2.jar
 
 # 3) 실행
-CMD ["java", "-Dspring.profiles.active=dev", "-jar", "gamegoov2.jar"]
+CMD ["java",
+    "-Dspring.profiles.active=dev",
+    "-javaagent:/pinpoint-agent/pinpoint-bootstrap-3.0.0.jar",
+    "-Dpinpoint.agentId=${PINPOINT_AGENT_ID}",
+    "-Dpinpoint.applicationName=${PINPOINT_APP_NAME}",
+    "-Dpinpoint.config=/pinpoint-agent/pinpoint-root.config",
+    "-jar", "gamegoov2.jar"]
