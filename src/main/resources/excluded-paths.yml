@@ -1,6 +1,7 @@
 security:
   jwt:
     excluded-matchers:
+      - pattern: /actuator/**
       - pattern: /healthcheck
       - pattern: /swagger-ui/*
       - pattern: /v3/api-docs/*
