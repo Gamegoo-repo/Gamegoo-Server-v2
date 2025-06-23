@@ -20,6 +20,7 @@ public class RiotMatchResponse {
 
         private List<ParticipantDTO> participants;
         private int gameDuration;
+        private int queueId;
 
     }
 
