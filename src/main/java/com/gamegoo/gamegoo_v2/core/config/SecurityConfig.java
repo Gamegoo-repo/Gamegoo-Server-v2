@@ -96,6 +96,7 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/v3/api-docs/**").permitAll()
                 .requestMatchers("healthcheck").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated());
 
         // 커스텀 필터 추가

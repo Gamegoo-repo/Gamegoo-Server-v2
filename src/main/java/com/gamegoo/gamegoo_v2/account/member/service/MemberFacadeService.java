@@ -7,17 +7,16 @@ import com.gamegoo.gamegoo_v2.account.member.dto.request.PositionRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.ProfileImageRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.response.MyProfileResponse;
 import com.gamegoo.gamegoo_v2.account.member.dto.response.OtherProfileResponse;
-import com.gamegoo.gamegoo_v2.account.member.repository.MemberChampionRepository;
-import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
-import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
-import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +27,7 @@ public class MemberFacadeService {
     private final FriendService friendService;
     private final BlockService blockService;
     private final MemberGameStyleService memberGameStyleService;
-    private final RiotAuthService riotAuthService;
-    private final MemberChampionService memberChampionService;
-    private final MemberChampionRepository memberChampionRepository;
-    private final RiotRecordService riotRecordService;
+    private final ChampionStatsRefreshService championStatsRefreshService;
 
     /**
      * 내 프로필 조회
@@ -39,7 +35,10 @@ public class MemberFacadeService {
      * @param member 조회할 회원
      * @return 조회된 결과 DTO
      */
+    @Transactional
     public MyProfileResponse getMyProfile(Member member) {
+        // 프로필 접근 시 최근 전적 챔피언 정보 자동 갱신
+        refreshChampionStatsIfNeeded(member);
         return MyProfileResponse.of(member);
     }
 
@@ -49,10 +48,14 @@ public class MemberFacadeService {
      * @param member 조회할 회원
      * @return 조회된 결과 DTO
      */
+    @Transactional
     public OtherProfileResponse getOtherProfile(Member member, Long targetMemberId) {
 
         // memberId로 targetMember 얻기
         Member targetMember = memberService.findMemberById(targetMemberId);
+
+        // 프로필 접근 시 최근 전적 챔피언 정보 자동 갱신
+        refreshChampionStatsIfNeeded(targetMember);
 
         // 친구 정보 얻기
         boolean isFriend = friendService.isFriend(member, targetMember);
@@ -63,6 +66,28 @@ public class MemberFacadeService {
 
         return OtherProfileResponse.of(targetMember, isFriend, friendRequestMemberId,
                 isBlocked);
+    }
+
+    /**
+     * 프로필 접근 시 최근 전적 챔피언 정보 자동 갱신 (필요한 경우에만)
+     *
+     * @param member 갱신 대상 사용자
+     */
+    private void refreshChampionStatsIfNeeded(Member member) {
+        // 마지막 갱신 시간 체크 (5분마다 갱신)
+        LocalDateTime lastRefreshTime = member.getUpdatedAt();
+        LocalDateTime now = LocalDateTime.now();
+
+        // 5분 이상 지났거나, 처음 접근하는 경우 갱신
+        if (lastRefreshTime == null ||
+            ChronoUnit.MINUTES.between(lastRefreshTime, now) >= 5) {
+            try {
+                championStatsRefreshService.refreshChampionStats(member);
+            } catch (Exception e) {
+                // 갱신에 실패하더라도 프로필 조회는 정상적으로 진행되어야 하므로,
+                // 트랜잭션을 분리하고 예외를 전파하지 않습니다.
+            }
+        }
     }
 
     /**
@@ -124,15 +149,9 @@ public class MemberFacadeService {
      * @param member 갱신 대상 사용자
      * @return 성공 메세지
      */
-
     @Transactional
     public String refreshChampionStats(Member member) {
-        String gameName = member.getGameName();
-        String tag = member.getTag();
-        String puuid = riotAuthService.getPuuid(gameName, tag);
-        memberChampionRepository.deleteByMember(member);
-        List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
-        memberChampionService.saveMemberChampions(member, preferChampionStats);
+        championStatsRefreshService.refreshChampionStats(member);
         return "챔피언 통계 갱신이 완료되었습니다";
     }
 

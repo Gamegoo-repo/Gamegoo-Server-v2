@@ -62,6 +62,7 @@ class RiotRecordServiceTest {
         RiotMatchResponse.InfoDTO info = RiotMatchResponse.InfoDTO.builder()
                 .participants(Arrays.asList(participant))
                 .gameDuration(1800) // 30분
+                .queueId(420)
                 .build();
 
         RiotMatchResponse matchResponse = RiotMatchResponse.builder()
@@ -110,6 +111,7 @@ class RiotRecordServiceTest {
         RiotMatchResponse.InfoDTO info = RiotMatchResponse.InfoDTO.builder()
                 .participants(Arrays.asList(participant))
                 .gameDuration(1800)
+                .queueId(420)
                 .build();
 
         RiotMatchResponse matchResponse = RiotMatchResponse.builder()
@@ -158,6 +160,7 @@ class RiotRecordServiceTest {
         RiotMatchResponse.InfoDTO info1 = RiotMatchResponse.InfoDTO.builder()
                 .participants(Arrays.asList(participant1))
                 .gameDuration(1800)
+                .queueId(420)
                 .build();
 
         RiotMatchResponse match1 = RiotMatchResponse.builder()
@@ -177,6 +180,7 @@ class RiotRecordServiceTest {
         RiotMatchResponse.InfoDTO info2 = RiotMatchResponse.InfoDTO.builder()
                 .participants(Arrays.asList(participant2))
                 .gameDuration(1800)
+                .queueId(420)
                 .build();
 
         RiotMatchResponse match2 = RiotMatchResponse.builder()

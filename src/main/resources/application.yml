@@ -55,6 +55,20 @@ logging:
   discord:
     scheduler_webhook: ${DISCORD_SCHEDULER_WEBHOOK}
 
+# Actuator 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
 ---
 # 로컬 환경
 spring:
