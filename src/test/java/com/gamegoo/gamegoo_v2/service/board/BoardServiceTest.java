@@ -361,6 +361,48 @@ public class BoardServiceTest {
                 assertThat(board.getSubP()).isEqualTo(Position.JUNGLE);
             });
         }
+
+        @Test
+        @DisplayName("nextCursor, cursorId로 다음 페이지 조회가 정상 동작하는지 확인")
+        void getAllBoardsWithNextCursor() {
+            // given
+            Member member = createMember("member@gmail.com", "member");
+            memberRepository.save(member);
+            List<Board> boards = new ArrayList<>();
+            LocalDateTime baseTime = LocalDateTime.now();
+
+            // 게시글 15개 생성
+            for (int i = 0; i < 15; i++) {
+                Board board = Board.create(member, GameMode.SOLO, Position.TOP, Position.JUNGLE, new ArrayList<>(),
+                        Mike.AVAILABLE, "contents " + i, 1);
+                LocalDateTime createdAt = baseTime.minusMinutes(i).minusSeconds(i);
+                ReflectionTestUtils.setField(board, "createdAt", createdAt);
+                if (i % 3 == 0) {
+                    board.bump(baseTime.plusMinutes(i).plusSeconds(i));
+                }
+                boards.add(boardRepository.save(board));
+            }
+
+            // when - 첫 페이지 조회
+            Slice<Board> firstPage = boardService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.IRON, Position.TOP, Position.JUNGLE);
+
+            // nextCursor, cursorId 추출
+            Board lastBoard = firstPage.getContent().get(firstPage.getContent().size() - 1);
+            LocalDateTime nextCursor = lastBoard.getBumpTime() != null ? lastBoard.getBumpTime() : lastBoard.getCreatedAt();
+            Long nextCursorId = lastBoard.getId();
+
+            // when - 두 번째 페이지 조회
+            Slice<Board> secondPage = boardService.getAllBoardsWithCursor(nextCursor, nextCursorId, GameMode.SOLO, Tier.IRON, Position.TOP, Position.JUNGLE);
+
+            // then
+            assertThat(secondPage.getContent()).allSatisfy(board -> {
+                LocalDateTime activityTime = board.getBumpTime() != null ? board.getBumpTime() : board.getCreatedAt();
+                assertThat(
+                    activityTime.isBefore(nextCursor) ||
+                    (activityTime.equals(nextCursor) && board.getId() < nextCursorId)
+                ).isTrue();
+            });
+        }
     }
 
     private Member createMember(String email, String gameName) {
