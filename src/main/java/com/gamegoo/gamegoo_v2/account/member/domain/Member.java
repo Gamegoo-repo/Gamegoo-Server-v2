@@ -128,6 +128,12 @@ public class Member extends BaseDateTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberGameStyle> memberGameStyleList = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
+    private BanType banType = BanType.NONE;
+
+    private java.time.LocalDateTime banExpireAt;
+
     // puuid 전용
     public static Member createForGeneral(String email, String password, LoginType loginType, String gameName,
                                           String tag,

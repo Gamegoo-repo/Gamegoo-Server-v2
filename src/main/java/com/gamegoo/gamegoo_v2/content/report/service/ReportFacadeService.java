@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
+import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
@@ -54,11 +55,12 @@ public class ReportFacadeService {
         return ReportInsertResponse.of(report);
     }
 
+
     /**
-     * 전체 신고 목록 조회 (관리자용)
+     * 신고 목록 고급 필터링 조회 (관리자용)
      */
-    public List<ReportListResponse> getAllReports() {
-        return reportService.getAllReports().stream()
+    public List<ReportListResponse> searchReports(ReportSearchRequest request) {
+        return reportService.searchReports(request).stream()
                 .map(report -> ReportListResponse.builder()
                         .reportId(report.getId())
                         .fromMemberName(report.getFromMember().getGameName())
