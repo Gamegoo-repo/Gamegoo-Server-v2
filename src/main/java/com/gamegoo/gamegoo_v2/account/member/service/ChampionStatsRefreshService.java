@@ -20,14 +20,18 @@ public class ChampionStatsRefreshService {
     private final MemberChampionService memberChampionService;
     private final MemberChampionRepository memberChampionRepository;
     private final RiotRecordService riotRecordService;
+    private final MemberService memberService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void refreshChampionStats(Member member) {
-        String gameName = member.getGameName();
-        String tag = member.getTag();
+        Long memberId = member.getId();
+        Member freshMember = memberService.findMemberById(memberId);
+        
+        String gameName = freshMember.getGameName();
+        String tag = freshMember.getTag();
         String puuid = riotAuthService.getPuuid(gameName, tag);
-        memberChampionRepository.deleteByMember(member);
+        memberChampionRepository.deleteByMember(freshMember);
         List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
-        memberChampionService.saveMemberChampions(member, preferChampionStats);
+        memberChampionService.saveMemberChampions(freshMember, preferChampionStats);
     }
 } 
