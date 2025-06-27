@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.dto.response.MemberRecentStatsResponse;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.Builder;
@@ -36,6 +37,7 @@ public class BoardListResponse {
     private Double winRate;
     private LocalDateTime bumpTime;
     private List<ChampionStatsResponse> championStatsResponseList;
+    private MemberRecentStatsResponse memberRecentStats;
     private Tier freeTier;
     private int freeRank;
     private Tier soloTier;
@@ -90,6 +92,7 @@ public class BoardListResponse {
                 .winRate(winRate)
                 .bumpTime(board.getBumpTime())
                 .championStatsResponseList(championStatsResponseList)
+                .memberRecentStats(MemberRecentStatsResponse.from(member.getMemberRecentStats()))
                 .freeTier(member.getFreeTier())
                 .freeRank(member.getFreeRank())
                 .soloTier(member.getSoloTier())
