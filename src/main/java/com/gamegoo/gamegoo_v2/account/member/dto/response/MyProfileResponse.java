@@ -4,7 +4,6 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import lombok.Builder;
@@ -37,6 +36,7 @@ public class MyProfileResponse {
     String loginType;
     List<GameStyleResponse> gameStyleResponseList;
     List<ChampionStatsResponse> championStatsResponseList;
+    MemberRecentStatsResponse memberRecentStats;
 
     public static MyProfileResponse of(Member member) {
         List<GameStyleResponse> gameStyleResponseList = member.getMemberGameStyleList().stream()
@@ -69,6 +69,7 @@ public class MyProfileResponse {
                 .updatedAt(String.valueOf(member.getUpdatedAt()))
                 .gameStyleResponseList(gameStyleResponseList)
                 .championStatsResponseList(championStatsResponseList)
+                .memberRecentStats(MemberRecentStatsResponse.from(member.getMemberRecentStats()))
                 .build();
     }
 
