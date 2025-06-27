@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.core.common.annotation;
 
 import com.gamegoo.gamegoo_v2.core.common.annotationValidator.ValidCursorAnnotationValidator;
+import com.gamegoo.gamegoo_v2.core.common.annotationValidator.ValidCursorLocalDateTimeValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -9,7 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = ValidCursorAnnotationValidator.class)
+@Constraint(validatedBy = {ValidCursorAnnotationValidator.class, ValidCursorLocalDateTimeValidator.class})
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidCursor {
