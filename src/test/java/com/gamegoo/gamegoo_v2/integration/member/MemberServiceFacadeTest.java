@@ -376,12 +376,11 @@ class MemberServiceFacadeTest {
 
     private void initMemberChampion(Member member, List<Long> top3ChampionIds) {
         top3ChampionIds.forEach(championId -> {
-            Champion champion = championRepository.findById(championId).isPresent() ?
-                    championRepository.findById(championId).get() : null;
-            MemberChampion memberChampion = MemberChampion.create(champion, member, 1, 10, 12, 0, 0, 0);
-            memberChampionRepository.save(memberChampion);
+            championRepository.findById(championId).ifPresent(champion -> {
+                MemberChampion memberChampion = MemberChampion.create(champion, member, 1, 10, 12, 0, 0, 0);
+                memberChampionRepository.save(memberChampion);
+            });
         });
-
     }
 
 }
