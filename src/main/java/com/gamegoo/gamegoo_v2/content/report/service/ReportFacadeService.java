@@ -7,10 +7,13 @@ import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
+import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,7 @@ public class ReportFacadeService {
     private final ReportService reportService;
     private final MemberService memberService;
     private final BoardService boardService;
+    private final BanService banService;
 
     /**
      * 신고 등록 facade 메소드
@@ -71,6 +75,48 @@ public class ReportFacadeService {
                         .createdAt(report.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 관리자 신고 처리 facade 메소드
+     *
+     * @param reportId 신고 ID
+     * @param request  신고 처리 요청
+     * @return ReportProcessResponse
+     */
+    @Transactional
+    public ReportProcessResponse processReport(Long reportId, ReportProcessRequest request) {
+        Report report = reportService.findById(reportId);
+        Member targetMember = report.getToMember();
+        
+        // 제재 적용
+        banService.applyBan(targetMember, request.getBanType());
+        
+        return ReportProcessResponse.of(
+                reportId, 
+                targetMember.getId(), 
+                request.getBanType(), 
+                targetMember.getBanExpireAt()
+        );
+    }
+
+    /**
+     * 신고된 게시글 삭제 facade 메소드
+     *
+     * @param reportId 신고 ID
+     * @return 삭제 성공 여부
+     */
+    @Transactional
+    public boolean deleteReportedPost(Long reportId) {
+        Report report = reportService.findById(reportId);
+        
+        if (report.getSourceBoard() != null) {
+            Board board = report.getSourceBoard();
+            boardService.deleteBoard(board.getId(), board.getMember().getId());
+            return true;
+        }
+        
+        return false;
     }
 
 }

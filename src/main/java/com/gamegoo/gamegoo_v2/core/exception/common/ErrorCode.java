@@ -166,6 +166,14 @@ public enum ErrorCode {
     REPORT_ALREADY_EXISTS(BAD_REQUEST, "REPORT_404", "해당 회원에 대한 신고가 이미 등록되었습니다. 내일 다시 시도해주세요."),
 
     /**
+     * 제재 관련 에러
+     */
+    MEMBER_BANNED(FORBIDDEN, "BAN_401", "현재 계정이 제재된 상태입니다. 고객센터에 문의해주세요."),
+    MEMBER_BANNED_FROM_POSTING(FORBIDDEN, "BAN_402", "게시글 작성이 제한된 상태입니다."),
+    MEMBER_BANNED_FROM_CHATTING(FORBIDDEN, "BAN_403", "채팅 사용이 제한된 상태입니다."),
+    MEMBER_BANNED_FROM_MATCHING(FORBIDDEN, "BAN_404", "매칭 사용이 제한된 상태입니다."),
+
+    /**
      * socket 서버 관련 에러
      */
     SOCKET_API_RESPONSE_ERROR(INTERNAL_SERVER_ERROR, "SOCKET501", "socket서버 api 요청에 실패했습니다.");

@@ -255,4 +255,39 @@ public class Member extends BaseDateTimeEntity {
         this.blind = true;
     }
 
+    public void applyBan(BanType banType, java.time.LocalDateTime banExpireAt) {
+        this.banType = banType;
+        this.banExpireAt = banExpireAt;
+    }
+
+    public void releaseBan() {
+        this.banType = BanType.NONE;
+        this.banExpireAt = null;
+    }
+
+    public boolean isBanned() {
+        if (banType == BanType.NONE) {
+            return false;
+        }
+        if (banType == BanType.PERMANENT) {
+            return true;
+        }
+        if (banExpireAt == null) {
+            return false;
+        }
+        return java.time.LocalDateTime.now().isBefore(banExpireAt);
+    }
+
+    public boolean canWritePost() {
+        return !isBanned();
+    }
+
+    public boolean canChat() {
+        return !isBanned();
+    }
+
+    public boolean canMatch() {
+        return !isBanned();
+    }
+
 }
