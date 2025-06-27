@@ -12,6 +12,7 @@ import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.event.SendReportEmailEvent;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -121,6 +122,10 @@ public class ReportService {
      */
     public List<Report> getAllReports() {
         return reportRepository.findAll();
+    }
+
+    public List<Report> searchReports(ReportSearchRequest request) {
+        return reportRepository.searchReports(request);
     }
 
 }

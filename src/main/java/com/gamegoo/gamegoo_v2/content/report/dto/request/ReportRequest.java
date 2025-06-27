@@ -23,7 +23,7 @@ public class ReportRequest {
     @EachMax(value = 6, message = "report code는 6 이하의 값이어야 합니다.")
     List<Integer> reportCodeList;
 
-    @Length(max = 1000, message = "contents는 1000자 이내여야 합니다.")
+    @Length(max = 500, message = "contents는 500자 이내여야 합니다.")
     String contents;
 
     @Min(value = 1, message = "path code는 1 이상의 값이어야 합니다.")

@@ -5,6 +5,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
+import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
 import com.gamegoo.gamegoo_v2.content.report.service.ReportFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,10 +41,10 @@ public class ReportController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "신고 목록 조회 (관리자 전용)", description = "관리자만 접근 가능한 신고 목록 전체 조회 API입니다.")
+    @Operation(summary = "신고 목록 조회 (관리자 전용)", description = "관리자만 접근 가능한 신고 목록 고급 필터링 조회 API입니다.")
     @GetMapping("/list")
-    public ApiResponse<List<ReportListResponse>> getReportList() {
-        return ApiResponse.ok(reportFacadeService.getAllReports());
+    public ApiResponse<List<ReportListResponse>> getReportList(ReportSearchRequest request) {
+        return ApiResponse.ok(reportFacadeService.searchReports(request));
     }
 
 }

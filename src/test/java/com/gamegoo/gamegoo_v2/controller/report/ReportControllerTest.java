@@ -28,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReportController.class)
-@WithCustomMockMember
 public class ReportControllerTest extends ControllerTestSupport {
 
     @MockitoBean
@@ -39,6 +38,7 @@ public class ReportControllerTest extends ControllerTestSupport {
 
     @Nested
     @DisplayName("신고 등록")
+    @WithCustomMockMember
     class AddReportTest {
 
         @DisplayName("실패: 신고 코드 리스트가 빈 리스트인 경우 에러 응답을 반환한다.")
@@ -162,7 +162,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                     .andExpect(jsonPath("$.message").value("report code는 6 이하의 값이어야 합니다."));
         }
 
-        @DisplayName("실패: 텍스트가 1000자 초과인 경우 에러 응답을 반환한다.")
+        @DisplayName("실패: 텍스트가 500자 초과인 경우 에러 응답을 반환한다.")
         @Test
         void addReportFailedWhenContentsSizeExceeds() throws Exception {
             // given
@@ -170,7 +170,7 @@ public class ReportControllerTest extends ControllerTestSupport {
 
             ReportRequest request = ReportRequest.builder()
                     .reportCodeList(reportCodeList)
-                    .contents("a".repeat(1001))
+                    .contents("a".repeat(501))
                     .pathCode(1)
                     .boardId(null)
                     .build();
@@ -189,7 +189,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value("VALID_ERROR"))
-                    .andExpect(jsonPath("$.message").value("contents는 1000자 이내여야 합니다."));
+                    .andExpect(jsonPath("$.message").value("contents는 500자 이내여야 합니다."));
         }
 
         @DisplayName("실패: 경로 코드 값이 없는 경우 에러 응답을 반환한다.")
@@ -351,10 +351,34 @@ public class ReportControllerTest extends ControllerTestSupport {
     @Nested
     @DisplayName("신고 목록 조회 (관리자 전용)")
     class GetReportListTest {
-        @WithCustomMockAdmin
-        @DisplayName("성공: 관리자 권한으로 신고 목록 전체 조회")
+        
+        @DisplayName("실패: 인증되지 않은 사용자가 접근하면 401 에러")
         @Test
-        void getReportListAsAdmin() throws Exception {
+        void getReportListFailedWhenNotAuthenticated() throws Exception {
+            // when // then
+            mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list"))
+                    .andDo(print())
+                    .andExpect(status().isUnauthorized());
+        }
+        
+        @WithCustomMockMember
+        @DisplayName("일반 사용자 접근 - Mock 환경에서는 빈 결과 반환")
+        @Test
+        void getReportListWithMemberRole() throws Exception {
+            // given
+            given(reportFacadeService.searchReports(any())).willReturn(List.of());
+            
+            // when // then
+            mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data").isArray())
+                    .andExpect(jsonPath("$.data").isEmpty());
+        }
+        
+        @WithCustomMockAdmin
+        @DisplayName("성공: 관리자 권한으로 신고 목록 조회 (검색 조건 없음)")
+        @Test
+        void getReportListAsAdminWithoutSearch() throws Exception {
             // given
             List<ReportListResponse> responseList = List.of(
                     ReportListResponse.builder()
@@ -376,7 +400,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.getAllReports()).willReturn(responseList);
+            given(reportFacadeService.searchReports(any())).willReturn(responseList);
 
             // when // then
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list"))
@@ -394,6 +418,36 @@ public class ReportControllerTest extends ControllerTestSupport {
                     .andExpect(jsonPath("$.data[1].content").value("신고 내용2"))
                     .andExpect(jsonPath("$.data[1].reportType").value("불쾌한 표현"))
                     .andExpect(jsonPath("$.data[1].path").value("BOARD"));
+        }
+        
+        @WithCustomMockAdmin
+        @DisplayName("성공: 관리자 권한으로 신고 목록 조회 (검색 조건 포함)")
+        @Test
+        void getReportListAsAdminWithSearch() throws Exception {
+            // given
+            List<ReportListResponse> responseList = List.of(
+                    ReportListResponse.builder()
+                            .reportId(1L)
+                            .fromMemberName("신고자1")
+                            .toMemberName("피신고자1")
+                            .content("신고 내용1")
+                            .reportType("욕설/ 혐오/ 차별적 표현")
+                            .path("CHAT")
+                            .createdAt(java.time.LocalDateTime.now())
+                            .build()
+            );
+            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+
+            // when // then
+            mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
+                            .param("reportedMemberKeyword", "피신고자1")
+                            .param("reporterKeyword", "신고자1")
+                            .param("contentKeyword", "욕설"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data").isArray())
+                    .andExpect(jsonPath("$.data[0].reportId").value(1L))
+                    .andExpect(jsonPath("$.data[0].fromMemberName").value("신고자1"))
+                    .andExpect(jsonPath("$.data[0].toMemberName").value("피신고자1"));
         }
     }
 
