@@ -56,6 +56,9 @@ public class MemberFacadeService {
 
         // 프로필 접근 시 최근 전적 챔피언 정보 자동 갱신
         refreshChampionStatsIfNeeded(targetMember);
+        
+        // 업데이트된 데이터를 반영하기 위해 fresh entity 로딩
+        targetMember = memberService.findMemberById(targetMemberId);
 
         // 친구 정보 얻기
         boolean isFriend = friendService.isFriend(member, targetMember);

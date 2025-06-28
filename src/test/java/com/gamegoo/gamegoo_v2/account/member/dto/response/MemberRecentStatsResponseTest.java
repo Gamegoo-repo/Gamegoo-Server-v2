@@ -32,6 +32,9 @@ class MemberRecentStatsResponseTest {
             .recTotalLosses(15)
             .recWinRate(62.5)
             .recAvgKDA(2.5)
+            .recAvgKills(8.5)
+            .recAvgDeaths(3.2)
+            .recAvgAssists(9.1)
             .recAvgCsPerMinute(6.8)
             .recTotalCs(1360)
             .build();
@@ -45,6 +48,9 @@ class MemberRecentStatsResponseTest {
         assertThat(response.getRecTotalLosses()).isEqualTo(15);
         assertThat(response.getRecWinRate()).isEqualTo(62.5);
         assertThat(response.getRecAvgKDA()).isEqualTo(2.5);
+        assertThat(response.getRecAvgKills()).isEqualTo(8.5);
+        assertThat(response.getRecAvgDeaths()).isEqualTo(3.2);
+        assertThat(response.getRecAvgAssists()).isEqualTo(9.1);
         assertThat(response.getRecAvgCsPerMinute()).isEqualTo(6.8);
         assertThat(response.getRecTotalCs()).isEqualTo(1360);
     }
@@ -61,6 +67,9 @@ class MemberRecentStatsResponseTest {
             .recTotalLosses(0)
             .recWinRate(0.0)
             .recAvgKDA(0.0)
+            .recAvgKills(0.0)
+            .recAvgDeaths(0.0)
+            .recAvgAssists(0.0)
             .recAvgCsPerMinute(0.0)
             .recTotalCs(0)
             .build();
@@ -74,6 +83,9 @@ class MemberRecentStatsResponseTest {
         assertThat(response.getRecTotalLosses()).isEqualTo(0);
         assertThat(response.getRecWinRate()).isEqualTo(0.0);
         assertThat(response.getRecAvgKDA()).isEqualTo(0.0);
+        assertThat(response.getRecAvgKills()).isEqualTo(0.0);
+        assertThat(response.getRecAvgDeaths()).isEqualTo(0.0);
+        assertThat(response.getRecAvgAssists()).isEqualTo(0.0);
         assertThat(response.getRecAvgCsPerMinute()).isEqualTo(0.0);
         assertThat(response.getRecTotalCs()).isEqualTo(0);
     }

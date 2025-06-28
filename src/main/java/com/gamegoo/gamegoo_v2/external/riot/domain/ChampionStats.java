@@ -122,6 +122,10 @@ public class ChampionStats {
         return 0;
     }
 
+    public int getTotalCs() {
+        return totalMinionsKilled;
+    }
+
     public int getKills() {
         return kills;
     }
