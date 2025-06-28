@@ -11,6 +11,9 @@ public class MemberRecentStatsResponse {
     private int recTotalLosses;
     private double recWinRate;
     private double recAvgKDA;
+    private double recAvgKills;
+    private double recAvgDeaths;
+    private double recAvgAssists;
     private double recAvgCsPerMinute;
     private int recTotalCs;
 
@@ -24,6 +27,9 @@ public class MemberRecentStatsResponse {
                 memberRecentStats.getRecTotalLosses(),
                 memberRecentStats.getRecWinRate(),
                 memberRecentStats.getRecAvgKDA(),
+                memberRecentStats.getRecAvgKills(),
+                memberRecentStats.getRecAvgDeaths(),
+                memberRecentStats.getRecAvgAssists(),
                 memberRecentStats.getRecAvgCsPerMinute(),
                 memberRecentStats.getRecTotalCs()
         );

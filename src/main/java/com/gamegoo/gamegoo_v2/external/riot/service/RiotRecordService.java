@@ -50,6 +50,9 @@ public class RiotRecordService {
         private int recTotalLosses;
         private double recWinRate;
         private double recAvgKDA;
+        private double recAvgKills;
+        private double recAvgDeaths;
+        private double recAvgAssists;
         private double recAvgCsPerMinute;
         private int recTotalCs;
     }
@@ -82,7 +85,7 @@ public class RiotRecordService {
      */
     private Map<Long, ChampionStats> fetchRecentChampionStats(String gameName, String puuid) {
         Map<Long, ChampionStats> championStatsMap = new HashMap<>();
-        
+
         List<String> matchIds = Optional.ofNullable(fetchMatchIds(puuid, 0, INITIAL_MATCH_COUNT))
                 .orElseGet(Collections::emptyList);
 
@@ -97,7 +100,7 @@ public class RiotRecordService {
                 }
             });
         }
-        
+
         return championStatsMap;
     }
 
@@ -157,9 +160,9 @@ public class RiotRecordService {
                     .map(participant -> {
                         ChampionStats stats = new ChampionStats(participant.getChampionId(), participant.isWin());
                         stats.setGameTime(finalGameDuration);
-                        // CS가 음수인 경우 0으로 설정
-                        int totalMinionsKilled = Math.max(0, participant.getTotalMinionsKilled());
-                        stats.setTotalMinionsKilled(totalMinionsKilled);
+                        // CS가 음수인 경우 0으로 설정 (미니언 + 정글몹)
+                        int totalCs = Math.max(0, participant.getTotalMinionsKilled() + participant.getNeutralMinionsKilled());
+                        stats.setTotalMinionsKilled(totalCs);
                         // KDA 정보 설정
                         stats.setKills(participant.getKills());
                         stats.setDeaths(participant.getDeaths());
@@ -211,8 +214,11 @@ public class RiotRecordService {
                 .recTotalLosses(totalLosses)
                 .recWinRate(recWinRate)
                 .recAvgKDA(recAvgKDA)
+                .recAvgKills((double) totalKills / totalGames)
+                .recAvgDeaths((double) totalDeaths / totalGames)
+                .recAvgAssists((double) totalAssists / totalGames)
                 .recAvgCsPerMinute(recAvgCsPerMinute)
-                .recTotalCs(totalCs)
+                .recTotalCs(totalCs/(totalWins+totalLosses))
                 .build();
     }
 
