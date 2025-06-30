@@ -26,6 +26,7 @@ public interface BlockRepository extends JpaRepository<Block, Long>, BlockReposi
             """)
     Page<Member> findBlockedMembersByBlockerMember(@Param("blockerId") Long blockerId, Pageable pageable);
 
-    Optional<Block> findByBlockerMemberAndBlockedMember(Member blockerMember, Member blockedMember);
+    Optional<Block> findByBlockerMemberAndBlockedMemberAndDeleted(Member blockerMember, Member blockedMember,
+                                                                  Boolean deleted);
 
 }
