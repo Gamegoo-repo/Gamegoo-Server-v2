@@ -196,7 +196,8 @@ class BlockFacadeServiceTest {
 
             // then
             // 차단 기록 엔티티의 delete 상태가 정상적으로 변경되었는지 검증
-            Block block = blockRepository.findByBlockerMemberAndBlockedMember(member, targetMember).get();
+            Block block = blockRepository.findByBlockerMemberAndBlockedMemberAndDeleted(member, targetMember,
+                    true).orElseThrow();
             assertThat(block.isDeleted()).isTrue();
         }
 
@@ -264,7 +265,8 @@ class BlockFacadeServiceTest {
 
             // then
             // 차단 기록 엔티티의 delete 상태가 정상적으로 변경되었는지 검증
-            Block block = blockRepository.findByBlockerMemberAndBlockedMember(member, targetMember).get();
+            Block block = blockRepository.findByBlockerMemberAndBlockedMemberAndDeleted(member, targetMember,
+                    true).orElseThrow();
             assertThat(block.isDeleted()).isTrue();
         }
 

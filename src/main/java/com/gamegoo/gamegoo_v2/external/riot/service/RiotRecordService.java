@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import lombok.Getter;
+import lombok.Builder;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,6 +43,20 @@ public class RiotRecordService {
     private static final int INITIAL_MATCH_COUNT = 30;
     private static final int MAX_CHAMPIONS_REQUIRED = 4;
 
+    @Getter
+    @Builder
+    public static class Recent30GameStatsResponse {
+        private int recTotalWins;
+        private int recTotalLosses;
+        private double recWinRate;
+        private double recAvgKDA;
+        private double recAvgKills;
+        private double recAvgDeaths;
+        private double recAvgAssists;
+        private double recAvgCsPerMinute;
+        private int recTotalCs;
+    }
+
     /**
      * Riot API: 최근 선호 챔피언 4개 리스트 조회
      *
@@ -69,7 +85,7 @@ public class RiotRecordService {
      */
     private Map<Long, ChampionStats> fetchRecentChampionStats(String gameName, String puuid) {
         Map<Long, ChampionStats> championStatsMap = new HashMap<>();
-        
+
         List<String> matchIds = Optional.ofNullable(fetchMatchIds(puuid, 0, INITIAL_MATCH_COUNT))
                 .orElseGet(Collections::emptyList);
 
@@ -84,7 +100,7 @@ public class RiotRecordService {
                 }
             });
         }
-        
+
         return championStatsMap;
     }
 
@@ -144,9 +160,9 @@ public class RiotRecordService {
                     .map(participant -> {
                         ChampionStats stats = new ChampionStats(participant.getChampionId(), participant.isWin());
                         stats.setGameTime(finalGameDuration);
-                        // CS가 음수인 경우 0으로 설정
-                        int totalMinionsKilled = Math.max(0, participant.getTotalMinionsKilled());
-                        stats.setTotalMinionsKilled(totalMinionsKilled);
+                        // CS가 음수인 경우 0으로 설정 (미니언 + 정글몹)
+                        int totalCs = Math.max(0, participant.getTotalMinionsKilled() + participant.getNeutralMinionsKilled());
+                        stats.setTotalMinionsKilled(totalCs);
                         // KDA 정보 설정
                         stats.setKills(participant.getKills());
                         stats.setDeaths(participant.getDeaths());
@@ -158,6 +174,52 @@ public class RiotRecordService {
             riotApiHelper.handleApiError(e);
             return Optional.empty();
         }
+    }
+
+    public Recent30GameStatsResponse getRecent30GameStats(String gameName, String puuid) {
+        List<String> matchIds = Optional.ofNullable(fetchMatchIds(puuid, 0, INITIAL_MATCH_COUNT))
+                .orElseGet(Collections::emptyList);
+
+        int totalWins = 0;
+        int totalLosses = 0;
+        int totalKills = 0;
+        int totalDeaths = 0;
+        int totalAssists = 0;
+        int totalCs = 0;
+        double totalCsPerMinute = 0.0;
+        int totalGames = 0;
+
+        for (String matchId : matchIds) {
+            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, gameName);
+            if (championStatsOpt.isPresent()) {
+                ChampionStats stats = championStatsOpt.get();
+                totalGames++;
+                if (stats.getWins() > 0) totalWins++;
+                else totalLosses++;
+                totalKills += stats.getKills();
+                totalDeaths += stats.getDeaths();
+                totalAssists += stats.getAssists();
+                totalCs += stats.getTotalMinionsKilled();
+                double gameMinutes = stats.getGameTime() / 60.0;
+                if (gameMinutes > 0) {
+                    totalCsPerMinute += stats.getTotalMinionsKilled() / gameMinutes;
+                }
+            }
+        }
+        double recWinRate = totalGames > 0 ? (double) totalWins / totalGames * 100 : 0.0;
+        double recAvgKDA = totalGames > 0 ? (double) (totalKills + totalAssists) / Math.max(1, totalDeaths) : 0.0;
+        double recAvgCsPerMinute = totalGames > 0 ? totalCsPerMinute / totalGames : 0.0;
+        return Recent30GameStatsResponse.builder()
+                .recTotalWins(totalWins)
+                .recTotalLosses(totalLosses)
+                .recWinRate(recWinRate)
+                .recAvgKDA(recAvgKDA)
+                .recAvgKills((double) totalKills / totalGames)
+                .recAvgDeaths((double) totalDeaths / totalGames)
+                .recAvgAssists((double) totalAssists / totalGames)
+                .recAvgCsPerMinute(recAvgCsPerMinute)
+                .recTotalCs(totalCs/(totalWins+totalLosses))
+                .build();
     }
 
 }

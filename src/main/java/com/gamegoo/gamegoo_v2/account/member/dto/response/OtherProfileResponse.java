@@ -4,7 +4,6 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.game.dto.response.ChampionResponse;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import lombok.Builder;
@@ -39,6 +38,7 @@ public class OtherProfileResponse {
     Long friendRequestMemberId; // 해당 회원과의 친구 요청 상태
     List<GameStyleResponse> gameStyleResponseList;
     List<ChampionStatsResponse> championStatsResponseList;
+    MemberRecentStatsResponse memberRecentStats;
 
     public static OtherProfileResponse of(Member targetMember, Boolean isFriend, Long friendRequestMemberId,
                                           Boolean isBlocked) {
@@ -74,6 +74,7 @@ public class OtherProfileResponse {
                 .friendRequestMemberId(friendRequestMemberId)
                 .gameStyleResponseList(gameStyleResponseList)
                 .championStatsResponseList(championStatsResponseList)
+                .memberRecentStats(MemberRecentStatsResponse.from(targetMember.getMemberRecentStats()))
                 .build();
     }
 

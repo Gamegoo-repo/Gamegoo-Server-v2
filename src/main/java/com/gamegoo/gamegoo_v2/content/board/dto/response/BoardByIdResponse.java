@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.dto.response.MemberRecentStatsResponse;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import lombok.Builder;
@@ -31,6 +32,7 @@ public class BoardByIdResponse {
     int freeRank;
     Mike mike;
     List<ChampionStatsResponse> championStatsResponseList;
+    MemberRecentStatsResponse memberRecentStats;
     GameMode gameMode;
     Position mainP;
     Position subP;
@@ -86,6 +88,7 @@ public class BoardByIdResponse {
                 .freeRank(poster.getFreeRank())
                 .mike(board.getMike())
                 .championStatsResponseList(championStatsResponseList)
+                .memberRecentStats(MemberRecentStatsResponse.from(poster.getMemberRecentStats()))
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())
