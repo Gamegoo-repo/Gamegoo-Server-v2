@@ -108,8 +108,8 @@ public class SecurityConfig {
         // 예외처리
         http
                 .exceptionHandling((exceptionHandling) -> exceptionHandling
-                        .accessDeniedHandler(accessDeniedHandler) // access deny 되었을 때 커스텀 응답 핸들러
-                        .authenticationEntryPoint(unauthorizedHandler)); // 로그인되지 않은 요청에 대해 커스텀 응답 핸들러
+                        .authenticationEntryPoint(unauthorizedHandler)  // 인증
+                        .accessDeniedHandler(accessDeniedHandler));     // 인가
 
         return http.build();
     }

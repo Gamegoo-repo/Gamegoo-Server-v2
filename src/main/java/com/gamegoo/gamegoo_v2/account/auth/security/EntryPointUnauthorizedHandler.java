@@ -4,48 +4,47 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 
-import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode._UNAUTHORIZED;
+import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode._INTERNAL_SERVER_ERROR;
+
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class EntryPointUnauthorizedHandler implements AuthenticationEntryPoint {
 
+    private final ObjectMapper objectMapper;
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException {
-        response.setContentType("application/json; charset=UTF-8");
-        response.setStatus(401);
-        PrintWriter writer = response.getWriter();
+                         AuthenticationException authException) {
 
-        // 실패 응답
-        ApiResponse<Object> apiResponse =
-                ApiResponse.builder()
-                        .code(_UNAUTHORIZED.getCode())
-                        .message(_UNAUTHORIZED.getMessage())
-                        .data(null)
-                        .status(_UNAUTHORIZED.getStatus())
-                        .build();
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
+        var errorCode = _INTERNAL_SERVER_ERROR;
+
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .data(null)
+                .status(errorCode.getStatus())
+                .build();
+
+        response.setContentType("application/json; charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+        try (PrintWriter writer = response.getWriter()) {
             String jsonResponse = objectMapper.writeValueAsString(apiResponse);
             writer.write(jsonResponse);
-        } catch (NullPointerException e) {
-            log.error("응답 메시지 작성 에러", e);
-        } finally {
-            if (writer != null) {
-                writer.flush();
-                writer.close();
-            }
+            writer.flush();
+        } catch (Exception e) {
+            log.error("Security Filter EntryPoint 응답 메시지 작성 에러", e);
         }
     }
 
 }
-
