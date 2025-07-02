@@ -3,7 +3,7 @@ package com.gamegoo.gamegoo_v2.core.config;
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.auth.security.CustomAccessDeniedHandler;
 import com.gamegoo.gamegoo_v2.account.auth.security.CustomUserDetailsService;
-import com.gamegoo.gamegoo_v2.account.auth.security.EntryPointUnauthorizedHandler;
+import com.gamegoo.gamegoo_v2.account.auth.security.EntryPointHandler;
 import com.gamegoo.gamegoo_v2.account.auth.security.JwtAuthFilter;
 import com.gamegoo.gamegoo_v2.account.auth.security.JwtAuthenticationExceptionHandler;
 import com.gamegoo.gamegoo_v2.core.log.LoggingFilter;
@@ -38,7 +38,7 @@ public class SecurityConfig {
     private final JwtProvider jwtProvider;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAccessDeniedHandler accessDeniedHandler;
-    private final EntryPointUnauthorizedHandler unauthorizedHandler;
+    private final EntryPointHandler unauthorizedHandler;
     private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler;
     private final LoggingFilter loggingFilter;
     private final SecurityJwtProperties securityJwtProperties;

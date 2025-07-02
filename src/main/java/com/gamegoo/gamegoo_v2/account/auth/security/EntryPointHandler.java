@@ -18,7 +18,7 @@ import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode._INTERNAL_S
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class EntryPointUnauthorizedHandler implements AuthenticationEntryPoint {
+public class EntryPointHandler implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
