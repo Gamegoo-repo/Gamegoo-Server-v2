@@ -46,6 +46,9 @@ public class ChampionStatsRefreshService {
             recStats.getRecTotalLosses(),
             recStats.getRecWinRate(),
             recStats.getRecAvgKDA(),
+            recStats.getRecAvgKills(),
+            recStats.getRecAvgDeaths(),
+            recStats.getRecAvgAssists(),
             recStats.getRecAvgCsPerMinute(),
             recStats.getRecTotalCs()
         );

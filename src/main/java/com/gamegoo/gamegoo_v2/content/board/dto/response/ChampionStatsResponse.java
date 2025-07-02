@@ -16,10 +16,11 @@ public class ChampionStatsResponse {
     private int wins;            // 승 수
     private int games;           // 판 수
     private double csPerMinute;  // 분당 CS
+    private double averageCs;    // 평균 CS
     private double kda;          // KDA
-    private int kills;           // 킬
-    private int deaths;          // 데스
-    private int assists;         // 어시스트
+    private double kills;        // 평균 킬
+    private double deaths;       // 평균 데스
+    private double assists;      // 평균 어시스트
 
     public static ChampionStatsResponse from(ChampionStats stats, Champion champion) {
         return ChampionStatsResponse.builder()
@@ -29,10 +30,11 @@ public class ChampionStatsResponse {
                 .wins(stats.getWins())
                 .games(stats.getGames())
                 .csPerMinute(stats.getCsPerMinute())
+                .averageCs(stats.getGames() > 0 ? (double) stats.getTotalCs() / stats.getGames() : 0)
                 .kda(stats.getKDA())
-                .kills(stats.getKills())
-                .deaths(stats.getDeaths())
-                .assists(stats.getAssists())
+                .kills(stats.getGames() > 0 ? (double) stats.getKills() / stats.getGames() : 0)
+                .deaths(stats.getGames() > 0 ? (double) stats.getDeaths() / stats.getGames() : 0)
+                .assists(stats.getGames() > 0 ? (double) stats.getAssists() / stats.getGames() : 0)
                 .build();
     }
 
@@ -48,10 +50,11 @@ public class ChampionStatsResponse {
                 .wins(wins)
                 .games(games)
                 .csPerMinute(memberChampion.getCsPerMinute())
+                .averageCs(games > 0 ? (double) memberChampion.getTotalCs() / games : 0)
                 .kda(memberChampion.getKDA())
-                .kills(memberChampion.getKills())
-                .deaths(memberChampion.getDeaths())
-                .assists(memberChampion.getAssists())
+                .kills(games > 0 ? (double) memberChampion.getKills() / games : 0)
+                .deaths(games > 0 ? (double) memberChampion.getDeaths() / games : 0)
+                .assists(games > 0 ? (double) memberChampion.getAssists() / games : 0)
                 .build();
     }
 
