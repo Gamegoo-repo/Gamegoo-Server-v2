@@ -104,7 +104,24 @@ public class ReportController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "신고 처리 (관리자 전용)", description = "관리자가 신고를 처리하여 제재를 적용하는 API입니다.")
+    @Operation(summary = "신고 처리 (관리자 전용)", 
+               description = """
+                   관리자가 신고를 처리하여 제재를 적용하는 API입니다.
+                   
+                   **Request Body:**
+                   - banType: 적용할 제재 유형 (필수)
+                     - NONE: 제재 없음
+                     - WARNING: 경고
+                     - BAN_1D: 1일 정지
+                     - BAN_3D: 3일 정지
+                     - BAN_5D: 5일 정지
+                     - BAN_7D: 7일 정지
+                     - BAN_1W: 1주 정지
+                     - BAN_2W: 2주 정지
+                     - BAN_1M: 1개월 정지
+                     - PERMANENT: 영구 정지
+                   - processReason: 제재 사유 (선택사항)
+                   """)
     @Parameter(name = "reportId", description = "처리할 신고의 ID입니다.")
     @PutMapping("/{reportId}/process")
     public ApiResponse<ReportProcessResponse> processReport(@PathVariable("reportId") Long reportId,
@@ -113,7 +130,17 @@ public class ReportController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "신고된 게시글 삭제 (관리자 전용)", description = "관리자가 신고된 게시글을 삭제하는 API입니다.")
+    @Operation(summary = "신고된 게시글 삭제 (관리자 전용)", 
+               description = """
+                   관리자가 신고된 게시글을 삭제하는 API입니다.
+                   
+                   해당 신고와 연관된 게시글이 있는 경우 삭제 처리되며,
+                   게시글이 없는 경우 적절한 메시지가 반환됩니다.
+                   
+                   **반환 메시지:**
+                   - 성공: "신고된 게시글 삭제가 완료되었습니다"
+                   - 게시글 없음: "삭제할 게시글이 존재하지 않습니다"
+                   """)
     @Parameter(name = "reportId", description = "삭제할 게시글과 연관된 신고의 ID입니다.")
     @DeleteMapping("/{reportId}/post")
     public ApiResponse<String> deleteReportedPost(@PathVariable("reportId") Long reportId) {
