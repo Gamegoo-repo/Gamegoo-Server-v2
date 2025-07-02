@@ -45,7 +45,25 @@ public class ReportController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "신고 목록 조회 (관리자 전용)", description = "관리자만 접근 가능한 신고 목록 고급 필터링 조회 API입니다.")
+    @Operation(summary = "신고 목록 조회 (관리자 전용)",
+               description = """
+                   관리자만 접근 가능한 신고 목록 고급 필터링 조회 API입니다.
+
+                   **필터링 옵션:**
+                   - reportedMemberKeyword: 피신고자 검색 (게임명, 태그, 게임명#태그 형식 지원)
+                   - reporterKeyword: 신고자 검색 (게임명, 태그, 게임명#태그 형식 지원)
+                   - contentKeyword: 신고 내용으로 검색
+                   - reportPaths: 신고 경로 (BOARD=게시판, CHAT=채팅, PROFILE=프로필)
+                   - reportTypes: 신고 사유 (1=스팸, 2=불법정보, 3=성희롱, 4=욕설/혐오, 5=개인정보노출, 6=불쾌한표현)
+                   - startDate/endDate: 신고 날짜 범위 (yyyy-MM-dd'T'HH:mm:ss)
+                   - reportCountMin/Max/Exact: 누적 신고 횟수 필터
+                   - isDeleted: 게시물 삭제 여부 (true/false)
+                   - banTypes: 제재 상태 (NONE, WARNING, BAN_1D, BAN_3D, BAN_5D, BAN_7D, BAN_1W, BAN_2W, BAN_1M, PERMANENT)
+                   - page/size/sort: 페이징 (예: page=0&size=10&sort=createdAt,desc)
+
+                   **사용 예시:**
+                   /api/v2/report/list?reportedMemberKeyword=홍길동#KR1&reportTypes=1,4&startDate=2024-01-01T00:00:00&page=0&size=10
+                   """)
     @GetMapping("/list")
     public ApiResponse<List<ReportListResponse>> getReportList(ReportSearchRequest request) {
         return ApiResponse.ok(reportFacadeService.searchReports(request));

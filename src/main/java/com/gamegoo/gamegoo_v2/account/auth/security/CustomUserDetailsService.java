@@ -1,6 +1,5 @@
 package com.gamegoo.gamegoo_v2.account.auth.security;
 
-import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.JwtAuthException;
@@ -28,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new JwtAuthException(ErrorCode.INACTIVE_MEMBER);
         }
 
-        return new CustomUserDetails(member.getId(), Role.MEMBER);
+        return new CustomUserDetails(member.getId(), member.getRole());
     }
 
     @Override

@@ -24,14 +24,22 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        // 1. 신고자 키워드 검색
+        // 1. 신고자 키워드 검색 (gameName, tag, gameName#tag 조합으로 검색)
         if (request.getReporterKeyword() != null && !request.getReporterKeyword().isEmpty()) {
-            builder.and(report.fromMember.gameName.contains(request.getReporterKeyword()));
+            builder.and(
+                report.fromMember.gameName.contains(request.getReporterKeyword())
+                .or(report.fromMember.tag.contains(request.getReporterKeyword()))
+                .or(report.fromMember.gameName.concat("#").concat(report.fromMember.tag).contains(request.getReporterKeyword()))
+            );
         }
 
-        // 2. 피신고자 키워드 검색
+        // 2. 피신고자 키워드 검색 (gameName, tag, gameName#tag 조합으로 검색)
         if (request.getReportedMemberKeyword() != null && !request.getReportedMemberKeyword().isEmpty()) {
-            builder.and(report.toMember.gameName.contains(request.getReportedMemberKeyword()));
+            builder.and(
+                report.toMember.gameName.contains(request.getReportedMemberKeyword())
+                .or(report.toMember.tag.contains(request.getReportedMemberKeyword()))
+                .or(report.toMember.gameName.concat("#").concat(report.toMember.tag).contains(request.getReportedMemberKeyword()))
+            );
         }
 
         // 3. 상세 내용 키워드 검색

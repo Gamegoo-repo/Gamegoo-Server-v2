@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.member.domain;
 
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
@@ -138,6 +139,10 @@ public class Member extends BaseDateTimeEntity {
 
     private java.time.LocalDateTime banExpireAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
+    private Role role = Role.MEMBER;
+
     // puuid 전용
     public static Member createForGeneral(String email, String password, LoginType loginType, String gameName,
                                           String tag,
@@ -267,6 +272,10 @@ public class Member extends BaseDateTimeEntity {
     public void releaseBan() {
         this.banType = BanType.NONE;
         this.banExpireAt = null;
+    }
+
+    public void updateRole(Role role) {
+        this.role = role;
     }
 
     public boolean isBanned() {

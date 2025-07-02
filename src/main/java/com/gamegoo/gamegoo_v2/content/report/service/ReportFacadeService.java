@@ -67,8 +67,12 @@ public class ReportFacadeService {
         return reportService.searchReports(request).stream()
                 .map(report -> ReportListResponse.builder()
                         .reportId(report.getId())
+                        .fromMemberId(report.getFromMember().getId())
                         .fromMemberName(report.getFromMember().getGameName())
+                        .fromMemberTag(report.getFromMember().getTag())
+                        .toMemberId(report.getToMember().getId())
                         .toMemberName(report.getToMember().getGameName())
+                        .toMemberTag(report.getToMember().getTag())
                         .content(report.getContent())
                         .reportType(reportService.getReportTypeString(report.getId()))
                         .path(report.getPath().name())
@@ -88,14 +92,14 @@ public class ReportFacadeService {
     public ReportProcessResponse processReport(Long reportId, ReportProcessRequest request) {
         Report report = reportService.findById(reportId);
         Member targetMember = report.getToMember();
-        
+
         // 제재 적용
         banService.applyBan(targetMember, request.getBanType());
-        
+
         return ReportProcessResponse.of(
-                reportId, 
-                targetMember.getId(), 
-                request.getBanType(), 
+                reportId,
+                targetMember.getId(),
+                request.getBanType(),
                 targetMember.getBanExpireAt()
         );
     }
@@ -109,13 +113,13 @@ public class ReportFacadeService {
     @Transactional
     public boolean deleteReportedPost(Long reportId) {
         Report report = reportService.findById(reportId);
-        
+
         if (report.getSourceBoard() != null) {
             Board board = report.getSourceBoard();
             boardService.deleteBoard(board.getId(), board.getMember().getId());
             return true;
         }
-        
+
         return false;
     }
 
