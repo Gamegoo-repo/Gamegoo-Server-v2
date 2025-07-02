@@ -84,15 +84,14 @@ public class MemberController {
     @Operation(summary = "어드민 권한 부여 API (개발용)", description = "개발용 어드민 권한 부여 API")
     @PatchMapping("/admin/grant/{memberId}")
     public ApiResponse<String> grantAdminRole(@PathVariable Long memberId) {
-        memberFacadeService.updateMemberRole(memberId, Role.ADMIN);
-        return ApiResponse.ok("어드민 권한이 부여되었습니다.");
+
+        return ApiResponse.ok(memberFacadeService.updateMemberRole(memberId, Role.ADMIN));
     }
 
     @Operation(summary = "일반 사용자 권한으로 변경 API (개발용)", description = "어드민 권한을 일반 사용자로 변경하는 API")
     @PatchMapping("/admin/revoke/{memberId}")
     public ApiResponse<String> revokeAdminRole(@PathVariable Long memberId) {
-        memberFacadeService.updateMemberRole(memberId, Role.MEMBER);
-        return ApiResponse.ok("일반 사용자 권한으로 변경되었습니다.");
+        return ApiResponse.ok(memberFacadeService.updateMemberRole(memberId, Role.MEMBER));
     }
 
 }

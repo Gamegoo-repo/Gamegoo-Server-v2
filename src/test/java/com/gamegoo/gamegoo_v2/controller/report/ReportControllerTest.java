@@ -369,7 +369,7 @@ public class ReportControllerTest extends ControllerTestSupport {
         @Test
         void getReportListWithMemberRole() throws Exception {
             // given
-            given(reportFacadeService.searchReports(any())).willReturn(List.of());
+            given(reportFacadeService.searchReports(any(), any())).willReturn(List.of());
 
             // when // then
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list"))
@@ -411,7 +411,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list"))
@@ -455,7 +455,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -485,7 +485,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then - 신고 사유 1(스팸), 4(욕설) 필터링
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -511,7 +511,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then - 채팅, 프로필 경로 필터링
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -537,7 +537,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then - 2024년 1월 1일부터 현재까지
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -564,7 +564,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then - 신고 횟수 3회 이상 10회 이하
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -591,7 +591,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then - 3일, 7일 제재 상태 필터링
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -617,7 +617,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then - 첫 번째 페이지, 사이즈 10, 생성일 내림차순 정렬
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -645,7 +645,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then - 모든 필터 조건을 조합하여 테스트
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -691,7 +691,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then - gameName#tag 형식으로 검색
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -723,7 +723,7 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any())).willReturn(responseList);
+            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
             // when // then - tag만으로 검색
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")

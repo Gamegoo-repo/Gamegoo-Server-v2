@@ -52,19 +52,4 @@ public class BanService {
             case PERMANENT -> null;
         };
     }
-    
-    public String getBanReasonMessage(BanType banType) {
-        return switch (banType) {
-            case WARNING -> "경고";
-            case BAN_1D -> "1일 정지";
-            case BAN_3D -> "3일 정지";
-            case BAN_5D -> "5일 정지";
-            case BAN_7D -> "7일 정지";
-            case BAN_1W -> "1주 정지";
-            case BAN_2W -> "2주 정지";
-            case BAN_1M -> "한달 정지";
-            case PERMANENT -> "영구 정지";
-            default -> "제재 없음";
-        };
-    }
 }

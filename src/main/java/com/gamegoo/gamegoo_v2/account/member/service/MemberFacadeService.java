@@ -165,11 +165,13 @@ public class MemberFacadeService {
      *
      * @param memberId 대상 회원 ID
      * @param role 변경할 역할
+     * @return 성공 메시지
      */
     @Transactional
-    public void updateMemberRole(Long memberId, Role role) {
+    public String updateMemberRole(Long memberId, Role role) {
         Member member = memberService.findMemberById(memberId);
-        member.updateRole(role);
+        memberService.updateMemberRole(member, role);
+        return "회원 권한 변경이 완료되었습니다";
     }
 
 }

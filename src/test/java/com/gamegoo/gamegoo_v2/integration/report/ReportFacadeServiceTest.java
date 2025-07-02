@@ -361,10 +361,10 @@ class ReportFacadeServiceTest {
             Report report = createReportWithBoard(board);
 
             // when
-            boolean result = reportFacadeService.deleteReportedPost(report.getId());
+            String result = reportFacadeService.deleteReportedPost(report.getId());
 
             // then
-            assertThat(result).isTrue();
+            assertThat(result).isEqualTo("신고된 게시글 삭제가 완료되었습니다");
             Board deletedBoard = boardRepository.findById(board.getId()).orElseThrow();
             assertThat(deletedBoard.isDeleted()).isTrue();
         }
@@ -376,10 +376,10 @@ class ReportFacadeServiceTest {
             Report report = createReport();
 
             // when
-            boolean result = reportFacadeService.deleteReportedPost(report.getId());
+            String result = reportFacadeService.deleteReportedPost(report.getId());
 
             // then
-            assertThat(result).isFalse();
+            assertThat(result).isEqualTo("삭제할 게시글이 존재하지 않습니다");
         }
 
         @DisplayName("실패: 존재하지 않는 신고 ID")

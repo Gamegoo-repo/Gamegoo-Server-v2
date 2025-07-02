@@ -18,12 +18,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
+import com.gamegoo.gamegoo_v2.content.report.domain.ReportPath;
+import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -62,11 +67,40 @@ public class ReportController {
                    - page/size/sort: 페이징 (예: page=0&size=10&sort=createdAt,desc)
 
                    **사용 예시:**
-                   /api/v2/report/list?reportedMemberKeyword=홍길동#KR1&reportTypes=1,4&startDate=2024-01-01T00:00:00&page=0&size=10
+                   /api/v2/report/list?reportedMemberKeyword=홍길동#KR1&reportTypes=1,4&startDate=2024-01-01T00:00:00&banTypes=WARNING&page=0&size=10
                    """)
     @GetMapping("/list")
-    public ApiResponse<List<ReportListResponse>> getReportList(ReportSearchRequest request) {
-        return ApiResponse.ok(reportFacadeService.searchReports(request));
+    public ApiResponse<List<ReportListResponse>> getReportList(
+            @RequestParam(required = false) String reportedMemberKeyword,
+            @RequestParam(required = false) String reporterKeyword,
+            @RequestParam(required = false) String contentKeyword,
+            @RequestParam(required = false) List<ReportPath> reportPaths,
+            @RequestParam(required = false) List<Integer> reportTypes,
+            @RequestParam(required = false) LocalDateTime startDate,
+            @RequestParam(required = false) LocalDateTime endDate,
+            @RequestParam(required = false) Integer reportCountMin,
+            @RequestParam(required = false) Integer reportCountMax,
+            @RequestParam(required = false) Integer reportCountExact,
+            @RequestParam(required = false) Boolean isDeleted,
+            @RequestParam(required = false) List<BanType> banTypes,
+            Pageable pageable) {
+        
+        ReportSearchRequest request = ReportSearchRequest.builder()
+                .reportedMemberKeyword(reportedMemberKeyword)
+                .reporterKeyword(reporterKeyword)
+                .contentKeyword(contentKeyword)
+                .reportPaths(reportPaths)
+                .reportTypes(reportTypes)
+                .startDate(startDate)
+                .endDate(endDate)
+                .reportCountMin(reportCountMin)
+                .reportCountMax(reportCountMax)
+                .reportCountExact(reportCountExact)
+                .isDeleted(isDeleted)
+                .banTypes(banTypes)
+                .build();
+                
+        return ApiResponse.ok(reportFacadeService.searchReports(request, pageable));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -83,9 +117,7 @@ public class ReportController {
     @Parameter(name = "reportId", description = "삭제할 게시글과 연관된 신고의 ID입니다.")
     @DeleteMapping("/{reportId}/post")
     public ApiResponse<String> deleteReportedPost(@PathVariable("reportId") Long reportId) {
-        boolean deleted = reportFacadeService.deleteReportedPost(reportId);
-        String message = deleted ? "게시글이 성공적으로 삭제되었습니다." : "삭제할 게시글이 없습니다.";
-        return ApiResponse.ok(message);
+        return ApiResponse.ok(reportFacadeService.deleteReportedPost(reportId));
     }
 
 }

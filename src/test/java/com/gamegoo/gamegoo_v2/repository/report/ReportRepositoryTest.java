@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -156,7 +157,7 @@ class ReportRepositoryTest {
             ReportSearchRequest request = ReportSearchRequest.builder().build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(3);
@@ -173,7 +174,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(2);
@@ -190,7 +191,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(2);
@@ -207,7 +208,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(1);
@@ -223,7 +224,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(2);
@@ -240,7 +241,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(2);
@@ -261,7 +262,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(3);
@@ -278,7 +279,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(3);
@@ -295,7 +296,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(3);
@@ -311,7 +312,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(2);
@@ -328,7 +329,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(2);
@@ -345,7 +346,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(1);
@@ -362,7 +363,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(3);
@@ -377,7 +378,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(1);
@@ -393,7 +394,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(2);
@@ -413,7 +414,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).hasSize(1);
@@ -429,7 +430,7 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request);
+            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
 
             // then
             assertThat(results).isEmpty();

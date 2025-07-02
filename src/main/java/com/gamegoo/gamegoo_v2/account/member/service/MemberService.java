@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.member.service;
 
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.JoinRequest;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
@@ -238,6 +239,17 @@ public class MemberService {
     public void deactivateMember(Member member) {
         member.deactiveMember();
         em.flush();
+    }
+
+    /**
+     * 회원 역할(권한) 수정
+     *
+     * @param member 회원
+     * @param role   변경할 역할
+     */
+    @Transactional
+    public void updateMemberRole(Member member, Role role) {
+        member.updateRole(role);
     }
 
 }

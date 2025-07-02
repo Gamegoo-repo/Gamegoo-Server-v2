@@ -145,18 +145,4 @@ class BanServiceTest {
         assertThat(member.getBanExpireAt()).isEqualTo(expireAt);
     }
 
-    @Test
-    @DisplayName("제재 사유 메시지 조회 테스트")
-    void getBanReasonMessage_AllTypes() {
-        assertThat(banService.getBanReasonMessage(BanType.WARNING)).isEqualTo("경고");
-        assertThat(banService.getBanReasonMessage(BanType.BAN_1D)).isEqualTo("1일 정지");
-        assertThat(banService.getBanReasonMessage(BanType.BAN_3D)).isEqualTo("3일 정지");
-        assertThat(banService.getBanReasonMessage(BanType.BAN_5D)).isEqualTo("5일 정지");
-        assertThat(banService.getBanReasonMessage(BanType.BAN_7D)).isEqualTo("7일 정지");
-        assertThat(banService.getBanReasonMessage(BanType.BAN_1W)).isEqualTo("1주 정지");
-        assertThat(banService.getBanReasonMessage(BanType.BAN_2W)).isEqualTo("2주 정지");
-        assertThat(banService.getBanReasonMessage(BanType.BAN_1M)).isEqualTo("한달 정지");
-        assertThat(banService.getBanReasonMessage(BanType.PERMANENT)).isEqualTo("영구 정지");
-        assertThat(banService.getBanReasonMessage(BanType.NONE)).isEqualTo("제재 없음");
-    }
 }

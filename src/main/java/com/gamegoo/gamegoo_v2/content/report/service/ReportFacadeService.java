@@ -63,8 +63,8 @@ public class ReportFacadeService {
     /**
      * 신고 목록 고급 필터링 조회 (관리자용)
      */
-    public List<ReportListResponse> searchReports(ReportSearchRequest request) {
-        return reportService.searchReports(request).stream()
+    public List<ReportListResponse> searchReports(ReportSearchRequest request, org.springframework.data.domain.Pageable pageable) {
+        return reportService.searchReports(request, pageable).stream()
                 .map(report -> ReportListResponse.builder()
                         .reportId(report.getId())
                         .fromMemberId(report.getFromMember().getId())
@@ -108,19 +108,19 @@ public class ReportFacadeService {
      * 신고된 게시글 삭제 facade 메소드
      *
      * @param reportId 신고 ID
-     * @return 삭제 성공 여부
+     * @return 삭제 결과 메시지
      */
     @Transactional
-    public boolean deleteReportedPost(Long reportId) {
+    public String deleteReportedPost(Long reportId) {
         Report report = reportService.findById(reportId);
 
         if (report.getSourceBoard() != null) {
             Board board = report.getSourceBoard();
             boardService.deleteBoard(board.getId(), board.getMember().getId());
-            return true;
+            return "신고된 게시글 삭제가 완료되었습니다";
         }
 
-        return false;
+        return "삭제할 게시글이 존재하지 않습니다";
     }
 
 }

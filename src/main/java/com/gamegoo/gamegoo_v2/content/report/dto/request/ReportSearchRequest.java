@@ -3,7 +3,6 @@ package com.gamegoo.gamegoo_v2.content.report.dto.request;
 import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.data.domain.Pageable;
 import com.gamegoo.gamegoo_v2.content.report.domain.ReportPath;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,5 @@ public class ReportSearchRequest {
     private Integer reportCountMax;
     private Integer reportCountExact;
     private Boolean isDeleted;
-    private Pageable pageable;
     private List<BanType> banTypes;
-
 }
