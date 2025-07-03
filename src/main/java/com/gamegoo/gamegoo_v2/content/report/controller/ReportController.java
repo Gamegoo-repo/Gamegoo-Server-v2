@@ -64,7 +64,7 @@ public class ReportController {
                    - reportCountMin/Max/Exact: 누적 신고 횟수 필터
                    - isDeleted: 게시물 삭제 여부 (true/false)
                    - banTypes: 제재 상태 (NONE, WARNING, BAN_1D, BAN_3D, BAN_5D, BAN_7D, BAN_1W, BAN_2W, BAN_1M, PERMANENT)
-                   - page/size/sort: 페이징 (예: page=0&size=10&sort=createdAt,desc)
+                   - page/size: 페이징 (예: page=0&size=10)
 
                    **사용 예시:**
                    /api/v2/report/list?reportedMemberKeyword=홍길동#KR1&reportTypes=1,4&startDate=2024-01-01T00:00:00&banTypes=WARNING&page=0&size=10
@@ -84,7 +84,7 @@ public class ReportController {
             @RequestParam(required = false) Boolean isDeleted,
             @RequestParam(required = false) List<BanType> banTypes,
             Pageable pageable) {
-        
+
         ReportSearchRequest request = ReportSearchRequest.builder()
                 .reportedMemberKeyword(reportedMemberKeyword)
                 .reporterKeyword(reporterKeyword)
@@ -99,15 +99,15 @@ public class ReportController {
                 .isDeleted(isDeleted)
                 .banTypes(banTypes)
                 .build();
-                
+
         return ApiResponse.ok(reportFacadeService.searchReports(request, pageable));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "신고 처리 (관리자 전용)", 
+    @Operation(summary = "신고 처리 (관리자 전용)",
                description = """
                    관리자가 신고를 처리하여 제재를 적용하는 API입니다.
-                   
+
                    **Request Body:**
                    - banType: 적용할 제재 유형 (필수)
                      - NONE: 제재 없음
@@ -130,13 +130,13 @@ public class ReportController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "신고된 게시글 삭제 (관리자 전용)", 
+    @Operation(summary = "신고된 게시글 삭제 (관리자 전용)",
                description = """
                    관리자가 신고된 게시글을 삭제하는 API입니다.
-                   
+
                    해당 신고와 연관된 게시글이 있는 경우 삭제 처리되며,
                    게시글이 없는 경우 적절한 메시지가 반환됩니다.
-                   
+
                    **반환 메시지:**
                    - 성공: "신고된 게시글 삭제가 완료되었습니다"
                    - 게시글 없음: "삭제할 게시글이 존재하지 않습니다"

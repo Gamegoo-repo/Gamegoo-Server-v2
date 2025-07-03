@@ -619,11 +619,10 @@ public class ReportControllerTest extends ControllerTestSupport {
             );
             given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
 
-            // when // then - 첫 번째 페이지, 사이즈 10, 생성일 내림차순 정렬
+            // when // then - 첫 번째 페이지, 사이즈 10
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
                             .param("page", "0")
-                            .param("size", "10")
-                            .param("sort", "createdAt,desc"))
+                            .param("size", "10"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data").isArray())
                     .andExpect(jsonPath("$.data[0].content").value("페이징 테스트"));
