@@ -57,7 +57,7 @@ class MemberFacadeServiceRefreshTest {
         when(testMember.getId()).thenReturn(1L);
         when(testMember.getGameName()).thenReturn("TestUser");
         when(testMember.getTag()).thenReturn("KR1");
-        when(testMember.getUpdatedAt()).thenReturn(LocalDateTime.now().minusMinutes(10)); // 10분 전 (갱신 필요)
+        when(testMember.getChampionStatsRefreshedAt()).thenReturn(LocalDateTime.now().minusMinutes(10)); // 10분 전 (갱신 필요)
 
         // Updated member
         updatedMember = mock(Member.class);
@@ -71,7 +71,7 @@ class MemberFacadeServiceRefreshTest {
         when(targetMember.getId()).thenReturn(2L);
         when(targetMember.getGameName()).thenReturn("TargetUser");
         when(targetMember.getTag()).thenReturn("KR1");
-        when(targetMember.getUpdatedAt()).thenReturn(LocalDateTime.now().minusMinutes(6)); // 6분 전 (갱신 필요)
+        when(targetMember.getChampionStatsRefreshedAt()).thenReturn(LocalDateTime.now().minusMinutes(6)); // 6분 전 (갱신 필요)
 
         // Updated target member
         updatedTargetMember = mock(Member.class);
@@ -161,7 +161,7 @@ class MemberFacadeServiceRefreshTest {
         // Given
         Member recentlyUpdatedMember = mock(Member.class);
         when(recentlyUpdatedMember.getId()).thenReturn(1L);
-        when(recentlyUpdatedMember.getUpdatedAt()).thenReturn(LocalDateTime.now().minusMinutes(2)); // 2분 전 (갱신 불필요)
+        when(recentlyUpdatedMember.getChampionStatsRefreshedAt()).thenReturn(LocalDateTime.now().minusMinutes(2)); // 2분 전 (갱신 불필요)
 
         given(memberService.findMemberById(1L)).willReturn(updatedMember);
 
@@ -175,20 +175,20 @@ class MemberFacadeServiceRefreshTest {
     }
 
     @Test
-    @DisplayName("updatedAt이 null인 멤버는 항상 챔피언 통계 갱신 수행")
-    void getMyProfile_AlwaysRefreshesWhenUpdatedAtIsNull() {
+    @DisplayName("championStatsRefreshedAt이 null인 멤버는 항상 챔피언 통계 갱신 수행")
+    void getMyProfile_AlwaysRefreshesWhenChampionStatsRefreshedAtIsNull() {
         // Given
-        Member memberWithNullUpdatedAt = mock(Member.class);
-        when(memberWithNullUpdatedAt.getId()).thenReturn(1L);
-        when(memberWithNullUpdatedAt.getUpdatedAt()).thenReturn(null); // null인 경우
+        Member memberWithNullChampionStatsRefreshedAt = mock(Member.class);
+        when(memberWithNullChampionStatsRefreshedAt.getId()).thenReturn(1L);
+        when(memberWithNullChampionStatsRefreshedAt.getChampionStatsRefreshedAt()).thenReturn(null); // null인 경우
 
         given(memberService.findMemberById(1L)).willReturn(updatedMember);
 
         // When
-        MyProfileResponse result = memberFacadeService.getMyProfile(memberWithNullUpdatedAt);
+        MyProfileResponse result = memberFacadeService.getMyProfile(memberWithNullChampionStatsRefreshedAt);
 
         // Then
-        verify(championStatsRefreshService).refreshChampionStats(memberWithNullUpdatedAt); // null이면 항상 갱신
+        verify(championStatsRefreshService).refreshChampionStats(memberWithNullChampionStatsRefreshedAt); // null이면 항상 갱신
         verify(memberService).findMemberById(1L); // fresh entity 로딩 확인
         assertNotNull(result);
     }
