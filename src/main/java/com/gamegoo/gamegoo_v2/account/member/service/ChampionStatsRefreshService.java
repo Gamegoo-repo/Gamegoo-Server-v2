@@ -32,7 +32,7 @@ public class ChampionStatsRefreshService {
         
         String gameName = freshMember.getGameName();
         String tag = freshMember.getTag();
-        String puuid = riotAuthService.getPuuid(gameName, tag);
+        String puuid = freshMember.getPuuid() != null ? freshMember.getPuuid() : riotAuthService.getPuuid(gameName, tag);
         memberChampionRepository.deleteByMember(freshMember);
         List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
         memberChampionService.saveMemberChampions(freshMember, preferChampionStats);
