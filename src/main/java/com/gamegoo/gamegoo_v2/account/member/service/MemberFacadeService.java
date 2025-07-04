@@ -40,7 +40,10 @@ public class MemberFacadeService {
     public MyProfileResponse getMyProfile(Member member) {
         // 프로필 접근 시 최근 전적 챔피언 정보 자동 갱신
         refreshChampionStatsIfNeeded(member);
-        return MyProfileResponse.of(member);
+        
+        // 업데이트된 데이터를 반영하기 위해 fresh entity 로딩
+        Member freshMember = memberService.findMemberById(member.getId());
+        return MyProfileResponse.of(freshMember);
     }
 
     /**
