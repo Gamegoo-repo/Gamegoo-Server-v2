@@ -139,6 +139,9 @@ public class Member extends BaseDateTimeEntity {
 
     private java.time.LocalDateTime banExpireAt;
 
+    @Column(name = "champion_stats_refreshed_at")
+    private java.time.LocalDateTime championStatsRefreshedAt;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Role role = Role.MEMBER;
@@ -276,6 +279,10 @@ public class Member extends BaseDateTimeEntity {
 
     public void updateRole(Role role) {
         this.role = role;
+    }
+
+    public void updateChampionStatsRefreshedAt() {
+        this.championStatsRefreshedAt = java.time.LocalDateTime.now();
     }
 
     public boolean isBanned() {

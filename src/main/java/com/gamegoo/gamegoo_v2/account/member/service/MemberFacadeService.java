@@ -81,8 +81,8 @@ public class MemberFacadeService {
      * @param member 갱신 대상 사용자
      */
     private void refreshChampionStatsIfNeeded(Member member) {
-        // 마지막 갱신 시간 체크 (5분마다 갱신)
-        LocalDateTime lastRefreshTime = member.getUpdatedAt();
+        // 마지막 챔피언 통계 갱신 시간 체크 (5분마다 갱신)
+        LocalDateTime lastRefreshTime = member.getChampionStatsRefreshedAt();
         LocalDateTime now = LocalDateTime.now();
 
         // 5분 이상 지났거나, 처음 접근하는 경우 갱신
@@ -90,6 +90,8 @@ public class MemberFacadeService {
             ChronoUnit.MINUTES.between(lastRefreshTime, now) >= 5) {
             try {
                 championStatsRefreshService.refreshChampionStats(member);
+                // 갱신 성공 시에만 시간 업데이트
+                member.updateChampionStatsRefreshedAt();
             } catch (Exception e) {
                 // 갱신에 실패하더라도 프로필 조회는 정상적으로 진행되어야 하므로,
                 // 트랜잭션을 분리하고 예외를 전파하지 않습니다.
