@@ -300,6 +300,118 @@ class ReportFacadeServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("신고 처리")
+    class ProcessReportTest {
+
+        @DisplayName("성공: 신고 처리로 제재를 적용한다")
+        @Test
+        void processReport_Success() {
+            // given
+            Report report = createReport();
+            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request = 
+                    com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest.builder()
+                            .banType(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D)
+                            .processReason("부적절한 내용")
+                            .build();
+
+            // when
+            com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse response = 
+                    reportFacadeService.processReport(report.getId(), request);
+
+            // then
+            assertThat(response.getReportId()).isEqualTo(report.getId());
+            assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getAppliedBanType()).isEqualTo(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D);
+            assertThat(response.getBanExpireAt()).isNotNull();
+            assertThat(response.getMessage()).isEqualTo("신고 처리가 완료되었습니다.");
+
+            // 회원 제재 상태 확인
+            Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
+            assertThat(updatedMember.getBanType()).isEqualTo(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D);
+            assertThat(updatedMember.getBanExpireAt()).isNotNull();
+        }
+
+        @DisplayName("실패: 존재하지 않는 신고 ID")
+        @Test
+        void processReport_NotFoundReport() {
+            // given
+            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request = 
+                    com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest.builder()
+                            .banType(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D)
+                            .processReason("부적절한 내용")
+                            .build();
+
+            // when // then
+            assertThatThrownBy(() -> reportFacadeService.processReport(999L, request))
+                    .isInstanceOf(ReportException.class)
+                    .hasMessage(ErrorCode.REPORT_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("신고된 게시글 삭제")
+    class DeleteReportedPostTest {
+
+        @DisplayName("성공: 신고된 게시글 삭제")
+        @Test
+        void deleteReportedPost_Success() {
+            // given
+            Board board = createBoard(targetMember);
+            Report report = createReportWithBoard(board);
+
+            // when
+            String result = reportFacadeService.deleteReportedPost(report.getId());
+
+            // then
+            assertThat(result).isEqualTo("신고된 게시글 삭제가 완료되었습니다");
+            Board deletedBoard = boardRepository.findById(board.getId()).orElseThrow();
+            assertThat(deletedBoard.isDeleted()).isTrue();
+        }
+
+        @DisplayName("성공: 게시글이 없는 신고의 경우 false 반환")
+        @Test
+        void deleteReportedPost_NoBoard() {
+            // given
+            Report report = createReport();
+
+            // when
+            String result = reportFacadeService.deleteReportedPost(report.getId());
+
+            // then
+            assertThat(result).isEqualTo("삭제할 게시글이 존재하지 않습니다");
+        }
+
+        @DisplayName("실패: 존재하지 않는 신고 ID")
+        @Test
+        void deleteReportedPost_NotFoundReport() {
+            // when // then
+            assertThatThrownBy(() -> reportFacadeService.deleteReportedPost(999L))
+                    .isInstanceOf(ReportException.class)
+                    .hasMessage(ErrorCode.REPORT_NOT_FOUND.getMessage());
+        }
+    }
+
+    private Report createReport() {
+        return reportRepository.save(Report.create(
+                member,
+                targetMember,
+                "신고 내용",
+                ReportPath.PROFILE,
+                null
+        ));
+    }
+
+    private Report createReportWithBoard(Board board) {
+        return reportRepository.save(Report.create(
+                member,
+                targetMember,
+                "신고 내용",
+                ReportPath.BOARD,
+                board
+        ));
+    }
+
     private Member createMember(String email, String gameName) {
         return memberRepository.save(Member.builder()
                 .email(email)

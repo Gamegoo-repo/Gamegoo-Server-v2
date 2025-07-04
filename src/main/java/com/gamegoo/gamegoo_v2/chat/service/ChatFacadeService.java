@@ -15,6 +15,7 @@ import com.gamegoo.gamegoo_v2.chat.dto.response.ChatroomResponse;
 import com.gamegoo.gamegoo_v2.chat.dto.response.EnterChatroomResponse;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
+import com.gamegoo.gamegoo_v2.core.common.validator.BanValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.BlockValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.ChatValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
@@ -53,6 +54,7 @@ public class ChatFacadeService {
 
     private final MemberValidator memberValidator;
     private final BlockValidator blockValidator;
+    private final BanValidator banValidator;
     private final ChatValidator chatValidator;
 
     private final ChatResponseFactory chatResponseFactory;
@@ -118,6 +120,9 @@ public class ChatFacadeService {
      */
     @Transactional
     public EnterChatroomResponse startChatroomByBoardId(Member member, Long boardId) {
+        // 채팅 제재 검증
+        banValidator.throwIfBannedFromChatting(member);
+
         // 게시글 검증 및 조회
         Board board = boardService.findBoard(boardId);
 
@@ -194,6 +199,9 @@ public class ChatFacadeService {
     public ChatCreateResponse createChat(ChatCreateRequest request, Long memberId, String uuid) {
         // member 엔티티 조회
         Member member = memberService.findMemberById(memberId);
+
+        // 채팅 제재 검증
+        banValidator.throwIfBannedFromChatting(member);
 
         // chatroom 엔티티 조회
         Chatroom chatroom = chatQueryService.getChatroomByUuid(uuid);

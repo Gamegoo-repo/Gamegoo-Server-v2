@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatQueryService;
+import com.gamegoo.gamegoo_v2.core.common.validator.BanValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.BlockValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MatchingValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
@@ -37,6 +38,7 @@ public class MatchingFacadeService {
     private final ChatCommandService chatCommandService;
     private final MemberValidator memberValidator;
     private final BlockValidator blockValidator;
+    private final BanValidator banValidator;
     private final MemberService memberService;
     private final MatchingService matchingService;
     private final BlockService blockService;
@@ -54,6 +56,9 @@ public class MatchingFacadeService {
     public PriorityListResponse calculatePriorityAndRecording(Long memberId, InitializingMatchingRequest request) {
         // 사용자 조회
         Member member = memberService.findMemberById(memberId);
+
+        // 매칭 제재 검증
+        banValidator.throwIfBannedFromMatching(member);
 
         // 매칭 정보로 member 업데이트
         // 마이크, 포지션 변경

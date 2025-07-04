@@ -124,8 +124,8 @@ public class ReportService {
         return reportRepository.findAll();
     }
 
-    public List<Report> searchReports(ReportSearchRequest request) {
-        return reportRepository.searchReports(request);
+    public List<Report> searchReports(ReportSearchRequest request, org.springframework.data.domain.Pageable pageable) {
+        return reportRepository.searchReports(request, pageable);
     }
 
 }

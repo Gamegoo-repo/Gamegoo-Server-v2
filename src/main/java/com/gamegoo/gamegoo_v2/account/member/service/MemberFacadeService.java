@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.member.service;
 
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.GameStyleRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.IsMikeRequest;
@@ -56,7 +57,7 @@ public class MemberFacadeService {
 
         // 프로필 접근 시 최근 전적 챔피언 정보 자동 갱신
         refreshChampionStatsIfNeeded(targetMember);
-        
+
         // 업데이트된 데이터를 반영하기 위해 fresh entity 로딩
         targetMember = memberService.findMemberById(targetMemberId);
 
@@ -156,6 +157,21 @@ public class MemberFacadeService {
     public String refreshChampionStats(Member member) {
         championStatsRefreshService.refreshChampionStats(member);
         return "챔피언 통계 갱신이 완료되었습니다";
+    }
+
+    /**
+     * 회원의 역할(권한) 변경 기능.
+     * 개발용으로 어드민 권한을 부여하거나 해제할 때 사용됩니다.
+     *
+     * @param memberId 대상 회원 ID
+     * @param role 변경할 역할
+     * @return 성공 메시지
+     */
+    @Transactional
+    public String updateMemberRole(Long memberId, Role role) {
+        Member member = memberService.findMemberById(memberId);
+        memberService.updateMemberRole(member, role);
+        return "회원 권한 변경이 완료되었습니다";
     }
 
 }

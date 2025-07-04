@@ -7,10 +7,13 @@ import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
+import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,7 @@ public class ReportFacadeService {
     private final ReportService reportService;
     private final MemberService memberService;
     private final BoardService boardService;
+    private final BanService banService;
 
     /**
      * 신고 등록 facade 메소드
@@ -59,18 +63,64 @@ public class ReportFacadeService {
     /**
      * 신고 목록 고급 필터링 조회 (관리자용)
      */
-    public List<ReportListResponse> searchReports(ReportSearchRequest request) {
-        return reportService.searchReports(request).stream()
+    public List<ReportListResponse> searchReports(ReportSearchRequest request, org.springframework.data.domain.Pageable pageable) {
+        return reportService.searchReports(request, pageable).stream()
                 .map(report -> ReportListResponse.builder()
                         .reportId(report.getId())
+                        .fromMemberId(report.getFromMember().getId())
                         .fromMemberName(report.getFromMember().getGameName())
+                        .fromMemberTag(report.getFromMember().getTag())
+                        .toMemberId(report.getToMember().getId())
                         .toMemberName(report.getToMember().getGameName())
+                        .toMemberTag(report.getToMember().getTag())
                         .content(report.getContent())
                         .reportType(reportService.getReportTypeString(report.getId()))
                         .path(report.getPath().name())
                         .createdAt(report.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 관리자 신고 처리 facade 메소드
+     *
+     * @param reportId 신고 ID
+     * @param request  신고 처리 요청
+     * @return ReportProcessResponse
+     */
+    @Transactional
+    public ReportProcessResponse processReport(Long reportId, ReportProcessRequest request) {
+        Report report = reportService.findById(reportId);
+        Member targetMember = report.getToMember();
+
+        // 제재 적용
+        banService.applyBan(targetMember, request.getBanType());
+
+        return ReportProcessResponse.of(
+                reportId,
+                targetMember.getId(),
+                request.getBanType(),
+                targetMember.getBanExpireAt()
+        );
+    }
+
+    /**
+     * 신고된 게시글 삭제 facade 메소드
+     *
+     * @param reportId 신고 ID
+     * @return 삭제 결과 메시지
+     */
+    @Transactional
+    public String deleteReportedPost(Long reportId) {
+        Report report = reportService.findById(reportId);
+
+        if (report.getSourceBoard() != null) {
+            Board board = report.getSourceBoard();
+            boardService.deleteBoard(board.getId(), board.getMember().getId());
+            return "신고된 게시글 삭제가 완료되었습니다";
+        }
+
+        return "삭제할 게시글이 존재하지 않습니다";
     }
 
 }
