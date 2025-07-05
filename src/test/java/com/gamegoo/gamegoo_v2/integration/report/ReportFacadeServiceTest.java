@@ -18,6 +18,11 @@ import com.gamegoo.gamegoo_v2.content.report.repository.ReportTypeMappingReposit
 import com.gamegoo.gamegoo_v2.content.report.service.ReportFacadeService;
 import com.gamegoo.gamegoo_v2.core.event.SendReportEmailEvent;
 import com.gamegoo.gamegoo_v2.core.event.listener.EmailEventListener;
+import com.gamegoo.gamegoo_v2.notification.domain.Notification;
+import com.gamegoo.gamegoo_v2.notification.domain.NotificationType;
+import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
+import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
+import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
 import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
@@ -63,6 +68,12 @@ class ReportFacadeServiceTest {
     @Autowired
     private BoardRepository boardRepository;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
+    private NotificationTypeRepository notificationTypeRepository;
+
     @MockitoSpyBean
     private EmailEventListener emailEventListener;
 
@@ -73,10 +84,13 @@ class ReportFacadeServiceTest {
     void setUp() {
         member = createMember("test@gmail.com", "member");
         targetMember = createMember("target@gmail.com", "targetMember");
+
     }
+
 
     @AfterEach
     void tearDown() {
+        notificationRepository.deleteAllInBatch();
         reportTypeMappingRepository.deleteAllInBatch();
         reportRepository.deleteAllInBatch();
         boardRepository.deleteAllInBatch();
@@ -306,17 +320,18 @@ class ReportFacadeServiceTest {
 
         @DisplayName("성공: 신고 처리로 제재를 적용한다")
         @Test
+        @org.springframework.transaction.annotation.Transactional
         void processReport_Success() {
             // given
             Report report = createReport();
-            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request = 
+            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request =
                     com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest.builder()
                             .banType(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D)
                             .processReason("부적절한 내용")
                             .build();
 
             // when
-            com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse response = 
+            com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse response =
                     reportFacadeService.processReport(report.getId(), request);
 
             // then
@@ -330,13 +345,68 @@ class ReportFacadeServiceTest {
             Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
             assertThat(updatedMember.getBanType()).isEqualTo(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D);
             assertThat(updatedMember.getBanExpireAt()).isNotNull();
+
+            // 알림 생성 확인
+            List<Notification> allNotifications = notificationRepository.findAll();
+
+            List<Notification> reporterNotifications = allNotifications.stream()
+                    .filter(n -> n.getMember().getId().equals(member.getId()))
+                    .toList();
+            assertThat(reporterNotifications).hasSize(1);
+            assertThat(reporterNotifications.get(0).getNotificationType().getTitle())
+                    .isEqualTo(NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
+
+            List<Notification> reportedNotifications = allNotifications.stream()
+                    .filter(n -> n.getMember().getId().equals(targetMember.getId()))
+                    .toList();
+            assertThat(reportedNotifications).hasSize(1);
+            assertThat(reportedNotifications.get(0).getNotificationType().getTitle())
+                    .isEqualTo(NotificationTypeTitle.REPORT_PROCESSED_REPORTED);
+        }
+
+        @DisplayName("성공: 신고 처리로 제재 없음(NONE)을 적용한다 - 신고당한 자에게는 알림 미전송")
+        @Test
+        @org.springframework.transaction.annotation.Transactional
+        void processReport_SuccessWithNoBan() {
+            // given
+            Report report = createReport();
+            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request =
+                    com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest.builder()
+                            .banType(com.gamegoo.gamegoo_v2.account.member.domain.BanType.NONE)
+                            .processReason("신고 내용이 부적절하지 않음")
+                            .build();
+
+            // when
+            com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse response =
+                    reportFacadeService.processReport(report.getId(), request);
+
+            // then
+            assertThat(response.getReportId()).isEqualTo(report.getId());
+            assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getAppliedBanType()).isEqualTo(com.gamegoo.gamegoo_v2.account.member.domain.BanType.NONE);
+
+            // 신고자에게만 알림 전송 확인
+            List<Notification> allNotifications = notificationRepository.findAll();
+
+            List<Notification> reporterNotifications = allNotifications.stream()
+                    .filter(n -> n.getMember().getId().equals(member.getId()))
+                    .toList();
+            assertThat(reporterNotifications).hasSize(1);
+            assertThat(reporterNotifications.get(0).getNotificationType().getTitle())
+                    .isEqualTo(NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
+
+            // 신고당한 자에게는 알림 미전송 확인
+            List<Notification> reportedNotifications = allNotifications.stream()
+                    .filter(n -> n.getMember().getId().equals(targetMember.getId()))
+                    .toList();
+            assertThat(reportedNotifications).hasSize(0);
         }
 
         @DisplayName("실패: 존재하지 않는 신고 ID")
         @Test
         void processReport_NotFoundReport() {
             // given
-            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request = 
+            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request =
                     com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest.builder()
                             .banType(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D)
                             .processReason("부적절한 내용")
@@ -393,13 +463,19 @@ class ReportFacadeServiceTest {
     }
 
     private Report createReport() {
-        return reportRepository.save(Report.create(
+        Report report = reportRepository.save(Report.create(
                 member,
                 targetMember,
                 "신고 내용",
                 ReportPath.PROFILE,
                 null
         ));
+
+        // ReportTypeMapping 추가 (테스트용 신고 유형)
+        reportTypeMappingRepository.save(ReportTypeMapping.create(report, 1)); // SPAM
+        reportTypeMappingRepository.save(ReportTypeMapping.create(report, 4)); // HATE_SPEECH
+
+        return report;
     }
 
     private Report createReportWithBoard(Board board) {
