@@ -45,6 +45,8 @@ public class NotificationTypeInitializer implements ApplicationListener<Applicat
         notificationTypes.add(NotificationType.create(NotificationTypeTitle.MANNER_LEVEL_UP));
         notificationTypes.add(NotificationType.create(NotificationTypeTitle.MANNER_LEVEL_DOWN));
         notificationTypes.add(NotificationType.create(NotificationTypeTitle.MANNER_KEYWORD_RATED));
+        notificationTypes.add(NotificationType.create(NotificationTypeTitle.REPORT_PROCESSED_REPORTER));
+        notificationTypes.add(NotificationType.create(NotificationTypeTitle.REPORT_PROCESSED_REPORTED));
 
         notificationTypeRepository.saveAll(notificationTypes);
     }

@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.content.report.service;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
@@ -14,6 +15,7 @@ import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.account.member.service.BanService;
+import com.gamegoo.gamegoo_v2.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ public class ReportFacadeService {
     private final MemberService memberService;
     private final BoardService boardService;
     private final BanService banService;
+    private final NotificationService notificationService;
 
     /**
      * 신고 등록 facade 메소드
@@ -92,9 +95,26 @@ public class ReportFacadeService {
     public ReportProcessResponse processReport(Long reportId, ReportProcessRequest request) {
         Report report = reportService.findById(reportId);
         Member targetMember = report.getToMember();
+        Member reporter = report.getFromMember();
 
         // 제재 적용
         banService.applyBan(targetMember, request.getBanType());
+
+        // 신고 처리 결과 알림 생성
+        String reportTypeString = reportService.getReportTypeString(reportId);
+        String banDescription = banService.getBanReasonMessage(request.getBanType());
+
+        // 신고자에게 알림 전송
+        notificationService.createReportProcessedNotificationForReporter(
+                reporter, reportTypeString, banDescription
+        );
+
+        // 신고 당한 회원에게 알림 전송 (제재가 있는 경우에만)
+        if (request.getBanType() != null && request.getBanType() != BanType.NONE) {
+            notificationService.createReportProcessedNotificationForReported(
+                    targetMember, reportTypeString, banDescription
+            );
+        }
 
         return ReportProcessResponse.of(
                 reportId,

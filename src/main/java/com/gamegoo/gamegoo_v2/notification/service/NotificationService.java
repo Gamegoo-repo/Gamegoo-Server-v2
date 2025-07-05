@@ -1,13 +1,16 @@
 package com.gamegoo.gamegoo_v2.notification.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+
 import com.gamegoo.gamegoo_v2.core.exception.NotificationException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationType;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
+
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import lombok.RequiredArgsConstructor;
@@ -139,6 +142,52 @@ public class NotificationService {
         String notificationContent = notificationType.getContent().replace(PLACEHOLDER, mannerKeywordString);
 
         return saveNotification(notificationType, notificationContent, member, null);
+    }
+
+    /**
+     * 신고 처리 결과 알림 생성 메소드 (신고자)
+     *
+     * @param reporter        신고자
+     * @param reportReason    신고 사유
+     * @param banDescription  제재 설명
+     * @return Notification
+     */
+    @Transactional
+    public Notification createReportProcessedNotificationForReporter(Member reporter, String reportReason, String banDescription) {
+        validateMember(reporter);
+
+        NotificationType notificationType = findNotificationType(NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
+
+        String notificationContent = String.format(
+            "신고 사유: %s\n처리 결과: %s",
+            reportReason,
+            banDescription
+        );
+
+        return saveNotification(notificationType, notificationContent, reporter, null);
+    }
+
+    /**
+     * 신고 처리 결과 알림 생성 메소드 (신고 당한 자)
+     *
+     * @param reported        신고 당한 회원
+     * @param reportReason    신고 사유
+     * @param banDescription  제재 설명
+     * @return Notification
+     */
+    @Transactional
+    public Notification createReportProcessedNotificationForReported(Member reported, String reportReason, String banDescription) {
+        validateMember(reported);
+
+        NotificationType notificationType = findNotificationType(NotificationTypeTitle.REPORT_PROCESSED_REPORTED);
+
+        String notificationContent = String.format(
+            "제한 사유: %s\n제한 기간: %s",
+            reportReason,
+            banDescription
+        );
+
+        return saveNotification(notificationType, notificationContent, reported, null);
     }
 
     /**

@@ -5,6 +5,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -143,6 +144,37 @@ class BanServiceTest {
         // then
         assertThat(member.getBanType()).isEqualTo(BanType.BAN_1D);
         assertThat(member.getBanExpireAt()).isEqualTo(expireAt);
+    }
+
+    @Nested
+    @DisplayName("제재 사유 메시지 변환")
+    class GetBanReasonMessageTest {
+
+        @Test
+        @DisplayName("성공: 모든 BanType에 대한 메시지 변환")
+        void getBanReasonMessage_AllBanTypes_Success() {
+            // when & then
+            assertThat(banService.getBanReasonMessage(BanType.NONE)).isEqualTo("제재 없음");
+            assertThat(banService.getBanReasonMessage(BanType.WARNING)).isEqualTo("경고");
+            assertThat(banService.getBanReasonMessage(BanType.BAN_1D)).isEqualTo("1일 정지");
+            assertThat(banService.getBanReasonMessage(BanType.BAN_3D)).isEqualTo("3일 정지");
+            assertThat(banService.getBanReasonMessage(BanType.BAN_5D)).isEqualTo("5일 정지");
+            assertThat(banService.getBanReasonMessage(BanType.BAN_7D)).isEqualTo("7일 정지");
+            assertThat(banService.getBanReasonMessage(BanType.BAN_1W)).isEqualTo("1주 정지");
+            assertThat(banService.getBanReasonMessage(BanType.BAN_2W)).isEqualTo("2주 정지");
+            assertThat(banService.getBanReasonMessage(BanType.BAN_1M)).isEqualTo("한달 정지");
+            assertThat(banService.getBanReasonMessage(BanType.PERMANENT)).isEqualTo("영구 정지");
+        }
+
+        @Test
+        @DisplayName("성공: null BanType에 대한 default 처리")
+        void getBanReasonMessage_NullBanType_ReturnsDefault() {
+            // when
+            String result = banService.getBanReasonMessage(null);
+
+            // then
+            assertThat(result).isEqualTo("제재 없음");
+        }
     }
 
 }
