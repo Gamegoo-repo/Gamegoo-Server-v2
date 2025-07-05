@@ -84,22 +84,13 @@ class ReportFacadeServiceTest {
     void setUp() {
         member = createMember("test@gmail.com", "member");
         targetMember = createMember("target@gmail.com", "targetMember");
-        setupNotificationTypes();
+
     }
 
-    private void setupNotificationTypes() {
-        // 모든 NotificationType이 없다면 생성
-        for (NotificationTypeTitle title : NotificationTypeTitle.values()) {
-            if (notificationTypeRepository.findNotificationTypeByTitle(title).isEmpty()) {
-                notificationTypeRepository.save(NotificationType.create(title));
-            }
-        }
-    }
 
     @AfterEach
     void tearDown() {
         notificationRepository.deleteAllInBatch();
-        notificationTypeRepository.deleteAllInBatch();
         reportTypeMappingRepository.deleteAllInBatch();
         reportRepository.deleteAllInBatch();
         boardRepository.deleteAllInBatch();
@@ -333,14 +324,14 @@ class ReportFacadeServiceTest {
         void processReport_Success() {
             // given
             Report report = createReport();
-            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request = 
+            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request =
                     com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest.builder()
                             .banType(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D)
                             .processReason("부적절한 내용")
                             .build();
 
             // when
-            com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse response = 
+            com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse response =
                     reportFacadeService.processReport(report.getId(), request);
 
             // then
@@ -357,7 +348,7 @@ class ReportFacadeServiceTest {
 
             // 알림 생성 확인
             List<Notification> allNotifications = notificationRepository.findAll();
-            
+
             List<Notification> reporterNotifications = allNotifications.stream()
                     .filter(n -> n.getMember().getId().equals(member.getId()))
                     .toList();
@@ -379,14 +370,14 @@ class ReportFacadeServiceTest {
         void processReport_SuccessWithNoBan() {
             // given
             Report report = createReport();
-            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request = 
+            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request =
                     com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest.builder()
                             .banType(com.gamegoo.gamegoo_v2.account.member.domain.BanType.NONE)
                             .processReason("신고 내용이 부적절하지 않음")
                             .build();
 
             // when
-            com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse response = 
+            com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse response =
                     reportFacadeService.processReport(report.getId(), request);
 
             // then
@@ -396,7 +387,7 @@ class ReportFacadeServiceTest {
 
             // 신고자에게만 알림 전송 확인
             List<Notification> allNotifications = notificationRepository.findAll();
-            
+
             List<Notification> reporterNotifications = allNotifications.stream()
                     .filter(n -> n.getMember().getId().equals(member.getId()))
                     .toList();
@@ -415,7 +406,7 @@ class ReportFacadeServiceTest {
         @Test
         void processReport_NotFoundReport() {
             // given
-            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request = 
+            com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest request =
                     com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest.builder()
                             .banType(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D)
                             .processReason("부적절한 내용")
@@ -479,11 +470,11 @@ class ReportFacadeServiceTest {
                 ReportPath.PROFILE,
                 null
         ));
-        
+
         // ReportTypeMapping 추가 (테스트용 신고 유형)
         reportTypeMappingRepository.save(ReportTypeMapping.create(report, 1)); // SPAM
         reportTypeMappingRepository.save(ReportTypeMapping.create(report, 4)); // HATE_SPEECH
-        
+
         return report;
     }
 

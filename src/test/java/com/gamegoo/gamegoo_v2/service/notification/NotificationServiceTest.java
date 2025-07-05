@@ -5,7 +5,6 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
-import com.gamegoo.gamegoo_v2.notification.domain.NotificationType;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
@@ -55,22 +54,11 @@ class NotificationServiceTest {
     @BeforeEach
     void setUp() {
         member = createMember("test@gmail.com", "member");
-        setupNotificationTypes();
-    }
-
-    private void setupNotificationTypes() {
-        // 모든 NotificationType이 없다면 생성
-        for (NotificationTypeTitle title : NotificationTypeTitle.values()) {
-            if (notificationTypeRepository.findNotificationTypeByTitle(title).isEmpty()) {
-                notificationTypeRepository.save(NotificationType.create(title));
-            }
-        }
     }
 
     @AfterEach
     void tearDown() {
         notificationRepository.deleteAllInBatch();
-        notificationTypeRepository.deleteAllInBatch();
         mannerKeywordRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
     }
