@@ -45,37 +45,32 @@ public class RiotFacadeService {
      * @param request 소환사명, 태그
      */
     public String verifyRiotAccount(RiotVerifyExistUserRequest request) {
-        // 1. puuid 발급 가능한지 검증
-        String puuid = riotAccountService.getPuuid(request.getGameName(), request.getTag());
+        // puuid 발급 가능한지 검증
+        riotAccountService.getPuuid(request.getGameName(), request.getTag());
 
-        // 2. summonerid 발급 가능한지 검증
-        riotAccountService.getSummonerId(puuid);
         return "해당 Riot 계정은 존재합니다";
     }
 
     @Transactional
     public String join(RiotJoinRequest request) {
-        // 1. [Member] puuid 중복 확인
+        // [Member] puuid 중복 확인
         memberService.checkDuplicateMemberByPuuid(request.getPuuid());
 
-        // 2. [Riot] gameName, Tag 얻기
+        // [Riot] gameName, Tag 얻기
         RiotPuuidGameNameResponse response = riotAccountService.getAccountByPuuid(request.getPuuid());
 
-        // 3. [Riot] summonerId 얻기
-        String summonerId = riotAccountService.getSummonerId(request.getPuuid());
+        // [Riot] tier, rank, winrate 얻기
+        List<TierDetails> tierWinrateRank = riotInfoService.getTierWinrateRank(request.getPuuid());
 
-        // 3. [Riot] tier, rank, winrate 얻기
-        List<TierDetails> tierWinrateRank = riotInfoService.getTierWinrateRank(summonerId);
-
-        // 4. [Member] member DB에 저장
+        // [Member] member DB에 저장
         Member member = memberService.createMemberRiot(request, response.getGameName(), response.getTagLine(),
                 tierWinrateRank);
 
-        // 5. [Riot] 최근 사용한 챔피언 3개 가져오기
+        // [Riot] 최근 사용한 챔피언 3개 가져오기
         List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(response.getGameName()
                 , response.getPuuid());
 
-        // 6. [Member] Member Champion DB 에서 매핑하기
+        // [Member] Member Champion DB 에서 매핑하기
         memberChampionService.saveMemberChampions(member, preferChampionStats);
 
         return "RSO 회원가입이 완료되었습니다.";
