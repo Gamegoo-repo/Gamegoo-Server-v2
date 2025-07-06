@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -104,8 +105,18 @@ class MemberServiceFacadeTest {
         }
 
         // 포지션 지정
-        member.updatePosition(Position.ADC, Position.TOP, List.of(Position.MID, Position.SUP));
-        targetMember.updatePosition(Position.TOP, Position.SUP, List.of(Position.ANY, Position.JUNGLE));
+        member.updatePosition(Position.ADC, Position.TOP, new ArrayList<>());
+        member.getWantP().clear();
+        member.getWantP().add(Position.MID);
+        member.getWantP().add(Position.SUP);
+
+        targetMember.updatePosition(Position.TOP, Position.SUP, new ArrayList<>());
+        targetMember.getWantP().clear();
+        targetMember.getWantP().add(Position.ANY);
+        targetMember.getWantP().add(Position.JUNGLE);
+
+        memberRepository.save(member);
+        memberRepository.save(targetMember);
     }
 
     @AfterEach
@@ -119,36 +130,40 @@ class MemberServiceFacadeTest {
 
     @DisplayName("내 프로필 조회 성공 - Recent Stats 없는 경우")
     @Test
+    @Transactional
     void getProfile() {
+        // DB에서 fresh member 다시 로딩 (wantP 포함)
+        Member freshMember = memberRepository.findById(member.getId()).orElseThrow();
+
         // when
-        MyProfileResponse response = memberFacadeService.getMyProfile(member);
+        MyProfileResponse response = memberFacadeService.getMyProfile(freshMember);
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(member.getId());
-        assertThat(response.getProfileImg()).isEqualTo(member.getProfileImage());
-        assertThat(response.getMike()).isEqualTo(member.getMike());
-        assertThat(response.getEmail()).isEqualTo(member.getEmail());
-        assertThat(response.getGameName()).isEqualTo(member.getGameName());
-        assertThat(response.getTag()).isEqualTo(member.getTag());
-        assertThat(response.getSoloTier()).isEqualTo(member.getSoloTier());
-        assertThat(response.getSoloRank()).isEqualTo(member.getSoloRank());
-        assertThat(response.getSoloWinrate()).isEqualTo(member.getSoloWinRate());
-        assertThat(response.getFreeTier()).isEqualTo(member.getFreeTier());
-        assertThat(response.getFreeRank()).isEqualTo(member.getFreeRank());
-        assertThat(response.getFreeWinrate()).isEqualTo(member.getFreeWinRate());
-        assertThat(response.getMainP()).isEqualTo(member.getMainP());
-        assertThat(response.getSubP()).isEqualTo(member.getSubP());
-        assertThat(response.getWantP()).isEqualTo(member.getWantP());
-        assertThat(response.getIsAgree()).isEqualTo(member.isAgree());
-        assertThat(response.getIsBlind()).isEqualTo(member.getBlind());
-        assertThat(response.getLoginType()).isEqualTo(member.getLoginType().name());
+        assertThat(response.getId()).isEqualTo(freshMember.getId());
+        assertThat(response.getProfileImg()).isEqualTo(freshMember.getProfileImage());
+        assertThat(response.getMike()).isEqualTo(freshMember.getMike());
+        assertThat(response.getEmail()).isEqualTo(freshMember.getEmail());
+        assertThat(response.getGameName()).isEqualTo(freshMember.getGameName());
+        assertThat(response.getTag()).isEqualTo(freshMember.getTag());
+        assertThat(response.getSoloTier()).isEqualTo(freshMember.getSoloTier());
+        assertThat(response.getSoloRank()).isEqualTo(freshMember.getSoloRank());
+        assertThat(response.getSoloWinrate()).isEqualTo(freshMember.getSoloWinRate());
+        assertThat(response.getFreeTier()).isEqualTo(freshMember.getFreeTier());
+        assertThat(response.getFreeRank()).isEqualTo(freshMember.getFreeRank());
+        assertThat(response.getFreeWinrate()).isEqualTo(freshMember.getFreeWinRate());
+        assertThat(response.getMainP()).isEqualTo(freshMember.getMainP());
+        assertThat(response.getSubP()).isEqualTo(freshMember.getSubP());
+        assertThat(response.getWantP()).isEqualTo(freshMember.getWantP());
+        assertThat(response.getIsAgree()).isEqualTo(freshMember.isAgree());
+        assertThat(response.getIsBlind()).isEqualTo(freshMember.getBlind());
+        assertThat(response.getLoginType()).isEqualTo(freshMember.getLoginType().name());
         assertThat(response.getChampionStatsResponseList()).isNotNull();
 
         // MemberRecentStats 검증 - null인 경우를 확인
         assertThat(response.getMemberRecentStats()).isNull();
 
-        List<MemberChampion> memberChampionList = member.getMemberChampionList();
+        List<MemberChampion> memberChampionList = freshMember.getMemberChampionList();
         List<ChampionStatsResponse> championStatsResponseList = response.getChampionStatsResponseList();
 
         assertThat(championStatsResponseList).hasSize(memberChampionList.size());

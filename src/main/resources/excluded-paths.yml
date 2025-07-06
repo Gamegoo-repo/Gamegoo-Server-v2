@@ -28,6 +28,8 @@ security:
       - method: GET
         pattern: /api/v2/posts/list/* # 비회원용 특정 게시글 조회
       - method: GET
+        pattern: /api/v2/posts/cursor # 커서 기반 조회
+      - method: GET
         pattern: /api/v2/manner/keyword/* # 매너 키워드 정보 조회
       - method: GET
         pattern: /api/v2/manner/level/* # 매너 레벨 정보 조회

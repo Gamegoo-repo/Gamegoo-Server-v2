@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.*;
+import com.gamegoo.gamegoo_v2.core.common.validator.BanValidator;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
@@ -31,6 +32,7 @@ public class BoardFacadeService {
     private final BlockService blockService;
     private final ProfanityCheckService profanityCheckService;
     private final MannerService mannerService;
+    private final BanValidator banValidator;
 
     /**
      * 게시글 생성 (파사드)
@@ -40,6 +42,8 @@ public class BoardFacadeService {
      */
     @Transactional
     public BoardInsertResponse createBoard(BoardInsertRequest request, Member member) {
+        // 게시글 작성 제재 검증
+        banValidator.throwIfBannedFromPosting(member);
 
         profanityCheckService.validateProfanity(request.getContents());
         Board board = boardService.createAndSaveBoard(request, member);
@@ -99,6 +103,8 @@ public class BoardFacadeService {
      */
     @Transactional
     public BoardUpdateResponse updateBoard(BoardUpdateRequest request, Member member, Long boardId) {
+        // 게시글 작성 제재 검증
+        banValidator.throwIfBannedFromPosting(member);
 
         profanityCheckService.validateProfanity(request.getContents());
         Board board = boardService.updateBoard(request, member.getId(), boardId);
@@ -143,6 +149,9 @@ public class BoardFacadeService {
 
     @Transactional
     public BoardBumpResponse bumpBoard(Long boardId, Member member) {
+        // 게시글 작성 제재 검증
+        banValidator.throwIfBannedFromPosting(member);
+
         Board board = boardService.bumpBoard(boardId, member.getId());
         return BoardBumpResponse.of(board.getId(), board.getBumpTime());
     }
