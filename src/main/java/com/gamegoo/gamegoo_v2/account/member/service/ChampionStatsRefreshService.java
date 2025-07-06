@@ -32,26 +32,35 @@ public class ChampionStatsRefreshService {
         
         String gameName = freshMember.getGameName();
         String tag = freshMember.getTag();
-        String puuid = riotAuthService.getPuuid(gameName, tag);
-        memberChampionRepository.deleteByMember(freshMember);
-        List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
-        memberChampionService.saveMemberChampions(freshMember, preferChampionStats);
+        String puuid = freshMember.getPuuid() != null ? freshMember.getPuuid() : riotAuthService.getPuuid(gameName, tag);
+        
+        try {
+            // 먼저 새로운 데이터 조회
+            List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
+            var recStats = riotRecordService.getRecent30GameStats(gameName, puuid);
+            
+            // API 호출이 성공한 경우에만 기존 데이터 삭제 후 새로 저장
+            memberChampionRepository.deleteByMember(freshMember);
+            memberChampionService.saveMemberChampions(freshMember, preferChampionStats);
 
-        // 최근 30게임 통계 계산 및 저장
-        var recStats = riotRecordService.getRecent30GameStats(gameName, puuid);
-        MemberRecentStats memberRecentStats = memberRecentStatsRepository.findById(memberId)
-            .orElse(MemberRecentStats.builder().member(freshMember).build());
-        memberRecentStats.update(
-            recStats.getRecTotalWins(),
-            recStats.getRecTotalLosses(),
-            recStats.getRecWinRate(),
-            recStats.getRecAvgKDA(),
-            recStats.getRecAvgKills(),
-            recStats.getRecAvgDeaths(),
-            recStats.getRecAvgAssists(),
-            recStats.getRecAvgCsPerMinute(),
-            recStats.getRecTotalCs()
-        );
-        memberRecentStatsRepository.save(memberRecentStats);
+            // 최근 30게임 통계 계산 및 저장
+            MemberRecentStats memberRecentStats = memberRecentStatsRepository.findById(memberId)
+                .orElse(MemberRecentStats.builder().member(freshMember).build());
+            memberRecentStats.update(
+                recStats.getRecTotalWins(),
+                recStats.getRecTotalLosses(),
+                recStats.getRecWinRate(),
+                recStats.getRecAvgKDA(),
+                recStats.getRecAvgKills(),
+                recStats.getRecAvgDeaths(),
+                recStats.getRecAvgAssists(),
+                recStats.getRecAvgCsPerMinute(),
+                recStats.getRecTotalCs()
+            );
+            memberRecentStatsRepository.save(memberRecentStats);
+        } catch (Exception e) {
+            // Riot API 호출 실패 시 기존 데이터 유지 (롤백)
+            throw new RuntimeException("Riot API 호출 실패로 인한 챔피언 통계 업데이트 실패", e);
+        }
     }
 } 

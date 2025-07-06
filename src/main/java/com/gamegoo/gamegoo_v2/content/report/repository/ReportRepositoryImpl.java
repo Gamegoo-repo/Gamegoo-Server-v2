@@ -17,21 +17,29 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Report> searchReports(ReportSearchRequest request) {
+    public List<Report> searchReports(ReportSearchRequest request, org.springframework.data.domain.Pageable pageable) {
         QReport report = QReport.report;
         QReportTypeMapping reportTypeMapping = QReportTypeMapping.reportTypeMapping;
         QBoard board = QBoard.board;
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        // 1. 신고자 키워드 검색
+        // 1. 신고자 키워드 검색 (gameName, tag, gameName#tag 조합으로 검색)
         if (request.getReporterKeyword() != null && !request.getReporterKeyword().isEmpty()) {
-            builder.and(report.fromMember.gameName.contains(request.getReporterKeyword()));
+            builder.and(
+                report.fromMember.gameName.contains(request.getReporterKeyword())
+                .or(report.fromMember.tag.contains(request.getReporterKeyword()))
+                .or(report.fromMember.gameName.concat("#").concat(report.fromMember.tag).contains(request.getReporterKeyword()))
+            );
         }
 
-        // 2. 피신고자 키워드 검색
+        // 2. 피신고자 키워드 검색 (gameName, tag, gameName#tag 조합으로 검색)
         if (request.getReportedMemberKeyword() != null && !request.getReportedMemberKeyword().isEmpty()) {
-            builder.and(report.toMember.gameName.contains(request.getReportedMemberKeyword()));
+            builder.and(
+                report.toMember.gameName.contains(request.getReportedMemberKeyword())
+                .or(report.toMember.tag.contains(request.getReportedMemberKeyword()))
+                .or(report.toMember.gameName.concat("#").concat(report.toMember.tag).contains(request.getReportedMemberKeyword()))
+            );
         }
 
         // 3. 상세 내용 키워드 검색
@@ -106,11 +114,20 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
             builder.and(report.toMember.banType.in(request.getBanTypes()));
         }
 
-        return queryFactory.selectFrom(report)
+        var query = queryFactory.selectFrom(report)
                 .leftJoin(reportTypeMapping).on(reportTypeMapping.report.eq(report))
                 .leftJoin(report.sourceBoard, board)
+                .leftJoin(report.toMember)    // banTypes 필터 + 피신고자 키워드 검색
+                .leftJoin(report.fromMember)  // 신고자 키워드 검색
                 .where(builder)
-                .distinct()
-                .fetch();
+                .distinct();
+
+        // 페이징 처리 (pageable이 null이 아니고 Unpaged가 아닌 경우에만)
+        if (pageable != null && pageable.isPaged()) {
+            query = query.offset(pageable.getOffset())
+                        .limit(pageable.getPageSize());
+        }
+
+        return new java.util.ArrayList<>(query.fetch());
     }
 }

@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.account.member.controller;
 
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.GameStyleRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.IsMikeRequest;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -78,5 +81,17 @@ public class MemberController {
         return ApiResponse.ok(memberFacadeService.refreshChampionStats(member));
     }
 
+    @Operation(summary = "어드민 권한 부여 API (개발용)", description = "개발용 어드민 권한 부여 API")
+    @PatchMapping("/admin/grant/{memberId}")
+    public ApiResponse<String> grantAdminRole(@PathVariable Long memberId) {
+
+        return ApiResponse.ok(memberFacadeService.updateMemberRole(memberId, Role.ADMIN));
+    }
+
+    @Operation(summary = "일반 사용자 권한으로 변경 API (개발용)", description = "어드민 권한을 일반 사용자로 변경하는 API")
+    @PatchMapping("/admin/revoke/{memberId}")
+    public ApiResponse<String> revokeAdminRole(@PathVariable Long memberId) {
+        return ApiResponse.ok(memberFacadeService.updateMemberRole(memberId, Role.MEMBER));
+    }
 
 }

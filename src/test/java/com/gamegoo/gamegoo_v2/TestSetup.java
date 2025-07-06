@@ -53,7 +53,9 @@ public class TestSetup {
                             NotificationType.create(NotificationTypeTitle.FRIEND_REQUEST_REJECTED),
                             NotificationType.create(NotificationTypeTitle.MANNER_LEVEL_UP),
                             NotificationType.create(NotificationTypeTitle.MANNER_LEVEL_DOWN),
-                            NotificationType.create(NotificationTypeTitle.MANNER_KEYWORD_RATED)
+                            NotificationType.create(NotificationTypeTitle.MANNER_KEYWORD_RATED),
+                            NotificationType.create(NotificationTypeTitle.REPORT_PROCESSED_REPORTER),
+                            NotificationType.create(NotificationTypeTitle.REPORT_PROCESSED_REPORTED)
                     );
                     notificationTypeRepository.saveAll(notificationTypes);
                 }

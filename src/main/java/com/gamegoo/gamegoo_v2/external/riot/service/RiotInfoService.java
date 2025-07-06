@@ -29,7 +29,7 @@ public class RiotInfoService {
     private String riotAPIKey;
 
     private static final String RIOT_LEAGUE_API_URL_TEMPLATE = "https://kr.api.riotgames" +
-            ".com/lol/league/v4/entries/by-summoner/%s?api_key=%s";
+            ".com/lol/league/v4/entries/by-puuid/%s?api_key=%s";
     private static final String RIOT_SOLO_QUEUE_TYPE = "RANKED_SOLO_5x5";
     private static final String RIOT_FREE_QUEUE_TYPE = "RANKED_FLEX_SR";
     private static final Map<String, Integer> romanToIntMap = Map.of(
@@ -39,15 +39,15 @@ public class RiotInfoService {
     /**
      * 티어, 랭크, 승률 조회
      *
-     * @param encryptedSummonerId 암호화된 소환사 id
+     * @param puuid 암호화된 소환사 id
      * @return 소환사 정보
      */
-    public List<TierDetails> getTierWinrateRank(String encryptedSummonerId) {
+    public List<TierDetails> getTierWinrateRank(String puuid) {
         // 티어 정보
         List<TierDetails> tierDetails = new ArrayList<>();
 
         // riot API 호출
-        String url = String.format(RIOT_LEAGUE_API_URL_TEMPLATE, encryptedSummonerId, riotAPIKey);
+        String url = String.format(RIOT_LEAGUE_API_URL_TEMPLATE, puuid, riotAPIKey);
         try {
             RiotInfoResponse[] responses = restTemplate.getForObject(url, RiotInfoResponse[].class);
             if (responses != null) {

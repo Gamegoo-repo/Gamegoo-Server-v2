@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.member.domain;
 
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
@@ -138,6 +139,13 @@ public class Member extends BaseDateTimeEntity {
 
     private java.time.LocalDateTime banExpireAt;
 
+    @Column(name = "champion_stats_refreshed_at")
+    private java.time.LocalDateTime championStatsRefreshedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
+    private Role role = Role.MEMBER;
+
     // puuid 전용
     public static Member createForGeneral(String email, String password, LoginType loginType, String gameName,
                                           String tag,
@@ -257,6 +265,49 @@ public class Member extends BaseDateTimeEntity {
 
     public void deactiveMember() {
         this.blind = true;
+    }
+
+    public void applyBan(BanType banType, java.time.LocalDateTime banExpireAt) {
+        this.banType = banType;
+        this.banExpireAt = banExpireAt;
+    }
+
+    public void releaseBan() {
+        this.banType = BanType.NONE;
+        this.banExpireAt = null;
+    }
+
+    public void updateRole(Role role) {
+        this.role = role;
+    }
+
+    public void updateChampionStatsRefreshedAt() {
+        this.championStatsRefreshedAt = java.time.LocalDateTime.now();
+    }
+
+    public boolean isBanned() {
+        if (banType == BanType.NONE) {
+            return false;
+        }
+        if (banType == BanType.PERMANENT) {
+            return true;
+        }
+        if (banExpireAt == null) {
+            return false;
+        }
+        return java.time.LocalDateTime.now().isBefore(banExpireAt);
+    }
+
+    public boolean canWritePost() {
+        return !isBanned();
+    }
+
+    public boolean canChat() {
+        return !isBanned();
+    }
+
+    public boolean canMatch() {
+        return !isBanned();
     }
 
 }

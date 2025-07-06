@@ -6,10 +6,10 @@ import lombok.Getter;
 public class RiotInfoResponse {
 
     String leagueId;
+    String puuid;
     String queueType;
     String tier;
     String rank;
-    String summonerId;
     int leaguePoints;
     int wins;
     int losses;
