@@ -71,7 +71,7 @@ public class Board extends BaseDateTimeEntity {
     private boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = true)
     private Member member;
 
     @Column(length = 50)
