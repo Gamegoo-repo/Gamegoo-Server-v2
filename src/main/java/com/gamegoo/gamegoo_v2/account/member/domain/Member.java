@@ -146,6 +146,13 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Role role = Role.MEMBER;
 
+    public void setMemberRecentStats(MemberRecentStats stats) {
+        this.memberRecentStats = stats;
+        if (stats.getMember() != this) {
+            stats.setMember(this);
+        }
+    }
+
     // puuid 전용
     public static Member createForGeneral(String email, String password, LoginType loginType, String gameName,
                                           String tag,
