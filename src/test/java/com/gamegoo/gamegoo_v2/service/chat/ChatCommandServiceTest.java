@@ -2,9 +2,11 @@ package com.gamegoo.gamegoo_v2.service.chat;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
 import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
@@ -75,6 +77,9 @@ class ChatCommandServiceTest {
     @Autowired
     private BoardRepository boardRepository;
 
+    @Autowired
+    private MemberRecentStatsRepository memberRecentStatsRepository;
+
     @MockitoSpyBean
     private MemberRepository memberRepository;
 
@@ -92,6 +97,7 @@ class ChatCommandServiceTest {
 
     @AfterEach
     void tearDown() {
+        memberRecentStatsRepository.deleteAll();
         chatRepository.deleteAllInBatch();
         memberChatroomRepository.deleteAllInBatch();
         chatroomRepository.deleteAllInBatch();
@@ -479,8 +485,9 @@ class ChatCommandServiceTest {
 
     }
 
+
     private Member createMember(String email, String gameName) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password("testPassword")
                 .profileImage(1)
@@ -496,7 +503,13 @@ class ChatCommandServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
+                .build();
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
                 .build());
+
+        return memberRepository.save(member);
     }
 
     private Chatroom createChatroom() {
