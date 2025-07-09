@@ -43,7 +43,7 @@ public class DiscordLogger {
         try {
             restTemplate.postForEntity(webhookUrl, entity, String.class);
         } catch (Exception e) {
-            log.error("디스코드 전송 실패", e);
+            //log.error("디스코드 전송 실패", e);
         }
     }
 
