@@ -18,11 +18,13 @@ import com.gamegoo.gamegoo_v2.account.member.repository.MemberGameStyleRepositor
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberFacadeService;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
 import com.gamegoo.gamegoo_v2.game.domain.Champion;
 import com.gamegoo.gamegoo_v2.game.domain.GameStyle;
 import com.gamegoo.gamegoo_v2.game.repository.ChampionRepository;
 import com.gamegoo.gamegoo_v2.game.repository.GameStyleRepository;
-import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,9 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -176,13 +175,21 @@ class MemberServiceFacadeTest {
             assertThat(championResponse.getChampionName()).isEqualTo(memberChampion.getChampion().getName());
             assertThat(championResponse.getWins()).isEqualTo(memberChampion.getWins());
             assertThat(championResponse.getGames()).isEqualTo(memberChampion.getGames());
-            assertThat(championResponse.getWinRate()).isEqualTo(memberChampion.getWins() / (double) memberChampion.getGames());
+            assertThat(championResponse.getWinRate()).isEqualTo(
+                    memberChampion.getWins() / (double) memberChampion.getGames());
             assertThat(championResponse.getCsPerMinute()).isEqualTo(memberChampion.getCsPerMinute());
-            assertThat(championResponse.getAverageCs()).isEqualTo(memberChampion.getGames() > 0 ? (double) memberChampion.getTotalCs() / memberChampion.getGames() : 0);
+            assertThat(championResponse.getAverageCs()).isEqualTo(
+                    memberChampion.getGames() > 0 ? (double) memberChampion.getTotalCs() / memberChampion.getGames()
+                            : 0);
             assertThat(championResponse.getKda()).isEqualTo(memberChampion.getKDA());
-            assertThat(championResponse.getKills()).isEqualTo(memberChampion.getGames() > 0 ? (double) memberChampion.getKills() / memberChampion.getGames() : 0);
-            assertThat(championResponse.getDeaths()).isEqualTo(memberChampion.getGames() > 0 ? (double) memberChampion.getDeaths() / memberChampion.getGames() : 0);
-            assertThat(championResponse.getAssists()).isEqualTo(memberChampion.getGames() > 0 ? (double) memberChampion.getAssists() / memberChampion.getGames() : 0);
+            assertThat(championResponse.getKills()).isEqualTo(
+                    memberChampion.getGames() > 0 ? (double) memberChampion.getKills() / memberChampion.getGames() : 0);
+            assertThat(championResponse.getDeaths()).isEqualTo(
+                    memberChampion.getGames() > 0 ? (double) memberChampion.getDeaths() / memberChampion.getGames() :
+                            0);
+            assertThat(championResponse.getAssists()).isEqualTo(
+                    memberChampion.getGames() > 0 ? (double) memberChampion.getAssists() / memberChampion.getGames()
+                            : 0);
         }
     }
 
@@ -243,13 +250,21 @@ class MemberServiceFacadeTest {
             assertThat(championResponse.getChampionName()).isEqualTo(memberChampion.getChampion().getName());
             assertThat(championResponse.getWins()).isEqualTo(memberChampion.getWins());
             assertThat(championResponse.getGames()).isEqualTo(memberChampion.getGames());
-            assertThat(championResponse.getWinRate()).isEqualTo(memberChampion.getWins() / (double) memberChampion.getGames());
+            assertThat(championResponse.getWinRate()).isEqualTo(
+                    memberChampion.getWins() / (double) memberChampion.getGames());
             assertThat(championResponse.getCsPerMinute()).isEqualTo(memberChampion.getCsPerMinute());
-            assertThat(championResponse.getAverageCs()).isEqualTo(memberChampion.getGames() > 0 ? (double) memberChampion.getTotalCs() / memberChampion.getGames() : 0);
+            assertThat(championResponse.getAverageCs()).isEqualTo(
+                    memberChampion.getGames() > 0 ? (double) memberChampion.getTotalCs() / memberChampion.getGames()
+                            : 0);
             assertThat(championResponse.getKda()).isEqualTo(memberChampion.getKDA());
-            assertThat(championResponse.getKills()).isEqualTo(memberChampion.getGames() > 0 ? (double) memberChampion.getKills() / memberChampion.getGames() : 0);
-            assertThat(championResponse.getDeaths()).isEqualTo(memberChampion.getGames() > 0 ? (double) memberChampion.getDeaths() / memberChampion.getGames() : 0);
-            assertThat(championResponse.getAssists()).isEqualTo(memberChampion.getGames() > 0 ? (double) memberChampion.getAssists() / memberChampion.getGames() : 0);
+            assertThat(championResponse.getKills()).isEqualTo(
+                    memberChampion.getGames() > 0 ? (double) memberChampion.getKills() / memberChampion.getGames() : 0);
+            assertThat(championResponse.getDeaths()).isEqualTo(
+                    memberChampion.getGames() > 0 ? (double) memberChampion.getDeaths() / memberChampion.getGames() :
+                            0);
+            assertThat(championResponse.getAssists()).isEqualTo(
+                    memberChampion.getGames() > 0 ? (double) memberChampion.getAssists() / memberChampion.getGames()
+                            : 0);
         }
     }
 
@@ -412,9 +427,8 @@ class MemberServiceFacadeTest {
 
     }
 
-
     private Member createForGeneralMember(String email, String gameName) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password("testPassword")
                 .profileImage(1)
@@ -430,7 +444,13 @@ class MemberServiceFacadeTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
+                .build();
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
                 .build());
+
+        return memberRepository.save(member);
     }
 
     private Champion initChampion(Long id, String name) {
@@ -453,18 +473,18 @@ class MemberServiceFacadeTest {
         Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow();
 
         MemberRecentStats recentStats = MemberRecentStats.builder()
-            .memberId(refreshedMember.getId())
-            .member(refreshedMember)
-            .recTotalWins(25)
-            .recTotalLosses(15)
-            .recWinRate(62.5)
-            .recAvgKDA(2.5)
-            .recAvgKills(8.5)
-            .recAvgDeaths(3.2)
-            .recAvgAssists(9.1)
-            .recAvgCsPerMinute(6.8)
-            .recTotalCs(1360)
-            .build();
+                .memberId(refreshedMember.getId())
+                .member(refreshedMember)
+                .recTotalWins(25)
+                .recTotalLosses(15)
+                .recWinRate(62.5)
+                .recAvgKDA(2.5)
+                .recAvgKills(8.5)
+                .recAvgDeaths(3.2)
+                .recAvgAssists(9.1)
+                .recAvgCsPerMinute(6.8)
+                .recTotalCs(1360)
+                .build();
         memberRecentStatsRepository.save(recentStats);
     }
 

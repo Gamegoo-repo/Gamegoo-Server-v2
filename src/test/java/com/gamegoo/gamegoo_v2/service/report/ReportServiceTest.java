@@ -2,7 +2,11 @@ package com.gamegoo.gamegoo_v2.service.report;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
+import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
+import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
@@ -17,8 +21,6 @@ import com.gamegoo.gamegoo_v2.core.event.listener.EmailEventListener;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
-import com.gamegoo.gamegoo_v2.account.member.domain.Position;
-import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,6 +61,9 @@ class ReportServiceTest {
     @Autowired
     private BoardRepository boardRepository;
 
+    @Autowired
+    private MemberRecentStatsRepository memberRecentStatsRepository;
+
     @MockitoSpyBean
     private EmailEventListener emailEventListener;
 
@@ -75,6 +80,7 @@ class ReportServiceTest {
 
     @AfterEach
     void tearDown() {
+        memberRecentStatsRepository.deleteAll();
         reportTypeMappingRepository.deleteAllInBatch();
         reportRepository.deleteAllInBatch();
         boardRepository.deleteAllInBatch();
@@ -94,7 +100,8 @@ class ReportServiceTest {
             Integer pathCode = 1;
 
             // when // then
-            assertThatThrownBy(() -> reportService.insertReport(fromMember, fromMember, reportCodes, content, pathCode, null))
+            assertThatThrownBy(
+                    () -> reportService.insertReport(fromMember, fromMember, reportCodes, content, pathCode, null))
                     .hasMessage(ErrorCode._BAD_REQUEST.getMessage());
         }
 
@@ -110,7 +117,8 @@ class ReportServiceTest {
             Integer pathCode = 1;
 
             // when // then
-            assertThatThrownBy(() -> reportService.insertReport(fromMember, toMember, reportCodes, content, pathCode, null))
+            assertThatThrownBy(
+                    () -> reportService.insertReport(fromMember, toMember, reportCodes, content, pathCode, null))
                     .hasMessage(ErrorCode.TARGET_MEMBER_DEACTIVATED.getMessage());
         }
 
@@ -192,6 +200,7 @@ class ReportServiceTest {
             assertThat(mappings).hasSize(2);
             mappings.forEach(mapping -> assertThat(mapping.getCode()).isIn(reportCodes));
         }
+
     }
 
     @Nested
@@ -238,6 +247,7 @@ class ReportServiceTest {
             // then
             assertThat(exists).isFalse();
         }
+
     }
 
     @Nested
@@ -248,7 +258,8 @@ class ReportServiceTest {
         @Test
         void findByIdSucceeds() {
             // given
-            Report savedReport = reportRepository.save(Report.create(fromMember, toMember, "content", ReportPath.CHAT, null));
+            Report savedReport = reportRepository.save(
+                    Report.create(fromMember, toMember, "content", ReportPath.CHAT, null));
 
             // when
             Report result = reportService.findById(savedReport.getId());
@@ -268,6 +279,7 @@ class ReportServiceTest {
                     .isInstanceOf(ReportException.class)
                     .hasMessage(ErrorCode.REPORT_NOT_FOUND.getMessage());
         }
+
     }
 
     @Nested
@@ -278,7 +290,8 @@ class ReportServiceTest {
         @Test
         void getReportTypeStringSucceeds() {
             // given
-            Report savedReport = reportRepository.save(Report.create(fromMember, toMember, "content", ReportPath.CHAT, null));
+            Report savedReport = reportRepository.save(
+                    Report.create(fromMember, toMember, "content", ReportPath.CHAT, null));
             reportTypeMappingRepository.save(ReportTypeMapping.create(savedReport, 4));
             reportTypeMappingRepository.save(ReportTypeMapping.create(savedReport, 2));
 
@@ -295,7 +308,8 @@ class ReportServiceTest {
         @Test
         void getReportTypeStringSucceedsWithSingleType() {
             // given
-            Report savedReport = reportRepository.save(Report.create(fromMember, toMember, "content", ReportPath.CHAT, null));
+            Report savedReport = reportRepository.save(
+                    Report.create(fromMember, toMember, "content", ReportPath.CHAT, null));
             reportTypeMappingRepository.save(ReportTypeMapping.create(savedReport, 4));
 
             // when
@@ -304,6 +318,7 @@ class ReportServiceTest {
             // then
             assertThat(result).isEqualTo("욕설/ 혐오/ 차별적 표현");
         }
+
     }
 
     @Nested
@@ -314,8 +329,10 @@ class ReportServiceTest {
         @Test
         void getAllReportsSucceeds() {
             // given
-            Report report1 = reportRepository.save(Report.create(fromMember, toMember, "content1", ReportPath.CHAT, null));
-            Report report2 = reportRepository.save(Report.create(toMember, fromMember, "content2", ReportPath.BOARD, board));
+            Report report1 = reportRepository.save(
+                    Report.create(fromMember, toMember, "content1", ReportPath.CHAT, null));
+            Report report2 = reportRepository.save(
+                    Report.create(toMember, fromMember, "content2", ReportPath.BOARD, board));
 
             // when
             List<Report> results = reportService.getAllReports();
@@ -335,10 +352,11 @@ class ReportServiceTest {
             // then
             assertThat(results).isEmpty();
         }
+
     }
 
     private Member createMember(String email, String gameName) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password("testPassword")
                 .profileImage(1)
@@ -354,7 +372,13 @@ class ReportServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
+                .build();
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
                 .build());
+
+        return memberRepository.save(member);
     }
 
     private Board createBoard(Member member) {
@@ -369,4 +393,5 @@ class ReportServiceTest {
                 .boardProfileImage(1)
                 .build());
     }
+
 }

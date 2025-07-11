@@ -2,9 +2,11 @@ package com.gamegoo.gamegoo_v2.service.board;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
@@ -38,6 +40,9 @@ public class BoardServiceTest {
     MemberRepository memberRepository;
 
     @Autowired
+    MemberRecentStatsRepository memberRecentStatsRepository;
+
+    @Autowired
     BoardRepository boardRepository;
 
     @Autowired
@@ -50,6 +55,7 @@ public class BoardServiceTest {
 
     @AfterEach
     void tearDown() {
+        memberRecentStatsRepository.deleteAll();
         boardRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
     }
@@ -157,6 +163,7 @@ public class BoardServiceTest {
                     .isInstanceOf(BoardException.class)
                     .hasFieldOrPropertyWithValue("code", ErrorCode.BOARD_NOT_FOUND.getCode());
         }
+
     }
 
     @Nested
@@ -191,11 +198,11 @@ public class BoardServiceTest {
             assertThat(result.hasNext()).isFalse();
             // 최신순 정렬 확인 (activityTime 기준)
             assertThat(result.getContent()).isSortedAccordingTo(
-                (b1, b2) -> {
-                    LocalDateTime t1 = b1.getBumpTime() != null ? b1.getBumpTime() : b1.getCreatedAt();
-                    LocalDateTime t2 = b2.getBumpTime() != null ? b2.getBumpTime() : b2.getCreatedAt();
-                    return t2.compareTo(t1);
-                }
+                    (b1, b2) -> {
+                        LocalDateTime t1 = b1.getBumpTime() != null ? b1.getBumpTime() : b1.getCreatedAt();
+                        LocalDateTime t2 = b2.getBumpTime() != null ? b2.getBumpTime() : b2.getCreatedAt();
+                        return t2.compareTo(t1);
+                    }
             );
         }
 
@@ -229,15 +236,16 @@ public class BoardServiceTest {
 
             // when - 두 번째 페이지 조회
             var lastActivityTime = firstPage.getContent().get(firstPage.getContent().size() - 1).getBumpTime() != null ?
-                firstPage.getContent().get(firstPage.getContent().size() - 1).getBumpTime() :
-                firstPage.getContent().get(firstPage.getContent().size() - 1).getCreatedAt();
+                    firstPage.getContent().get(firstPage.getContent().size() - 1).getBumpTime() :
+                    firstPage.getContent().get(firstPage.getContent().size() - 1).getCreatedAt();
             var secondPage = boardService.getMyBoards(member.getId(), lastActivityTime);
 
             // then - 두 번째 페이지 검증
             System.out.println("secondPage.getContent().size() = " + secondPage.getContent().size());
             for (Board board : secondPage.getContent()) {
                 LocalDateTime activityTime = board.getBumpTime() != null ? board.getBumpTime() : board.getCreatedAt();
-                System.out.println("activityTime = " + activityTime + ", gameMode = " + board.getGameMode() + ", mainP = " + board.getMainP() + ", subP = " + board.getSubP());
+                System.out.println(
+                        "activityTime = " + activityTime + ", gameMode = " + board.getGameMode() + ", mainP = " + board.getMainP() + ", subP = " + board.getSubP());
             }
             assertThat(secondPage.getContent()).hasSize(5);
             assertThat(secondPage.hasNext()).isFalse();
@@ -273,9 +281,10 @@ public class BoardServiceTest {
             // then
             assertThat(result.getContent()).hasSize(2);
             assertThat(result.getContent()).allSatisfy(board ->
-                assertThat(board.isDeleted()).isFalse()
+                    assertThat(board.isDeleted()).isFalse()
             );
         }
+
     }
 
     @Nested
@@ -309,11 +318,11 @@ public class BoardServiceTest {
             assertThat(result.getContent()).hasSize(10);
             assertThat(result.hasNext()).isFalse();
             assertThat(result.getContent()).isSortedAccordingTo(
-                (b1, b2) -> {
-                    LocalDateTime t1 = b1.getBumpTime() != null ? b1.getBumpTime() : b1.getCreatedAt();
-                    LocalDateTime t2 = b2.getBumpTime() != null ? b2.getBumpTime() : b2.getCreatedAt();
-                    return t2.compareTo(t1);
-                }
+                    (b1, b2) -> {
+                        LocalDateTime t1 = b1.getBumpTime() != null ? b1.getBumpTime() : b1.getCreatedAt();
+                        LocalDateTime t2 = b2.getBumpTime() != null ? b2.getBumpTime() : b2.getCreatedAt();
+                        return t2.compareTo(t1);
+                    }
             );
         }
 
@@ -340,15 +349,18 @@ public class BoardServiceTest {
             }
 
             // 첫 페이지 조회
-            Slice<Board> firstPage = boardService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE);
+            Slice<Board> firstPage = boardService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.GOLD,
+                    Position.TOP, Position.JUNGLE);
             assertThat(firstPage.getContent()).hasSize(10);
             assertThat(firstPage.hasNext()).isTrue();
 
             // 두 번째 페이지 조회
             Board lastBoard = firstPage.getContent().get(firstPage.getContent().size() - 1);
-            LocalDateTime lastActivityTime = lastBoard.getBumpTime() != null ? lastBoard.getBumpTime() : lastBoard.getCreatedAt();
+            LocalDateTime lastActivityTime = lastBoard.getBumpTime() != null ? lastBoard.getBumpTime() :
+                    lastBoard.getCreatedAt();
             Long lastId = lastBoard.getId();
-            Slice<Board> secondPage = boardService.getAllBoardsWithCursor(lastActivityTime, lastId, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE);
+            Slice<Board> secondPage = boardService.getAllBoardsWithCursor(lastActivityTime, lastId, GameMode.SOLO,
+                    Tier.GOLD, Position.TOP, Position.JUNGLE);
 
             // then
             assertThat(secondPage.getContent()).hasSize(5);
@@ -384,29 +396,33 @@ public class BoardServiceTest {
             }
 
             // when - 첫 페이지 조회
-            Slice<Board> firstPage = boardService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.IRON, Position.TOP, Position.JUNGLE);
+            Slice<Board> firstPage = boardService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.IRON,
+                    Position.TOP, Position.JUNGLE);
 
             // nextCursor, cursorId 추출
             Board lastBoard = firstPage.getContent().get(firstPage.getContent().size() - 1);
-            LocalDateTime nextCursor = lastBoard.getBumpTime() != null ? lastBoard.getBumpTime() : lastBoard.getCreatedAt();
+            LocalDateTime nextCursor = lastBoard.getBumpTime() != null ? lastBoard.getBumpTime() :
+                    lastBoard.getCreatedAt();
             Long nextCursorId = lastBoard.getId();
 
             // when - 두 번째 페이지 조회
-            Slice<Board> secondPage = boardService.getAllBoardsWithCursor(nextCursor, nextCursorId, GameMode.SOLO, Tier.IRON, Position.TOP, Position.JUNGLE);
+            Slice<Board> secondPage = boardService.getAllBoardsWithCursor(nextCursor, nextCursorId, GameMode.SOLO,
+                    Tier.IRON, Position.TOP, Position.JUNGLE);
 
             // then
             assertThat(secondPage.getContent()).allSatisfy(board -> {
                 LocalDateTime activityTime = board.getBumpTime() != null ? board.getBumpTime() : board.getCreatedAt();
                 assertThat(
-                    activityTime.isBefore(nextCursor) ||
-                    (activityTime.equals(nextCursor) && board.getId() < nextCursorId)
+                        activityTime.isBefore(nextCursor) ||
+                                (activityTime.equals(nextCursor) && board.getId() < nextCursorId)
                 ).isTrue();
             });
         }
+
     }
 
     private Member createMember(String email, String gameName) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password("testPassword")
                 .profileImage(1)
@@ -422,9 +438,14 @@ public class BoardServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
-                .build());
-    }
+                .build();
 
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
+                .build());
+
+        return memberRepository.save(member);
+    }
 
 
 }

@@ -2,7 +2,9 @@ package com.gamegoo.gamegoo_v2.service.batch;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.batch.BatchService;
 import jakarta.persistence.EntityManager;
@@ -36,11 +38,15 @@ public class BatchServiceTest {
     @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    MemberRecentStatsRepository memberRecentStatsRepository;
+
     @MockitoSpyBean
     EntityManager entityManager;
 
     @AfterEach
     void tearDown() {
+        memberRecentStatsRepository.deleteAll();
         memberRepository.deleteAllInBatch();
     }
 
@@ -143,7 +149,7 @@ public class BatchServiceTest {
     }
 
     private Member createMember(String email, String gameName) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password("testPassword")
                 .profileImage(1)
@@ -159,7 +165,13 @@ public class BatchServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
+                .build();
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
                 .build());
+
+        return memberRepository.save(member);
     }
 
 }

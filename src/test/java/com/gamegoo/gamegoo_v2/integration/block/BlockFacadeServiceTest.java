@@ -2,7 +2,9 @@ package com.gamegoo.gamegoo_v2.integration.block;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.BlockException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
@@ -49,6 +51,9 @@ class BlockFacadeServiceTest {
     @Autowired
     private FriendRequestRepository friendRequestRepository;
 
+    @Autowired
+    private MemberRecentStatsRepository memberRecentStatsRepository;
+
     private static final String MEMBER_EMAIL = "test@gmail.com";
     private static final String MEMBER_GAMENAME = "member";
     private static final String TARGET_EMAIL = "target@naver.com";
@@ -63,6 +68,7 @@ class BlockFacadeServiceTest {
 
     @AfterEach
     void tearDown() {
+        memberRecentStatsRepository.deleteAll();
         blockRepository.deleteAllInBatch();
         friendRepository.deleteAllInBatch();
         friendRequestRepository.deleteAllInBatch();
@@ -353,7 +359,7 @@ class BlockFacadeServiceTest {
     }
 
     private Member createMember(String email, String gameName) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password("testPassword")
                 .profileImage(1)
@@ -369,7 +375,13 @@ class BlockFacadeServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
+                .build();
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
                 .build());
+
+        return memberRepository.save(member);
     }
 
 }
