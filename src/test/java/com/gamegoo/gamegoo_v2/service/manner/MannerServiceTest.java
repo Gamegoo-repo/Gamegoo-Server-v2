@@ -2,7 +2,9 @@ package com.gamegoo.gamegoo_v2.service.manner;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRating;
@@ -44,8 +46,12 @@ public class MannerServiceTest {
     @Autowired
     MannerRatingKeywordRepository mannerRatingKeywordRepository;
 
+    @Autowired
+    MemberRecentStatsRepository memberRecentStatsRepository;
+
     @AfterEach
     void tearDown() {
+        memberRecentStatsRepository.deleteAll();
         mannerRatingKeywordRepository.deleteAllInBatch();
         mannerRatingRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
@@ -238,7 +244,7 @@ public class MannerServiceTest {
     }
 
     private Member createMember(String email, String gameName) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password("testPassword")
                 .profileImage(1)
@@ -254,7 +260,13 @@ public class MannerServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
+                .build();
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
                 .build());
+
+        return memberRepository.save(member);
     }
 
 }

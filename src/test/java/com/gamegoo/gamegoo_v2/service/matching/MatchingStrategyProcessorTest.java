@@ -1,10 +1,12 @@
 package com.gamegoo.gamegoo_v2.service.matching;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
@@ -33,9 +35,13 @@ class MatchingStrategyProcessorTest {
     @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    MemberRecentStatsRepository memberRecentStatsRepository;
+
     @AfterEach
     void tearDown() {
-        memberRepository.deleteAll();
+        memberRecentStatsRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     @Test
@@ -337,6 +343,10 @@ class MatchingStrategyProcessorTest {
         } else {
             member.updateMike(Mike.UNAVAILABLE);
         }
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
+                .build());
 
         return memberRepository.save(member);
 

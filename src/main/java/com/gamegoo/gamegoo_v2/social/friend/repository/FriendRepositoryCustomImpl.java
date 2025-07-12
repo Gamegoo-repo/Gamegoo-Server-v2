@@ -21,6 +21,7 @@ public class FriendRepositoryCustomImpl implements FriendRepositoryCustom {
     public List<Friend> findAllFriendsOrdered(Long memberId) {
         // 전체 친구 목록 조회
         List<Friend> allFriends = queryFactory.selectFrom(friend)
+                .join(friend.toMember).fetchJoin()
                 .where(friend.fromMember.id.eq(memberId))
                 .fetch();
 
