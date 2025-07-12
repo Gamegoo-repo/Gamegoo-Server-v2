@@ -5,13 +5,20 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardCursorResponse;
+import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardListResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardResponse;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
+import com.gamegoo.gamegoo_v2.content.board.service.BoardGameStyleService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
+import com.gamegoo.gamegoo_v2.content.board.service.ProfanityCheckService;
+import com.gamegoo.gamegoo_v2.core.exception.BoardException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
@@ -36,8 +43,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -57,6 +65,15 @@ class BoardFacadeServiceTest {
 
     @Mock
     private MannerService mannerService;
+
+    @Mock
+    private BoardGameStyleService boardGameStyleService;
+
+    @Mock
+    private ProfanityCheckService profanityCheckService;
+
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private BoardFacadeService boardFacadeService;
@@ -744,6 +761,103 @@ class BoardFacadeServiceTest {
         assertThat(response.getMyBoards()).isSortedAccordingTo(
             (b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())
         );
+    }
+
+    @Nested
+    @DisplayName("게스트 게시글 작성")
+    class CreateGuestBoardTest {
+
+        private BoardInsertRequest createBoardInsertRequest() {
+            BoardInsertRequest request = new BoardInsertRequest();
+            ReflectionTestUtils.setField(request, "gameMode", GameMode.SOLO);
+            ReflectionTestUtils.setField(request, "mainP", Position.TOP);
+            ReflectionTestUtils.setField(request, "subP", Position.JUNGLE);
+            ReflectionTestUtils.setField(request, "wantP", Arrays.asList(Position.TOP, Position.MID));
+            ReflectionTestUtils.setField(request, "mike", Mike.AVAILABLE);
+            ReflectionTestUtils.setField(request, "contents", "게스트 게시글 내용");
+            ReflectionTestUtils.setField(request, "boardProfileImage", 1);
+            ReflectionTestUtils.setField(request, "gameStyles", Arrays.asList(1L, 2L));
+            return request;
+        }
+
+        @Test
+        @DisplayName("게스트 게시글 작성 성공")
+        void createGuestBoard_Success() {
+            // given
+            String gameName = "testGuestUser";
+            String tag = "KR1";
+            BoardInsertRequest request = createBoardInsertRequest();
+
+            Board guestBoard = Board.createForGuest(
+                    gameName, tag, request.getGameMode(), request.getMainP(), request.getSubP(),
+                    request.getWantP(), request.getMike(), request.getContents(), 1
+            );
+            ReflectionTestUtils.setField(guestBoard, "id", 1L);
+
+            // when
+            when(memberRepository.existsByGameNameAndTag(gameName, tag)).thenReturn(false);
+            doNothing().when(profanityCheckService).validateProfanity(request.getContents());
+            when(boardService.createAndSaveGuestBoard(request, gameName, tag)).thenReturn(guestBoard);
+            doNothing().when(boardGameStyleService).mapGameStylesToBoard(guestBoard, request.getGameStyles());
+
+            BoardInsertResponse response = boardFacadeService.createGuestBoard(request, gameName, tag);
+
+            // then
+            assertThat(response.getBoardId()).isEqualTo(1L);
+            assertThat(response.getMemberId()).isEqualTo(null);
+            assertThat(response.getGameName()).isEqualTo(gameName);
+            assertThat(response.getTag()).isEqualTo(tag);
+            verify(memberRepository).existsByGameNameAndTag(gameName, tag);
+            verify(profanityCheckService).validateProfanity(request.getContents());
+            verify(boardService).createAndSaveGuestBoard(request, gameName, tag);
+            verify(boardGameStyleService).mapGameStylesToBoard(guestBoard, request.getGameStyles());
+        }
+
+        @Test
+        @DisplayName("게스트 게시글 작성 실패 - 기존 회원 존재")
+        void createGuestBoard_FailWhenMemberExists() {
+            // given
+            String gameName = "existingUser";
+            String tag = "KR1";
+            BoardInsertRequest request = createBoardInsertRequest();
+
+            // when
+            when(memberRepository.existsByGameNameAndTag(gameName, tag)).thenReturn(true);
+
+            // then
+            assertThatThrownBy(() -> boardFacadeService.createGuestBoard(request, gameName, tag))
+                    .isInstanceOf(BoardException.class)
+                    .hasFieldOrPropertyWithValue("code", ErrorCode.MEMBER_ALREADY_EXISTS.getCode());
+
+            verify(memberRepository).existsByGameNameAndTag(gameName, tag);
+            verify(profanityCheckService, never()).validateProfanity(anyString());
+            verify(boardService, never()).createAndSaveGuestBoard(any(), anyString(), anyString());
+            verify(boardGameStyleService, never()).mapGameStylesToBoard(any(), any());
+        }
+
+        @Test
+        @DisplayName("게스트 게시글 작성 실패 - 욕설 포함")
+        void createGuestBoard_FailWhenContainsProfanity() {
+            // given
+            String gameName = "testGuestUser";
+            String tag = "KR1";
+            BoardInsertRequest request = createBoardInsertRequest();
+
+            // when
+            when(memberRepository.existsByGameNameAndTag(gameName, tag)).thenReturn(false);
+            doThrow(new BoardException(ErrorCode.BOARD_FORBIDDEN_WORD))
+                    .when(profanityCheckService).validateProfanity(request.getContents());
+
+            // then
+            assertThatThrownBy(() -> boardFacadeService.createGuestBoard(request, gameName, tag))
+                    .isInstanceOf(BoardException.class)
+                    .hasFieldOrPropertyWithValue("code", ErrorCode.BOARD_FORBIDDEN_WORD.getCode());
+
+            verify(memberRepository).existsByGameNameAndTag(gameName, tag);
+            verify(profanityCheckService).validateProfanity(request.getContents());
+            verify(boardService, never()).createAndSaveGuestBoard(any(), anyString(), anyString());
+            verify(boardGameStyleService, never()).mapGameStylesToBoard(any(), any());
+        }
     }
 
 }

@@ -64,6 +64,29 @@ public class BoardService {
     }
 
     /**
+     * 게스트 게시글 엔티티 생성 및 저장
+     */
+    @Transactional
+    public Board createAndSaveGuestBoard(BoardInsertRequest request, String gameName, String tag) {
+        int boardProfileImage = (request.getBoardProfileImage() != null)
+                ? request.getBoardProfileImage()
+                : 1; // 기본 이미지
+
+        Board board = Board.createForGuest(
+                gameName,
+                tag,
+                request.getGameMode(),
+                request.getMainP(),
+                request.getSubP(),
+                request.getWantP(),
+                request.getMike(),
+                request.getContents(),
+                boardProfileImage
+        );
+        return boardRepository.save(board);
+    }
+
+    /**
      * 게시글 목록 조회
      */
     public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike,

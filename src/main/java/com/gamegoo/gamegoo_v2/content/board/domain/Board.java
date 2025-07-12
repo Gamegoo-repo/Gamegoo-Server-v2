@@ -71,8 +71,17 @@ public class Board extends BaseDateTimeEntity {
     private boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = true)
     private Member member;
+
+    @Column(length = 50)
+    private String gameName;
+
+    @Column(length = 10)
+    private String tag;
+
+    @Column(nullable = false)
+    private boolean isGuest = false;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<BoardGameStyle> boardGameStyles = new ArrayList<>();
@@ -88,6 +97,23 @@ public class Board extends BaseDateTimeEntity {
                                Mike mike, String content, int boardProfileImage) {
         return Board.builder()
                 .member(member)
+                .isGuest(false)
+                .gameMode(gameMode)
+                .mainP(mainP)
+                .subP(subP)
+                .wantP(wantP)
+                .mike(mike)
+                .content(content)
+                .boardProfileImage(boardProfileImage)
+                .build();
+    }
+
+    public static Board createForGuest(String gameName, String tag, GameMode gameMode, Position mainP, Position subP,
+                                       List<Position> wantP, Mike mike, String content, int boardProfileImage) {
+        return Board.builder()
+                .gameName(gameName)
+                .tag(tag)
+                .isGuest(true)
                 .gameMode(gameMode)
                 .mainP(mainP)
                 .subP(subP)
@@ -100,8 +126,8 @@ public class Board extends BaseDateTimeEntity {
 
     @Builder
     private Board(GameMode gameMode, Position mainP, Position subP, List<Position> wantP, Mike mike,
-                  String content,
-                  int boardProfileImage, boolean deleted, Member member) {
+                  String content, int boardProfileImage, boolean deleted, Member member,
+                  String gameName, String tag, boolean isGuest) {
         this.gameMode = gameMode;
         this.mainP = mainP;
         this.subP = subP;
@@ -111,6 +137,9 @@ public class Board extends BaseDateTimeEntity {
         this.boardProfileImage = boardProfileImage;
         this.deleted = deleted;
         this.member = member;
+        this.gameName = gameName;
+        this.tag = tag;
+        this.isGuest = isGuest;
     }
 
     public void addBoardGameStyle(BoardGameStyle boardGameStyle) {

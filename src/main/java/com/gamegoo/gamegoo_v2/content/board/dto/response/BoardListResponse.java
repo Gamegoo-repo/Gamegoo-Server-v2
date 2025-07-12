@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,37 @@ public class BoardListResponse {
 
     public static BoardListResponse of(Board board) {
         Member member = board.getMember();
+
+        if (member == null) { // 비회원 게시글 처리
+            return BoardListResponse.builder()
+                    .boardId(board.getId())
+                    .memberId(null)
+                    .gameName(board.getGameName())
+                    .tag(board.getTag())
+                    .mainP(board.getMainP())
+                    .subP(board.getSubP())
+                    .wantP(board.getWantP())
+                    .mike(board.getMike())
+                    .contents(board.getContent())
+                    .boardProfileImage(board.getBoardProfileImage())
+                    .createdAt(board.getCreatedAt())
+                    .profileImage(null)
+                    .mannerLevel(null)
+                    .tier(null)
+                    .rank(0)
+                    .gameMode(board.getGameMode())
+                    .winRate(null)
+                    .bumpTime(board.getBumpTime())
+                    .championStatsResponseList(Collections.emptyList())
+                    .memberRecentStats(null)
+                    .freeTier(null)
+                    .freeRank(0)
+                    .soloTier(null)
+                    .soloRank(0)
+                    .build();
+        }
+
+        // 회원 게시글 처리
         Tier tier;
         int rank;
         Double winRate;

@@ -22,7 +22,7 @@ import java.util.Optional;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-    @Query("SELECT b FROM Board b JOIN b.member m WHERE " +
+    @Query("SELECT b FROM Board b LEFT JOIN b.member m WHERE " +
             "b.deleted = false AND " +
             "(:gameMode IS NULL OR b.gameMode = :gameMode) AND " +
             "(:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m.freeTier ELSE m.soloTier END) = :tier) AND " +
@@ -54,7 +54,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             @Param("activityTime") LocalDateTime activityTime,
             Pageable pageable);
 
-    @Query("SELECT b FROM Board b JOIN b.member m " +
+    @Query("SELECT b FROM Board b LEFT JOIN b.member m " +
            "WHERE b.deleted = false " +
            "AND (" +
            "  :activityTime IS NULL " +

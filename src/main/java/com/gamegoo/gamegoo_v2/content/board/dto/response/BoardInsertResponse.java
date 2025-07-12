@@ -16,7 +16,7 @@ import java.util.List;
 public class BoardInsertResponse {
 
     private long boardId;
-    private long memberId;
+    private Long memberId;
     private Integer profileImage;
     private String gameName;
     private String tag;
@@ -50,6 +50,27 @@ public class BoardInsertResponse {
                 .tag(member.getTag())
                 .tier(tier)
                 .rank(rank)
+                .gameMode(board.getGameMode())
+                .mainP(board.getMainP())
+                .subP(board.getSubP())
+                .wantP(board.getWantP())
+                .mike(board.getMike())
+                .gameStyles(board.getBoardGameStyles().stream()
+                        .map(bg -> bg.getGameStyle().getId())
+                        .toList())
+                .contents(board.getContent())
+                .build();
+    }
+
+    public static BoardInsertResponse ofGuest(Board board) {
+        return BoardInsertResponse.builder()
+                .boardId(board.getId())
+                .memberId(null) // 게스트는 memberId null
+                .profileImage(board.getBoardProfileImage())
+                .gameName(board.getGameName())
+                .tag(board.getTag())
+                .tier(null) // 게스트는 티어 없음
+                .rank(0) // 게스트는 랭크 없음
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())
