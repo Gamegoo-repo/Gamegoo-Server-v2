@@ -83,6 +83,9 @@ public class Board extends BaseDateTimeEntity {
     @Column(nullable = false)
     private boolean isGuest = false;
 
+    @Column(length = 16)
+    private String guestPassword;
+
     @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<BoardGameStyle> boardGameStyles = new ArrayList<>();
 
@@ -109,7 +112,7 @@ public class Board extends BaseDateTimeEntity {
     }
 
     public static Board createForGuest(String gameName, String tag, GameMode gameMode, Position mainP, Position subP,
-                                       List<Position> wantP, Mike mike, String content, int boardProfileImage) {
+                                       List<Position> wantP, Mike mike, String content, int boardProfileImage, String guestPassword) {
         return Board.builder()
                 .gameName(gameName)
                 .tag(tag)
@@ -121,13 +124,14 @@ public class Board extends BaseDateTimeEntity {
                 .mike(mike)
                 .content(content)
                 .boardProfileImage(boardProfileImage)
+                .guestPassword(guestPassword)
                 .build();
     }
 
     @Builder
     private Board(GameMode gameMode, Position mainP, Position subP, List<Position> wantP, Mike mike,
                   String content, int boardProfileImage, boolean deleted, Member member,
-                  String gameName, String tag, boolean isGuest) {
+                  String gameName, String tag, boolean isGuest, String guestPassword) {
         this.gameMode = gameMode;
         this.mainP = mainP;
         this.subP = subP;
@@ -140,6 +144,7 @@ public class Board extends BaseDateTimeEntity {
         this.gameName = gameName;
         this.tag = tag;
         this.isGuest = isGuest;
+        this.guestPassword = guestPassword;
     }
 
     public void addBoardGameStyle(BoardGameStyle boardGameStyle) {
@@ -189,6 +194,10 @@ public class Board extends BaseDateTimeEntity {
 
     public LocalDateTime getActivityTime() {
         return activityTime;
+    }
+
+    public boolean verifyGuestPassword(String password) {
+        return this.guestPassword != null && this.guestPassword.equals(password);
     }
 
 

@@ -38,4 +38,8 @@ security:
       - pattern: /api/v2/riot/oauth/callback/** # RSO
       - method: POST # riot 회원가입
         pattern: /api/v2/riot/join
+      - method: PUT
+        pattern: /api/v2/posts/guest/* # 비회원 게시글 수정
+      - method: DELETE
+        pattern: /api/v2/posts/guest/* # 비회원 게시글 삭제
 

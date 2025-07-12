@@ -8,6 +8,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardUpdateRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardDeleteRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.*;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
@@ -183,6 +185,23 @@ public class BoardController {
             @RequestParam(required = false) Position position2) {
         BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2);
         return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+
+    @PutMapping("/guest/{boardId}")
+    @Operation(summary = "비회원 게시판 글 수정 API", description = "비회원이 게시판에서 글을 수정하는 API 입니다.")
+    @Parameter(name = "boardId", description = "수정할 게시판 글 id 입니다.")
+    public ApiResponse<BoardUpdateResponse> guestBoardUpdate(@PathVariable Long boardId,
+                                                            @Valid @RequestBody GuestBoardUpdateRequest request) {
+        return ApiResponse.ok(boardFacadeService.updateGuestBoard(request, boardId));
+    }
+
+    @DeleteMapping("/guest/{boardId}")
+    @Operation(summary = "비회원 게시판 글 삭제 API", description = "비회원이 게시판에서 글을 삭제하는 API 입니다.")
+    @Parameter(name = "boardId", description = "삭제할 게시판 글 id 입니다.")
+    public ApiResponse<String> deleteGuestBoard(@PathVariable Long boardId, 
+                                               @Valid @RequestBody GuestBoardDeleteRequest request) {
+        boardFacadeService.deleteGuestBoard(boardId, request);
+        return ApiResponse.ok("게시글을 삭제하였습니다.");
     }
 
 }
