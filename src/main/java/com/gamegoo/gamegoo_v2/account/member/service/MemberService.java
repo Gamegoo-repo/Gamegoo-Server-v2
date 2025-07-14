@@ -130,6 +130,16 @@ public class MemberService {
     }
 
     /**
+     * Member 엔티티 리스트 조회
+     *
+     * @param memberIds
+     * @return
+     */
+    public List<Member> findAllMemberByIds(List<Long> memberIds) {
+        return memberRepository.findAllByIdIn(memberIds);
+    }
+
+    /**
      * Email로 회원 정보 조회
      *
      * @param email 사용자 ID
