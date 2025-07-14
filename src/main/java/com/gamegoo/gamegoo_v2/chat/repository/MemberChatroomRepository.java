@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberChatroomRepository extends JpaRepository<MemberChatroom, Long>, MemberChatroomRepositoryCustom {
+public interface MemberChatroomRepository extends JpaRepository<MemberChatroom, Long> {
 
     Optional<MemberChatroom> findByMemberIdAndChatroomId(Long memberId, Long chatroomId);
 
@@ -22,16 +22,6 @@ public interface MemberChatroomRepository extends JpaRepository<MemberChatroom, 
             """)
     Optional<Member> findTargetMemberByChatroomIdAndMemberId(@Param("chatroomId") Long chatroomId,
                                                              @Param("memberId") Long memberId);
-
-    @Query("""
-            SELECT mc
-            FROM MemberChatroom mc
-            JOIN FETCH mc.chatroom c
-            WHERE mc.member.id = :memberId
-            AND mc.lastJoinDate is not null
-            ORDER BY COALESCE(c.lastChatAt, mc.lastJoinDate) DESC
-            """)
-    List<MemberChatroom> findAllActiveMemberChatroomByMemberId(@Param("memberId") Long memberId);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE MemberChatroom mc SET mc.lastJoinDate = null where mc.member = :member")

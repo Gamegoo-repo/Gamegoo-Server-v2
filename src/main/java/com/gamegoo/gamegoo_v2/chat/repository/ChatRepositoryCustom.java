@@ -3,9 +3,6 @@ package com.gamegoo.gamegoo_v2.chat.repository;
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
 import org.springframework.data.domain.Slice;
 
-import java.util.List;
-import java.util.Map;
-
 public interface ChatRepositoryCustom {
 
     /**
@@ -37,14 +34,5 @@ public interface ChatRepositoryCustom {
      * @return 안읽은 메시지 개수
      */
     int countUnreadChats(Long chatroomId, Long memberId);
-
-    /**
-     * 채팅방 각각에 대한 안읽은 메시지 개수 조회
-     *
-     * @param chatroomIds 채팅방 id list
-     * @param memberId    회원 id
-     * @return Map<채팅방 id, 안읽은 메시지 개수>
-     */
-    Map<Long, Integer> countUnreadChatsBatch(List<Long> chatroomIds, Long memberId);
 
 }

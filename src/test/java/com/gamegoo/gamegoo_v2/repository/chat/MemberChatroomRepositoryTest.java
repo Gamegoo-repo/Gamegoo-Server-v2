@@ -12,9 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,33 +33,6 @@ public class MemberChatroomRepositoryTest extends RepositoryTestSupport {
         memberChatroomRepository.deleteAllInBatch();
         chatroomRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
-    }
-
-    @DisplayName("채팅 상대 회원 배치 조회")
-    @Test
-    void findTargetMembersBatch() {
-        // given
-        List<Long> chatroomIds = new ArrayList<>();
-        List<Member> targetMembers = new ArrayList<>();
-
-        for (int i = 0; i < 3; i++) {
-            Member targetMember = createMember("targetMember" + i + "@gmail.com", "targetMember" + i);
-            Chatroom chatroom = createForGeneralChatroom();
-            createForGeneralMemberChatroom(member, chatroom);
-            createForGeneralMemberChatroom(targetMember, chatroom);
-            chatroomIds.add(chatroom.getId());
-            targetMembers.add(targetMember);
-        }
-
-        // when
-        Map<Long, Member> targetMemberMap = memberChatroomRepository.findTargetMembersBatch(chatroomIds,
-                member.getId());
-
-        // then
-        assertThat(targetMemberMap).hasSize(chatroomIds.size());
-        for (Member targetMember : targetMembers) {
-            assertThat(targetMember).isIn(targetMemberMap.values());
-        }
     }
 
     @DisplayName("채팅방 lastJoinDate 배치 초기화")
