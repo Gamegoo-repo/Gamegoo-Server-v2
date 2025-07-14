@@ -12,7 +12,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByPuuid(String puuid);
-    
+
     Optional<Member> findByEmail(String email);
 
     List<Member> findByPuuid(String puuid);
@@ -22,5 +22,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m.id FROM Member m WHERE m.mannerScore IS NULL AND m.mannerRank IS NOT NULL")
     List<Long> getMemberIdsWhereMannerScoreIsNullAndMannerRankIsNotNull();
+
+    List<Member> findAllByIdIn(List<Long> memberIds);
 
 }

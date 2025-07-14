@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
 import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
 import com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom;
+import com.gamegoo.gamegoo_v2.chat.dto.data.ChatroomSummaryDTO;
 import com.gamegoo.gamegoo_v2.chat.repository.ChatRepository;
 import com.gamegoo.gamegoo_v2.chat.repository.ChatroomRepository;
 import com.gamegoo.gamegoo_v2.chat.repository.MemberChatroomRepository;
@@ -172,6 +173,17 @@ public class ChatQueryService {
         }
 
         return chatMap;
+    }
+
+    /**
+     * 채팅방 목록에 보여줄 정보 DTO 리스트 반환
+     * 채팅방 id, 안읽은 메시지 개수, 마지막 채팅 내용, 마지막 채팅 메시지 id, 마지막 메시지 시각, 상대 회원 id
+     *
+     * @param memberId 회원 id
+     * @return
+     */
+    public List<ChatroomSummaryDTO> getChatroomSummaryList(Long memberId) {
+        return chatroomRepository.findChatroomSummariedByMemberId(memberId);
     }
 
 }
