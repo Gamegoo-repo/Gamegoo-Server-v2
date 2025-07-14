@@ -4,11 +4,14 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.*;
 import com.gamegoo.gamegoo_v2.core.common.validator.BanValidator;
+import com.gamegoo.gamegoo_v2.core.exception.BoardException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
@@ -33,6 +36,7 @@ public class BoardFacadeService {
     private final ProfanityCheckService profanityCheckService;
     private final MannerService mannerService;
     private final BanValidator banValidator;
+    private final MemberRepository memberRepository;
 
     /**
      * 게시글 생성 (파사드)
@@ -50,6 +54,26 @@ public class BoardFacadeService {
         boardGameStyleService.mapGameStylesToBoard(board, request.getGameStyles());
 
         return BoardInsertResponse.of(board, member);
+    }
+
+    /**
+     * 게스트 게시글 생성 (파사드)
+     * - 소환사명 + 태그로 기존 회원 확인
+     * - 기존 회원이면 예외 발생
+     * - 게스트 게시글 생성
+     */
+    @Transactional
+    public BoardInsertResponse createGuestBoard(BoardInsertRequest request, String gameName, String tag) {
+        // 기존 회원 확인
+        if (memberRepository.existsByGameNameAndTag(gameName, tag)) {
+            throw new BoardException(ErrorCode.MEMBER_ALREADY_EXISTS);
+        }
+
+        profanityCheckService.validateProfanity(request.getContents());
+        Board board = boardService.createAndSaveGuestBoard(request, gameName, tag);
+        boardGameStyleService.mapGameStylesToBoard(board, request.getGameStyles());
+
+        return BoardInsertResponse.ofGuest(board);
     }
 
     /**

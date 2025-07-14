@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.*;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
@@ -55,6 +56,17 @@ public class BoardController {
             @AuthMember Member member,
             @Valid @RequestBody BoardInsertRequest request) {
         return ApiResponse.ok(boardFacadeService.createBoard(request, member));
+    }
+
+    @PostMapping("/guest")
+    @Operation(summary = "비회원 게시판 글 작성 API",
+            description = "비회원이 게시판에서 글을 작성하는 API 입니다. 프로필이미지 값: 1~8, gameMode: < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, 칼바람 " +
+                    "나락: ARAM >, " +
+                    "주 포지션, 부포지션, 희망 포지션: < TOP, JUNGLE, MID, ADC, SUP, ANY >, 마이크 여부: < AVAILABLE, UNAVAILABLE >, 게임" +
+                    " 스타일 리스트: 1~3개 선택 가능")
+    public ApiResponse<BoardInsertResponse> guestBoardInsert(
+            @Valid @RequestBody GuestBoardInsertRequest request) {
+        return ApiResponse.ok(boardFacadeService.createGuestBoard(request, request.getGameName(), request.getTag()));
     }
 
     /**

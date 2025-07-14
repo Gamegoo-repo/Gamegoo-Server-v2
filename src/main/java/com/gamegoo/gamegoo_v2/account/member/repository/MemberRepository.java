@@ -23,6 +23,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m.id FROM Member m WHERE m.mannerScore IS NULL AND m.mannerRank IS NOT NULL")
     List<Long> getMemberIdsWhereMannerScoreIsNullAndMannerRankIsNotNull();
 
+    boolean existsByGameNameAndTag(String gameName, String tag);
+
     List<Member> findAllByIdIn(List<Long> memberIds);
 
 }
