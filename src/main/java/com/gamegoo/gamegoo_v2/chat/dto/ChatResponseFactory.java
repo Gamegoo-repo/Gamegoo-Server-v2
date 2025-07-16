@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.chat.dto;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
 import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
+import com.gamegoo.gamegoo_v2.chat.dto.data.ChatroomSummaryDTO;
 import com.gamegoo.gamegoo_v2.chat.dto.response.ChatMessageListResponse;
 import com.gamegoo.gamegoo_v2.chat.dto.response.ChatMessageResponse;
 import com.gamegoo.gamegoo_v2.chat.dto.response.ChatroomListResponse;
@@ -146,6 +147,36 @@ public class ChatResponseFactory {
                 .lastMsgAt(lastMsgAt)
                 .notReadMsgCnt(unreadCnt)
                 .lastMsgTimestamp(lastMsgTimestamp)
+                .build();
+    }
+
+    public ChatroomResponse toChatroomResponse(Member targetMember, boolean isFriend, boolean isBlocked,
+                                               Long friendRequestMemberId,
+                                               ChatroomSummaryDTO chatroomSummaryDTO) {
+        String gameName = targetMember.getBlind()
+                ? "(탈퇴한 사용자)"
+                : targetMember.getGameName();
+
+        String lastMsgAt = null;
+
+        if (chatroomSummaryDTO.getLastChatAt() != null) {
+            lastMsgAt = DateTimeUtil.toKSTString(chatroomSummaryDTO.getLastChatAt());
+        }
+
+        return ChatroomResponse.builder()
+                .chatroomId(chatroomSummaryDTO.getChatroomId())
+                .uuid(chatroomSummaryDTO.getChatroomUuid())
+                .targetMemberId(targetMember.getId())
+                .targetMemberImg(targetMember.getProfileImage())
+                .targetMemberName(gameName)
+                .friend(isFriend)
+                .blocked(isBlocked)
+                .blind(targetMember.getBlind())
+                .friendRequestMemberId(friendRequestMemberId)
+                .lastMsg(chatroomSummaryDTO.getLastChat())
+                .lastMsgAt(lastMsgAt)
+                .notReadMsgCnt(chatroomSummaryDTO.getUnreadCnt())
+                .lastMsgTimestamp(chatroomSummaryDTO.getLastChatTimestamp())
                 .build();
     }
 

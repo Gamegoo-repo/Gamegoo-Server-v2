@@ -3,7 +3,7 @@ package com.gamegoo.gamegoo_v2.chat.service;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
 import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
-import com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom;
+import com.gamegoo.gamegoo_v2.chat.dto.data.ChatroomSummaryDTO;
 import com.gamegoo.gamegoo_v2.chat.repository.ChatRepository;
 import com.gamegoo.gamegoo_v2.chat.repository.ChatroomRepository;
 import com.gamegoo.gamegoo_v2.chat.repository.MemberChatroomRepository;
@@ -15,9 +15,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -31,7 +29,6 @@ public class ChatQueryService {
     private final ChatValidator chatValidator;
 
     private static final int PAGE_SIZE = 20;
-
 
     /**
      * 두 회원 사이에 존재하는 채팅방을 반환하는 메소드
@@ -79,17 +76,6 @@ public class ChatQueryService {
     }
 
     /**
-     * 채팅방 각각에 대한 상대 회원을 반환하는 메소드
-     *
-     * @param member      회원
-     * @param chatroomIds 채팅방 id list
-     * @return Map<채팅방 id, 상대 회원 객체>
-     */
-    public Map<Long, Member> getChatroomTargetMembersBatch(Member member, List<Long> chatroomIds) {
-        return memberChatroomRepository.findTargetMembersBatch(chatroomIds, member.getId());
-    }
-
-    /**
      * 해당 채팅방의 메시지 내역 slice 객체를 반환하는 메소드
      *
      * @param member   회원
@@ -113,16 +99,6 @@ public class ChatQueryService {
     }
 
     /**
-     * 회원이 입장한 상태인 모든 memberChatroom list 반환하는 메소드
-     *
-     * @param member 회원
-     * @return MemberChatroom list
-     */
-    public List<MemberChatroom> getActiveMemberChatrooms(Member member) {
-        return memberChatroomRepository.findAllActiveMemberChatroomByMemberId(member.getId());
-    }
-
-    /**
      * 해당 채팅방의 안읽은 메시지 개수를 반환하는 메소드
      *
      * @param member   회원
@@ -132,17 +108,6 @@ public class ChatQueryService {
     public int countUnreadChats(Member member, Chatroom chatroom) {
         chatValidator.validateMemberChatroom(member.getId(), chatroom.getId());
         return chatRepository.countUnreadChats(member.getId(), chatroom.getId());
-    }
-
-    /**
-     * 채팅방 각각에 대한 안읽은 메시지 개수를 반환하는 메소드
-     *
-     * @param member      회원
-     * @param chatroomIds 채팅방 id list
-     * @return Map<채팅방 id, 안읽은 메시지 개수>
-     */
-    public Map<Long, Integer> countUnreadChatsBatch(Member member, List<Long> chatroomIds) {
-        return chatRepository.countUnreadChatsBatch(chatroomIds, member.getId());
     }
 
     /**
@@ -158,20 +123,14 @@ public class ChatQueryService {
     }
 
     /**
-     * id로 chat 엔티티 배치 조회 메소드
+     * 채팅방 목록에 보여줄 정보 DTO 리스트 반환
+     * 채팅방 id, 안읽은 메시지 개수, 마지막 채팅 내용, 마지막 채팅 메시지 id, 마지막 메시지 시각, 상대 회원 id
      *
-     * @param chatIds 채팅 id list
-     * @return Map<채팅방 id, 채팅 객체>
+     * @param memberId 회원 id
+     * @return
      */
-    public Map<Long, Chat> findAllChatsBatch(List<Long> chatIds) {
-        List<Chat> chats = chatRepository.findAllById(chatIds);
-
-        Map<Long, Chat> chatMap = new HashMap<>();
-        for (Chat chat : chats) {
-            chatMap.put(chat.getChatroom().getId(), chat);
-        }
-
-        return chatMap;
+    public List<ChatroomSummaryDTO> getChatroomSummaryList(Long memberId) {
+        return chatroomRepository.findChatroomSummariedByMemberId(memberId);
     }
 
 }
