@@ -116,6 +116,11 @@ logging:
   discord:
     webhook: ${DISCORD_MONITORING_WEBHOOK_URL_DEV}
 
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+
 ---
 # 운영 환경
 server:
@@ -138,3 +143,8 @@ spring:
 logging:
   discord:
     webhook: ${DISCORD_MONITORING_WEBHOOK_URL_PROD}
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false

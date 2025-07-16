@@ -37,6 +37,25 @@ public class BoardUpdateResponse {
                 .map(bgs -> bgs.getGameStyle().getId())
                 .collect(Collectors.toList());
 
+        if (member == null) {
+            return BoardUpdateResponse.builder()
+                    .boardId(board.getId())
+                    .memberId(0L)
+                    .profileImage(board.getBoardProfileImage())
+                    .gameName(board.getGameName())
+                    .tag(board.getTag())
+                    .tier(null)
+                    .rank(0)
+                    .gameMode(board.getGameMode())
+                    .mainP(board.getMainP())
+                    .subP(board.getSubP())
+                    .wantP(board.getWantP())
+                    .mike(board.getMike())
+                    .gameStyles(gameStyleIds)
+                    .contents(board.getContent())
+                    .build();
+        }
+
         Tier tier;
         int rank;
         if (board.getGameMode() == GameMode.FREE) {

@@ -82,7 +82,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v2/riot/verify",
                         "/api/v2/riot/oauth/callback",
                         "/api/v2/riot/join").permitAll() // riot
-                .requestMatchers("/api/v2/posts/list/**", "/api/v2/posts/cursor").permitAll() // board
+                .requestMatchers("/api/v2/posts/list/**", "/api/v2/posts/cursor", "/api/v2/posts/guest").permitAll() // board
+                .requestMatchers("/api/v2/posts/guest/**").permitAll() // guest board
                 .requestMatchers(
                         "/api/v2/auth/token/**",
                         "/api/v2/auth/join",

@@ -12,16 +12,16 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @Builder
-
 public class BoardByIdResponseForMember {
 
     long boardId;
-    long memberId;
+    Long memberId;
     Boolean isBlocked;
     Boolean isFriend;
     Long friendRequestMemberId;
@@ -57,7 +57,43 @@ public class BoardByIdResponseForMember {
             MannerService mannerService
     ) {
         Member poster = board.getMember();
+        List<Long> gameStyleIds = board.getBoardGameStyles().stream()
+                .map(bgs -> bgs.getGameStyle().getId())
+                .collect(Collectors.toList());
 
+        if (poster == null) { // 비회원 게시글 처리
+            return BoardByIdResponseForMember.builder()
+                    .boardId(board.getId())
+                    .memberId(null)
+                    .isBlocked(null)
+                    .isFriend(null)
+                    .friendRequestMemberId(null)
+                    .createdAt(board.getCreatedAt())
+                    .profileImage(board.getBoardProfileImage())
+                    .gameName(board.getGameName())
+                    .tag(board.getTag())
+                    .mannerLevel(null)
+                    .mannerRank(null)
+                    .mannerRatingCount(null)
+                    .soloTier(null)
+                    .soloRank(0)
+                    .freeTier(null)
+                    .freeRank(0)
+                    .mike(board.getMike())
+                    .championStatsResponseList(Collections.emptyList())
+                    .memberRecentStats(null)
+                    .gameMode(board.getGameMode())
+                    .mainP(board.getMainP())
+                    .subP(board.getSubP())
+                    .wantP(board.getWantP())
+                    .recentGameCount(null)
+                    .winRate(null)
+                    .gameStyles(gameStyleIds)
+                    .contents(board.getContent())
+                    .build();
+        }
+
+        // 회원 게시글 처리
         List<ChampionStatsResponse> championStatsResponseList = poster.getMemberChampionList() == null
                 ? List.of()
                 : poster.getMemberChampionList().stream()
@@ -70,11 +106,6 @@ public class BoardByIdResponseForMember {
                         .csPerMinute(mc.getCsPerMinute())
                         .kda(mc.getKDA())
                         .build())
-                .collect(Collectors.toList());
-
-
-        List<Long> gameStyleIds = board.getBoardGameStyles().stream()
-                .map(bgs -> bgs.getGameStyle().getId())
                 .collect(Collectors.toList());
 
         Integer recentGameCount;

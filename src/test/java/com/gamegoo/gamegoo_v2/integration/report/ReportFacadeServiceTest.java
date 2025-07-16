@@ -2,9 +2,11 @@ package com.gamegoo.gamegoo_v2.integration.report;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
@@ -18,17 +20,16 @@ import com.gamegoo.gamegoo_v2.content.report.repository.ReportTypeMappingReposit
 import com.gamegoo.gamegoo_v2.content.report.service.ReportFacadeService;
 import com.gamegoo.gamegoo_v2.core.event.SendReportEmailEvent;
 import com.gamegoo.gamegoo_v2.core.event.listener.EmailEventListener;
-import com.gamegoo.gamegoo_v2.notification.domain.Notification;
-import com.gamegoo.gamegoo_v2.notification.domain.NotificationType;
-import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
-import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
-import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
 import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.core.exception.common.GlobalException;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import com.gamegoo.gamegoo_v2.notification.domain.Notification;
+import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
+import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
+import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -74,6 +75,9 @@ class ReportFacadeServiceTest {
     @Autowired
     private NotificationTypeRepository notificationTypeRepository;
 
+    @Autowired
+    private MemberRecentStatsRepository memberRecentStatsRepository;
+
     @MockitoSpyBean
     private EmailEventListener emailEventListener;
 
@@ -84,12 +88,12 @@ class ReportFacadeServiceTest {
     void setUp() {
         member = createMember("test@gmail.com", "member");
         targetMember = createMember("target@gmail.com", "targetMember");
-
     }
 
 
     @AfterEach
     void tearDown() {
+        memberRecentStatsRepository.deleteAllInBatch();
         notificationRepository.deleteAllInBatch();
         reportTypeMappingRepository.deleteAllInBatch();
         reportRepository.deleteAllInBatch();
@@ -337,13 +341,15 @@ class ReportFacadeServiceTest {
             // then
             assertThat(response.getReportId()).isEqualTo(report.getId());
             assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
-            assertThat(response.getAppliedBanType()).isEqualTo(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D);
+            assertThat(response.getAppliedBanType()).isEqualTo(
+                    com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D);
             assertThat(response.getBanExpireAt()).isNotNull();
             assertThat(response.getMessage()).isEqualTo("신고 처리가 완료되었습니다.");
 
             // 회원 제재 상태 확인
             Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
-            assertThat(updatedMember.getBanType()).isEqualTo(com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D);
+            assertThat(updatedMember.getBanType()).isEqualTo(
+                    com.gamegoo.gamegoo_v2.account.member.domain.BanType.BAN_1D);
             assertThat(updatedMember.getBanExpireAt()).isNotNull();
 
             // 알림 생성 확인
@@ -383,7 +389,8 @@ class ReportFacadeServiceTest {
             // then
             assertThat(response.getReportId()).isEqualTo(report.getId());
             assertThat(response.getTargetMemberId()).isEqualTo(targetMember.getId());
-            assertThat(response.getAppliedBanType()).isEqualTo(com.gamegoo.gamegoo_v2.account.member.domain.BanType.NONE);
+            assertThat(response.getAppliedBanType()).isEqualTo(
+                    com.gamegoo.gamegoo_v2.account.member.domain.BanType.NONE);
 
             // 신고자에게만 알림 전송 확인
             List<Notification> allNotifications = notificationRepository.findAll();
@@ -417,6 +424,7 @@ class ReportFacadeServiceTest {
                     .isInstanceOf(ReportException.class)
                     .hasMessage(ErrorCode.REPORT_NOT_FOUND.getMessage());
         }
+
     }
 
     @Nested
@@ -460,6 +468,7 @@ class ReportFacadeServiceTest {
                     .isInstanceOf(ReportException.class)
                     .hasMessage(ErrorCode.REPORT_NOT_FOUND.getMessage());
         }
+
     }
 
     private Report createReport() {
@@ -489,7 +498,7 @@ class ReportFacadeServiceTest {
     }
 
     private Member createMember(String email, String gameName) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password("testPassword")
                 .profileImage(1)
@@ -505,7 +514,13 @@ class ReportFacadeServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
+                .build();
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
                 .build());
+
+        return memberRepository.save(member);
     }
 
     private Board createBoard(Member member) {

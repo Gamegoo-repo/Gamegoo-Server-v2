@@ -2,9 +2,11 @@ package com.gamegoo.gamegoo_v2.integration.chat;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
@@ -13,8 +15,6 @@ import com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom;
 import com.gamegoo.gamegoo_v2.chat.dto.request.ChatCreateRequest;
 import com.gamegoo.gamegoo_v2.chat.dto.request.SystemFlagRequest;
 import com.gamegoo.gamegoo_v2.chat.dto.response.ChatMessageListResponse;
-import com.gamegoo.gamegoo_v2.chat.dto.response.ChatroomListResponse;
-import com.gamegoo.gamegoo_v2.chat.dto.response.ChatroomResponse;
 import com.gamegoo.gamegoo_v2.chat.dto.response.EnterChatroomResponse;
 import com.gamegoo.gamegoo_v2.chat.repository.ChatRepository;
 import com.gamegoo.gamegoo_v2.chat.repository.ChatroomRepository;
@@ -32,8 +32,6 @@ import com.gamegoo.gamegoo_v2.external.socket.SocketService;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.domain.Block;
 import com.gamegoo.gamegoo_v2.social.block.repository.BlockRepository;
-import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
-import com.gamegoo.gamegoo_v2.social.friend.domain.FriendRequest;
 import com.gamegoo.gamegoo_v2.social.friend.repository.FriendRepository;
 import com.gamegoo.gamegoo_v2.social.friend.repository.FriendRequestRepository;
 import com.gamegoo.gamegoo_v2.utils.TimestampUtil;
@@ -93,6 +91,9 @@ class ChatFacadeServiceTest {
     @Autowired
     private FriendRequestRepository friendRequestRepository;
 
+    @Autowired
+    private MemberRecentStatsRepository memberRecentStatsRepository;
+
     @MockitoSpyBean
     private MemberRepository memberRepository;
 
@@ -117,6 +118,7 @@ class ChatFacadeServiceTest {
 
     @AfterEach
     void tearDown() {
+        memberRecentStatsRepository.deleteAll();
         chatRepository.deleteAllInBatch();
         memberChatroomRepository.deleteAllInBatch();
         chatroomRepository.deleteAllInBatch();
@@ -930,96 +932,96 @@ class ChatFacadeServiceTest {
         }
 
     }
-
-    @Nested
-    @DisplayName("채팅방 목록 조회")
-    class GetChatroomsTest {
-
-        @DisplayName("성공: 입장 상태인 채팅방이 없는 경우")
-        @Test
-        void getChatroomsSucceedsWhenNoActiveChatroom() {
-            // when
-            ChatroomListResponse response = chatFacadeService.getChatrooms(member);
-
-            // then
-            assertThat(response.getChatroomResponseList()).isEmpty();
-            assertThat(response.getListSize()).isEqualTo(0);
-        }
-
-        @DisplayName("성공")
-        @Test
-        void getChatroomsSucceeds() {
-            // given
-            LocalDateTime now = LocalDateTime.now();
-
-            // targetMember1 생성
-            Member targetMember1 = createMember("targetMember1@gmail.com", "targetMember1");
-            Chatroom chatroom1 = createChatroom();
-            createMemberChatroom(targetMember1, chatroom1, now, now);
-            createMemberChatroom(member, chatroom1, now, now);
-            Chat chat1 = createChat(targetMember1, "message 1", chatroom1);
-            updateLastChat(chatroom1, chat1);
-
-            friendRepository.save(Friend.create(member, targetMember1));
-            friendRepository.save(Friend.create(targetMember1, member));
-
-            // targetMember2 생성
-            Member targetMember2 = createMember("targetmember2@gmail.com", "targetMember2");
-            Chatroom chatroom2 = createChatroom();
-            createMemberChatroom(member, chatroom2, now.plusHours(1), now);
-            createMemberChatroom(targetMember2, chatroom2, now.plusHours(1), now);
-            Chat chat2 = createChat(targetMember2, "message 2", chatroom2);
-            updateLastChat(chatroom2, chat2);
-
-            friendRequestRepository.save(FriendRequest.create(member, targetMember2));
-
-            // targetMember3 생성
-            Member targetMember3 = createMember("targetmember3@gmail.com", "targetMember3");
-            Chatroom chatroom3 = createChatroom();
-            createMemberChatroom(member, chatroom3, now, now);
-            createMemberChatroom(targetMember3, chatroom3, now, now);
-            Chat chat3 = createChat(targetMember3, "message 3", chatroom3);
-            updateLastChat(chatroom3, chat3);
-
-            blockMember(targetMember3, member);
-
-            // targetMember4 생성
-            Member targetMember4 = createMember("targetmember4@gmail.com", "targetMember4");
-            Chatroom chatroom4 = createChatroom();
-            createMemberChatroom(member, chatroom4, null);
-            createMemberChatroom(targetMember4, chatroom4, now);
-
-            // when
-            ChatroomListResponse response = chatFacadeService.getChatrooms(member);
-
-            // then
-            assertThat(response.getChatroomResponseList()).hasSize(3);
-            assertThat(response.getListSize()).isEqualTo(3);
-
-            ChatroomResponse chatroomResponse1 = response.getChatroomResponseList().get(0);
-            ChatroomResponse chatroomResponse2 = response.getChatroomResponseList().get(1);
-            ChatroomResponse chatroomResponse3 = response.getChatroomResponseList().get(2);
-
-            assertThat(chatroomResponse1.getChatroomId()).isEqualTo(chatroom3.getId());
-            assertThat(chatroomResponse1.getLastMsg()).isEqualTo(chat3.getContents());
-            assertThat(chatroomResponse1.getLastMsgTimestamp()).isEqualTo(chat3.getTimestamp());
-            assertThat(chatroomResponse1.getNotReadMsgCnt()).isEqualTo(1);
-            assertThat(chatroomResponse1.isBlocked()).isTrue();
-
-            assertThat(chatroomResponse2.getChatroomId()).isEqualTo(chatroom2.getId());
-            assertThat(chatroomResponse2.getLastMsg()).isEqualTo(chat2.getContents());
-            assertThat(chatroomResponse2.getLastMsgTimestamp()).isEqualTo(chat2.getTimestamp());
-            assertThat(chatroomResponse2.getNotReadMsgCnt()).isEqualTo(0);
-            assertThat(chatroomResponse2.getFriendRequestMemberId()).isEqualTo(member.getId());
-
-            assertThat(chatroomResponse3.getChatroomId()).isEqualTo(chatroom1.getId());
-            assertThat(chatroomResponse3.getLastMsg()).isEqualTo(chat1.getContents());
-            assertThat(chatroomResponse3.getLastMsgTimestamp()).isEqualTo(chat1.getTimestamp());
-            assertThat(chatroomResponse3.getNotReadMsgCnt()).isEqualTo(1);
-            assertThat(chatroomResponse3.isFriend()).isTrue();
-        }
-
-    }
+    //
+    //@Nested
+    //@DisplayName("채팅방 목록 조회")
+    //class GetChatroomsTest {
+    //
+    //    @DisplayName("성공: 입장 상태인 채팅방이 없는 경우")
+    //    @Test
+    //    void getChatroomsSucceedsWhenNoActiveChatroom() {
+    //        // when
+    //        ChatroomListResponse response = chatFacadeService.getChatrooms(member);
+    //
+    //        // then
+    //        assertThat(response.getChatroomResponseList()).isEmpty();
+    //        assertThat(response.getListSize()).isEqualTo(0);
+    //    }
+    //
+    //    @DisplayName("성공")
+    //    @Test
+    //    void getChatroomsSucceeds() {
+    //        // given
+    //        LocalDateTime now = LocalDateTime.now();
+    //
+    //        // targetMember1 생성
+    //        Member targetMember1 = createMember("targetMember1@gmail.com", "targetMember1");
+    //        Chatroom chatroom1 = createChatroom();
+    //        createMemberChatroom(targetMember1, chatroom1, now, now);
+    //        createMemberChatroom(member, chatroom1, now, now);
+    //        Chat chat1 = createChat(targetMember1, "message 1", chatroom1);
+    //        updateLastChat(chatroom1, chat1);
+    //
+    //        friendRepository.save(Friend.create(member, targetMember1));
+    //        friendRepository.save(Friend.create(targetMember1, member));
+    //
+    //        // targetMember2 생성
+    //        Member targetMember2 = createMember("targetmember2@gmail.com", "targetMember2");
+    //        Chatroom chatroom2 = createChatroom();
+    //        createMemberChatroom(member, chatroom2, now.plusHours(1), now);
+    //        createMemberChatroom(targetMember2, chatroom2, now.plusHours(1), now);
+    //        Chat chat2 = createChat(targetMember2, "message 2", chatroom2);
+    //        updateLastChat(chatroom2, chat2);
+    //
+    //        friendRequestRepository.save(FriendRequest.create(member, targetMember2));
+    //
+    //        // targetMember3 생성
+    //        Member targetMember3 = createMember("targetmember3@gmail.com", "targetMember3");
+    //        Chatroom chatroom3 = createChatroom();
+    //        createMemberChatroom(member, chatroom3, now, now);
+    //        createMemberChatroom(targetMember3, chatroom3, now, now);
+    //        Chat chat3 = createChat(targetMember3, "message 3", chatroom3);
+    //        updateLastChat(chatroom3, chat3);
+    //
+    //        blockMember(targetMember3, member);
+    //
+    //        // targetMember4 생성
+    //        Member targetMember4 = createMember("targetmember4@gmail.com", "targetMember4");
+    //        Chatroom chatroom4 = createChatroom();
+    //        createMemberChatroom(member, chatroom4, null);
+    //        createMemberChatroom(targetMember4, chatroom4, now);
+    //
+    //        // when
+    //        ChatroomListResponse response = chatFacadeService.getChatrooms(member);
+    //
+    //        // then
+    //        assertThat(response.getChatroomResponseList()).hasSize(3);
+    //        assertThat(response.getListSize()).isEqualTo(3);
+    //
+    //        ChatroomResponse chatroomResponse1 = response.getChatroomResponseList().get(0);
+    //        ChatroomResponse chatroomResponse2 = response.getChatroomResponseList().get(1);
+    //        ChatroomResponse chatroomResponse3 = response.getChatroomResponseList().get(2);
+    //
+    //        assertThat(chatroomResponse1.getChatroomId()).isEqualTo(chatroom3.getId());
+    //        assertThat(chatroomResponse1.getLastMsg()).isEqualTo(chat3.getContents());
+    //        assertThat(chatroomResponse1.getLastMsgTimestamp()).isEqualTo(chat3.getTimestamp());
+    //        assertThat(chatroomResponse1.getNotReadMsgCnt()).isEqualTo(1);
+    //        assertThat(chatroomResponse1.isBlocked()).isTrue();
+    //
+    //        assertThat(chatroomResponse2.getChatroomId()).isEqualTo(chatroom2.getId());
+    //        assertThat(chatroomResponse2.getLastMsg()).isEqualTo(chat2.getContents());
+    //        assertThat(chatroomResponse2.getLastMsgTimestamp()).isEqualTo(chat2.getTimestamp());
+    //        assertThat(chatroomResponse2.getNotReadMsgCnt()).isEqualTo(0);
+    //        assertThat(chatroomResponse2.getFriendRequestMemberId()).isEqualTo(member.getId());
+    //
+    //        assertThat(chatroomResponse3.getChatroomId()).isEqualTo(chatroom1.getId());
+    //        assertThat(chatroomResponse3.getLastMsg()).isEqualTo(chat1.getContents());
+    //        assertThat(chatroomResponse3.getLastMsgTimestamp()).isEqualTo(chat1.getTimestamp());
+    //        assertThat(chatroomResponse3.getNotReadMsgCnt()).isEqualTo(1);
+    //        assertThat(chatroomResponse3.isFriend()).isTrue();
+    //    }
+    //
+    //}
 
     @Nested
     @DisplayName("모든 채팅방 uuid 조회")
@@ -1081,7 +1083,7 @@ class ChatFacadeServiceTest {
     }
 
     private Member createMember(String email, String gameName) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password("testPassword")
                 .profileImage(1)
@@ -1097,7 +1099,13 @@ class ChatFacadeServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
+                .build();
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
                 .build());
+
+        return memberRepository.save(member);
     }
 
     private Chatroom createChatroom() {

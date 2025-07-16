@@ -3,7 +3,9 @@ package com.gamegoo.gamegoo_v2.feature;
 import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.core.common.validator.BanValidator;
@@ -31,6 +33,9 @@ class BanFeatureTest {
     private MemberRepository memberRepository;
 
     @Autowired
+    private MemberRecentStatsRepository memberRecentStatsRepository;
+
+    @Autowired
     private BanService banService;
 
     @Autowired
@@ -45,7 +50,8 @@ class BanFeatureTest {
 
     @AfterEach
     void tearDown() {
-        memberRepository.deleteAll();
+        memberRecentStatsRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
     }
 
     @Test
@@ -220,6 +226,12 @@ class BanFeatureTest {
                 5,
                 true
         );
+
+        memberRecentStatsRepository.save(MemberRecentStats.builder()
+                .member(member)
+                .build());
+
         return memberRepository.save(member);
     }
+
 }

@@ -146,6 +146,8 @@ public enum ErrorCode {
     BUMP_ACCESS_DENIED(FORBIDDEN, "BOARD_410", "게시글 끌어올리기 권한이 없습니다."),
     BUMP_TIME_LIMIT(BAD_REQUEST, "BOARD_411", "게시글 끌어올리기는 5분에 1회만 가능합니다."),
     BOARD_CREATE_COOL_DOWN(BAD_REQUEST, "BOARD_412", "게시글 작성 쿨타임이 적용되었습니다. 5분 후 다시 시도해주세요."),
+    GUEST_BOARD_ACCESS_DENIED(FORBIDDEN, "BOARD_413", "비회원 게시글에 대한 접근 권한이 없습니다."),
+    INVALID_GUEST_PASSWORD(UNAUTHORIZED, "BOARD_414", "비회원 게시글 비밀번호가 틀렸습니다."),
 
 
     /**

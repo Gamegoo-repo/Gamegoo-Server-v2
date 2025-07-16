@@ -130,7 +130,7 @@ public class Member extends BaseDateTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberGameStyle> memberGameStyleList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private MemberRecentStats memberRecentStats;
 
     @Enumerated(EnumType.STRING)
@@ -145,6 +145,13 @@ public class Member extends BaseDateTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Role role = Role.MEMBER;
+
+    public void setMemberRecentStats(MemberRecentStats stats) {
+        this.memberRecentStats = stats;
+        if (stats.getMember() != this) {
+            stats.setMember(this);
+        }
+    }
 
     // puuid 전용
     public static Member createForGeneral(String email, String password, LoginType loginType, String gameName,

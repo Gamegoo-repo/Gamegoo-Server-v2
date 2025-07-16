@@ -7,6 +7,7 @@ import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
 import com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom;
 import com.gamegoo.gamegoo_v2.chat.domain.SystemMessageType;
 import com.gamegoo.gamegoo_v2.chat.dto.ChatResponseFactory;
+import com.gamegoo.gamegoo_v2.chat.dto.data.ChatroomSummaryDTO;
 import com.gamegoo.gamegoo_v2.chat.dto.request.ChatCreateRequest;
 import com.gamegoo.gamegoo_v2.chat.dto.response.ChatCreateResponse;
 import com.gamegoo.gamegoo_v2.chat.dto.response.ChatMessageListResponse;
@@ -29,7 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -174,11 +175,11 @@ public class ChatFacadeService {
         Member targetMember = chatQueryService.getChatroomTargetMember(member, chatroom);
         blockValidator.throwIfBlocked(member, targetMember, ChatException.class, CHAT_START_FAILED_TARGET_IS_BLOCKED);
 
-        // 채팅방에 입장 처리
-        chatCommandService.enterExistingChatroom(member, targetMember, chatroom);
-
         // 최근 메시지 내역 조회
         Slice<Chat> chatSlice = chatQueryService.getRecentChatSlice(member, chatroom);
+
+        // 채팅방에 입장 처리
+        chatCommandService.enterExistingChatroom(member, targetMember, chatroom);
 
         // 응답 dto 생성
         ChatMessageListResponse chatMessageListResponse = chatResponseFactory.toChatMessageListResponse(chatSlice);
@@ -356,38 +357,21 @@ public class ChatFacadeService {
      * @return ChatroomListResponse
      */
     public ChatroomListResponse getChatrooms(Member member) {
-        // 입장 상태인 모든 memberChatroom 엔티티 정렬해 조회
-        List<MemberChatroom> activeMemberChatrooms = chatQueryService.getActiveMemberChatrooms(member);
+        List<ChatroomSummaryDTO> chatroomSummaryList = chatQueryService.getChatroomSummaryList(member.getId());
 
-        if (activeMemberChatrooms.isEmpty()) {
-            return chatResponseFactory.toChatroomListResponse();
-        }
-
-        List<Chatroom> chatrooms = activeMemberChatrooms.stream()
-                .map(MemberChatroom::getChatroom)
+        // 상대 회원 id 리스트
+        List<Long> targetMemberIds = chatroomSummaryList.stream()
+                .map(ChatroomSummaryDTO::getTargetMemberId)
                 .toList();
 
-        List<Long> chatroomIds = new ArrayList<>(chatrooms.size());
-        List<Long> lastChatIds = new ArrayList<>(chatrooms.size());
+        // 상대 회원 엔티티 리스트
+        List<Member> targetMembers = memberService.findAllMemberByIds(targetMemberIds);
 
-        for (Chatroom cr : chatrooms) {
-            chatroomIds.add(cr.getId());
-            lastChatIds.add(cr.getLastChatId());
+        // 상대 회원 id: 엔티티 map
+        Map<Long, Member> targetMemberMap = new HashMap<>(targetMembers.size());
+        for (Member targetMember : targetMembers) {
+            targetMemberMap.put(targetMember.getId(), targetMember);
         }
-
-        // 마지막 채팅 메시지 배치 조회
-        Map<Long, Chat> lastChatMap = chatQueryService.findAllChatsBatch(lastChatIds);
-
-        // 안읽은 메시지 수 배치 조회
-        Map<Long, Integer> unreadChatsMap = chatQueryService.countUnreadChatsBatch(member, chatroomIds);
-
-        // 채팅 상대 회원 배치 조회
-        Map<Long, Member> targetMemberMap = chatQueryService.getChatroomTargetMembersBatch(member, chatroomIds);
-
-        List<Member> targetMembers = new ArrayList<>(targetMemberMap.values());
-        List<Long> targetMemberIds = targetMembers.stream()
-                .map(Member::getId)
-                .toList();
 
         // 상대 회원과 친구 여부, 차단 여부, 친구 요청 배치 조회
         Map<Long, Boolean> isFriendMap = friendService.isFriendBatch(member, targetMemberIds);
@@ -395,18 +379,16 @@ public class ChatFacadeService {
         Map<Long, Long> friendRequestMap = friendService.getFriendRequestMemberIdBatch(member, targetMemberIds);
 
         // dto 생성
-        List<ChatroomResponse> chatroomResponses = activeMemberChatrooms.stream()
-                .map(mc -> {
-                    Chatroom chatroom = mc.getChatroom();
-                    Chat lastChat = lastChatMap.getOrDefault(chatroom.getId(), null);
-                    Member targetMember = targetMemberMap.get(chatroom.getId());
-                    Integer unreadCnt = unreadChatsMap.get(chatroom.getId());
+        List<ChatroomResponse> chatroomResponses = chatroomSummaryList.stream()
+                .map(chatroomSummaryDTO -> {
+
+                    Member targetMember = targetMemberMap.get(chatroomSummaryDTO.getTargetMemberId());
                     boolean friend = isFriendMap.get(targetMember.getId());
                     boolean blocked = isBlockedMap.get(targetMember.getId());
                     Long friendRequestMemberId = friendRequestMap.get(targetMember.getId());
 
-                    return chatResponseFactory.toChatroomResponse(chatroom, targetMember, friend, blocked,
-                            friendRequestMemberId, lastChat, unreadCnt);
+                    return chatResponseFactory.toChatroomResponse(targetMember, friend, blocked,
+                            friendRequestMemberId, chatroomSummaryDTO);
                 }).toList();
 
         return chatResponseFactory.toChatroomListResponse(chatroomResponses);

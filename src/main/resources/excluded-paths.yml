@@ -25,6 +25,8 @@ security:
         pattern: /api/v2/riot/verify # riot 계정 검증
       - method: GET
         pattern: /api/v2/posts/list # 게시글 목록 조회
+      - method: POST
+        pattern: /api/v2/posts/guest # 비회원 게시물 등록
       - method: GET
         pattern: /api/v2/posts/list/* # 비회원용 특정 게시글 조회
       - method: GET
@@ -36,4 +38,8 @@ security:
       - pattern: /api/v2/riot/oauth/callback/** # RSO
       - method: POST # riot 회원가입
         pattern: /api/v2/riot/join
+      - method: PUT
+        pattern: /api/v2/posts/guest/* # 비회원 게시글 수정
+      - method: DELETE
+        pattern: /api/v2/posts/guest/* # 비회원 게시글 삭제
 
