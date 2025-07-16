@@ -7,15 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class GuestBoardInsertRequest extends BoardInsertRequest {
-
-    @NotBlank(message = "게임 닉네임은 필수입니다.")
-    @Schema(description = "게임 내 닉네임")
-    private String gameName;
-
-    @NotBlank(message = "태그는 필수입니다.")
-    @Schema(description = "게임 태그")
-    private String tag;
+public class GuestBoardDeleteRequest {
 
     @NotBlank(message = "비밀번호는 필수입니다.")
     @Size(min = 4, max = 16, message = "비밀번호는 4-16자 이내로 입력해주세요.")

@@ -7,6 +7,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardUpdateRequest;
 import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
 import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
@@ -67,7 +68,7 @@ public class BoardService {
      * 게스트 게시글 엔티티 생성 및 저장
      */
     @Transactional
-    public Board createAndSaveGuestBoard(BoardInsertRequest request, String gameName, String tag) {
+    public Board createAndSaveGuestBoard(BoardInsertRequest request, String gameName, String tag, String password) {
         int boardProfileImage = (request.getBoardProfileImage() != null)
                 ? request.getBoardProfileImage()
                 : 1; // 기본 이미지
@@ -81,7 +82,8 @@ public class BoardService {
                 request.getWantP(),
                 request.getMike(),
                 request.getContents(),
-                boardProfileImage
+                boardProfileImage,
+                password
         );
         return boardRepository.save(board);
     }
@@ -250,6 +252,55 @@ public class BoardService {
     @Transactional
     public void deleteAllBoardByMember(Member member) {
         boardRepository.deleteAllByMember(member);
+    }
+
+    /**
+     * 비회원 게시글 수정
+     */
+    @Transactional
+    public Board updateGuestBoard(GuestBoardUpdateRequest request, Long boardId) {
+        Board board = boardRepository.findByIdAndDeleted(boardId, false)
+                .orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (!board.isGuest()) {
+            throw new BoardException(ErrorCode.GUEST_BOARD_ACCESS_DENIED);
+        }
+
+        if (!board.verifyGuestPassword(request.getPassword())) {
+            throw new BoardException(ErrorCode.INVALID_GUEST_PASSWORD);
+        }
+
+        board.updateBoard(
+                request.getGameMode(),
+                request.getMainP(),
+                request.getSubP(),
+                request.getWantP(),
+                request.getMike(),
+                request.getContents(),
+                request.getBoardProfileImage()
+        );
+
+        return board;
+    }
+
+    /**
+     * 비회원 게시글 삭제
+     */
+    @Transactional
+    public void deleteGuestBoard(Long boardId, String password) {
+        Board board = boardRepository.findByIdAndDeleted(boardId, false)
+                .orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (!board.isGuest()) {
+            throw new BoardException(ErrorCode.GUEST_BOARD_ACCESS_DENIED);
+        }
+
+        if (!board.verifyGuestPassword(password)) {
+            throw new BoardException(ErrorCode.INVALID_GUEST_PASSWORD);
+        }
+
+        board.setDeleted(true);
+        boardRepository.save(board);
     }
 
     /**

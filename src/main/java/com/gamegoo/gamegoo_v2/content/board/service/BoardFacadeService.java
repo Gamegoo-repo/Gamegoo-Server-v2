@@ -8,6 +8,9 @@ import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardUpdateRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardDeleteRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.*;
 import com.gamegoo.gamegoo_v2.core.common.validator.BanValidator;
 import com.gamegoo.gamegoo_v2.core.exception.BoardException;
@@ -63,14 +66,14 @@ public class BoardFacadeService {
      * - 게스트 게시글 생성
      */
     @Transactional
-    public BoardInsertResponse createGuestBoard(BoardInsertRequest request, String gameName, String tag) {
+    public BoardInsertResponse createGuestBoard(GuestBoardInsertRequest request, String gameName, String tag) {
         // 기존 회원 확인
         if (memberRepository.existsByGameNameAndTag(gameName, tag)) {
             throw new BoardException(ErrorCode.MEMBER_ALREADY_EXISTS);
         }
 
         profanityCheckService.validateProfanity(request.getContents());
-        Board board = boardService.createAndSaveGuestBoard(request, gameName, tag);
+        Board board = boardService.createAndSaveGuestBoard(request, gameName, tag, request.getPassword());
         boardGameStyleService.mapGameStylesToBoard(board, request.getGameStyles());
 
         return BoardInsertResponse.ofGuest(board);
@@ -147,6 +150,26 @@ public class BoardFacadeService {
     @Transactional
     public void deleteBoard(Member member, Long boardId) {
         boardService.deleteBoard(boardId, member.getId());
+    }
+
+    /**
+     * 비회원 게시글 수정 (파사드)
+     */
+    @Transactional
+    public BoardUpdateResponse updateGuestBoard(GuestBoardUpdateRequest request, Long boardId) {
+        profanityCheckService.validateProfanity(request.getContents());
+        Board board = boardService.updateGuestBoard(request, boardId);
+        boardGameStyleService.updateBoardGameStyles(board, request.getGameStyles());
+
+        return BoardUpdateResponse.of(board);
+    }
+
+    /**
+     * 비회원 게시글 삭제 (파사드)
+     */
+    @Transactional
+    public void deleteGuestBoard(Long boardId, GuestBoardDeleteRequest request) {
+        boardService.deleteGuestBoard(boardId, request.getPassword());
     }
 
     /**

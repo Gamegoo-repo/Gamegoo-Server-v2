@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
+import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardByIdResponseForMember;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardCursorResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.BoardInsertResponse;
@@ -780,24 +781,41 @@ class BoardFacadeServiceTest {
             return request;
         }
 
+        private GuestBoardInsertRequest createGuestBoardInsertRequest(String gameName, String tag, String password) {
+            GuestBoardInsertRequest request = new GuestBoardInsertRequest();
+            ReflectionTestUtils.setField(request, "gameMode", GameMode.SOLO);
+            ReflectionTestUtils.setField(request, "mainP", Position.TOP);
+            ReflectionTestUtils.setField(request, "subP", Position.JUNGLE);
+            ReflectionTestUtils.setField(request, "wantP", Arrays.asList(Position.TOP, Position.MID));
+            ReflectionTestUtils.setField(request, "mike", Mike.AVAILABLE);
+            ReflectionTestUtils.setField(request, "contents", "게스트 게시글 내용");
+            ReflectionTestUtils.setField(request, "boardProfileImage", 1);
+            ReflectionTestUtils.setField(request, "gameStyles", Arrays.asList(1L, 2L));
+            ReflectionTestUtils.setField(request, "gameName", gameName);
+            ReflectionTestUtils.setField(request, "tag", tag);
+            ReflectionTestUtils.setField(request, "password", password);
+            return request;
+        }
+
         @Test
         @DisplayName("게스트 게시글 작성 성공")
         void createGuestBoard_Success() {
             // given
             String gameName = "testGuestUser";
             String tag = "KR1";
-            BoardInsertRequest request = createBoardInsertRequest();
+            String password = "testpass123";
+            GuestBoardInsertRequest request = createGuestBoardInsertRequest(gameName, tag, password);
 
             Board guestBoard = Board.createForGuest(
                     gameName, tag, request.getGameMode(), request.getMainP(), request.getSubP(),
-                    request.getWantP(), request.getMike(), request.getContents(), 1
+                    request.getWantP(), request.getMike(), request.getContents(), 1, password
             );
             ReflectionTestUtils.setField(guestBoard, "id", 1L);
 
             // when
             when(memberRepository.existsByGameNameAndTag(gameName, tag)).thenReturn(false);
             doNothing().when(profanityCheckService).validateProfanity(request.getContents());
-            when(boardService.createAndSaveGuestBoard(request, gameName, tag)).thenReturn(guestBoard);
+            when(boardService.createAndSaveGuestBoard(request, gameName, tag, password)).thenReturn(guestBoard);
             doNothing().when(boardGameStyleService).mapGameStylesToBoard(guestBoard, request.getGameStyles());
 
             BoardInsertResponse response = boardFacadeService.createGuestBoard(request, gameName, tag);
@@ -809,7 +827,7 @@ class BoardFacadeServiceTest {
             assertThat(response.getTag()).isEqualTo(tag);
             verify(memberRepository).existsByGameNameAndTag(gameName, tag);
             verify(profanityCheckService).validateProfanity(request.getContents());
-            verify(boardService).createAndSaveGuestBoard(request, gameName, tag);
+            verify(boardService).createAndSaveGuestBoard(request, gameName, tag, password);
             verify(boardGameStyleService).mapGameStylesToBoard(guestBoard, request.getGameStyles());
         }
 
@@ -819,7 +837,8 @@ class BoardFacadeServiceTest {
             // given
             String gameName = "existingUser";
             String tag = "KR1";
-            BoardInsertRequest request = createBoardInsertRequest();
+            String password = "testpass123";
+            GuestBoardInsertRequest request = createGuestBoardInsertRequest(gameName, tag, password);
 
             // when
             when(memberRepository.existsByGameNameAndTag(gameName, tag)).thenReturn(true);
@@ -831,7 +850,7 @@ class BoardFacadeServiceTest {
 
             verify(memberRepository).existsByGameNameAndTag(gameName, tag);
             verify(profanityCheckService, never()).validateProfanity(anyString());
-            verify(boardService, never()).createAndSaveGuestBoard(any(), anyString(), anyString());
+            verify(boardService, never()).createAndSaveGuestBoard(any(), anyString(), anyString(), anyString());
             verify(boardGameStyleService, never()).mapGameStylesToBoard(any(), any());
         }
 
@@ -841,7 +860,8 @@ class BoardFacadeServiceTest {
             // given
             String gameName = "testGuestUser";
             String tag = "KR1";
-            BoardInsertRequest request = createBoardInsertRequest();
+            String password = "testpass123";
+            GuestBoardInsertRequest request = createGuestBoardInsertRequest(gameName, tag, password);
 
             // when
             when(memberRepository.existsByGameNameAndTag(gameName, tag)).thenReturn(false);
@@ -855,7 +875,7 @@ class BoardFacadeServiceTest {
 
             verify(memberRepository).existsByGameNameAndTag(gameName, tag);
             verify(profanityCheckService).validateProfanity(request.getContents());
-            verify(boardService, never()).createAndSaveGuestBoard(any(), anyString(), anyString());
+            verify(boardService, never()).createAndSaveGuestBoard(any(), anyString(), anyString(), anyString());
             verify(boardGameStyleService, never()).mapGameStylesToBoard(any(), any());
         }
     }
