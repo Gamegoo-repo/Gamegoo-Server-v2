@@ -37,25 +37,7 @@ public class BoardUpdateResponse {
                 .map(bgs -> bgs.getGameStyle().getId())
                 .collect(Collectors.toList());
 
-        if (member == null) {
-            return BoardUpdateResponse.builder()
-                    .boardId(board.getId())
-                    .memberId(0L)
-                    .profileImage(board.getBoardProfileImage())
-                    .gameName(board.getGameName())
-                    .tag(board.getTag())
-                    .tier(null)
-                    .rank(0)
-                    .gameMode(board.getGameMode())
-                    .mainP(board.getMainP())
-                    .subP(board.getSubP())
-                    .wantP(board.getWantP())
-                    .mike(board.getMike())
-                    .gameStyles(gameStyleIds)
-                    .contents(board.getContent())
-                    .build();
-        }
-
+        // 임시 멤버든 정식 멤버든 항상 Member가 존재함
         Tier tier;
         int rank;
         if (board.getGameMode() == GameMode.FREE) {

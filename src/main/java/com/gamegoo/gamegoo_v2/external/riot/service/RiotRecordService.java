@@ -214,11 +214,11 @@ public class RiotRecordService {
                 .recTotalLosses(totalLosses)
                 .recWinRate(recWinRate)
                 .recAvgKDA(recAvgKDA)
-                .recAvgKills((double) totalKills / totalGames)
-                .recAvgDeaths((double) totalDeaths / totalGames)
-                .recAvgAssists((double) totalAssists / totalGames)
+                .recAvgKills(totalGames > 0 ? (double) totalKills / totalGames : 0.0)
+                .recAvgDeaths(totalGames > 0 ? (double) totalDeaths / totalGames : 0.0)
+                .recAvgAssists(totalGames > 0 ? (double) totalAssists / totalGames : 0.0)
                 .recAvgCsPerMinute(recAvgCsPerMinute)
-                .recTotalCs(totalCs/(totalWins+totalLosses))
+                .recTotalCs((totalWins + totalLosses) > 0 ? totalCs / (totalWins + totalLosses) : 0)
                 .build();
     }
 
