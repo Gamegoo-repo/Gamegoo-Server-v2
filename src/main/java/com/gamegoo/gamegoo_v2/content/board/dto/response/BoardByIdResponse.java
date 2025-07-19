@@ -11,7 +11,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,35 +46,6 @@ public class BoardByIdResponse {
         List<Long> gameStyleIds = board.getBoardGameStyles().stream()
                 .map(bgs -> bgs.getGameStyle().getId())
                 .collect(Collectors.toList());
-
-        if (poster == null) { // 비회원 게시글 처리
-            return BoardByIdResponse.builder()
-                    .boardId(board.getId())
-                    .memberId(null)
-                    .createdAt(board.getCreatedAt())
-                    .profileImage(board.getBoardProfileImage())
-                    .gameName(board.getGameName())
-                    .tag(board.getTag())
-                    .mannerLevel(null)
-                    .soloTier(null)
-                    .soloRank(0)
-                    .freeTier(null)
-                    .freeRank(0)
-                    .mike(board.getMike())
-                    .championStatsResponseList(Collections.emptyList())
-                    .memberRecentStats(null)
-                    .gameMode(board.getGameMode())
-                    .mainP(board.getMainP())
-                    .subP(board.getSubP())
-                    .wantP(board.getWantP())
-                    .recentGameCount(null)
-                    .winRate(null)
-                    .gameStyles(gameStyleIds)
-                    .contents(board.getContent())
-                    .build();
-        }
-
-        // 회원 게시글 처리
         List<ChampionStatsResponse> championStatsResponseList = poster.getMemberChampionList() == null
                 ? List.of()
                 : poster.getMemberChampionList().stream()
@@ -86,7 +56,11 @@ public class BoardByIdResponse {
                         .games(mc.getGames())
                         .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
                         .csPerMinute(mc.getCsPerMinute())
+                        .averageCs(mc.getGames() > 0 ? (double) mc.getTotalCs() / mc.getGames() : 0)
                         .kda(mc.getKDA())
+                        .kills(mc.getGames() > 0 ? (double) mc.getKills() / mc.getGames() : 0)
+                        .deaths(mc.getGames() > 0 ? (double) mc.getDeaths() / mc.getGames() : 0)
+                        .assists(mc.getGames() > 0 ? (double) mc.getAssists() / mc.getGames() : 0)
                         .build())
                 .collect(Collectors.toList());
 

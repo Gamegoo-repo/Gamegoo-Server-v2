@@ -262,4 +262,81 @@ public class MemberService {
         member.updateRole(role);
     }
 
+    /**
+     * 임시 멤버 생성 및 저장
+     *
+     * @param gameName 게임 이름
+     * @param tag 태그
+     * @param tiers 티어 정보 리스트
+     * @return 생성된 임시 멤버
+     */
+    @Transactional
+    public Member createTmpMember(String gameName, String tag, List<TierDetails> tiers) {
+        // 기본 값 설정
+        Tier soloTier = Tier.UNRANKED;
+        int soloRank = 0;
+        double soloWinRate = 0.0;
+        int soloGameCount = 0;
+
+        Tier freeTier = Tier.UNRANKED;
+        int freeRank = 0;
+        double freeWinRate = 0.0;
+        int freeGameCount = 0;
+
+        // 티어 정보 설정
+        if (tiers != null) {
+            for (TierDetails tierDetail : tiers) {
+                if (tierDetail.getGameMode() == GameMode.SOLO) {
+                    soloTier = tierDetail.getTier();
+                    soloRank = tierDetail.getRank();
+                    soloWinRate = tierDetail.getWinrate();
+                    soloGameCount = tierDetail.getGameCount();
+                } else if (tierDetail.getGameMode() == GameMode.FREE) {
+                    freeTier = tierDetail.getTier();
+                    freeRank = tierDetail.getRank();
+                    freeWinRate = tierDetail.getWinrate();
+                    freeGameCount = tierDetail.getGameCount();
+                }
+            }
+        }
+
+        // 임시 멤버 생성
+        Member tmpMember = Member.createForTmp(
+                gameName, tag,
+                soloTier, soloRank, soloWinRate,
+                freeTier, freeRank, freeWinRate,
+                soloGameCount, freeGameCount
+        );
+
+        // Role을 TMP로 설정
+        tmpMember.updateRole(Role.TMP);
+
+        memberRepository.save(tmpMember);
+        return tmpMember;
+    }
+
+    /**
+     * 임시 멤버 조회 또는 생성
+     *
+     * @param gameName 게임 이름
+     * @param tag 태그
+     * @param tiers 티어 정보 리스트
+     * @return 기존 또는 새로 생성된 임시 멤버
+     */
+    @Transactional
+    public Member getOrCreateTmpMember(String gameName, String tag, List<TierDetails> tiers) {
+        // 기존 멤버 확인
+        return memberRepository.findByGameNameAndTag(gameName, tag)
+                .map(existingMember -> {
+                    // 기존 회원이 있으면 TMP 역할인지 확인
+                    if (existingMember.getRole() == Role.TMP) {
+                        return existingMember; // 재사용
+                    } else {
+                        // 정식 회원이면 예외 발생
+                        throw new MemberException(ErrorCode.MEMBER_ALREADY_EXISTS);
+                    }
+                })
+                .orElseGet(() -> createTmpMember(gameName, tag, tiers)); // 없으면 새로 생성
+    }
+
 }

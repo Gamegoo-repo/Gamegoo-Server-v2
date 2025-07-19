@@ -21,12 +21,17 @@ public class MemberChampionService {
 
     /**
      * 멤버와 챔피언 ID 목록을 기반으로 MemberChampion 엔티티를 생성 및 저장하는 메서드
+     * 기존 데이터를 삭제하고 새로운 데이터를 저장합니다.
      *
      * @param member        대상 멤버
      * @param championStats 챔피언 ID 목록
      */
     @Transactional
     public void saveMemberChampions(Member member, List<ChampionStats> championStats) {
+        // 기존 챔피언 데이터 삭제
+        memberChampionRepository.deleteByMember(member);
+        
+        // 새로운 챔피언 데이터 저장
         championStats.forEach(stats -> {
             Long championId = stats.getChampionId();
             // 챔피언이 존재하지 않으면 스킵

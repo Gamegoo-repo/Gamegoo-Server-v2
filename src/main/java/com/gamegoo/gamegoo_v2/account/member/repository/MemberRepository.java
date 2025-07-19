@@ -25,6 +25,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     boolean existsByGameNameAndTag(String gameName, String tag);
 
+    Optional<Member> findByGameNameAndTag(String gameName, String tag);
+
     List<Member> findAllByIdIn(List<Long> memberIds);
 
 }

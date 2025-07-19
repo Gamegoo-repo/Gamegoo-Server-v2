@@ -47,36 +47,7 @@ public class BoardListResponse {
     public static BoardListResponse of(Board board) {
         Member member = board.getMember();
 
-        if (member == null) { // 비회원 게시글 처리
-            return BoardListResponse.builder()
-                    .boardId(board.getId())
-                    .memberId(null)
-                    .gameName(board.getGameName())
-                    .tag(board.getTag())
-                    .mainP(board.getMainP())
-                    .subP(board.getSubP())
-                    .wantP(board.getWantP())
-                    .mike(board.getMike())
-                    .contents(board.getContent())
-                    .boardProfileImage(board.getBoardProfileImage())
-                    .createdAt(board.getCreatedAt())
-                    .profileImage(null)
-                    .mannerLevel(null)
-                    .tier(null)
-                    .rank(0)
-                    .gameMode(board.getGameMode())
-                    .winRate(null)
-                    .bumpTime(board.getBumpTime())
-                    .championStatsResponseList(Collections.emptyList())
-                    .memberRecentStats(null)
-                    .freeTier(null)
-                    .freeRank(0)
-                    .soloTier(null)
-                    .soloRank(0)
-                    .build();
-        }
-
-        // 회원 게시글 처리
+        // 모든 게시글은 임시 멤버든 정식 멤버든 항상 Member를 가짐
         Tier tier;
         int rank;
         Double winRate;
@@ -100,7 +71,11 @@ public class BoardListResponse {
                         .games(mc.getGames())
                         .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
                         .csPerMinute(mc.getCsPerMinute())
+                        .averageCs(mc.getGames() > 0 ? (double) mc.getTotalCs() / mc.getGames() : 0)
                         .kda(mc.getKDA())
+                        .kills(mc.getGames() > 0 ? (double) mc.getKills() / mc.getGames() : 0)
+                        .deaths(mc.getGames() > 0 ? (double) mc.getDeaths() / mc.getGames() : 0)
+                        .assists(mc.getGames() > 0 ? (double) mc.getAssists() / mc.getGames() : 0)
                         .build())
                 .collect(Collectors.toList());
 

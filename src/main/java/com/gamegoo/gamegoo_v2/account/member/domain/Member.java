@@ -204,6 +204,29 @@ public class Member extends BaseDateTimeEntity {
                 .build();
     }
 
+    // 임시 멤버 전용
+    public static Member createForTmp(String gameName, String tag, Tier soloTier, int soloRank, double soloWinRate, 
+                                      Tier freeTier, int freeRank, double freeWinRate, int soloGameCount, int freeGameCount) {
+        // 임시 멤버 랜덤 프로필 사진 설정
+        int randomProfileImage = ThreadLocalRandom.current().nextInt(1, 9);
+
+        return Member.builder()
+                .profileImage(randomProfileImage)
+                .loginType(LoginType.GENERAL)
+                .gameName(gameName)
+                .tag(tag)
+                .soloGameCount(soloGameCount)
+                .freeGameCount(freeGameCount)
+                .soloTier(soloTier)
+                .soloRank(soloRank)
+                .soloWinRate(soloWinRate)
+                .freeTier(freeTier)
+                .freeRank(freeRank)
+                .freeWinRate(freeWinRate)
+                .isAgree(true)
+                .build();
+    }
+
     @Builder
     private Member(String email, String puuid, String password, int profileImage, LoginType loginType, String gameName,
                    String tag, Tier soloTier, int soloRank, double soloWinRate, Tier freeTier, int freeRank,
