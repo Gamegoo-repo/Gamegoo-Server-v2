@@ -22,16 +22,20 @@ public class MemberRecentStatsResponse {
             return null;
         }
         
-        return new MemberRecentStatsResponse(
-                memberRecentStats.getRecTotalWins(),
-                memberRecentStats.getRecTotalLosses(),
-                memberRecentStats.getRecWinRate(),
-                memberRecentStats.getRecAvgKDA(),
-                memberRecentStats.getRecAvgKills(),
-                memberRecentStats.getRecAvgDeaths(),
-                memberRecentStats.getRecAvgAssists(),
-                memberRecentStats.getRecAvgCsPerMinute(),
-                memberRecentStats.getRecTotalCs()
-        );
+        try {
+            return new MemberRecentStatsResponse(
+                    memberRecentStats.getRecTotalWins(),
+                    memberRecentStats.getRecTotalLosses(),
+                    memberRecentStats.getRecWinRate(),
+                    memberRecentStats.getRecAvgKDA(),
+                    memberRecentStats.getRecAvgKills(),
+                    memberRecentStats.getRecAvgDeaths(),
+                    memberRecentStats.getRecAvgAssists(),
+                    memberRecentStats.getRecAvgCsPerMinute(),
+                    memberRecentStats.getRecTotalCs()
+            );
+        } catch (jakarta.persistence.EntityNotFoundException e) {
+            return null;
+        }
     }
 }
