@@ -157,7 +157,8 @@ class ReportRepositoryTest {
             ReportSearchRequest request = ReportSearchRequest.builder().build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(3);
@@ -174,7 +175,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(2);
@@ -191,7 +193,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(2);
@@ -208,7 +211,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(1);
@@ -224,7 +228,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(2);
@@ -241,7 +246,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(2);
@@ -262,7 +268,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(3);
@@ -279,7 +286,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(3);
@@ -296,7 +304,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(3);
@@ -312,7 +321,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(2);
@@ -329,7 +339,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(2);
@@ -346,7 +357,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(1);
@@ -363,7 +375,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(3);
@@ -378,7 +391,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(1);
@@ -394,7 +408,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(2);
@@ -414,7 +429,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).hasSize(1);
@@ -430,7 +446,8 @@ class ReportRepositoryTest {
                     .build();
 
             // when
-            List<Report> results = reportRepository.searchReports(request, Pageable.unpaged());
+            org.springframework.data.domain.Page<Report> resultPage = reportRepository.searchReports(request, Pageable.unpaged());
+            List<Report> results = resultPage.getContent();
 
             // then
             assertThat(results).isEmpty();

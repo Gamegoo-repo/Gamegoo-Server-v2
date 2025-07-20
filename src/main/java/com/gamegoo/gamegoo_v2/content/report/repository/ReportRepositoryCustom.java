@@ -2,8 +2,9 @@ package com.gamegoo.gamegoo_v2.content.report.repository;
 
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ReportRepositoryCustom {
-    List<Report> searchReports(ReportSearchRequest request, org.springframework.data.domain.Pageable pageable);
+    Page<Report> searchReports(ReportSearchRequest request, Pageable pageable);
 } 
