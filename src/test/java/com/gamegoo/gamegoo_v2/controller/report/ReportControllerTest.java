@@ -5,6 +5,7 @@ import com.gamegoo.gamegoo_v2.content.report.controller.ReportController;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportPageResponse;
 import com.gamegoo.gamegoo_v2.content.report.service.ReportFacadeService;
 import com.gamegoo.gamegoo_v2.controller.ControllerTestSupport;
 import com.gamegoo.gamegoo_v2.controller.WithCustomMockMember;
@@ -369,13 +370,21 @@ public class ReportControllerTest extends ControllerTestSupport {
         @Test
         void getReportListWithMemberRole() throws Exception {
             // given
-            given(reportFacadeService.searchReports(any(), any())).willReturn(List.of());
+            ReportPageResponse emptyResponse = ReportPageResponse.builder()
+                    .reports(List.of())
+                    .totalPages(0)
+                    .totalElements(0)
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(emptyResponse);
 
             // when // then
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data").isEmpty());
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.reports").isEmpty())
+                    .andExpect(jsonPath("$.data.totalPages").value(0))
+                    .andExpect(jsonPath("$.data.totalElements").value(0));
         }
 
         @WithCustomMockAdmin
@@ -411,32 +420,41 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(2)
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].reportId").value(1L))
-                    .andExpect(jsonPath("$.data[0].fromMemberId").value(10L))
-                    .andExpect(jsonPath("$.data[0].fromMemberName").value("신고자1"))
-                    .andExpect(jsonPath("$.data[0].fromMemberTag").value("KR1"))
-                    .andExpect(jsonPath("$.data[0].toMemberId").value(20L))
-                    .andExpect(jsonPath("$.data[0].toMemberName").value("피신고자1"))
-                    .andExpect(jsonPath("$.data[0].toMemberTag").value("KR2"))
-                    .andExpect(jsonPath("$.data[0].content").value("신고 내용1"))
-                    .andExpect(jsonPath("$.data[0].reportType").value("욕설/ 혐오/ 차별적 표현"))
-                    .andExpect(jsonPath("$.data[0].path").value("CHAT"))
-                    .andExpect(jsonPath("$.data[1].reportId").value(2L))
-                    .andExpect(jsonPath("$.data[1].fromMemberId").value(30L))
-                    .andExpect(jsonPath("$.data[1].fromMemberName").value("신고자2"))
-                    .andExpect(jsonPath("$.data[1].fromMemberTag").value("KR3"))
-                    .andExpect(jsonPath("$.data[1].toMemberId").value(40L))
-                    .andExpect(jsonPath("$.data[1].toMemberName").value("피신고자2"))
-                    .andExpect(jsonPath("$.data[1].toMemberTag").value("KR4"))
-                    .andExpect(jsonPath("$.data[1].content").value("신고 내용2"))
-                    .andExpect(jsonPath("$.data[1].reportType").value("불쾌한 표현"))
-                    .andExpect(jsonPath("$.data[1].path").value("BOARD"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(2))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].reportId").value(1L))
+                    .andExpect(jsonPath("$.data.reports[0].fromMemberId").value(10L))
+                    .andExpect(jsonPath("$.data.reports[0].fromMemberName").value("신고자1"))
+                    .andExpect(jsonPath("$.data.reports[0].fromMemberTag").value("KR1"))
+                    .andExpect(jsonPath("$.data.reports[0].toMemberId").value(20L))
+                    .andExpect(jsonPath("$.data.reports[0].toMemberName").value("피신고자1"))
+                    .andExpect(jsonPath("$.data.reports[0].toMemberTag").value("KR2"))
+                    .andExpect(jsonPath("$.data.reports[0].content").value("신고 내용1"))
+                    .andExpect(jsonPath("$.data.reports[0].reportType").value("욕설/ 혐오/ 차별적 표현"))
+                    .andExpect(jsonPath("$.data.reports[0].path").value("CHAT"))
+                    .andExpect(jsonPath("$.data.reports[1].reportId").value(2L))
+                    .andExpect(jsonPath("$.data.reports[1].fromMemberId").value(30L))
+                    .andExpect(jsonPath("$.data.reports[1].fromMemberName").value("신고자2"))
+                    .andExpect(jsonPath("$.data.reports[1].fromMemberTag").value("KR3"))
+                    .andExpect(jsonPath("$.data.reports[1].toMemberId").value(40L))
+                    .andExpect(jsonPath("$.data.reports[1].toMemberName").value("피신고자2"))
+                    .andExpect(jsonPath("$.data.reports[1].toMemberTag").value("KR4"))
+                    .andExpect(jsonPath("$.data.reports[1].content").value("신고 내용2"))
+                    .andExpect(jsonPath("$.data.reports[1].reportType").value("불쾌한 표현"))
+                    .andExpect(jsonPath("$.data.reports[1].path").value("BOARD"));
         }
 
         @WithCustomMockAdmin
@@ -455,7 +473,13 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -463,10 +487,13 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .param("reporterKeyword", "신고자1")
                             .param("contentKeyword", "욕설"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].reportId").value(1L))
-                    .andExpect(jsonPath("$.data[0].fromMemberName").value("신고자1"))
-                    .andExpect(jsonPath("$.data[0].toMemberName").value("피신고자1"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].reportId").value(1L))
+                    .andExpect(jsonPath("$.data.reports[0].fromMemberName").value("신고자1"))
+                    .andExpect(jsonPath("$.data.reports[0].toMemberName").value("피신고자1"));
         }
 
         @WithCustomMockAdmin
@@ -485,14 +512,23 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then - 신고 사유 1(스팸), 4(욕설) 필터링
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
                             .param("reportTypes", "1,4"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].reportType").value("스팸 홍보/도배글"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].reportType").value("스팸 홍보/도배글"));
         }
 
         @WithCustomMockAdmin
@@ -511,14 +547,23 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then - 채팅, 프로필 경로 필터링
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
                             .param("reportPaths", "CHAT,PROFILE"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].path").value("CHAT"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].path").value("CHAT"));
         }
 
         @WithCustomMockAdmin
@@ -537,15 +582,24 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then - 2024년 1월 1일부터 현재까지
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
                             .param("startDate", "2024-01-01T00:00:00")
                             .param("endDate", "2024-12-31T23:59:59"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].content").value("최근 신고"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].content").value("최근 신고"));
         }
 
         @WithCustomMockAdmin
@@ -564,15 +618,24 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then - 신고 횟수 3회 이상 10회 이하
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
                             .param("reportCountMin", "3")
                             .param("reportCountMax", "10"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].content").value("다중 신고 대상"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].content").value("다중 신고 대상"));
         }
 
         @WithCustomMockAdmin
@@ -591,14 +654,23 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then - 3일, 7일 제재 상태 필터링
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
                             .param("banTypes", "BAN_3D,BAN_7D"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].content").value("제재된 사용자"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].content").value("제재된 사용자"));
         }
 
         @WithCustomMockAdmin
@@ -617,15 +689,24 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then - 첫 번째 페이지, 사이즈 10
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
                             .param("page", "0")
                             .param("size", "10"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].content").value("페이징 테스트"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].content").value("페이징 테스트"));
         }
 
         @WithCustomMockAdmin
@@ -644,7 +725,13 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then - 모든 필터 조건을 조합하여 테스트
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
@@ -662,12 +749,15 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .param("page", "0")
                             .param("size", "10"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].reportId").value(1L))
-                    .andExpect(jsonPath("$.data[0].fromMemberName").value("신고자1"))
-                    .andExpect(jsonPath("$.data[0].toMemberName").value("피신고자1"))
-                    .andExpect(jsonPath("$.data[0].path").value("CHAT"))
-                    .andExpect(jsonPath("$.data[0].content").value("종합 필터링 테스트"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].reportId").value(1L))
+                    .andExpect(jsonPath("$.data.reports[0].fromMemberName").value("신고자1"))
+                    .andExpect(jsonPath("$.data.reports[0].toMemberName").value("피신고자1"))
+                    .andExpect(jsonPath("$.data.reports[0].path").value("CHAT"))
+                    .andExpect(jsonPath("$.data.reports[0].content").value("종합 필터링 테스트"));
         }
 
         @WithCustomMockAdmin
@@ -690,16 +780,25 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then - gameName#tag 형식으로 검색
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
                             .param("reportedMemberKeyword", "피신고자1#KR2"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].toMemberName").value("피신고자1"))
-                    .andExpect(jsonPath("$.data[0].toMemberTag").value("KR2"))
-                    .andExpect(jsonPath("$.data[0].content").value("태그 검색 테스트"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].toMemberName").value("피신고자1"))
+                    .andExpect(jsonPath("$.data.reports[0].toMemberTag").value("KR2"))
+                    .andExpect(jsonPath("$.data.reports[0].content").value("태그 검색 테스트"));
         }
 
         @WithCustomMockAdmin
@@ -722,15 +821,24 @@ public class ReportControllerTest extends ControllerTestSupport {
                             .createdAt(java.time.LocalDateTime.now())
                             .build()
             );
-            given(reportFacadeService.searchReports(any(), any())).willReturn(responseList);
+            ReportPageResponse pageResponse = ReportPageResponse.builder()
+                    .reports(responseList)
+                    .totalPages(1)
+                    .totalElements(responseList.size())
+                    .currentPage(0)
+                    .build();
+            given(reportFacadeService.searchReports(any(), any())).willReturn(pageResponse);
 
             // when // then - tag만으로 검색
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
                             .param("reporterKeyword", "KR1"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data").isArray())
-                    .andExpect(jsonPath("$.data[0].fromMemberTag").value("KR1"))
-                    .andExpect(jsonPath("$.data[0].content").value("태그 단독 검색 테스트"));
+                    .andExpect(jsonPath("$.data.reports").isArray())
+                    .andExpect(jsonPath("$.data.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.totalElements").value(responseList.size()))
+                    .andExpect(jsonPath("$.data.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.reports[0].fromMemberTag").value("KR1"))
+                    .andExpect(jsonPath("$.data.reports[0].content").value("태그 단독 검색 테스트"));
         }
     }
 

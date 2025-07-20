@@ -5,7 +5,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
-import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportPageResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
 import com.gamegoo.gamegoo_v2.content.report.service.ReportFacadeService;
@@ -70,7 +70,7 @@ public class ReportController {
                    /api/v2/report/list?reportedMemberKeyword=홍길동#KR1&reportTypes=1,4&startDate=2024-01-01T00:00:00&banTypes=WARNING&page=0&size=10
                    """)
     @GetMapping("/list")
-    public ApiResponse<List<ReportListResponse>> getReportList(
+    public ApiResponse<ReportPageResponse> getReportList(
             @RequestParam(required = false) String reportedMemberKeyword,
             @RequestParam(required = false) String reporterKeyword,
             @RequestParam(required = false) String contentKeyword,

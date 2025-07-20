@@ -86,7 +86,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then
         System.out.println("=== 신고자 게임명 검색 결과 ===");
@@ -112,7 +113,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then
         assertThat(results).hasSize(1);
@@ -129,7 +131,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then
         assertThat(results).hasSize(1);
@@ -146,7 +149,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then
         assertThat(results).hasSize(1);
@@ -163,7 +167,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then
         assertThat(results).hasSize(1);
@@ -180,7 +185,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then
         System.out.println("=== 피신고자 게임명#태그 조합 검색 결과 ===");
@@ -206,7 +212,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then
         assertThat(results).hasSize(1);
@@ -222,7 +229,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then
         assertThat(results).isEmpty();
@@ -237,7 +245,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then - "신고자1", "신고자2" 모두 포함되어야 함
         assertThat(results).hasSize(2);
@@ -252,7 +261,8 @@ public class ReportSearchIntegrationTest {
                 .build();
 
         // when
-        List<Report> results = reportService.searchReports(request, Pageable.unpaged());
+        org.springframework.data.domain.Page<Report> resultPage = reportService.searchReports(request, Pageable.unpaged());
+        List<Report> results = resultPage.getContent();
 
         // then - 대문자 KR1과 매칭되지 않아야 함 (정확한 동작 확인)
         // MySQL은 기본적으로 대소문자를 구분하지 않지만, 정확한 설정에 따라 다를 수 있음
