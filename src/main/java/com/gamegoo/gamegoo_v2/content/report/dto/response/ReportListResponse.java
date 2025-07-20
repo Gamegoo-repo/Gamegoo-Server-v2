@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.content.report.dto.response;
 
+import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -19,4 +20,19 @@ public class ReportListResponse {
     private String reportType;
     private String path;
     private LocalDateTime createdAt;
+
+    public static ReportListResponse of(Report report) {
+        return ReportListResponse.builder()
+                .reportId(report.getId())
+                .fromMemberId(report.getFromMember().getId())
+                .fromMemberName(report.getFromMember().getGameName())
+                .fromMemberTag(report.getFromMember().getTag())
+                .toMemberId(report.getToMember().getId())
+                .toMemberName(report.getToMember().getGameName())
+                .toMemberTag(report.getToMember().getTag())
+                .content(report.getContent())
+                .path(report.getPath().name())
+                .createdAt(report.getCreatedAt())
+                .build();
+    }
 }
