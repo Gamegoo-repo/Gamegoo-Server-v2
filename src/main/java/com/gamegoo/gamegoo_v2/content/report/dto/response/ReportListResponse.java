@@ -1,10 +1,12 @@
 package com.gamegoo.gamegoo_v2.content.report.dto.response;
 
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
+import com.gamegoo.gamegoo_v2.content.report.domain.ReportType;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -31,6 +33,10 @@ public class ReportListResponse {
             isPostDeleted = report.getSourceBoard().isDeleted();
         }
         
+        String reportType = report.getReportTypeMappingList().stream()
+                .map(mapping -> ReportType.of(mapping.getCode()).getDescription())
+                .collect(Collectors.joining(", "));
+        
         return ReportListResponse.builder()
                 .reportId(report.getId())
                 .fromMemberId(report.getFromMember().getId())
@@ -40,6 +46,7 @@ public class ReportListResponse {
                 .toMemberName(report.getToMember().getGameName())
                 .toMemberTag(report.getToMember().getTag())
                 .content(report.getContent())
+                .reportType(reportType)
                 .path(report.getPath().name())
                 .createdAt(report.getCreatedAt())
                 .postId(postId)
