@@ -20,8 +20,17 @@ public class ReportListResponse {
     private String reportType;
     private String path;
     private LocalDateTime createdAt;
+    private Long postId;
+    private Boolean isPostDeleted;
 
     public static ReportListResponse of(Report report) {
+        Long postId = null;
+        Boolean isPostDeleted = null;
+        if (report.getSourceBoard() != null) {
+            postId = report.getSourceBoard().getId();
+            isPostDeleted = report.getSourceBoard().isDeleted();
+        }
+        
         return ReportListResponse.builder()
                 .reportId(report.getId())
                 .fromMemberId(report.getFromMember().getId())
@@ -33,6 +42,8 @@ public class ReportListResponse {
                 .content(report.getContent())
                 .path(report.getPath().name())
                 .createdAt(report.getCreatedAt())
+                .postId(postId)
+                .isPostDeleted(isPostDeleted)
                 .build();
     }
 }
