@@ -136,14 +136,10 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
                 .distinct();
 
         // 정렬 처리
-        if (request.getSortOrder() != null) {
-            if (request.getSortOrder() == ReportSortOrder.LATEST) {
-                query = query.orderBy(report.createdAt.desc());
-            } else if (request.getSortOrder() == ReportSortOrder.OLDEST) {
-                query = query.orderBy(report.createdAt.asc());
-            }
+        if (request.getSortOrder() == ReportSortOrder.OLDEST) {
+            query = query.orderBy(report.createdAt.asc());
         } else {
-            // 기본값: 최신순
+            // 기본값: 최신순 (LATEST 또는 null)
             query = query.orderBy(report.createdAt.desc());
         }
 
