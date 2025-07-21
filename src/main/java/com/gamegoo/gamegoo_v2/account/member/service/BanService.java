@@ -53,7 +53,6 @@ public class BanService {
             case BAN_1D -> "1일 정지";
             case BAN_3D -> "3일 정지";
             case BAN_5D -> "5일 정지";
-            case BAN_7D -> "7일 정지";
             case BAN_1W -> "1주 정지";
             case BAN_2W -> "2주 정지";
             case BAN_1M -> "한달 정지";
@@ -70,7 +69,6 @@ public class BanService {
             case BAN_1D -> now.plusDays(1);
             case BAN_3D -> now.plusDays(3);
             case BAN_5D -> now.plusDays(5);
-            case BAN_7D -> now.plusDays(7);
             case BAN_1W -> now.plusWeeks(1);
             case BAN_2W -> now.plusWeeks(2);
             case BAN_1M -> now.plusMonths(1);

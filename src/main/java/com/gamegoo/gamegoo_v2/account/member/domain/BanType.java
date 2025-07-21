@@ -6,7 +6,6 @@ public enum BanType {
     BAN_1D,    // 1일 제한
     BAN_3D,    // 3일 제한
     BAN_5D,    // 5일 제한
-    BAN_7D,    // 7일 제한
     BAN_1W,    // 1주 제한
     BAN_2W,    // 2주 제한
     BAN_1M,    // 한달 제한

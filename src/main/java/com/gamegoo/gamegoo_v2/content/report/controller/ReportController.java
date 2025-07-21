@@ -64,7 +64,7 @@ public class ReportController {
                    - startDate/endDate: 신고 날짜 범위 (yyyy-MM-dd'T'HH:mm:ss)
                    - reportCountMin/Max/Exact: 누적 신고 횟수 필터
                    - isDeleted: 게시물 삭제 여부 (true/false)
-                   - banTypes: 제재 상태 (NONE, WARNING, BAN_1D, BAN_3D, BAN_5D, BAN_7D, BAN_1W, BAN_2W, BAN_1M, PERMANENT)
+                   - banTypes: 제재 상태 (NONE, WARNING, BAN_1D, BAN_3D, BAN_5D, BAN_1W, BAN_2W, BAN_1M, PERMANENT)
                    - sortOrder: 정렬 순서 (LATEST: 최신순, OLDEST: 오래된순) - 기본값: LATEST
                    - page/size: 페이징 (예: page=0&size=10)
 
@@ -119,7 +119,6 @@ public class ReportController {
                      - BAN_1D: 1일 정지
                      - BAN_3D: 3일 정지
                      - BAN_5D: 5일 정지
-                     - BAN_7D: 7일 정지
                      - BAN_1W: 1주 정지
                      - BAN_2W: 2주 정지
                      - BAN_1M: 1개월 정지
