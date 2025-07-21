@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Pageable;
 import com.gamegoo.gamegoo_v2.content.report.domain.ReportPath;
+import com.gamegoo.gamegoo_v2.content.report.domain.ReportSortOrder;
 import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
 import java.time.LocalDateTime;
 
@@ -64,6 +65,7 @@ public class ReportController {
                    - reportCountMin/Max/Exact: 누적 신고 횟수 필터
                    - isDeleted: 게시물 삭제 여부 (true/false)
                    - banTypes: 제재 상태 (NONE, WARNING, BAN_1D, BAN_3D, BAN_5D, BAN_7D, BAN_1W, BAN_2W, BAN_1M, PERMANENT)
+                   - sortOrder: 정렬 순서 (LATEST: 최신순, OLDEST: 오래된순) - 기본값: LATEST
                    - page/size: 페이징 (예: page=0&size=10)
 
                    **사용 예시:**
@@ -83,6 +85,7 @@ public class ReportController {
             @RequestParam(required = false) Integer reportCountExact,
             @RequestParam(required = false) Boolean isDeleted,
             @RequestParam(required = false) List<BanType> banTypes,
+            @RequestParam(required = false) ReportSortOrder sortOrder,
             Pageable pageable) {
 
         ReportSearchRequest request = ReportSearchRequest.builder()
@@ -98,6 +101,7 @@ public class ReportController {
                 .reportCountExact(reportCountExact)
                 .isDeleted(isDeleted)
                 .banTypes(banTypes)
+                .sortOrder(sortOrder)
                 .build();
 
         return ApiResponse.ok(reportFacadeService.searchReports(request, pageable));

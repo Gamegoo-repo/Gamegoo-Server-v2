@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.content.report.repository;
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.domain.QReport;
 import com.gamegoo.gamegoo_v2.content.report.domain.QReportTypeMapping;
+import com.gamegoo.gamegoo_v2.content.report.domain.ReportSortOrder;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
 import com.gamegoo.gamegoo_v2.content.board.domain.QBoard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -133,6 +134,18 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
                 .leftJoin(report.fromMember)
                 .where(builder)
                 .distinct();
+
+        // 정렬 처리
+        if (request.getSortOrder() != null) {
+            if (request.getSortOrder() == ReportSortOrder.LATEST) {
+                query = query.orderBy(report.createdAt.desc());
+            } else if (request.getSortOrder() == ReportSortOrder.OLDEST) {
+                query = query.orderBy(report.createdAt.asc());
+            }
+        } else {
+            // 기본값: 최신순
+            query = query.orderBy(report.createdAt.desc());
+        }
 
         // 페이징 처리
         if (pageable != null && pageable.isPaged()) {
