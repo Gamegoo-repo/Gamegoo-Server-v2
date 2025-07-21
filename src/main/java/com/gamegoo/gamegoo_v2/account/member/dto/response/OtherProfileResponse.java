@@ -39,6 +39,7 @@ public class OtherProfileResponse {
     List<GameStyleResponse> gameStyleResponseList;
     List<ChampionStatsResponse> championStatsResponseList;
     MemberRecentStatsResponse memberRecentStats;
+    Boolean canRefresh;
 
     public static OtherProfileResponse of(Member targetMember, Boolean isFriend, Long friendRequestMemberId,
                                           Boolean isBlocked) {
@@ -49,6 +50,9 @@ public class OtherProfileResponse {
         List<ChampionStatsResponse> championStatsResponseList = targetMember.getMemberChampionList().stream()
                 .map(ChampionStatsResponse::from)
                 .toList();
+
+        // 3일 기준으로 갱신 가능 여부 체크
+        boolean canRefresh = targetMember.canRefreshChampionStats();
 
         return OtherProfileResponse.builder()
                 .id(targetMember.getId())
@@ -75,7 +79,9 @@ public class OtherProfileResponse {
                 .gameStyleResponseList(gameStyleResponseList)
                 .championStatsResponseList(championStatsResponseList)
                 .memberRecentStats(MemberRecentStatsResponse.from(targetMember.getMemberRecentStats()))
+                .canRefresh(canRefresh)
                 .build();
     }
+
 
 }

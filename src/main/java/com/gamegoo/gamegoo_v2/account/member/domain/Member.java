@@ -317,4 +317,32 @@ public class Member extends BaseDateTimeEntity {
         return !isBanned();
     }
 
+    /**
+     * 챔피언 통계 갱신 가능 여부 체크
+     * 마지막 갱신으로부터 3일이 지났거나, 처음 갱신하는 경우 true 반환
+     */
+    public boolean canRefreshChampionStats() {
+        if (this.championStatsRefreshedAt == null) {
+            return true; // 처음 갱신하는 경우
+        }
+        
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        return java.time.temporal.ChronoUnit.DAYS.between(this.championStatsRefreshedAt, now) >= 3;
+    }
+
+    public void updateRiotStats(List<com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails> tiers) {
+        for (com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails tierDetail : tiers) {
+            if (tierDetail.getGameMode() == com.gamegoo.gamegoo_v2.matching.domain.GameMode.SOLO) {
+                this.soloTier = tierDetail.getTier();
+                this.soloRank = tierDetail.getRank();
+                this.soloWinRate = tierDetail.getWinrate();
+                this.soloGameCount = tierDetail.getGameCount();
+            } else if (tierDetail.getGameMode() == com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE) {
+                this.freeTier = tierDetail.getTier();
+                this.freeRank = tierDetail.getRank();
+                this.freeWinRate = tierDetail.getWinrate();
+                this.freeGameCount = tierDetail.getGameCount();
+            }
+        }
+    }
 }

@@ -36,14 +36,8 @@ public class MemberFacadeService {
      * @param member 조회할 회원
      * @return 조회된 결과 DTO
      */
-    @Transactional
     public MyProfileResponse getMyProfile(Member member) {
-        // 프로필 접근 시 최근 전적 챔피언 정보 자동 갱신
-        refreshChampionStatsIfNeeded(member);
-        
-        // 업데이트된 데이터를 반영하기 위해 fresh entity 로딩
-        Member freshMember = memberService.findMemberById(member.getId());
-        return MyProfileResponse.of(freshMember);
+        return MyProfileResponse.of(member);
     }
 
     /**
@@ -52,17 +46,10 @@ public class MemberFacadeService {
      * @param member 조회할 회원
      * @return 조회된 결과 DTO
      */
-    @Transactional
     public OtherProfileResponse getOtherProfile(Member member, Long targetMemberId) {
 
         // memberId로 targetMember 얻기
         Member targetMember = memberService.findMemberById(targetMemberId);
-
-        // 프로필 접근 시 최근 전적 챔피언 정보 자동 갱신
-        refreshChampionStatsIfNeeded(targetMember);
-
-        // 업데이트된 데이터를 반영하기 위해 fresh entity 로딩
-        targetMember = memberService.findMemberById(targetMemberId);
 
         // 친구 정보 얻기
         boolean isFriend = friendService.isFriend(member, targetMember);
@@ -75,29 +62,6 @@ public class MemberFacadeService {
                 isBlocked);
     }
 
-    /**
-     * 프로필 접근 시 최근 전적 챔피언 정보 자동 갱신 (필요한 경우에만)
-     *
-     * @param member 갱신 대상 사용자
-     */
-    private void refreshChampionStatsIfNeeded(Member member) {
-        // 마지막 챔피언 통계 갱신 시간 체크 (5분마다 갱신)
-        LocalDateTime lastRefreshTime = member.getChampionStatsRefreshedAt();
-        LocalDateTime now = LocalDateTime.now();
-
-        // 5분 이상 지났거나, 처음 접근하는 경우 갱신
-        if (lastRefreshTime == null ||
-            ChronoUnit.MINUTES.between(lastRefreshTime, now) >= 5) {
-            try {
-                championStatsRefreshService.refreshChampionStats(member);
-                // 갱신 성공 시에만 시간 업데이트
-                member.updateChampionStatsRefreshedAt();
-            } catch (Exception e) {
-                // 갱신에 실패하더라도 프로필 조회는 정상적으로 진행되어야 하므로,
-                // 트랜잭션을 분리하고 예외를 전파하지 않습니다.
-            }
-        }
-    }
 
     /**
      * 프로필 이미지 수정
@@ -154,13 +118,26 @@ public class MemberFacadeService {
     /**
      * 회원의 챔피언 통계 갱신(새로고침) 기능.
      * 회원이 새로고침 버튼을 누르면 호출됩니다.
+     * 마지막 갱신으로부터 3일이 지난 경우에만 갱신이 가능합니다.
      *
      * @param member 갱신 대상 사용자
      * @return 성공 메세지
      */
     @Transactional
     public String refreshChampionStats(Member member) {
+        // 갱신 가능 여부 체크
+        if (!member.canRefreshChampionStats()) {
+            LocalDateTime lastRefreshTime = member.getChampionStatsRefreshedAt();
+            long remainingHours = 72 - ChronoUnit.HOURS.between(lastRefreshTime, LocalDateTime.now());
+            System.out.println("[REFRESH] 갱신 불가 - 마지막: " + lastRefreshTime + ", 남은시간: " + remainingHours + "h");
+            return String.format("전적 갱신은 3일마다 가능합니다. %d시간 후 다시 시도해주세요.", remainingHours);
+        }
+
+        // 갱신 진행
+        System.out.println("[REFRESH] 갱신 시작 - 이전: " + member.getChampionStatsRefreshedAt());
         championStatsRefreshService.refreshChampionStats(member);
+        member.updateChampionStatsRefreshedAt();
+        System.out.println("[REFRESH] 갱신 완료 - 현재: " + member.getChampionStatsRefreshedAt());
         return "챔피언 통계 갱신이 완료되었습니다";
     }
 
