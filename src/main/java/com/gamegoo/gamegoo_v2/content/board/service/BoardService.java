@@ -68,14 +68,13 @@ public class BoardService {
      * 게스트 게시글 엔티티 생성 및 저장
      */
     @Transactional
-    public Board createAndSaveGuestBoard(BoardInsertRequest request, String gameName, String tag, String password) {
+    public Board createAndSaveGuestBoard(BoardInsertRequest request, Member tmpMember, String password) {
         int boardProfileImage = (request.getBoardProfileImage() != null)
                 ? request.getBoardProfileImage()
-                : 1; // 기본 이미지
+                : tmpMember.getProfileImage();
 
         Board board = Board.createForGuest(
-                gameName,
-                tag,
+                tmpMember,
                 request.getGameMode(),
                 request.getMainP(),
                 request.getSubP(),
