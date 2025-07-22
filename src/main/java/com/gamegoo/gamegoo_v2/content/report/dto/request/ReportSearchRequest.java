@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
+import com.gamegoo.gamegoo_v2.content.report.domain.ReportSortOrder;
 
 @Getter
 @NoArgsConstructor
@@ -26,4 +27,5 @@ public class ReportSearchRequest {
     private Integer reportCountExact;
     private Boolean isDeleted;
     private List<BanType> banTypes;
+    private ReportSortOrder sortOrder;
 }

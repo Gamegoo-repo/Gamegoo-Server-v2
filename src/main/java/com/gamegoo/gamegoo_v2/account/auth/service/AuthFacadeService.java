@@ -18,6 +18,7 @@ import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
+import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,7 @@ public class AuthFacadeService {
     private final AuthService authService;
     private final JwtProvider jwtProvider;
     private final PasswordService passwordService;
+    private final BanService banService;
 
     /**
      * 회원가입
@@ -90,7 +92,16 @@ public class AuthFacadeService {
         // DB에 저장
         authService.updateRefreshToken(member, refreshToken);
 
-        return LoginResponse.of(member, accessToken, refreshToken);
+        // 제재 만료 확인 (만료된 제재 자동 해제)
+        banService.checkBanExpiry(member);
+        
+        // 제재 메시지 생성
+        String banMessage = null;
+        if (member.isBanned()) {
+            banMessage = banService.getBanReasonMessage(member.getBanType());
+        }
+
+        return LoginResponse.of(member, accessToken, refreshToken, banMessage);
     }
 
     /**
