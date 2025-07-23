@@ -22,7 +22,7 @@ public class LoggingFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
 
         // /healthcheck 경로는 로그 출력 제외
-        if ("/healthcheck".equals(uri)) {
+        if ("/healthcheck".equals(uri) || "/actuator/prometheus".equals(uri)) {
             filterChain.doFilter(request, response);
             return;
         }
