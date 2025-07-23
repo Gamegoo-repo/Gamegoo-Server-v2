@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+@Slf4j
 @RestControllerAdvice
 public class ExceptionAdvice {
 
@@ -118,6 +120,7 @@ public class ExceptionAdvice {
     // 서버 내부 에러
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleAll(Exception e) {
+        log.error("Unhandled exception occurred", e);
         ErrorCode errorCode = ErrorCode._INTERNAL_SERVER_ERROR;
 
         ApiResponse<Object> apiResponse = ApiResponse.builder()
