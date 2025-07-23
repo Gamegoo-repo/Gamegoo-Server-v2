@@ -6,13 +6,13 @@ import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.domain.ReportPath;
 import com.gamegoo.gamegoo_v2.content.report.domain.ReportType;
 import com.gamegoo.gamegoo_v2.content.report.domain.ReportTypeMapping;
+import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
 import com.gamegoo.gamegoo_v2.content.report.repository.ReportRepository;
 import com.gamegoo.gamegoo_v2.content.report.repository.ReportTypeMappingRepository;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.event.SendReportEmailEvent;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -47,8 +47,10 @@ public class ReportService {
     @Transactional
     public Report insertReport(Member member, Member targetMember, List<Integer> reportCodes, String content,
                                Integer pathCode, Board board) {
-        // targetMember로 나 자신을 요청한 경우 검증
-        memberValidator.throwIfEqual(member, targetMember);
+        if (member != null) {
+            // targetMember로 나 자신을 요청한 경우 검증
+            memberValidator.throwIfEqual(member, targetMember);
+        }
 
         // 상대방의 탈퇴 여부 검증
         memberValidator.throwIfBlind(targetMember);
@@ -65,13 +67,23 @@ public class ReportService {
         reportTypeMappingRepository.saveAll(reportTypeMappings);
 
         // 관리자에게 메일 발송 event 발생
-        eventPublisher.publishEvent(SendReportEmailEvent.builder()
-                .reportId(report.getId())
-                .fromMemberId(member.getId())
-                .fromMemberGameName(member.getGameName())
-                .fromMemberTag(member.getTag())
-                .toMemberId(targetMember.getId())
-                .build());
+        if (member != null) {
+            eventPublisher.publishEvent(SendReportEmailEvent.builder()
+                    .reportId(report.getId())
+                    .fromMemberId(member.getId())
+                    .fromMemberGameName(member.getGameName())
+                    .fromMemberTag(member.getTag())
+                    .toMemberId(targetMember.getId())
+                    .build());
+        } else { // 비회원 신고 건
+            eventPublisher.publishEvent(SendReportEmailEvent.builder()
+                    .reportId(report.getId())
+                    .fromMemberId(null)
+                    .fromMemberGameName("비회원")
+                    .fromMemberTag("#")
+                    .toMemberId(targetMember.getId())
+                    .build());
+        }
 
         return report;
     }
@@ -124,7 +136,8 @@ public class ReportService {
         return reportRepository.findAll();
     }
 
-    public org.springframework.data.domain.Page<Report> searchReports(ReportSearchRequest request, org.springframework.data.domain.Pageable pageable) {
+    public org.springframework.data.domain.Page<Report> searchReports(ReportSearchRequest request,
+                                                                      org.springframework.data.domain.Pageable pageable) {
         return reportRepository.searchReports(request, pageable);
     }
 

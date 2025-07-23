@@ -2,19 +2,19 @@ package com.gamegoo.gamegoo_v2.content.report.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
+import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
-import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportPageResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class ReportFacadeService {
     /**
      * 신고 등록 facade 메소드
      *
-     * @param member         회원
+     * @param member         회원 (비회원 요청의 경우 null)
      * @param targetMemberId 대상 회원 id
      * @param request        신고 등록 요청
      * @return ReportInsertResponse
@@ -46,10 +46,11 @@ public class ReportFacadeService {
         Member targetMember = memberService.findMemberById(targetMemberId);
 
         // 오늘 날짜에 해당 회원에게 신고 내역이 존재하는 경우 쿨타임 적용
-        boolean exists = reportService.existsByMemberAndCreatedAt(member, targetMember, LocalDate.now());
-
-        if (exists) {
-            throw new ReportException(ErrorCode.REPORT_ALREADY_EXISTS);
+        if (member != null) { // 쿨타임 로직은 회원만 해당
+            boolean exists = reportService.existsByMemberAndCreatedAt(member, targetMember, LocalDate.now());
+            if (exists) {
+                throw new ReportException(ErrorCode.REPORT_ALREADY_EXISTS);
+            }
         }
 
         Board board = (request.getBoardId() != null) ? boardService.findBoard(request.getBoardId()) : null;
@@ -64,7 +65,8 @@ public class ReportFacadeService {
     /**
      * 신고 목록 고급 필터링 조회 (관리자용)
      */
-    public ReportPageResponse searchReports(ReportSearchRequest request, org.springframework.data.domain.Pageable pageable) {
+    public ReportPageResponse searchReports(ReportSearchRequest request,
+                                            org.springframework.data.domain.Pageable pageable) {
         return ReportPageResponse.of(reportService.searchReports(request, pageable));
     }
 
