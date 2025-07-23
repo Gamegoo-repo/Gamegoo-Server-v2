@@ -37,13 +37,20 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
     public Object resolveArgument(@NonNull MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   @NonNull NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
+        AuthMember authMember = parameter.getParameterAnnotation(AuthMember.class);
+        boolean required = authMember == null || authMember.required(); // 기본값 true
+
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         if (currentMemberId != null) {
             return memberRepository.findById(currentMemberId)
                     .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
-        } else {
+        }
+
+        if (required) {
             throw new AuthException(ErrorCode.UNAUTHORIZED_EXCEPTION);
         }
+
+        return null; // 비회원 요청인 경우 null 객체 리턴
 
     }
 
