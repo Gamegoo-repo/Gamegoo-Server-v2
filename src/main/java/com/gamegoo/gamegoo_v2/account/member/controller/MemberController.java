@@ -49,7 +49,7 @@ public class MemberController {
 
     @Operation(summary = "프로필 이미지 수정 API 입니다.", description = "API for Profile Image Modification")
     @PutMapping("/profileImage")
-    public ApiResponse<String> modifyPosition(
+    public ApiResponse<String> modifyProfileImage(
             @Valid @RequestBody ProfileImageRequest request, @AuthMember Member member) {
         return ApiResponse.ok(memberFacadeService.setProfileImage(member, request));
     }
