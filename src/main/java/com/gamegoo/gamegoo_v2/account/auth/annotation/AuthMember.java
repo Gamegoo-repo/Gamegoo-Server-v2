@@ -12,4 +12,6 @@ import java.lang.annotation.Target;
 @Parameter(hidden = true)
 public @interface AuthMember {
 
+    boolean required() default true;
+
 }
