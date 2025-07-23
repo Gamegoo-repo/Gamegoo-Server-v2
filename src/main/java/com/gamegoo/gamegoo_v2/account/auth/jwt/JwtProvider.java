@@ -89,17 +89,11 @@ public class JwtProvider {
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
-        if (!StringUtils.hasText(bearerToken)) {
-            // Authorization 헤더가 없는 경우
-            throw new JwtAuthException(ErrorCode.MISSING_AUTH_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken.substring(7);
         }
 
-        if (!bearerToken.startsWith(BEARER_PREFIX)) {
-            // Authorization 헤더 형식이 잘못된 경우
-            throw new JwtAuthException(ErrorCode.INVALID_AUTH_HEADER);
-        }
-
-        return bearerToken.substring(7);
+        return null;
     }
 
     /**
