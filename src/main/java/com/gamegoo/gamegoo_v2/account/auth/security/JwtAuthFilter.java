@@ -37,20 +37,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
             Long memberId = jwtProvider.getMemberId(jwt);
-
-            // 유저와 토큰 일치 시 userDetails 생성
             UserDetails userDetails = customUserDetailsService.loadUserByMemberId(memberId);
-
-            // UserDetails, Password, Role -> 접근권한 인증 Token 생성
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails, null,
-                            userDetails.getAuthorities());
-
-            //현재 Request의 Security Context에 접근권한 설정
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
-            SecurityContextHolder.getContext().setAuthentication(null);
+            // 토큰이 없으면 인증 없이 진행 (비회원)
+            SecurityContextHolder.clearContext(); // 또는 유지
         }
         filterChain.doFilter(request, response);
     }
