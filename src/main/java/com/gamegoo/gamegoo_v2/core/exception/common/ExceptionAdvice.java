@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -115,6 +116,12 @@ public class ExceptionAdvice {
 
         String errorMessage = String.format("%s 파라미터의 값은 %s 타입이어야 합니다.", parameterName, expectedType);
         return ResponseEntity.badRequest().body(ApiResponse.of(BAD_REQUEST, errorMessage));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleNoResourceFoundException(NoResourceFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.of(HttpStatus.NOT_FOUND, e.getMessage()));
     }
 
     // 서버 내부 에러
