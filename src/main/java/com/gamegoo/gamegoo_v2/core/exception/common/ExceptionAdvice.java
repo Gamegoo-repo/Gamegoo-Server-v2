@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -112,6 +113,20 @@ public class ExceptionAdvice {
 
         String errorMessage = String.format("%s 파라미터의 값은 %s 타입이어야 합니다.", parameterName, expectedType);
         return ResponseEntity.badRequest().body(ApiResponse.of(BAD_REQUEST, errorMessage));
+    }
+
+    // 서버 내부 에러
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Object>> handleAll(Exception e) {
+        ErrorCode errorCode = ErrorCode._INTERNAL_SERVER_ERROR;
+
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .status(errorCode.getStatus())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
     }
 
 }
