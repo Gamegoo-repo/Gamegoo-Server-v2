@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
@@ -32,145 +33,53 @@ public class OpenApiConfig {
                 openApi.setComponents(components);
             }
 
-            // Tier enum 등록
-            Schema<String> tierSchema = new Schema<String>()
-                    .type("string")
-                    .description("리그오브레전드 티어");
-            tierSchema.setEnum(Arrays.asList(
-                    Tier.UNRANKED.name(),
-                    Tier.IRON.name(),
-                    Tier.BRONZE.name(),
-                    Tier.SILVER.name(),
-                    Tier.GOLD.name(),
-                    Tier.PLATINUM.name(),
-                    Tier.EMERALD.name(),
-                    Tier.DIAMOND.name(),
-                    Tier.MASTER.name(),
-                    Tier.GRANDMASTER.name(),
-                    Tier.CHALLENGER.name()
-            ));
-            components.addSchemas("Tier", tierSchema);
+            // 일반 String enum들 등록
+            addStringEnumSchema(components, "Tier", Tier.class, "리그오브레전드 티어");
+            addStringEnumSchema(components, "Position", Position.class, "게임 포지션");
+            addStringEnumSchema(components, "Mike", Mike.class, "마이크 사용 가능 여부");
+            addStringEnumSchema(components, "GameMode", GameMode.class, "게임 모드");
+            addStringEnumSchema(components, "LoginType", LoginType.class, "로그인 유형");
+            addStringEnumSchema(components, "BanType", BanType.class, "차단 유형");
+            addStringEnumSchema(components, "MatchingType", MatchingType.class, "매칭 타입");
+            addStringEnumSchema(components, "ReportSortOrder", ReportSortOrder.class, "신고 정렬 순서");
+            addStringEnumSchema(components, "ReportPath", ReportPath.class, "신고 경로");
+            addStringEnumSchema(components, "MatchingStatus", MatchingStatus.class, "매칭 상태");
 
-            // Position enum 등록
-            Schema<String> positionSchema = new Schema<String>()
-                    .type("string")
-                    .description("게임 포지션");
-            positionSchema.setEnum(Arrays.asList(
-                    Position.ANY.name(),
-                    Position.TOP.name(),
-                    Position.JUNGLE.name(),
-                    Position.MID.name(),
-                    Position.ADC.name(),
-                    Position.SUP.name()
-            ));
-            components.addSchemas("Position", positionSchema);
-
-            // Mike enum 등록
-            Schema<String> mikeSchema = new Schema<String>()
-                    .type("string")
-                    .description("마이크 사용 가능 여부");
-            mikeSchema.setEnum(Arrays.asList(
-                    Mike.UNAVAILABLE.name(),
-                    Mike.AVAILABLE.name()
-            ));
-            components.addSchemas("Mike", mikeSchema);
-
-            // GameMode enum 등록
-            Schema<String> gameModeSchema = new Schema<String>()
-                    .type("string")
-                    .description("게임 모드");
-            gameModeSchema.setEnum(Arrays.asList(
-                    GameMode.FAST.name(),
-                    GameMode.SOLO.name(),
-                    GameMode.FREE.name(),
-                    GameMode.ARAM.name()
-            ));
-            components.addSchemas("GameMode", gameModeSchema);
-
-            // LoginType enum 등록
-            Schema<String> loginTypeSchema = new Schema<String>()
-                    .type("string")
-                    .description("로그인 유형");
-            loginTypeSchema.setEnum(Arrays.asList(
-                    LoginType.GENERAL.name(),
-                    LoginType.RSO.name()
-            ));
-            components.addSchemas("LoginType", loginTypeSchema);
-
-            // BanType enum 등록
-            Schema<String> banTypeSchema = new Schema<String>()
-                    .type("string")
-                    .description("차단 유형");
-            banTypeSchema.setEnum(Arrays.asList(
-                    BanType.NONE.name(),
-                    BanType.WARNING.name(),
-                    BanType.BAN_1D.name(),
-                    BanType.BAN_3D.name(),
-                    BanType.BAN_5D.name(),
-                    BanType.BAN_1W.name(),
-                    BanType.BAN_2W.name(),
-                    BanType.BAN_1M.name(),
-                    BanType.PERMANENT.name()
-            ));
-            components.addSchemas("BanType", banTypeSchema);
-
-            // MatchingType enum 등록
-            Schema<String> matchingTypeSchema = new Schema<String>()
-                    .type("string")
-                    .description("매칭 타입");
-            matchingTypeSchema.setEnum(Arrays.asList(
-                    MatchingType.BASIC.name(),
-                    MatchingType.PRECISE.name()
-            ));
-            components.addSchemas("MatchingType", matchingTypeSchema);
-
-            // ReportSortOrder enum 등록
-            Schema<String> reportSortOrderSchema = new Schema<String>()
-                    .type("string")
-                    .description("신고 정렬 순서");
-            reportSortOrderSchema.setEnum(Arrays.asList(
-                    ReportSortOrder.LATEST.name(),
-                    ReportSortOrder.OLDEST.name()
-            ));
-            components.addSchemas("ReportSortOrder", reportSortOrderSchema);
-
-            // ReportType enum 등록 (ID 기반)
-            Schema<Integer> reportTypeSchema = new Schema<Integer>()
-                    .type("integer")
-                    .description("신고 유형 (1=스팸, 2=불법정보, 3=성희롱, 4=욕설/혐오, 5=개인정보노출, 6=불쾌한표현)");
-            reportTypeSchema.setEnum(Arrays.asList(
-                    ReportType.SPAM.getId(),
-                    ReportType.ILLEGAL_CONTENT.getId(),
-                    ReportType.HARASSMENT.getId(),
-                    ReportType.HATE_SPEECH.getId(),
-                    ReportType.PRIVACY_VIOLATION.getId(),
-                    ReportType.OFFENSIVE.getId()
-            ));
-            components.addSchemas("ReportType", reportTypeSchema);
-
-            // ReportPath enum 등록
-            Schema<String> reportPathSchema = new Schema<String>()
-                    .type("string")
-                    .description("신고 경로");
-            reportPathSchema.setEnum(Arrays.asList(
-                    ReportPath.BOARD.name(),
-                    ReportPath.CHAT.name(),
-                    ReportPath.PROFILE.name()
-            ));
-            components.addSchemas("ReportPath", reportPathSchema);
-
-            // MatchingStatus enum 등록
-            Schema<String> matchingStatusSchema = new Schema<String>()
-                    .type("string")
-                    .description("매칭 상태");
-            matchingStatusSchema.setEnum(Arrays.asList(
-                    MatchingStatus.FAIL.name(),
-                    MatchingStatus.SUCCESS.name(),
-                    MatchingStatus.PENDING.name(),
-                    MatchingStatus.FOUND.name(),
-                    MatchingStatus.QUIT.name()
-            ));
-            components.addSchemas("MatchingStatus", matchingStatusSchema);
+            // ReportType은 특별 처리 (ID 기반)
+            addReportTypeSchema(components);
         };
+    }
+
+    /**
+     * 일반적인 String enum 스키마를 등록하는 헬퍼 메서드
+     */
+    private <T extends Enum<T>> void addStringEnumSchema(Components components, String schemaName, 
+                                                        Class<T> enumClass, String description) {
+        Schema<String> schema = new Schema<String>()
+                .type("string")
+                .description(description);
+        
+        List<String> enumValues = Arrays.stream(enumClass.getEnumConstants())
+                .map(Enum::name)
+                .toList();
+        
+        schema.setEnum(enumValues);
+        components.addSchemas(schemaName, schema);
+    }
+
+    /**
+     * ReportType 전용 스키마 등록 (ID 기반)
+     */
+    private void addReportTypeSchema(Components components) {
+        Schema<Integer> reportTypeSchema = new Schema<Integer>()
+                .type("integer")
+                .description("신고 유형 (1=스팸, 2=불법정보, 3=성희롱, 4=욕설/혐오, 5=개인정보노출, 6=불쾌한표현)");
+        
+        List<Integer> enumValues = Arrays.stream(ReportType.values())
+                .map(ReportType::getId)
+                .toList();
+        
+        reportTypeSchema.setEnum(enumValues);
+        components.addSchemas("ReportType", reportTypeSchema);
     }
 }
