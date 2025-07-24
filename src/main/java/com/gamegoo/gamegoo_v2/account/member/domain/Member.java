@@ -130,7 +130,7 @@ public class Member extends BaseDateTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberGameStyle> memberGameStyleList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private MemberRecentStats memberRecentStats;
 
     @Enumerated(EnumType.STRING)
@@ -205,7 +205,7 @@ public class Member extends BaseDateTimeEntity {
     }
 
     // 임시 멤버 전용
-    public static Member createForTmp(String gameName, String tag, Tier soloTier, int soloRank, double soloWinRate, 
+    public static Member createForTmp(String gameName, String tag, Tier soloTier, int soloRank, double soloWinRate,
                                       Tier freeTier, int freeRank, double freeWinRate, int soloGameCount, int freeGameCount) {
         // 임시 멤버 랜덤 프로필 사진 설정
         int randomProfileImage = ThreadLocalRandom.current().nextInt(1, 9);
