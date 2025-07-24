@@ -15,6 +15,7 @@ import com.gamegoo.gamegoo_v2.content.report.service.ReportFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +77,9 @@ public class ReportController {
             @RequestParam(required = false) String reportedMemberKeyword,
             @RequestParam(required = false) String reporterKeyword,
             @RequestParam(required = false) String contentKeyword,
+            @Parameter(description = "신고 경로", schema = @Schema(ref = "#/components/schemas/ReportPath"))
             @RequestParam(required = false) List<ReportPath> reportPaths,
+            @Parameter(description = "신고 유형 (1=스팸, 2=불법정보, 3=성희롱, 4=욕설/혐오, 5=개인정보노출, 6=불쾌한표현)", schema = @Schema(ref = "#/components/schemas/ReportType"))
             @RequestParam(required = false) List<Integer> reportTypes,
             @RequestParam(required = false) LocalDateTime startDate,
             @RequestParam(required = false) LocalDateTime endDate,
@@ -84,7 +87,9 @@ public class ReportController {
             @RequestParam(required = false) Integer reportCountMax,
             @RequestParam(required = false) Integer reportCountExact,
             @RequestParam(required = false) Boolean isDeleted,
+            @Parameter(description = "제재 상태", schema = @Schema(ref = "#/components/schemas/BanType"))
             @RequestParam(required = false) List<BanType> banTypes,
+            @Parameter(description = "정렬 순서", schema = @Schema(ref = "#/components/schemas/ReportSortOrder"))
             @RequestParam(required = false) ReportSortOrder sortOrder,
             Pageable pageable) {
 

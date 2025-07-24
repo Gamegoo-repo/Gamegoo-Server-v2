@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 @Builder
 public class ReportRequest {
 
+    @ArraySchema(schema = @Schema(ref = "#/components/schemas/ReportType"))
     @NotDuplicated
     @NotEmpty(message = "신고 코드 리스트는 비워둘 수 없습니다.")
     @EachMin(value = 1, message = "report code는 1 이상의 값이어야 합니다.")

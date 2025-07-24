@@ -19,6 +19,7 @@ import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -91,10 +92,15 @@ public class BoardController {
     })
     public ApiResponse<BoardResponse> boardList(
             @ValidPage @RequestParam(name = "page") Integer page,
+            @Parameter(description = "게임 모드", schema = @Schema(ref = "#/components/schemas/GameMode"))
             @RequestParam(required = false) GameMode gameMode,
+            @Parameter(description = "티어", schema = @Schema(ref = "#/components/schemas/Tier"))
             @RequestParam(required = false) Tier tier,
+            @Parameter(description = "메인 포지션", schema = @Schema(ref = "#/components/schemas/Position"))
             @RequestParam(required = false) Position mainP,
+            @Parameter(description = "서브 포지션", schema = @Schema(ref = "#/components/schemas/Position"))
             @RequestParam(required = false) Position subP,
+            @Parameter(description = "마이크 사용 여부", schema = @Schema(ref = "#/components/schemas/Mike"))
             @RequestParam(required = false) Mike mike) {
 
         return ApiResponse.ok(boardFacadeService.getBoardList(gameMode, tier, mainP, subP, mike, page));
@@ -179,9 +185,13 @@ public class BoardController {
     public ResponseEntity<ApiResponse<BoardCursorResponse>> getBoardsWithCursor(
             @RequestParam(required = false) LocalDateTime cursor,
             @RequestParam(required = false) Long cursorId,
+            @Parameter(description = "게임 모드", schema = @Schema(ref = "#/components/schemas/GameMode"))
             @RequestParam(required = false) GameMode gameMode,
+            @Parameter(description = "티어", schema = @Schema(ref = "#/components/schemas/Tier"))
             @RequestParam(required = false) Tier tier,
+            @Parameter(description = "주 포지션", schema = @Schema(ref = "#/components/schemas/Position"))
             @RequestParam(required = false) Position position1,
+            @Parameter(description = "부 포지션", schema = @Schema(ref = "#/components/schemas/Position"))
             @RequestParam(required = false) Position position2) {
         BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2);
         return ResponseEntity.ok(ApiResponse.ok(response));
