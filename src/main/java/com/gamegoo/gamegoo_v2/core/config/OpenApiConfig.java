@@ -1,6 +1,5 @@
 package com.gamegoo.gamegoo_v2.core.config;
 
-import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
