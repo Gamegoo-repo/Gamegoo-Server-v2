@@ -7,6 +7,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.dto.response.MemberRecentStatsResponse;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -23,24 +25,32 @@ public class BoardListResponse {
     private Long memberId;
     private String gameName;
     private String tag;
+    @Schema(ref = "#/components/schemas/Position")
     private Position mainP;
+    @Schema(ref = "#/components/schemas/Position")
     private Position subP;
+    @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     private List<Position> wantP;
+    @Schema(ref = "#/components/schemas/Mike")
     private Mike mike;
     private String contents;
     private Integer boardProfileImage;
     private LocalDateTime createdAt;
     private Integer profileImage;
     private Integer mannerLevel;
+    @Schema(ref = "#/components/schemas/Tier")
     private Tier tier;
     private int rank;
+    @Schema(ref = "#/components/schemas/GameMode")
     private GameMode gameMode;
     private Double winRate;
     private LocalDateTime bumpTime;
     private List<ChampionStatsResponse> championStatsResponseList;
     private MemberRecentStatsResponse memberRecentStats;
+    @Schema(ref = "#/components/schemas/Tier")
     private Tier freeTier;
     private int freeRank;
+    @Schema(ref = "#/components/schemas/Tier")
     private Tier soloTier;
     private int soloRank;
 

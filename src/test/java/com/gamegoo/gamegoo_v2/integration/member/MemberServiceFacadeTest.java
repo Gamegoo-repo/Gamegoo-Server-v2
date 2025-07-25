@@ -156,7 +156,7 @@ class MemberServiceFacadeTest {
         assertThat(response.getWantP()).isEqualTo(freshMember.getWantP());
         assertThat(response.getIsAgree()).isEqualTo(freshMember.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(freshMember.getBlind());
-        assertThat(response.getLoginType()).isEqualTo(freshMember.getLoginType().name());
+        assertThat(response.getLoginType()).isEqualTo(freshMember.getLoginType());
         assertThat(response.getChampionStatsResponseList()).isNotNull();
 
         // MemberRecentStats 검증 - null인 경우를 확인
@@ -231,7 +231,7 @@ class MemberServiceFacadeTest {
         assertThat(response.getWantP()).isEqualTo(targetMember.getWantP());
         assertThat(response.getIsAgree()).isEqualTo(targetMember.isAgree());
         assertThat(response.getIsBlind()).isEqualTo(targetMember.getBlind());
-        assertThat(response.getLoginType()).isEqualTo(String.valueOf(targetMember.getLoginType()));
+        assertThat(response.getLoginType()).isEqualTo(targetMember.getLoginType());
         assertThat(response.getChampionStatsResponseList()).isNotNull();
 
         // MemberRecentStats 검증 - null인 경우를 확인
