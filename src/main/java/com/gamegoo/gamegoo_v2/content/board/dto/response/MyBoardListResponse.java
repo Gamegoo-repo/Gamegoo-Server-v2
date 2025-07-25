@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,6 +19,7 @@ public class MyBoardListResponse {
     Integer profileImage;
     String gameName;
     String tag;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier tier;
     int rank;
     String contents;

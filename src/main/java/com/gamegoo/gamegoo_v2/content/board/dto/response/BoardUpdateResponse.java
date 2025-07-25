@@ -6,6 +6,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,12 +23,18 @@ public class BoardUpdateResponse {
     Integer profileImage;
     String gameName;
     String tag;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier tier;
     Integer rank;
+    @Schema(ref = "#/components/schemas/GameMode")
     GameMode gameMode;
+    @Schema(ref = "#/components/schemas/Position")
     Position mainP;
+    @Schema(ref = "#/components/schemas/Position")
     Position subP;
+    @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     List<Position> wantP;
+    @Schema(ref = "#/components/schemas/Mike")
     Mike mike;
     List<Long> gameStyles;
     String contents;

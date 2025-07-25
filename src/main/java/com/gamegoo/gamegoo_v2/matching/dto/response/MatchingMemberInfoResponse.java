@@ -6,6 +6,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,16 +23,23 @@ public class MatchingMemberInfoResponse {
     String matchingUuid;
     String gameName;
     String tag;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier soloTier;
     Integer soloRank;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier freeTier;
     Integer freeRank;
     Integer mannerLevel;
     Integer profileImg;
+    @Schema(ref = "#/components/schemas/GameMode")
     GameMode gameMode;
+    @Schema(ref = "#/components/schemas/Position")
     Position mainP;
+    @Schema(ref = "#/components/schemas/Position")
     Position subP;
+    @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     List<Position> wantP;
+    @Schema(ref = "#/components/schemas/Mike")
     Mike mike;
     List<GameStyleResponse> gameStyleResponseList;
 

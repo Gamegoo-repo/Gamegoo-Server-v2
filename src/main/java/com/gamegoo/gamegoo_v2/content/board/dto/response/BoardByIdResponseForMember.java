@@ -8,6 +8,8 @@ import com.gamegoo.gamegoo_v2.account.member.dto.response.MemberRecentStatsRespo
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -32,16 +34,23 @@ public class BoardByIdResponseForMember {
     Integer mannerLevel;
     Double mannerRank;
     Integer mannerRatingCount;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier soloTier;
     int soloRank;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier freeTier;
     int freeRank;
+    @Schema(ref = "#/components/schemas/Mike")
     Mike mike;
     List<ChampionStatsResponse> championStatsResponseList;
     MemberRecentStatsResponse memberRecentStats;
+    @Schema(ref = "#/components/schemas/GameMode")
     GameMode gameMode;
+    @Schema(ref = "#/components/schemas/Position")
     Position mainP;
+    @Schema(ref = "#/components/schemas/Position")
     Position subP;
+    @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     List<Position> wantP;
     Integer recentGameCount;
     Double winRate;

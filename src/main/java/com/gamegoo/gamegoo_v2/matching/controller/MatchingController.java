@@ -7,6 +7,8 @@ import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
 import com.gamegoo.gamegoo_v2.matching.dto.response.PriorityListResponse;
 import com.gamegoo.gamegoo_v2.matching.service.MatchingFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ public class MatchingController {
     @PatchMapping("/matching/status/{matchingUuid}/{status}")
     public ApiResponse<String> UpdateMatchingStatus(
             @PathVariable(name = "matchingUuid") String matchingUuid,
+            @Parameter(description = "매칭 상태", schema = @Schema(ref = "#/components/schemas/MatchingStatus"))
             @PathVariable(name = "status") MatchingStatus status
     ) {
         return ApiResponse.ok(matchingFacadeService.modifyMyMatchingStatus(matchingUuid, status));
@@ -47,6 +50,7 @@ public class MatchingController {
     @PatchMapping("/matching/status/target/{matchingUuid}/{status}")
     public ApiResponse<String> UpdateBothMatchingStatus(
             @PathVariable(name = "matchingUuid") String matchingUuid,
+            @Parameter(description = "매칭 상태", schema = @Schema(ref = "#/components/schemas/MatchingStatus"))
             @PathVariable(name = "status") MatchingStatus status
     ) {
         return ApiResponse.ok(matchingFacadeService.modifyBothMatchingStatus(matchingUuid, status));
