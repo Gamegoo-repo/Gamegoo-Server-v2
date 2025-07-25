@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class ReportListResponse {
+
     private Long reportId;
     private Long fromMemberId;
     private String fromMemberName;
@@ -32,16 +33,25 @@ public class ReportListResponse {
             postId = report.getSourceBoard().getId();
             isPostDeleted = report.getSourceBoard().isDeleted();
         }
-        
+
+        Long fromMemberId = null;
+        String fromMemberName = "비회원";
+        String fromMemberTag = "#";
+        if (report.getFromMember() != null) {
+            fromMemberId = report.getFromMember().getId();
+            fromMemberName = report.getFromMember().getGameName();
+            fromMemberTag = report.getFromMember().getTag();
+        }
+
         String reportType = report.getReportTypeMappingList().stream()
                 .map(mapping -> ReportType.of(mapping.getCode()).getDescription())
                 .collect(Collectors.joining(", "));
-        
+
         return ReportListResponse.builder()
                 .reportId(report.getId())
-                .fromMemberId(report.getFromMember().getId())
-                .fromMemberName(report.getFromMember().getGameName())
-                .fromMemberTag(report.getFromMember().getTag())
+                .fromMemberId(fromMemberId)
+                .fromMemberName(fromMemberName)
+                .fromMemberTag(fromMemberTag)
                 .toMemberId(report.getToMember().getId())
                 .toMemberName(report.getToMember().getGameName())
                 .toMemberTag(report.getToMember().getTag())
@@ -53,4 +63,5 @@ public class ReportListResponse {
                 .isPostDeleted(isPostDeleted)
                 .build();
     }
+
 }

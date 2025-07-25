@@ -81,7 +81,6 @@ public class ReportFacadeService {
     public ReportProcessResponse processReport(Long reportId, ReportProcessRequest request) {
         Report report = reportService.findById(reportId);
         Member targetMember = report.getToMember();
-        Member reporter = report.getFromMember();
 
         // 제재 적용
         banService.applyBan(targetMember, request.getBanType());
@@ -91,9 +90,12 @@ public class ReportFacadeService {
         String banDescription = banService.getBanReasonMessage(request.getBanType());
 
         // 신고자에게 알림 전송
-        notificationService.createReportProcessedNotificationForReporter(
-                reporter, reportTypeString, banDescription
-        );
+        Member reporter = report.getFromMember();
+        if (reporter != null) {
+            notificationService.createReportProcessedNotificationForReporter(
+                    reporter, reportTypeString, banDescription
+            );
+        }
 
         // 신고 당한 회원에게 알림 전송 (제재가 있는 경우에만)
         if (request.getBanType() != null && request.getBanType() != BanType.NONE) {
