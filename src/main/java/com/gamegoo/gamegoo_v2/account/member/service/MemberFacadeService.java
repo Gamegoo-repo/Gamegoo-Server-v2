@@ -8,6 +8,8 @@ import com.gamegoo.gamegoo_v2.account.member.dto.request.PositionRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.request.ProfileImageRequest;
 import com.gamegoo.gamegoo_v2.account.member.dto.response.MyProfileResponse;
 import com.gamegoo.gamegoo_v2.account.member.dto.response.OtherProfileResponse;
+import com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
@@ -121,16 +123,16 @@ public class MemberFacadeService {
      * 마지막 갱신으로부터 3일이 지난 경우에만 갱신이 가능합니다.
      *
      * @param member 갱신 대상 사용자
-     * @return 성공 메세지
+     * @return 갱신된 프로필 정보
      */
     @Transactional
-    public String refreshChampionStats(Member member) {
+    public MyProfileResponse refreshChampionStats(Member member) {
         // 갱신 가능 여부 체크
         if (!member.canRefreshChampionStats()) {
             LocalDateTime lastRefreshTime = member.getChampionStatsRefreshedAt();
             long remainingHours = 72 - ChronoUnit.HOURS.between(lastRefreshTime, LocalDateTime.now());
             System.out.println("[REFRESH] 갱신 불가 - 마지막: " + lastRefreshTime + ", 남은시간: " + remainingHours + "h");
-            return String.format("전적 갱신은 3일마다 가능합니다. %d시간 후 다시 시도해주세요.", remainingHours);
+            throw new ChampionRefreshCooldownException(ErrorCode.CHAMPION_REFRESH_COOLDOWN, remainingHours);
         }
 
         // 갱신 진행
@@ -138,7 +140,9 @@ public class MemberFacadeService {
         championStatsRefreshService.refreshChampionStats(member);
         member.updateChampionStatsRefreshedAt();
         System.out.println("[REFRESH] 갱신 완료 - 현재: " + member.getChampionStatsRefreshedAt());
-        return "챔피언 통계 갱신이 완료되었습니다";
+        
+        // 갱신된 데이터로 프로필 응답 생성
+        return MyProfileResponse.of(member);
     }
 
     /**

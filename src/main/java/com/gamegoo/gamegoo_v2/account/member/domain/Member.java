@@ -368,4 +368,9 @@ public class Member extends BaseDateTimeEntity {
             }
         }
     }
+
+    public void updateRiotBasicInfo(String gameName, String tag) {
+        this.gameName = gameName;
+        this.tag = tag;
+    }
 }

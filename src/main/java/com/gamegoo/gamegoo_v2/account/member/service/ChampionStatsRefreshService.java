@@ -39,6 +39,7 @@ public class ChampionStatsRefreshService {
 
         try {
             // 먼저 새로운 데이터 조회
+            var accountInfo = riotAuthService.getAccountByPuuid(puuid);
             List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
             var recStats = riotRecordService.getRecent30GameStats(gameName, puuid);
             List<TierDetails> tierWinrateRank = riotInfoService.getTierWinrateRank(puuid);
@@ -46,6 +47,7 @@ public class ChampionStatsRefreshService {
             // API 호출이 성공한 경우에만 기존 데이터 삭제 후 새로 저장
             memberChampionRepository.deleteByMember(freshMember);
             memberChampionService.saveMemberChampions(freshMember, preferChampionStats);
+            freshMember.updateRiotBasicInfo(accountInfo.getGameName(), accountInfo.getTagLine());
             freshMember.updateRiotStats(tierWinrateRank);
 
             // 최근 30게임 통계 계산 및 저장
