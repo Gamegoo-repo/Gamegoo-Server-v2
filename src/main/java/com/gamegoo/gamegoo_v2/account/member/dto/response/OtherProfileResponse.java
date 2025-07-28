@@ -1,11 +1,14 @@
 package com.gamegoo.gamegoo_v2.account.member.dto.response;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.game.dto.response.GameStyleResponse;
 import com.gamegoo.gamegoo_v2.content.board.dto.response.ChampionStatsResponse;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,22 +20,29 @@ public class OtherProfileResponse {
 
     Long id;
     Integer profileImg;
+    @Schema(ref = "#/components/schemas/Mike")
     Mike mike;
     String gameName;
     String tag;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier soloTier;
     Integer soloRank;
     Double soloWinrate;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier freeTier;
     Integer freeRank;
     Double freeWinrate;
     String updatedAt;
+    @Schema(ref = "#/components/schemas/Position")
     Position mainP;
+    @Schema(ref = "#/components/schemas/Position")
     Position subP;
+    @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     List<Position> wantP;
     Boolean isAgree;
     Boolean isBlind;
-    String loginType;
+    @Schema(ref = "#/components/schemas/LoginType")
+    LoginType loginType;
     Boolean blocked; // 해당 회원을 차단했는지 여부
     Boolean friend; // 해당 회원과의 친구 여부
     Long friendRequestMemberId; // 해당 회원과의 친구 요청 상태
@@ -71,7 +81,7 @@ public class OtherProfileResponse {
                 .subP(targetMember.getSubP())
                 .isAgree(targetMember.isAgree())
                 .isBlind(targetMember.getBlind())
-                .loginType(String.valueOf(targetMember.getLoginType()))
+                .loginType(targetMember.getLoginType())
                 .updatedAt(String.valueOf(targetMember.getUpdatedAt()))
                 .blocked(isBlocked)
                 .friend(isFriend)

@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.account.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +11,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.PrintWriter;
-
-import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode._INTERNAL_SERVER_ERROR;
 
 
 @Slf4j
@@ -25,8 +25,7 @@ public class EntryPointHandler implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) {
-
-        var errorCode = _INTERNAL_SERVER_ERROR;
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED_EXCEPTION;
 
         ApiResponse<Object> apiResponse = ApiResponse.builder()
                 .code(errorCode.getCode())
@@ -36,14 +35,12 @@ public class EntryPointHandler implements AuthenticationEntryPoint {
                 .build();
 
         response.setContentType("application/json; charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
 
         try (PrintWriter writer = response.getWriter()) {
-            String jsonResponse = objectMapper.writeValueAsString(apiResponse);
-            writer.write(jsonResponse);
-            writer.flush();
-        } catch (Exception e) {
-            log.error("Security Filter EntryPoint 응답 메시지 작성 에러", e);
+            writer.write(objectMapper.writeValueAsString(apiResponse));
+        } catch (IOException e) {
+            log.error("EntryPoint 응답 실패", e);
         }
     }
 

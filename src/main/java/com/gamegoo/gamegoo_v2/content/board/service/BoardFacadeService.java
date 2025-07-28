@@ -5,6 +5,14 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
+import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
+import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
+import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
+import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
+import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
+import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
+import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardUpdateRequest;
@@ -26,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +49,11 @@ public class BoardFacadeService {
     private final MannerService mannerService;
     private final BanValidator banValidator;
     private final MemberRepository memberRepository;
+    private final MemberService memberService;
+    private final RiotAuthService riotAuthService;
+    private final RiotInfoService riotInfoService;
+    private final RiotRecordService riotRecordService;
+    private final MemberChampionService memberChampionService;
 
     /**
      * 게시글 생성 (파사드)
@@ -61,19 +75,90 @@ public class BoardFacadeService {
 
     /**
      * 게스트 게시글 생성 (파사드)
-     * - 소환사명 + 태그로 기존 회원 확인
-     * - 기존 회원이면 예외 발생
-     * - 게스트 게시글 생성
+     * - 소환사명 + 태그로 임시 멤버 생성/재사용
+     * - 라이엇 API 호출하여 실제 게임 정보 가져오기
+     * - 임시 멤버로 게시글 생성
      */
     @Transactional
     public BoardInsertResponse createGuestBoard(GuestBoardInsertRequest request, String gameName, String tag) {
-        // 기존 회원 확인
-        if (memberRepository.existsByGameNameAndTag(gameName, tag)) {
-            throw new BoardException(ErrorCode.MEMBER_ALREADY_EXISTS);
+        // 라이엇 API 호출하여 puuid 및 티어 정보 가져오기
+        String puuid = riotAuthService.getPuuid(gameName, tag);
+        List<TierDetails> tiers = null;
+        RiotRecordService.Recent30GameStatsResponse recentStats = null;
+        
+        if (puuid != null) {
+            tiers = riotInfoService.getTierWinrateRank(puuid);
+            recentStats = riotRecordService.getRecent30GameStats(gameName, puuid);
+            
+        }
+
+        // 임시 멤버 생성 또는 재사용
+        Member tmpMember = memberService.getOrCreateTmpMember(gameName, tag, tiers);
+        
+        // MemberChampion 처리 (임시 멤버에게 최신 챔피언 통계 추가/업데이트)
+        if (puuid != null) {
+            List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
+            if (preferChampionStats != null && !preferChampionStats.isEmpty()) {
+                memberChampionService.saveMemberChampions(tmpMember, preferChampionStats);
+            }
+        }
+        
+        // MemberRecentStats 항상 최신 데이터로 업데이트
+        MemberRecentStats existingStats = tmpMember.getMemberRecentStats();
+        if (existingStats != null) {
+            // 기존 통계 업데이트
+            if (recentStats != null) {
+                existingStats.update(
+                        recentStats.getRecTotalWins(),
+                        recentStats.getRecTotalLosses(),
+                        recentStats.getRecWinRate(),
+                        recentStats.getRecAvgKDA(),
+                        recentStats.getRecAvgKills(),
+                        recentStats.getRecAvgDeaths(),
+                        recentStats.getRecAvgAssists(),
+                        recentStats.getRecAvgCsPerMinute(),
+                        recentStats.getRecTotalCs()
+                );
+            } else {
+                // recentStats가 null인 경우 기본값으로 업데이트
+                existingStats.update(0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+            }
+        } else {
+            // 새로운 통계 생성
+            MemberRecentStats memberRecentStats;
+            if (recentStats != null) {
+                memberRecentStats = MemberRecentStats.builder()
+                        .member(tmpMember)  // @MapsId를 위해 member 설정
+                        .recTotalWins(recentStats.getRecTotalWins())
+                        .recTotalLosses(recentStats.getRecTotalLosses())
+                        .recWinRate(recentStats.getRecWinRate())
+                        .recAvgKDA(recentStats.getRecAvgKDA())
+                        .recAvgKills(recentStats.getRecAvgKills())
+                        .recAvgDeaths(recentStats.getRecAvgDeaths())
+                        .recAvgAssists(recentStats.getRecAvgAssists())
+                        .recAvgCsPerMinute(recentStats.getRecAvgCsPerMinute())
+                        .recTotalCs(recentStats.getRecTotalCs())
+                        .build();
+            } else {
+                // recentStats가 null인 경우 기본값으로 생성
+                memberRecentStats = MemberRecentStats.builder()
+                        .member(tmpMember)  // @MapsId를 위해 member 설정
+                        .recTotalWins(0)
+                        .recTotalLosses(0)
+                        .recWinRate(0.0)
+                        .recAvgKDA(0.0)
+                        .recAvgKills(0.0)
+                        .recAvgDeaths(0.0)
+                        .recAvgAssists(0.0)
+                        .recAvgCsPerMinute(0.0)
+                        .recTotalCs(0)
+                        .build();
+            }
+            tmpMember.setMemberRecentStats(memberRecentStats);
         }
 
         profanityCheckService.validateProfanity(request.getContents());
-        Board board = boardService.createAndSaveGuestBoard(request, gameName, tag, request.getPassword());
+        Board board = boardService.createAndSaveGuestBoard(request, tmpMember, request.getPassword());
         boardGameStyleService.mapGameStylesToBoard(board, request.getGameStyles());
 
         return BoardInsertResponse.ofGuest(board);

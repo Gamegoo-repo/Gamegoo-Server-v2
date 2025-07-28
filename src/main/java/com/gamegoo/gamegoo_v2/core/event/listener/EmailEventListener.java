@@ -38,10 +38,15 @@ public class EmailEventListener {
             String subject = String.format(REPORT_EMAIL_SUBJECT, event.getFromMemberGameName(),
                     event.getFromMemberTag());
 
+            String fromMemberId = "비회원";
+            if (event.getFromMemberId() != null) {
+                fromMemberId = event.getFromMemberId().toString();
+            }
+
             Map<String, String> placeholders = new HashMap<>();
             placeholders.put("TITLE", subject);
             placeholders.put("REPORT_ID", report.getId().toString());
-            placeholders.put("REPORT_FROM_MEMBER_ID", event.getFromMemberId().toString());
+            placeholders.put("REPORT_FROM_MEMBER_ID", fromMemberId);
             placeholders.put("REPORT_TO_MEMBER_ID", event.getToMemberId().toString());
             placeholders.put("REPORT_PATH", report.getPath().name());
             placeholders.put("REPORT_TYPE", reportService.getReportTypeString(event.getReportId()));

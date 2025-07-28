@@ -8,6 +8,8 @@ import com.gamegoo.gamegoo_v2.account.member.dto.response.MemberRecentStatsRespo
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -32,16 +34,23 @@ public class BoardByIdResponseForMember {
     Integer mannerLevel;
     Double mannerRank;
     Integer mannerRatingCount;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier soloTier;
     int soloRank;
+    @Schema(ref = "#/components/schemas/Tier")
     Tier freeTier;
     int freeRank;
+    @Schema(ref = "#/components/schemas/Mike")
     Mike mike;
     List<ChampionStatsResponse> championStatsResponseList;
     MemberRecentStatsResponse memberRecentStats;
+    @Schema(ref = "#/components/schemas/GameMode")
     GameMode gameMode;
+    @Schema(ref = "#/components/schemas/Position")
     Position mainP;
+    @Schema(ref = "#/components/schemas/Position")
     Position subP;
+    @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     List<Position> wantP;
     Integer recentGameCount;
     Double winRate;
@@ -61,39 +70,7 @@ public class BoardByIdResponseForMember {
                 .map(bgs -> bgs.getGameStyle().getId())
                 .collect(Collectors.toList());
 
-        if (poster == null) { // 비회원 게시글 처리
-            return BoardByIdResponseForMember.builder()
-                    .boardId(board.getId())
-                    .memberId(null)
-                    .isBlocked(null)
-                    .isFriend(null)
-                    .friendRequestMemberId(null)
-                    .createdAt(board.getCreatedAt())
-                    .profileImage(board.getBoardProfileImage())
-                    .gameName(board.getGameName())
-                    .tag(board.getTag())
-                    .mannerLevel(null)
-                    .mannerRank(null)
-                    .mannerRatingCount(null)
-                    .soloTier(null)
-                    .soloRank(0)
-                    .freeTier(null)
-                    .freeRank(0)
-                    .mike(board.getMike())
-                    .championStatsResponseList(Collections.emptyList())
-                    .memberRecentStats(null)
-                    .gameMode(board.getGameMode())
-                    .mainP(board.getMainP())
-                    .subP(board.getSubP())
-                    .wantP(board.getWantP())
-                    .recentGameCount(null)
-                    .winRate(null)
-                    .gameStyles(gameStyleIds)
-                    .contents(board.getContent())
-                    .build();
-        }
-
-        // 회원 게시글 처리
+        // 임시 멤버든 정식 멤버든 항상 Member가 존재함
         List<ChampionStatsResponse> championStatsResponseList = poster.getMemberChampionList() == null
                 ? List.of()
                 : poster.getMemberChampionList().stream()
@@ -104,7 +81,11 @@ public class BoardByIdResponseForMember {
                         .games(mc.getGames())
                         .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
                         .csPerMinute(mc.getCsPerMinute())
+                        .averageCs(mc.getGames() > 0 ? (double) mc.getTotalCs() / mc.getGames() : 0)
                         .kda(mc.getKDA())
+                        .kills(mc.getGames() > 0 ? (double) mc.getKills() / mc.getGames() : 0)
+                        .deaths(mc.getGames() > 0 ? (double) mc.getDeaths() / mc.getGames() : 0)
+                        .assists(mc.getGames() > 0 ? (double) mc.getAssists() / mc.getGames() : 0)
                         .build())
                 .collect(Collectors.toList());
 

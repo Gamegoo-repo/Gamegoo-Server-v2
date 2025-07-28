@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.content.report.dto.response;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,7 @@ public class ReportProcessResponse {
     
     private Long reportId;
     private Long targetMemberId;
+    @Schema(ref = "#/components/schemas/BanType")
     private BanType appliedBanType;
     private LocalDateTime banExpireAt;
     private String message;

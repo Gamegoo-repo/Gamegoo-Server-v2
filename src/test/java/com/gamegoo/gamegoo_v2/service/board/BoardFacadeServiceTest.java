@@ -4,8 +4,9 @@ import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
-import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
+import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.BoardInsertRequest;
 import com.gamegoo.gamegoo_v2.content.board.dto.request.GuestBoardInsertRequest;
@@ -18,6 +19,9 @@ import com.gamegoo.gamegoo_v2.content.board.service.BoardFacadeService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardGameStyleService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.content.board.service.ProfanityCheckService;
+import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
+import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
+import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
 import com.gamegoo.gamegoo_v2.core.exception.BoardException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
@@ -74,7 +78,16 @@ class BoardFacadeServiceTest {
     private ProfanityCheckService profanityCheckService;
 
     @Mock
-    private MemberRepository memberRepository;
+    private MemberService memberService;
+
+    @Mock
+    private RiotAuthService riotAuthService;
+
+    @Mock
+    private RiotInfoService riotInfoService;
+
+    @Mock
+    private RiotRecordService riotRecordService;
 
     @InjectMocks
     private BoardFacadeService boardFacadeService;
@@ -806,16 +819,27 @@ class BoardFacadeServiceTest {
             String password = "testpass123";
             GuestBoardInsertRequest request = createGuestBoardInsertRequest(gameName, tag, password);
 
+            Member tmpMember = Member.createForTmp(
+                    gameName, tag, Tier.GOLD, 4, 55.0,
+                    Tier.SILVER, 2, 45.0, 100, 50
+            );
+            tmpMember.updateRole(Role.TMP);
+            ReflectionTestUtils.setField(tmpMember, "id", 1L);
+
             Board guestBoard = Board.createForGuest(
-                    gameName, tag, request.getGameMode(), request.getMainP(), request.getSubP(),
+                    tmpMember, request.getGameMode(), request.getMainP(), request.getSubP(),
                     request.getWantP(), request.getMike(), request.getContents(), 1, password
             );
             ReflectionTestUtils.setField(guestBoard, "id", 1L);
 
             // when
-            when(memberRepository.existsByGameNameAndTag(gameName, tag)).thenReturn(false);
+            when(riotAuthService.getPuuid(gameName, tag)).thenReturn("test-puuid");
+            when(riotInfoService.getTierWinrateRank("test-puuid")).thenReturn(null);
+            when(riotRecordService.getRecent30GameStats(gameName, "test-puuid")).thenReturn(null);
+            when(memberService.getOrCreateTmpMember(eq(gameName), eq(tag), any())).thenReturn(tmpMember);
+            when(riotRecordService.getPreferChampionfromMatch(gameName, "test-puuid")).thenReturn(null);
             doNothing().when(profanityCheckService).validateProfanity(request.getContents());
-            when(boardService.createAndSaveGuestBoard(request, gameName, tag, password)).thenReturn(guestBoard);
+            when(boardService.createAndSaveGuestBoard(request, tmpMember, password)).thenReturn(guestBoard);
             doNothing().when(boardGameStyleService).mapGameStylesToBoard(guestBoard, request.getGameStyles());
 
             BoardInsertResponse response = boardFacadeService.createGuestBoard(request, gameName, tag);
@@ -825,9 +849,10 @@ class BoardFacadeServiceTest {
             assertThat(response.getMemberId()).isEqualTo(null);
             assertThat(response.getGameName()).isEqualTo(gameName);
             assertThat(response.getTag()).isEqualTo(tag);
-            verify(memberRepository).existsByGameNameAndTag(gameName, tag);
+            verify(riotAuthService).getPuuid(gameName, tag);
+            verify(memberService).getOrCreateTmpMember(eq(gameName), eq(tag), any());
             verify(profanityCheckService).validateProfanity(request.getContents());
-            verify(boardService).createAndSaveGuestBoard(request, gameName, tag, password);
+            verify(boardService).createAndSaveGuestBoard(eq(request), any(Member.class), eq(password));
             verify(boardGameStyleService).mapGameStylesToBoard(guestBoard, request.getGameStyles());
         }
 
@@ -841,16 +866,21 @@ class BoardFacadeServiceTest {
             GuestBoardInsertRequest request = createGuestBoardInsertRequest(gameName, tag, password);
 
             // when
-            when(memberRepository.existsByGameNameAndTag(gameName, tag)).thenReturn(true);
+            when(riotAuthService.getPuuid(gameName, tag)).thenReturn("test-puuid");
+            when(riotInfoService.getTierWinrateRank("test-puuid")).thenReturn(null);
+            when(riotRecordService.getRecent30GameStats(gameName, "test-puuid")).thenReturn(null);
+            when(memberService.getOrCreateTmpMember(eq(gameName), eq(tag), any()))
+                    .thenThrow(new BoardException(ErrorCode.MEMBER_ALREADY_EXISTS));
 
             // then
             assertThatThrownBy(() -> boardFacadeService.createGuestBoard(request, gameName, tag))
                     .isInstanceOf(BoardException.class)
                     .hasFieldOrPropertyWithValue("code", ErrorCode.MEMBER_ALREADY_EXISTS.getCode());
 
-            verify(memberRepository).existsByGameNameAndTag(gameName, tag);
+            verify(riotAuthService).getPuuid(gameName, tag);
+            verify(memberService).getOrCreateTmpMember(eq(gameName), eq(tag), any());
             verify(profanityCheckService, never()).validateProfanity(anyString());
-            verify(boardService, never()).createAndSaveGuestBoard(any(), anyString(), anyString(), anyString());
+            verify(boardService, never()).createAndSaveGuestBoard(any(), any(Member.class), anyString());
             verify(boardGameStyleService, never()).mapGameStylesToBoard(any(), any());
         }
 
@@ -863,8 +893,19 @@ class BoardFacadeServiceTest {
             String password = "testpass123";
             GuestBoardInsertRequest request = createGuestBoardInsertRequest(gameName, tag, password);
 
+            Member tmpMember = Member.createForTmp(
+                    gameName, tag, Tier.GOLD, 4, 55.0,
+                    Tier.SILVER, 2, 45.0, 100, 50
+            );
+            tmpMember.updateRole(Role.TMP);
+            ReflectionTestUtils.setField(tmpMember, "id", 1L);
+
             // when
-            when(memberRepository.existsByGameNameAndTag(gameName, tag)).thenReturn(false);
+            when(riotAuthService.getPuuid(gameName, tag)).thenReturn("test-puuid");
+            when(riotInfoService.getTierWinrateRank("test-puuid")).thenReturn(null);
+            when(riotRecordService.getRecent30GameStats(gameName, "test-puuid")).thenReturn(null);
+            when(memberService.getOrCreateTmpMember(eq(gameName), eq(tag), any())).thenReturn(tmpMember);
+            when(riotRecordService.getPreferChampionfromMatch(gameName, "test-puuid")).thenReturn(null);
             doThrow(new BoardException(ErrorCode.BOARD_FORBIDDEN_WORD))
                     .when(profanityCheckService).validateProfanity(request.getContents());
 
@@ -873,9 +914,10 @@ class BoardFacadeServiceTest {
                     .isInstanceOf(BoardException.class)
                     .hasFieldOrPropertyWithValue("code", ErrorCode.BOARD_FORBIDDEN_WORD.getCode());
 
-            verify(memberRepository).existsByGameNameAndTag(gameName, tag);
+            verify(riotAuthService).getPuuid(gameName, tag);
+            verify(memberService).getOrCreateTmpMember(eq(gameName), eq(tag), any());
             verify(profanityCheckService).validateProfanity(request.getContents());
-            verify(boardService, never()).createAndSaveGuestBoard(any(), anyString(), anyString(), anyString());
+            verify(boardService, never()).createAndSaveGuestBoard(any(), any(Member.class), anyString());
             verify(boardGameStyleService, never()).mapGameStylesToBoard(any(), any());
         }
     }

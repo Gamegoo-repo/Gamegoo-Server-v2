@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -13,12 +15,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+@Slf4j
 @RestControllerAdvice
 public class ExceptionAdvice {
 
@@ -112,6 +116,27 @@ public class ExceptionAdvice {
 
         String errorMessage = String.format("%s 파라미터의 값은 %s 타입이어야 합니다.", parameterName, expectedType);
         return ResponseEntity.badRequest().body(ApiResponse.of(BAD_REQUEST, errorMessage));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleNoResourceFoundException(NoResourceFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.of(HttpStatus.NOT_FOUND, e.getMessage()));
+    }
+
+    // 서버 내부 에러
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Object>> handleAll(Exception e) {
+        log.error("Unhandled exception occurred", e);
+        ErrorCode errorCode = ErrorCode._INTERNAL_SERVER_ERROR;
+
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .status(errorCode.getStatus())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
     }
 
 }

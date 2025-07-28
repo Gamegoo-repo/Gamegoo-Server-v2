@@ -37,7 +37,7 @@ public class Report extends BaseDateTimeEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_member_id", nullable = false)
+    @JoinColumn(name = "from_member_id")
     private Member fromMember;
 
     @ManyToOne(fetch = FetchType.LAZY)

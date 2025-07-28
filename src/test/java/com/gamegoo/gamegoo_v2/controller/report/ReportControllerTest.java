@@ -664,7 +664,7 @@ public class ReportControllerTest extends ControllerTestSupport {
 
             // when // then - 3일, 7일 제재 상태 필터링
             mockMvc.perform(MockMvcRequestBuilders.get(API_URL_PREFIX + "/list")
-                            .param("banTypes", "BAN_3D,BAN_7D"))
+                            .param("banTypes", "BAN_3D,BAN_1W"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.reports").isArray())
                     .andExpect(jsonPath("$.data.totalPages").value(1))

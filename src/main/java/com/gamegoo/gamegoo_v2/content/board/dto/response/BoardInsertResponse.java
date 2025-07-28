@@ -6,6 +6,8 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,12 +22,18 @@ public class BoardInsertResponse {
     private Integer profileImage;
     private String gameName;
     private String tag;
+    @Schema(ref = "#/components/schemas/Tier")
     private Tier tier;
     private int rank;
+    @Schema(ref = "#/components/schemas/GameMode")
     private GameMode gameMode;
+    @Schema(ref = "#/components/schemas/Position")
     private Position mainP;
+    @Schema(ref = "#/components/schemas/Position")
     private Position subP;
+    @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     private List<Position> wantP;
+    @Schema(ref = "#/components/schemas/Mike")
     private Mike mike;
     private List<Long> gameStyles;
     private String contents;
@@ -63,14 +71,26 @@ public class BoardInsertResponse {
     }
 
     public static BoardInsertResponse ofGuest(Board board) {
+        Member tmpMember = board.getMember();
+        
+        Tier tier;
+        int rank;
+        if (board.getGameMode() == GameMode.FREE) {
+            tier = tmpMember.getFreeTier();
+            rank = tmpMember.getFreeRank();
+        } else {
+            tier = tmpMember.getSoloTier();
+            rank = tmpMember.getSoloRank();
+        }
+        
         return BoardInsertResponse.builder()
                 .boardId(board.getId())
                 .memberId(null) // 게스트는 memberId null
                 .profileImage(board.getBoardProfileImage())
-                .gameName(board.getGameName())
-                .tag(board.getTag())
-                .tier(null) // 게스트는 티어 없음
-                .rank(0) // 게스트는 랭크 없음
+                .gameName(tmpMember.getGameName())
+                .tag(tmpMember.getTag())
+                .tier(tier)
+                .rank(rank)
                 .gameMode(board.getGameMode())
                 .mainP(board.getMainP())
                 .subP(board.getSubP())

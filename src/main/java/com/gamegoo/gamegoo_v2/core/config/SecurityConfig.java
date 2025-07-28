@@ -10,6 +10,7 @@ import com.gamegoo.gamegoo_v2.core.log.LoggingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -82,7 +83,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v2/riot/verify",
                         "/api/v2/riot/oauth/callback",
                         "/api/v2/riot/join").permitAll() // riot
-                .requestMatchers("/api/v2/posts/list/**", "/api/v2/posts/cursor", "/api/v2/posts/guest").permitAll() // board
+                .requestMatchers("/api/v2/posts/list/**", "/api/v2/posts/cursor",
+                        "/api/v2/posts/guest").permitAll() // board
                 .requestMatchers("/api/v2/posts/guest/**").permitAll() // guest board
                 .requestMatchers(
                         "/api/v2/auth/token/**",
@@ -95,6 +97,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/api/v2/manner/keyword/*",
                         "/api/v2/manner/level/*").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v2/report/*").permitAll()
                 .requestMatchers(
                         "/swagger-ui/**",
                         "/v3/api-docs/**").permitAll()
