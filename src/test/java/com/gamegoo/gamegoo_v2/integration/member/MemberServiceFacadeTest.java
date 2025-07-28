@@ -435,10 +435,10 @@ class MemberServiceFacadeTest {
         memberRepository.save(member);
 
         // when & then
-        com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException exception = 
+        com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException exception =
             org.junit.jupiter.api.Assertions.assertThrows(
                 com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException.class,
-                () -> memberFacadeService.refreshChampionStats(member)
+                () -> memberFacadeService.refreshChampionStats(member, null)
             );
 
         assertThat(exception.getErrorCode()).isEqualTo(com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAMPION_REFRESH_COOLDOWN);

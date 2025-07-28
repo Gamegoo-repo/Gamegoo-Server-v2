@@ -77,8 +77,10 @@ public class MemberController {
 
     @Operation(summary = "챔피언 통계 새로고침 API 입니다.", description = "API for refreshing champion statistics")
     @PutMapping("/champion-stats/refresh")
-    public ApiResponse<MyProfileResponse> refreshChampionStats(@AuthMember Member member) {
-        return ApiResponse.ok(memberFacadeService.refreshChampionStats(member));
+    public ApiResponse<MyProfileResponse> refreshChampionStats(
+            @AuthMember Member member,
+            @RequestParam(value = "memberId", required = false) Long targetMemberId) {
+        return ApiResponse.ok(memberFacadeService.refreshChampionStats(member, targetMemberId));
     }
 
     @Operation(summary = "어드민 권한 부여 API (개발용)", description = "개발용 어드민 권한 부여 API")

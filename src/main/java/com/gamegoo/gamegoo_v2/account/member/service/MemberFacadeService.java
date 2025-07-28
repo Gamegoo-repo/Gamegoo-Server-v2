@@ -122,27 +122,26 @@ public class MemberFacadeService {
      * 회원이 새로고침 버튼을 누르면 호출됩니다.
      * 마지막 갱신으로부터 3일이 지난 경우에만 갱신이 가능합니다.
      *
-     * @param member 갱신 대상 사용자
+     * @param targetMemberId 갱신 대상 사용자
      * @return 갱신된 프로필 정보
      */
     @Transactional
-    public MyProfileResponse refreshChampionStats(Member member) {
-        // 갱신 가능 여부 체크
-        if (!member.canRefreshChampionStats()) {
-            LocalDateTime lastRefreshTime = member.getChampionStatsRefreshedAt();
+    public MyProfileResponse refreshChampionStats(Member requestMember, Long targetMemberId) {
+        Member targetMember = (targetMemberId != null)
+                ? memberService.findMemberById(targetMemberId)
+                : requestMember;
+
+        validateCanRefresh(targetMember);
+        championStatsRefreshService.refreshChampionStats(targetMember);
+        return MyProfileResponse.of(targetMember);
+    }
+
+    private void validateCanRefresh(Member targetMember) {
+        if (!targetMember.canRefreshChampionStats()) {
+            LocalDateTime lastRefreshTime = targetMember.getChampionStatsRefreshedAt();
             long remainingHours = 72 - ChronoUnit.HOURS.between(lastRefreshTime, LocalDateTime.now());
-            System.out.println("[REFRESH] 갱신 불가 - 마지막: " + lastRefreshTime + ", 남은시간: " + remainingHours + "h");
             throw new ChampionRefreshCooldownException(ErrorCode.CHAMPION_REFRESH_COOLDOWN, remainingHours);
         }
-
-        // 갱신 진행
-        System.out.println("[REFRESH] 갱신 시작 - 이전: " + member.getChampionStatsRefreshedAt());
-        championStatsRefreshService.refreshChampionStats(member);
-        member.updateChampionStatsRefreshedAt();
-        System.out.println("[REFRESH] 갱신 완료 - 현재: " + member.getChampionStatsRefreshedAt());
-        
-        // 갱신된 데이터로 프로필 응답 생성
-        return MyProfileResponse.of(member);
     }
 
     /**

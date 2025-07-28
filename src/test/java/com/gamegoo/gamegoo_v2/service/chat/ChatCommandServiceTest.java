@@ -19,7 +19,6 @@ import com.gamegoo.gamegoo_v2.chat.repository.MemberChatroomRepository;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
 import com.gamegoo.gamegoo_v2.content.board.repository.BoardRepository;
-import com.gamegoo.gamegoo_v2.core.config.AsyncConfig;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.external.socket.SocketService;
@@ -56,7 +55,6 @@ import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 @SpringBootTest
-@Import(AsyncConfig.class)
 class ChatCommandServiceTest {
 
     @Autowired

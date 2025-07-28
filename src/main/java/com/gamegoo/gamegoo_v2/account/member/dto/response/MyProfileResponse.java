@@ -80,7 +80,7 @@ public class MyProfileResponse {
                 .isAgree(member.isAgree())
                 .isBlind(member.getBlind())
                 .loginType(member.getLoginType())
-                .updatedAt(String.valueOf(member.getUpdatedAt()))
+                .updatedAt(String.valueOf(member.getChampionStatsRefreshedAt()))
                 .gameStyleResponseList(gameStyleResponseList)
                 .championStatsResponseList(championStatsResponseList)
                 .memberRecentStats(MemberRecentStatsResponse.from(member.getMemberRecentStats()))

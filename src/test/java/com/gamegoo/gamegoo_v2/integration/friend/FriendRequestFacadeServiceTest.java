@@ -6,7 +6,6 @@ import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
-import com.gamegoo.gamegoo_v2.core.config.AsyncConfig;
 import com.gamegoo.gamegoo_v2.core.exception.FriendException;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
@@ -43,7 +41,6 @@ import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 @SpringBootTest
-@Import(AsyncConfig.class)
 class FriendRequestFacadeServiceTest {
 
     @Autowired

@@ -11,7 +11,6 @@ import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public class ChampionStatsRefreshService {
     private final MemberService memberService;
     private final MemberRecentStatsRepository memberRecentStatsRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void refreshChampionStats(Member member) {
         Long memberId = member.getId();
         Member freshMember = memberService.findMemberById(memberId);
@@ -50,6 +49,9 @@ public class ChampionStatsRefreshService {
             freshMember.updateRiotBasicInfo(accountInfo.getGameName(), accountInfo.getTagLine());
             freshMember.updateRiotStats(tierWinrateRank);
 
+            // 갱신 시간도 함께 업데이트
+            freshMember.updateChampionStatsRefreshedAt();
+
             // 최근 30게임 통계 계산 및 저장
             MemberRecentStats memberRecentStats = memberRecentStatsRepository.findById(memberId)
                     .orElse(MemberRecentStats.builder().member(freshMember).build());
@@ -70,4 +72,4 @@ public class ChampionStatsRefreshService {
             throw new RuntimeException("Riot API 호출 실패로 인한 챔피언 통계 업데이트 실패", e);
         }
     }
-} 
+}
