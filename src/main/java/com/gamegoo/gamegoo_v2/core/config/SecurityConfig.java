@@ -2,7 +2,6 @@ package com.gamegoo.gamegoo_v2.core.config;
 
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.auth.security.CustomAccessDeniedHandler;
-import com.gamegoo.gamegoo_v2.account.auth.security.CustomUserDetailsService;
 import com.gamegoo.gamegoo_v2.account.auth.security.EntryPointHandler;
 import com.gamegoo.gamegoo_v2.account.auth.security.JwtAuthFilter;
 import com.gamegoo.gamegoo_v2.account.auth.security.JwtAuthenticationExceptionHandler;
@@ -39,7 +38,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
-    private final CustomUserDetailsService customUserDetailsService;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final EntryPointHandler unauthorizedHandler;
     private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler;
@@ -57,7 +55,7 @@ public class SecurityConfig {
                 .map(e -> new AntPathRequestMatcher(e.getPattern(), e.getMethod()))
                 .collect(Collectors.toList());
 
-        return new JwtAuthFilter(customUserDetailsService, excludedRequestMatchers, jwtProvider);
+        return new JwtAuthFilter(excludedRequestMatchers, jwtProvider);
     }
 
     @Bean

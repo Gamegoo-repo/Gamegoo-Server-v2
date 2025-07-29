@@ -88,7 +88,8 @@ public class JwtProvider {
      * @return
      */
     public Role getRole(String token) {
-        return parseClaims(token).get("role", Role.class);
+        String roleStr = parseClaims(token).get("role", String.class);
+        return Role.valueOf(roleStr);
     }
 
     /**
