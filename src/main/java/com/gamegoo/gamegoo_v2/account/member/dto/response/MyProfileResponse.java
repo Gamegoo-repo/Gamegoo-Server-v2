@@ -34,6 +34,7 @@ public class MyProfileResponse {
     Integer freeRank;
     Double freeWinrate;
     String updatedAt;
+    String championStatsRefreshedAt;
     @Schema(ref = "#/components/schemas/Position")
     Position mainP;
     @Schema(ref = "#/components/schemas/Position")
@@ -80,7 +81,8 @@ public class MyProfileResponse {
                 .isAgree(member.isAgree())
                 .isBlind(member.getBlind())
                 .loginType(member.getLoginType())
-                .updatedAt(String.valueOf(member.getChampionStatsRefreshedAt()))
+                .updatedAt(member.getUpdatedAt() != null ? member.getUpdatedAt().toString() : null)
+                .championStatsRefreshedAt(member.getChampionStatsRefreshedAt() != null ? member.getChampionStatsRefreshedAt().toString() : null)
                 .gameStyleResponseList(gameStyleResponseList)
                 .championStatsResponseList(championStatsResponseList)
                 .memberRecentStats(MemberRecentStatsResponse.from(member.getMemberRecentStats()))
