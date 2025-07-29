@@ -2,6 +2,8 @@ package com.gamegoo.gamegoo_v2.account.member.domain;
 
 import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
+import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
 import jakarta.persistence.CascadeType;
@@ -355,14 +357,14 @@ public class Member extends BaseDateTimeEntity {
         return ChronoUnit.DAYS.between(this.championStatsRefreshedAt, now) >= 3;
     }
 
-    public void updateRiotStats(List<com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails> tiers) {
-        for (com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails tierDetail : tiers) {
-            if (tierDetail.getGameMode() == com.gamegoo.gamegoo_v2.matching.domain.GameMode.SOLO) {
+    public void updateRiotStats(List<TierDetails> tiers) {
+        for (TierDetails tierDetail : tiers) {
+            if (tierDetail.getGameMode() == GameMode.SOLO) {
                 this.soloTier = tierDetail.getTier();
                 this.soloRank = tierDetail.getRank();
                 this.soloWinRate = tierDetail.getWinrate();
                 this.soloGameCount = tierDetail.getGameCount();
-            } else if (tierDetail.getGameMode() == com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE) {
+            } else if (tierDetail.getGameMode() == GameMode.FREE) {
                 this.freeTier = tierDetail.getTier();
                 this.freeRank = tierDetail.getRank();
                 this.freeWinRate = tierDetail.getWinrate();
