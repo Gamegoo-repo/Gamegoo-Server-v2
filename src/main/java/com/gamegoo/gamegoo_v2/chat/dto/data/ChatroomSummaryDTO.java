@@ -18,6 +18,10 @@ public interface ChatroomSummaryDTO {
 
     Long getTargetMemberId();
 
-    boolean getBlind();
+    String getTargetMemberName();
+
+    Integer getTargetMemberImg();
+
+    Boolean getBlind();
 
 }
