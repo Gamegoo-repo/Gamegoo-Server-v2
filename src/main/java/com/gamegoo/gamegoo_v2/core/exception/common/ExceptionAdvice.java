@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.core.exception.common;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,18 @@ public class ExceptionAdvice {
                 .build();
 
         return ResponseEntity.status(ex.getStatus()).body(errorResponse);
+    }
+
+    // 챔피언 통계 새로고침 쿨다운 에러
+    @ExceptionHandler(ChampionRefreshCooldownException.class)
+    public ResponseEntity<ApiResponse<?>> championRefreshCooldownException(ChampionRefreshCooldownException ex) {
+        ApiResponse<?> errorResponse = ApiResponse.builder()
+                .status(ex.getErrorCode().getStatus())
+                .code(ex.getErrorCode().getCode())
+                .message(ex.getDetailedMessage())
+                .build();
+
+        return ResponseEntity.status(ex.getErrorCode().getStatus()).body(errorResponse);
     }
 
     // @Valid 검증 실패 시 발생하는 에러

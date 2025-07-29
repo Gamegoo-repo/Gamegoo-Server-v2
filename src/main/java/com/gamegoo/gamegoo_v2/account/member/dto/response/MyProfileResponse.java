@@ -34,6 +34,7 @@ public class MyProfileResponse {
     Integer freeRank;
     Double freeWinrate;
     String updatedAt;
+    String championStatsRefreshedAt;
     @Schema(ref = "#/components/schemas/Position")
     Position mainP;
     @Schema(ref = "#/components/schemas/Position")
@@ -47,6 +48,7 @@ public class MyProfileResponse {
     List<GameStyleResponse> gameStyleResponseList;
     List<ChampionStatsResponse> championStatsResponseList;
     MemberRecentStatsResponse memberRecentStats;
+    Boolean canRefresh;
 
     public static MyProfileResponse of(Member member) {
         List<GameStyleResponse> gameStyleResponseList = member.getMemberGameStyleList().stream()
@@ -56,6 +58,9 @@ public class MyProfileResponse {
         List<ChampionStatsResponse> championStatsResponseList = member.getMemberChampionList().stream()
                 .map(ChampionStatsResponse::from)
                 .toList();
+
+        // 3일 기준으로 갱신 가능 여부 체크
+        boolean canRefresh = member.canRefreshChampionStats();
 
         return MyProfileResponse.builder()
                 .id(member.getId())
@@ -76,11 +81,14 @@ public class MyProfileResponse {
                 .isAgree(member.isAgree())
                 .isBlind(member.getBlind())
                 .loginType(member.getLoginType())
-                .updatedAt(String.valueOf(member.getUpdatedAt()))
+                .updatedAt(member.getUpdatedAt() != null ? member.getUpdatedAt().toString() : null)
+                .championStatsRefreshedAt(member.getChampionStatsRefreshedAt() != null ? member.getChampionStatsRefreshedAt().toString() : null)
                 .gameStyleResponseList(gameStyleResponseList)
                 .championStatsResponseList(championStatsResponseList)
                 .memberRecentStats(MemberRecentStatsResponse.from(member.getMemberRecentStats()))
+                .canRefresh(canRefresh)
                 .build();
     }
+
 
 }

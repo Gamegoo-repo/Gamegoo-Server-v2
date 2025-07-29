@@ -427,6 +427,24 @@ class MemberServiceFacadeTest {
 
     }
 
+    @DisplayName("챔피언 통계 새로고침 실패 - 3일 제한")
+    @Test
+    void refreshChampionStatsFailsWhenNotEnoughTimePassed() {
+        // given - 최근에 갱신한 상태로 설정
+        member.updateChampionStatsRefreshedAt();
+        memberRepository.save(member);
+
+        // when & then
+        com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException exception =
+            org.junit.jupiter.api.Assertions.assertThrows(
+                com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException.class,
+                () -> memberFacadeService.refreshChampionStats(member, null)
+            );
+
+        assertThat(exception.getErrorCode()).isEqualTo(com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAMPION_REFRESH_COOLDOWN);
+        assertThat(exception.getDetailedMessage()).contains("전적 갱신은 3일마다 가능합니다");
+    }
+
     private Member createForGeneralMember(String email, String gameName) {
         Member member = Member.builder()
                 .email(email)

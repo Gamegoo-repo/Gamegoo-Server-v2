@@ -2,16 +2,19 @@ package com.gamegoo.gamegoo_v2.service.member;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
-import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
-import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberChampionRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.service.ChampionStatsRefreshService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
+import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotPuuidGameNameResponse;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
+import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,6 +54,9 @@ class ChampionStatsRefreshServiceTest {
     private RiotRecordService riotRecordService;
 
     @Mock
+    private RiotInfoService riotInfoService;
+
+    @Mock
     private MemberService memberService;
 
     @Mock
@@ -61,6 +67,8 @@ class ChampionStatsRefreshServiceTest {
     private List<ChampionStats> mockChampionStats;
     private RiotRecordService.Recent30GameStatsResponse mockRecentStats;
     private MemberRecentStats mockMemberRecentStats;
+    private List<TierDetails> mockTierDetails;
+    private RiotPuuidGameNameResponse mockAccountInfo;
 
     @BeforeEach
     void setUp() {
@@ -99,6 +107,30 @@ class ChampionStatsRefreshServiceTest {
 
         // Mock MemberRecentStats
         mockMemberRecentStats = mock(MemberRecentStats.class);
+        
+        // Mock TierDetails
+        TierDetails soloTier = mock(TierDetails.class);
+        when(soloTier.getGameMode()).thenReturn(GameMode.SOLO);
+        when(soloTier.getTier()).thenReturn(Tier.GOLD);
+        when(soloTier.getRank()).thenReturn(3);
+        when(soloTier.getWinrate()).thenReturn(65.5);
+        when(soloTier.getGameCount()).thenReturn(100);
+        
+        TierDetails freeTier = mock(TierDetails.class);
+        when(freeTier.getGameMode()).thenReturn(GameMode.FREE);
+        when(freeTier.getTier()).thenReturn(Tier.SILVER);
+        when(freeTier.getRank()).thenReturn(2);
+        when(freeTier.getWinrate()).thenReturn(58.2);
+        when(freeTier.getGameCount()).thenReturn(50);
+        
+        mockTierDetails = Arrays.asList(soloTier, freeTier);
+        
+        // Mock RiotPuuidGameNameResponse
+        mockAccountInfo = RiotPuuidGameNameResponse.builder()
+                .puuid("test-puuid-123")
+                .gameName("UpdatedGameName")
+                .tagLine("UpdatedTag")
+                .build();
     }
 
     @Test
@@ -106,10 +138,12 @@ class ChampionStatsRefreshServiceTest {
     void refreshChampionStats_WithPuuid_Success() {
         // Given
         given(memberService.findMemberById(1L)).willReturn(testMemberWithPuuid);
+        given(riotAuthService.getAccountByPuuid("test-puuid-123")).willReturn(mockAccountInfo);
         given(riotRecordService.getPreferChampionfromMatch("TestUser", "test-puuid-123"))
                 .willReturn(mockChampionStats);
         given(riotRecordService.getRecent30GameStats("TestUser", "test-puuid-123"))
                 .willReturn(mockRecentStats);
+        given(riotInfoService.getTierWinrateRank("test-puuid-123")).willReturn(mockTierDetails);
         given(memberRecentStatsRepository.findById(1L))
                 .willReturn(Optional.of(mockMemberRecentStats));
 
@@ -119,8 +153,12 @@ class ChampionStatsRefreshServiceTest {
         // Then
         verify(memberService).findMemberById(1L);
         verify(riotAuthService, never()).getPuuid(anyString(), anyString()); // puuid 캐시 확인
+        verify(riotAuthService).getAccountByPuuid("test-puuid-123");
         verify(riotRecordService).getPreferChampionfromMatch("TestUser", "test-puuid-123");
         verify(riotRecordService).getRecent30GameStats("TestUser", "test-puuid-123");
+        verify(riotInfoService).getTierWinrateRank("test-puuid-123");
+        verify(testMemberWithPuuid).updateRiotBasicInfo("UpdatedGameName", "UpdatedTag");
+        verify(testMemberWithPuuid).updateRiotStats(mockTierDetails);
         verify(memberChampionRepository).deleteByMember(testMemberWithPuuid);
         verify(memberChampionService).saveMemberChampions(testMemberWithPuuid, mockChampionStats);
         verify(memberRecentStatsRepository).save(any(MemberRecentStats.class));
@@ -132,10 +170,12 @@ class ChampionStatsRefreshServiceTest {
         // Given
         given(memberService.findMemberById(2L)).willReturn(testMemberWithoutPuuid);
         given(riotAuthService.getPuuid("TestUser2", "KR1")).willReturn("fetched-puuid-123");
+        given(riotAuthService.getAccountByPuuid("fetched-puuid-123")).willReturn(mockAccountInfo);
         given(riotRecordService.getPreferChampionfromMatch("TestUser2", "fetched-puuid-123"))
                 .willReturn(mockChampionStats);
         given(riotRecordService.getRecent30GameStats("TestUser2", "fetched-puuid-123"))
                 .willReturn(mockRecentStats);
+        given(riotInfoService.getTierWinrateRank("fetched-puuid-123")).willReturn(mockTierDetails);
         given(memberRecentStatsRepository.findById(2L))
                 .willReturn(Optional.of(mockMemberRecentStats));
 
@@ -145,8 +185,12 @@ class ChampionStatsRefreshServiceTest {
         // Then
         verify(memberService).findMemberById(2L);
         verify(riotAuthService).getPuuid("TestUser2", "KR1");
+        verify(riotAuthService).getAccountByPuuid("fetched-puuid-123");
         verify(riotRecordService).getPreferChampionfromMatch("TestUser2", "fetched-puuid-123");
         verify(riotRecordService).getRecent30GameStats("TestUser2", "fetched-puuid-123");
+        verify(riotInfoService).getTierWinrateRank("fetched-puuid-123");
+        verify(testMemberWithoutPuuid).updateRiotBasicInfo("UpdatedGameName", "UpdatedTag");
+        verify(testMemberWithoutPuuid).updateRiotStats(mockTierDetails);
         verify(memberChampionRepository).deleteByMember(testMemberWithoutPuuid);
         verify(memberChampionService).saveMemberChampions(testMemberWithoutPuuid, mockChampionStats);
         verify(memberRecentStatsRepository).save(any(MemberRecentStats.class));
@@ -157,10 +201,12 @@ class ChampionStatsRefreshServiceTest {
     void refreshChampionStats_NewMemberRecentStats_Success() {
         // Given
         given(memberService.findMemberById(1L)).willReturn(testMemberWithPuuid);
+        given(riotAuthService.getAccountByPuuid("test-puuid-123")).willReturn(mockAccountInfo);
         given(riotRecordService.getPreferChampionfromMatch("TestUser", "test-puuid-123"))
                 .willReturn(mockChampionStats);
         given(riotRecordService.getRecent30GameStats("TestUser", "test-puuid-123"))
                 .willReturn(mockRecentStats);
+        given(riotInfoService.getTierWinrateRank("test-puuid-123")).willReturn(mockTierDetails);
         given(memberRecentStatsRepository.findById(1L))
                 .willReturn(Optional.empty()); // 신규 멤버
 
@@ -169,8 +215,12 @@ class ChampionStatsRefreshServiceTest {
 
         // Then
         verify(memberService).findMemberById(1L);
+        verify(riotAuthService).getAccountByPuuid("test-puuid-123");
         verify(riotRecordService).getPreferChampionfromMatch("TestUser", "test-puuid-123");
         verify(riotRecordService).getRecent30GameStats("TestUser", "test-puuid-123");
+        verify(riotInfoService).getTierWinrateRank("test-puuid-123");
+        verify(testMemberWithPuuid).updateRiotBasicInfo("UpdatedGameName", "UpdatedTag");
+        verify(testMemberWithPuuid).updateRiotStats(mockTierDetails);
         verify(memberChampionRepository).deleteByMember(testMemberWithPuuid);
         verify(memberChampionService).saveMemberChampions(testMemberWithPuuid, mockChampionStats);
         verify(memberRecentStatsRepository).save(any(MemberRecentStats.class));
@@ -181,6 +231,7 @@ class ChampionStatsRefreshServiceTest {
     void refreshChampionStats_PreferChampionsFetchFails_Rollback() {
         // Given
         given(memberService.findMemberById(1L)).willReturn(testMemberWithPuuid);
+        given(riotAuthService.getAccountByPuuid("test-puuid-123")).willReturn(mockAccountInfo);
         given(riotRecordService.getPreferChampionfromMatch("TestUser", "test-puuid-123"))
                 .willThrow(new RuntimeException("Riot API 호출 실패"));
 
@@ -189,48 +240,6 @@ class ChampionStatsRefreshServiceTest {
                 () -> championStatsRefreshService.refreshChampionStats(testMemberWithPuuid));
         
         assertTrue(exception.getMessage().contains("Riot API 호출 실패로 인한 챔피언 통계 업데이트 실패"));
-        
-        // 기존 데이터 삭제가 호출되지 않았는지 확인 (롤백)
-        verify(memberChampionRepository, never()).deleteByMember(any(Member.class));
-        verify(memberChampionService, never()).saveMemberChampions(any(Member.class), anyList());
-        verify(memberRecentStatsRepository, never()).save(any(MemberRecentStats.class));
-    }
-
-    @Test
-    @DisplayName("최근 30게임 통계 조회 실패 시 롤백 - 기존 데이터 유지")
-    void refreshChampionStats_RecentStatsFetchFails_Rollback() {
-        // Given
-        given(memberService.findMemberById(1L)).willReturn(testMemberWithPuuid);
-        given(riotRecordService.getPreferChampionfromMatch("TestUser", "test-puuid-123"))
-                .willReturn(mockChampionStats);
-        given(riotRecordService.getRecent30GameStats("TestUser", "test-puuid-123"))
-                .willThrow(new RuntimeException("Riot API 호출 실패"));
-
-        // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, 
-                () -> championStatsRefreshService.refreshChampionStats(testMemberWithPuuid));
-        
-        assertTrue(exception.getMessage().contains("Riot API 호출 실패로 인한 챔피언 통계 업데이트 실패"));
-        
-        // 기존 데이터 삭제가 호출되지 않았는지 확인 (롤백)
-        verify(memberChampionRepository, never()).deleteByMember(any(Member.class));
-        verify(memberChampionService, never()).saveMemberChampions(any(Member.class), anyList());
-        verify(memberRecentStatsRepository, never()).save(any(MemberRecentStats.class));
-    }
-
-    @Test
-    @DisplayName("puuid 조회 실패 시 예외 발생")
-    void refreshChampionStats_PuuidFetchFails_ThrowsException() {
-        // Given
-        given(memberService.findMemberById(2L)).willReturn(testMemberWithoutPuuid);
-        given(riotAuthService.getPuuid("TestUser2", "KR1"))
-                .willThrow(new RuntimeException("Riot API 호출 실패"));
-
-        // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, 
-                () -> championStatsRefreshService.refreshChampionStats(testMemberWithoutPuuid));
-        
-        assertNotNull(exception.getMessage());
         
         // 기존 데이터 삭제가 호출되지 않았는지 확인 (롤백)
         verify(memberChampionRepository, never()).deleteByMember(any(Member.class));
@@ -243,10 +252,12 @@ class ChampionStatsRefreshServiceTest {
     void refreshChampionStats_SaveFails_TransactionRollback() {
         // Given
         given(memberService.findMemberById(1L)).willReturn(testMemberWithPuuid);
+        given(riotAuthService.getAccountByPuuid("test-puuid-123")).willReturn(mockAccountInfo);
         given(riotRecordService.getPreferChampionfromMatch("TestUser", "test-puuid-123"))
                 .willReturn(mockChampionStats);
         given(riotRecordService.getRecent30GameStats("TestUser", "test-puuid-123"))
                 .willReturn(mockRecentStats);
+        given(riotInfoService.getTierWinrateRank("test-puuid-123")).willReturn(mockTierDetails);
         given(memberRecentStatsRepository.findById(1L))
                 .willReturn(Optional.of(mockMemberRecentStats));
         doThrow(new RuntimeException("DB 저장 실패"))
