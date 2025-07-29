@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom;
 import com.gamegoo.gamegoo_v2.chat.domain.SystemMessageType;
 import com.gamegoo.gamegoo_v2.chat.dto.ChatResponseFactory;
 import com.gamegoo.gamegoo_v2.chat.dto.data.ChatroomSummaryDTO;
+import com.gamegoo.gamegoo_v2.chat.dto.data.ChatroomTargetDTO;
 import com.gamegoo.gamegoo_v2.chat.dto.request.ChatCreateRequest;
 import com.gamegoo.gamegoo_v2.chat.dto.response.ChatCreateResponse;
 import com.gamegoo.gamegoo_v2.chat.dto.response.ChatMessageListResponse;
@@ -30,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -357,6 +357,7 @@ public class ChatFacadeService {
      * @return ChatroomListResponse
      */
     public ChatroomListResponse getChatrooms(Member member) {
+        // 채팅방 목록 정보 리스트 조회
         List<ChatroomSummaryDTO> chatroomSummaryList = chatQueryService.getChatroomSummaryList(member.getId());
 
         // 상대 회원 id 리스트
@@ -364,31 +365,20 @@ public class ChatFacadeService {
                 .map(ChatroomSummaryDTO::getTargetMemberId)
                 .toList();
 
-        // 상대 회원 엔티티 리스트
-        List<Member> targetMembers = memberService.findAllMemberByIds(targetMemberIds);
-
-        // 상대 회원 id: 엔티티 map
-        Map<Long, Member> targetMemberMap = new HashMap<>(targetMembers.size());
-        for (Member targetMember : targetMembers) {
-            targetMemberMap.put(targetMember.getId(), targetMember);
-        }
-
-        // 상대 회원과 친구 여부, 차단 여부, 친구 요청 배치 조회
-        Map<Long, Boolean> isFriendMap = friendService.isFriendBatch(member, targetMemberIds);
-        Map<Long, Boolean> isBlockedMap = blockService.isBlockedByTargetMembersBatch(member, targetMemberIds);
-        Map<Long, Long> friendRequestMap = friendService.getFriendRequestMemberIdBatch(member, targetMemberIds);
+        // 상대 회원 관련 정보 map 조회
+        Map<Long, ChatroomTargetDTO> chatroomTargetMap = chatQueryService.getChatroomTargetMap(member.getId(),
+                targetMemberIds);
 
         // dto 생성
         List<ChatroomResponse> chatroomResponses = chatroomSummaryList.stream()
                 .map(chatroomSummaryDTO -> {
-
-                    Member targetMember = targetMemberMap.get(chatroomSummaryDTO.getTargetMemberId());
-                    boolean friend = isFriendMap.get(targetMember.getId());
-                    boolean blocked = isBlockedMap.get(targetMember.getId());
-                    Long friendRequestMemberId = friendRequestMap.get(targetMember.getId());
-
-                    return chatResponseFactory.toChatroomResponse(targetMember, friend, blocked,
-                            friendRequestMemberId, chatroomSummaryDTO);
+                    Long targetMemberId = chatroomSummaryDTO.getTargetMemberId();
+                    boolean friend = chatroomTargetMap.get(targetMemberId).getIsFriend() == 1;
+                    boolean blocked = chatroomTargetMap.get(targetMemberId).getIsBlocked() == 1;
+                    Long friendRequestMemberId = chatroomTargetMap.get(targetMemberId).getFriendRequestMemberId();
+                    
+                    return chatResponseFactory.toChatroomResponse(friend, blocked, friendRequestMemberId,
+                            chatroomSummaryDTO);
                 }).toList();
 
         return chatResponseFactory.toChatroomListResponse(chatroomResponses);

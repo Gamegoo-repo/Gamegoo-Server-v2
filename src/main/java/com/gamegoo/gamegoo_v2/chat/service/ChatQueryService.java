@@ -4,6 +4,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
 import com.gamegoo.gamegoo_v2.chat.domain.Chatroom;
 import com.gamegoo.gamegoo_v2.chat.dto.data.ChatroomSummaryDTO;
+import com.gamegoo.gamegoo_v2.chat.dto.data.ChatroomTargetDTO;
 import com.gamegoo.gamegoo_v2.chat.repository.ChatRepository;
 import com.gamegoo.gamegoo_v2.chat.repository.ChatroomRepository;
 import com.gamegoo.gamegoo_v2.chat.repository.MemberChatroomRepository;
@@ -16,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -131,6 +135,20 @@ public class ChatQueryService {
      */
     public List<ChatroomSummaryDTO> getChatroomSummaryList(Long memberId) {
         return chatroomRepository.findChatroomSummariedByMemberId(memberId);
+    }
+
+    /**
+     * 채팅방 목록에 보여줄 상대 회원 관련 정보 DTO 맵 반환
+     * 상대 회원 id: 친구 여부, 차단 당함 여부, 친구요청 보낸 회원 id
+     *
+     * @param memberId
+     * @param targetMemberIds
+     * @return
+     */
+    public Map<Long, ChatroomTargetDTO> getChatroomTargetMap(Long memberId, List<Long> targetMemberIds) {
+        List<ChatroomTargetDTO> list = chatroomRepository.findChatroomTargetsByMemberId(memberId, targetMemberIds);
+        return list.stream()
+                .collect(Collectors.toMap(ChatroomTargetDTO::getTargetMemberId, Function.identity()));
     }
 
 }
