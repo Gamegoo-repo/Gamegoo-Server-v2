@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -124,6 +125,20 @@ public class ExceptionAdvice {
                 .body(ApiResponse.of(HttpStatus.NOT_FOUND, e.getMessage()));
     }
 
+    // @PreAuthorize 인가 실패
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiResponse<?>> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        ErrorCode errorCode = ErrorCode._FORBIDDEN;
+
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .status(errorCode.getStatus())
+                .build();
+
+        return ResponseEntity.status(ErrorCode._FORBIDDEN.getStatus()).body(apiResponse);
+    }
+
     // 서버 내부 에러
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleAll(Exception e) {
@@ -136,7 +151,7 @@ public class ExceptionAdvice {
                 .status(errorCode.getStatus())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        return ResponseEntity.status(ErrorCode._INTERNAL_SERVER_ERROR.getStatus()).body(apiResponse);
     }
 
 }
