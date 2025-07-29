@@ -346,7 +346,7 @@ public class Member extends BaseDateTimeEntity {
 
     /**
      * 챔피언 통계 갱신 가능 여부 체크
-     * 마지막 갱신으로부터 3일이 지났거나, 처음 갱신하는 경우 true 반환
+     * 마지막 갱신으로부터 1일이 지났거나, 처음 갱신하는 경우 true 반환
      */
     public boolean canRefreshChampionStats() {
         if (this.championStatsRefreshedAt == null) {
@@ -354,7 +354,7 @@ public class Member extends BaseDateTimeEntity {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        return ChronoUnit.DAYS.between(this.championStatsRefreshedAt, now) >= 3;
+        return ChronoUnit.DAYS.between(this.championStatsRefreshedAt, now) >= 1;
     }
 
     public void updateRiotStats(List<TierDetails> tiers) {

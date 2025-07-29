@@ -120,7 +120,7 @@ public class MemberFacadeService {
     /**
      * 회원의 챔피언 통계 갱신(새로고침) 기능.
      * 회원이 새로고침 버튼을 누르면 호출됩니다.
-     * 마지막 갱신으로부터 3일이 지난 경우에만 갱신이 가능합니다.
+     * 마지막 갱신으로부터 1일이 지난 경우에만 갱신이 가능합니다.
      *
      * @param targetMemberId 갱신 대상 사용자
      * @return 갱신된 프로필 정보
@@ -139,7 +139,7 @@ public class MemberFacadeService {
     private void validateCanRefresh(Member targetMember) {
         if (!targetMember.canRefreshChampionStats()) {
             LocalDateTime lastRefreshTime = targetMember.getChampionStatsRefreshedAt();
-            long remainingHours = (3 * 24) - ChronoUnit.HOURS.between(lastRefreshTime, LocalDateTime.now());
+            long remainingHours = (1 * 24) - ChronoUnit.HOURS.between(lastRefreshTime, LocalDateTime.now());
             throw new ChampionRefreshCooldownException(ErrorCode.CHAMPION_REFRESH_COOLDOWN, remainingHours);
         }
     }
