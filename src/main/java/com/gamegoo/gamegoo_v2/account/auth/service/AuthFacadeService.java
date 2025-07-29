@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.auth.service;
 
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.JoinRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.LoginRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RefreshTokenRequest;
@@ -7,6 +8,7 @@ import com.gamegoo.gamegoo_v2.account.auth.dto.response.LoginResponse;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
@@ -18,7 +20,6 @@ import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
-import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,15 +87,15 @@ public class AuthFacadeService {
         passwordService.verifyPassword(member, request.getPassword());
 
         // 해당 사용자의 정보를 가진 jwt 토큰 발급
-        String accessToken = jwtProvider.createAccessToken(member.getId());
-        String refreshToken = jwtProvider.createRefreshToken(member.getId());
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getRole());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole());
 
         // DB에 저장
         authService.updateRefreshToken(member, refreshToken);
 
         // 제재 만료 확인 (만료된 제재 자동 해제)
         banService.checkBanExpiry(member);
-        
+
         // 제재 메시지 생성
         String banMessage = null;
         if (member.isBanned()) {
@@ -127,10 +128,11 @@ public class AuthFacadeService {
 
         // memberId 조회
         Long memberId = jwtProvider.getMemberId(request.getRefreshToken());
+        Role role = jwtProvider.getRole(request.getRefreshToken());
 
         // jwt 토큰 재발급
-        String accessToken = jwtProvider.createAccessToken(memberId);
-        String refreshToken = jwtProvider.createRefreshToken(memberId);
+        String accessToken = jwtProvider.createAccessToken(memberId, role);
+        String refreshToken = jwtProvider.createRefreshToken(memberId, role);
 
         // memberId로 member 엔티티 조회
         Member member = memberService.findMemberById(memberId);
@@ -164,6 +166,11 @@ public class AuthFacadeService {
         authService.deleteRefreshToken(member);
 
         return "탈퇴처리가 완료되었습니다";
+    }
+
+    public String createTestAccessToken(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+        return jwtProvider.createAccessToken(member.getId(), member.getRole());
     }
 
 }
