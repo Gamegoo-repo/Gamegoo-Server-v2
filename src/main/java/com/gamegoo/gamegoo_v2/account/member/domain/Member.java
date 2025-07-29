@@ -27,6 +27,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @DynamicUpdate
@@ -137,10 +139,10 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private BanType banType = BanType.NONE;
 
-    private java.time.LocalDateTime banExpireAt;
+    private LocalDateTime banExpireAt;
 
     @Column(name = "champion_stats_refreshed_at")
-    private java.time.LocalDateTime championStatsRefreshedAt;
+    private LocalDateTime championStatsRefreshedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
@@ -297,7 +299,7 @@ public class Member extends BaseDateTimeEntity {
         this.blind = true;
     }
 
-    public void applyBan(BanType banType, java.time.LocalDateTime banExpireAt) {
+    public void applyBan(BanType banType, LocalDateTime banExpireAt) {
         this.banType = banType;
         this.banExpireAt = banExpireAt;
     }
@@ -312,7 +314,7 @@ public class Member extends BaseDateTimeEntity {
     }
 
     public void updateChampionStatsRefreshedAt() {
-        this.championStatsRefreshedAt = java.time.LocalDateTime.now();
+        this.championStatsRefreshedAt = LocalDateTime.now();
     }
 
     public boolean isBanned() {
@@ -325,7 +327,7 @@ public class Member extends BaseDateTimeEntity {
         if (banExpireAt == null) {
             return false;
         }
-        return java.time.LocalDateTime.now().isBefore(banExpireAt);
+        return LocalDateTime.now().isBefore(banExpireAt);
     }
 
     public boolean canWritePost() {
@@ -348,9 +350,9 @@ public class Member extends BaseDateTimeEntity {
         if (this.championStatsRefreshedAt == null) {
             return true; // 처음 갱신하는 경우
         }
-        
-        java.time.LocalDateTime now = java.time.LocalDateTime.now();
-        return java.time.temporal.ChronoUnit.DAYS.between(this.championStatsRefreshedAt, now) >= 3;
+
+        LocalDateTime now = LocalDateTime.now();
+        return ChronoUnit.DAYS.between(this.championStatsRefreshedAt, now) >= 3;
     }
 
     public void updateRiotStats(List<com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails> tiers) {
