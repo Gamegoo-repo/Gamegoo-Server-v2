@@ -139,7 +139,7 @@ public class MemberFacadeService {
     private void validateCanRefresh(Member targetMember) {
         if (!targetMember.canRefreshChampionStats()) {
             LocalDateTime lastRefreshTime = targetMember.getChampionStatsRefreshedAt();
-            long remainingHours = 72 - ChronoUnit.HOURS.between(lastRefreshTime, LocalDateTime.now());
+            long remainingHours = (3 * 24) - ChronoUnit.HOURS.between(lastRefreshTime, LocalDateTime.now());
             throw new ChampionRefreshCooldownException(ErrorCode.CHAMPION_REFRESH_COOLDOWN, remainingHours);
         }
     }
