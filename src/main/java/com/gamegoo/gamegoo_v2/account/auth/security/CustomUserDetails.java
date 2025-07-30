@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class CustomUserDetails implements UserDetails {
 
     Long memberId;
-    Role role;    // Member, Admin
+    Role role;    // MEMBER, ADMIN
 
     public CustomUserDetails(Long memberId, Role role) {
         this.memberId = memberId;

@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.auth.security;
 
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,7 +10,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final CustomUserDetailsService customUserDetailsService;
     private final List<RequestMatcher> excludedRequestMatchers;
     private final JwtProvider jwtProvider;
 
@@ -37,7 +36,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
             Long memberId = jwtProvider.getMemberId(jwt);
-            UserDetails userDetails = customUserDetailsService.loadUserByMemberId(memberId);
+            Role role = jwtProvider.getRole(jwt);
+
+            CustomUserDetails userDetails = new CustomUserDetails(memberId, role);
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

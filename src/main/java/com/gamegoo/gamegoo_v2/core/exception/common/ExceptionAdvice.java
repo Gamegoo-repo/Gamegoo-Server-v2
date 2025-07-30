@@ -2,12 +2,14 @@ package com.gamegoo.gamegoo_v2.core.exception.common;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -36,6 +38,18 @@ public class ExceptionAdvice {
                 .build();
 
         return ResponseEntity.status(ex.getStatus()).body(errorResponse);
+    }
+
+    // 챔피언 통계 새로고침 쿨다운 에러
+    @ExceptionHandler(ChampionRefreshCooldownException.class)
+    public ResponseEntity<ApiResponse<?>> championRefreshCooldownException(ChampionRefreshCooldownException ex) {
+        ApiResponse<?> errorResponse = ApiResponse.builder()
+                .status(ex.getErrorCode().getStatus())
+                .code(ex.getErrorCode().getCode())
+                .message(ex.getDetailedMessage())
+                .build();
+
+        return ResponseEntity.status(ex.getErrorCode().getStatus()).body(errorResponse);
     }
 
     // @Valid 검증 실패 시 발생하는 에러
@@ -124,6 +138,20 @@ public class ExceptionAdvice {
                 .body(ApiResponse.of(HttpStatus.NOT_FOUND, e.getMessage()));
     }
 
+    // @PreAuthorize 인가 실패
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiResponse<?>> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        ErrorCode errorCode = ErrorCode._FORBIDDEN;
+
+        ApiResponse<Object> apiResponse = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .status(errorCode.getStatus())
+                .build();
+
+        return ResponseEntity.status(ErrorCode._FORBIDDEN.getStatus()).body(apiResponse);
+    }
+
     // 서버 내부 에러
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleAll(Exception e) {
@@ -136,7 +164,7 @@ public class ExceptionAdvice {
                 .status(errorCode.getStatus())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        return ResponseEntity.status(ErrorCode._INTERNAL_SERVER_ERROR.getStatus()).body(apiResponse);
     }
 
 }

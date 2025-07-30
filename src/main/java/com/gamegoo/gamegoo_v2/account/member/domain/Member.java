@@ -2,6 +2,8 @@ package com.gamegoo.gamegoo_v2.account.member.domain;
 
 import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
+import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
+import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
 import jakarta.persistence.CascadeType;
@@ -27,6 +29,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @DynamicUpdate
@@ -137,10 +141,10 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private BanType banType = BanType.NONE;
 
-    private java.time.LocalDateTime banExpireAt;
+    private LocalDateTime banExpireAt;
 
     @Column(name = "champion_stats_refreshed_at")
-    private java.time.LocalDateTime championStatsRefreshedAt;
+    private LocalDateTime championStatsRefreshedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
@@ -297,7 +301,7 @@ public class Member extends BaseDateTimeEntity {
         this.blind = true;
     }
 
-    public void applyBan(BanType banType, java.time.LocalDateTime banExpireAt) {
+    public void applyBan(BanType banType, LocalDateTime banExpireAt) {
         this.banType = banType;
         this.banExpireAt = banExpireAt;
     }
@@ -312,7 +316,7 @@ public class Member extends BaseDateTimeEntity {
     }
 
     public void updateChampionStatsRefreshedAt() {
-        this.championStatsRefreshedAt = java.time.LocalDateTime.now();
+        this.championStatsRefreshedAt = LocalDateTime.now();
     }
 
     public boolean isBanned() {
@@ -325,7 +329,7 @@ public class Member extends BaseDateTimeEntity {
         if (banExpireAt == null) {
             return false;
         }
-        return java.time.LocalDateTime.now().isBefore(banExpireAt);
+        return LocalDateTime.now().isBefore(banExpireAt);
     }
 
     public boolean canWritePost() {
@@ -340,4 +344,37 @@ public class Member extends BaseDateTimeEntity {
         return !isBanned();
     }
 
+    /**
+     * 챔피언 통계 갱신 가능 여부 체크
+     * 마지막 갱신으로부터 1일이 지났거나, 처음 갱신하는 경우 true 반환
+     */
+    public boolean canRefreshChampionStats() {
+        if (this.championStatsRefreshedAt == null) {
+            return true; // 처음 갱신하는 경우
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        return ChronoUnit.DAYS.between(this.championStatsRefreshedAt, now) >= 1;
+    }
+
+    public void updateRiotStats(List<TierDetails> tiers) {
+        for (TierDetails tierDetail : tiers) {
+            if (tierDetail.getGameMode() == GameMode.SOLO) {
+                this.soloTier = tierDetail.getTier();
+                this.soloRank = tierDetail.getRank();
+                this.soloWinRate = tierDetail.getWinrate();
+                this.soloGameCount = tierDetail.getGameCount();
+            } else if (tierDetail.getGameMode() == GameMode.FREE) {
+                this.freeTier = tierDetail.getTier();
+                this.freeRank = tierDetail.getRank();
+                this.freeWinRate = tierDetail.getWinrate();
+                this.freeGameCount = tierDetail.getGameCount();
+            }
+        }
+    }
+
+    public void updateRiotBasicInfo(String gameName, String tag) {
+        this.gameName = gameName;
+        this.tag = tag;
+    }
 }

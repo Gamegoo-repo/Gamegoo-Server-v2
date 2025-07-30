@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.auth.jwt;
 
+import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.core.exception.JwtAuthException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import io.jsonwebtoken.Claims;
@@ -43,8 +44,8 @@ public class JwtProvider {
      * @param memberId
      * @return
      */
-    public String createAccessToken(Long memberId) {
-        return createToken(memberId, accessTokenExpTime);
+    public String createAccessToken(Long memberId, Role role) {
+        return createToken(memberId, role, accessTokenExpTime);
     }
 
     /**
@@ -53,11 +54,11 @@ public class JwtProvider {
      * @param memberId
      * @return
      */
-    public String createRefreshToken(Long memberId) {
+    public String createRefreshToken(Long memberId, Role role) {
         // refreshExpireDay를 밀리초 단위로 변환
         long refreshExpireTimeInMillis = refreshExpireDay * 24 * 60 * 60 * 1000;
 
-        return createToken(memberId, refreshExpireTimeInMillis);
+        return createToken(memberId, role, refreshExpireTimeInMillis);
     }
 
     /**
@@ -78,6 +79,21 @@ public class JwtProvider {
      */
     public Long getMemberId(String token) {
         return parseClaims(token).get("memberId", Long.class);
+    }
+
+    /**
+     * token claim에서 role 추출 메소드
+     *
+     * @param token
+     * @return
+     */
+    public Role getRole(String token) {
+        try {
+            String roleStr = parseClaims(token).get("role", String.class);
+            return Role.valueOf(roleStr);
+        } catch (Exception e) {
+            throw new JwtAuthException(ErrorCode.INVALID_CLAIMS);
+        }
     }
 
     /**
@@ -126,16 +142,18 @@ public class JwtProvider {
      * token 생성 메소드
      *
      * @param memberId
+     * @param role
      * @param expireTime
      * @return
      */
-    private String createToken(Long memberId, Long expireTime) {
+    private String createToken(Long memberId, Role role, Long expireTime) {
 
         long now = (new Date()).getTime();
         Date validity = new Date(now + expireTime);
 
         return Jwts.builder()
                 .claim("memberId", memberId)
+                .claim("role", role)
                 .issuedAt(new Date(now))
                 .expiration(validity)
                 .signWith(key)
