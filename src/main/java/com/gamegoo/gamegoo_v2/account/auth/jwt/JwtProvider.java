@@ -88,8 +88,12 @@ public class JwtProvider {
      * @return
      */
     public Role getRole(String token) {
-        String roleStr = parseClaims(token).get("role", String.class);
-        return Role.valueOf(roleStr);
+        try {
+            String roleStr = parseClaims(token).get("role", String.class);
+            return Role.valueOf(roleStr);
+        } catch (Exception e) {
+            throw new JwtAuthException(ErrorCode.INVALID_CLAIMS);
+        }
     }
 
     /**
