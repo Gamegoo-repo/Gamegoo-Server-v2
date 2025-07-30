@@ -8,9 +8,9 @@ import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
-import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotAuthTokenResponse;
-import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotAccountIdResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotVerifyExistUserRequest;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotAccountIdResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotAuthTokenResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotPuuidGameNameResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -109,8 +109,8 @@ public class RiotFacadeService {
 
         // 사용자가 있을 경우, 로그인 진행
         Member member = memberList.get(0);
-        String accessToken = jwtProvider.createAccessToken(member.getId());
-        String refreshToken = jwtProvider.createRefreshToken(member.getId());
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getRole());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole());
 
         // refresh token DB에 저장
         authService.updateRefreshToken(member, refreshToken);

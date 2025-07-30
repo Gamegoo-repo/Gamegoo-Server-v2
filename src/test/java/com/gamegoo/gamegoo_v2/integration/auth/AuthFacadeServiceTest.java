@@ -158,7 +158,7 @@ class AuthFacadeServiceTest {
         @Test
         void updateToken() {
             // given
-            String token = jwtProvider.createRefreshToken(member.getId());
+            String token = jwtProvider.createRefreshToken(member.getId(), member.getRole());
             RefreshToken refreshToken = RefreshToken.builder()
                     .refreshToken(token)
                     .member(member)
@@ -190,7 +190,7 @@ class AuthFacadeServiceTest {
         @Test
         void updateTokenWithInvalidRefreshToken() {
             // given
-            String token = jwtProvider.createRefreshToken(member.getId());
+            String token = jwtProvider.createRefreshToken(member.getId(), member.getRole());
             RefreshToken refreshToken = RefreshToken.builder()
                     .refreshToken(token)
                     .member(member)
