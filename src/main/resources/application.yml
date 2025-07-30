@@ -28,6 +28,12 @@ spring:
     client-id: ${CLIENT_ID}
     client-secret: ${CLIENT_SECRET}
 
+  datasource:
+    hikari:
+      leak-detection-threshold: 3000  # ms 단위 (예: 3초)
+      maximum-pool-size: 20       # 최대 커넥션 수
+      minimum-idle: 20            # 최소 유휴 커넥션 수
+
 # batch size 설정
 batch_size:
   manner_rank: 30

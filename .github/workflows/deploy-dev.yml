@@ -4,6 +4,9 @@ on:
     types: [ closed ]
     branches:
       - develop
+  push:
+    branches:
+      - refactor/392
   workflow_dispatch: # 수동 실행 가능
 
 jobs:
