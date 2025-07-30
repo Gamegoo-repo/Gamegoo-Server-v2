@@ -111,6 +111,10 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
     password: ${DEV_DB_PASSWORD}
+    hikari:
+      leak-detection-threshold: 3000  # ms 단위 (예: 3초)
+      maximum-pool-size: 20       # 최대 커넥션 수
+      minimum-idle: 20            # 최소 유휴 커넥션 수
 
 logging:
   discord:
