@@ -43,6 +43,12 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         if (currentMemberId != null) {
             return memberRepository.findById(currentMemberId)
+                    .map(member -> {
+                        if (member.getBlind()) {
+                            throw new MemberException(ErrorCode.INACTIVE_MEMBER); // 탈퇴 여부 검증
+                        }
+                        return member;
+                    })
                     .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
         }
 
