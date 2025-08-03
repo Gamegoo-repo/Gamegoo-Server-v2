@@ -13,6 +13,7 @@ public class ChampionStats {
     private int kills; // 킬
     private int deaths; // 데스
     private int assists; // 어시스트
+    private int queueId; // 큐 ID (420: 솔로, 440: 자유, 450: 칼바람)
 
     /**
      * 한 경기의 결과로 객체를 생성
@@ -148,6 +149,14 @@ public class ChampionStats {
 
     public void setAssists(int assists) {
         this.assists = assists;
+    }
+
+    public int getQueueId() {
+        return queueId;
+    }
+
+    public void setQueueId(int queueId) {
+        this.queueId = queueId;
     }
 
 }
