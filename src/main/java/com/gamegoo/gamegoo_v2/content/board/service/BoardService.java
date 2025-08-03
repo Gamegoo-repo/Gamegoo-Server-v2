@@ -134,7 +134,7 @@ public class BoardService {
             subPList.add(subP);
         }
 
-        Pageable pageable = PageRequest.of(pageIdx - 1, 10, Sort.by("activityTime").descending());
+        Pageable pageable = PageRequest.of(pageIdx - 1, 20, Sort.by("activityTime").descending());
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
                 gameMode, tier, mainPList, subPList, mike, pageable);
     }
