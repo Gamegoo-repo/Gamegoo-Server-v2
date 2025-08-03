@@ -95,6 +95,9 @@ public class Member extends BaseDateTimeEntity {
     @Column(nullable = false)
     private double freeWinRate = 0.0;
 
+    @Column(nullable = false, columnDefinition = "double default 0.0")
+    private double aramWinRate = 0.0;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Position mainP = Position.ANY;
@@ -376,5 +379,9 @@ public class Member extends BaseDateTimeEntity {
     public void updateRiotBasicInfo(String gameName, String tag) {
         this.gameName = gameName;
         this.tag = tag;
+    }
+
+    public void updateAramWinRate(double aramWinRate) {
+        this.aramWinRate = aramWinRate;
     }
 }

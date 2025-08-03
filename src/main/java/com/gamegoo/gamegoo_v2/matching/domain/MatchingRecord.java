@@ -122,10 +122,11 @@ public class MatchingRecord extends BaseDateTimeEntity {
     }
 
     private static double getWinRateByGameMode(GameMode gameMode, Member member) {
-        if (gameMode == GameMode.FREE) {
-            return member.getFreeWinRate();
-        }
-        return member.getSoloWinRate();
+        return switch (gameMode) {
+            case FREE -> member.getFreeWinRate();
+            case ARAM -> member.getAramWinRate();
+            default -> member.getSoloWinRate(); // SOLO, FAST
+        };
     }
 
     // MatchingRecord Builder
