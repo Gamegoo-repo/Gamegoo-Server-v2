@@ -136,7 +136,7 @@ spring:
       on-profile: prod
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: false
   datasource:
     url: jdbc:mysql://${RDS_PRIVATE_IP}:${RDS_PORT}/${PROD_DB_SCHEMA_NAME}?useSSL=true
