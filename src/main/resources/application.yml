@@ -170,7 +170,7 @@ spring:
     url: jdbc:mysql://${QA_DB_HOST}:${RDS_PORT}/${QA_DB_SCHEMA_NAME}?useSSL=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    password: ${QA_DB_PASSWORD}
 
 logging:
   discord:
