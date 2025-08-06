@@ -136,10 +136,38 @@ spring:
       on-profile: prod
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: false
   datasource:
     url: jdbc:mysql://${RDS_PRIVATE_IP}:${RDS_PORT}/${PROD_DB_SCHEMA_NAME}?useSSL=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+logging:
+  discord:
+    webhook: ${DISCORD_MONITORING_WEBHOOK_URL_PROD}
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+
+---
+# QA 환경
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: qa
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+  datasource:
+    url: jdbc:mysql://${QA_DB_HOST}:${RDS_PORT}/${QA_DB_SCHEMA_NAME}?useSSL=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
