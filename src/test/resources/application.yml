@@ -51,3 +51,6 @@ email:
 logging:
   discord:
     webhook: aaa
+
+cors:
+  allowed-origins: [ ]
