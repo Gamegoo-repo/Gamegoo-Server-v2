@@ -98,7 +98,7 @@ jobs:
             -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
             -e CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
             -e RSO_REDIRECT_URI=${{ secrets.RSO_REDIRECT_URI }} \
-            -e DISCORD_MONITORING_WEBHOOK_URL_DEV=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL_DEV }} \
+            -e DISCORD_MONITORING_WEBHOOK_URL_QA=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL_QA }} \
             -e DISCORD_SCHEDULER_WEBHOOK=${{ secrets.DISCORD_SCHEDULER_WEBHOOK }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-qa:${{ github.sha }}
 
