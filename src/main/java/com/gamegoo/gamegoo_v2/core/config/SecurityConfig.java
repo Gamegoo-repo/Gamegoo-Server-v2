@@ -43,6 +43,7 @@ public class SecurityConfig {
     private final JwtAuthenticationExceptionHandler jwtAuthenticationExceptionHandler;
     private final LoggingFilter loggingFilter;
     private final SecurityJwtProperties securityJwtProperties;
+    private final CorsProperties corsProperties;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -125,11 +126,11 @@ public class SecurityConfig {
 
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("http://local.mydomain.com");
-        config.addAllowedOrigin("https://api.gamegoo.co.kr");
-        config.addAllowedOrigin("https://dev.gamegoo.co.kr");
-        config.addAllowedOrigin("https://socket.gamegoo.co.kr");
-        config.addAllowedOrigin("https://www.gamegoo.co.kr");
+
+        for (String origin : corsProperties.getAllowedOrigins()) {
+            config.addAllowedOrigin(origin);
+        }
+
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
