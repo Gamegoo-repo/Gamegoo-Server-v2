@@ -100,7 +100,7 @@ jobs:
             -e RSO_REDIRECT_URI=${{ secrets.RSO_REDIRECT_URI }} \
             -e DISCORD_MONITORING_WEBHOOK_URL_DEV=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL_DEV }} \
             -e DISCORD_SCHEDULER_WEBHOOK=${{ secrets.DISCORD_SCHEDULER_WEBHOOK }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-qa:${{ github.sha }}
 
       # 실패 시 디스코드에 알림 보내기
       - name: 배포 실패 시 디스코드 알림 전송
