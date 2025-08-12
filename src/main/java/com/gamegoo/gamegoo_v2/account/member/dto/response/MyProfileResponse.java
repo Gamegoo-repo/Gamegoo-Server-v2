@@ -55,9 +55,7 @@ public class MyProfileResponse {
                 .map(memberGameStyle -> GameStyleResponse.of(memberGameStyle.getGameStyle()))
                 .toList();
 
-        List<ChampionStatsResponse> championStatsResponseList = member.getMemberChampionList().stream()
-                .map(ChampionStatsResponse::from)
-                .toList();
+        List<ChampionStatsResponse> championStatsResponseList = getProfileChampionStats(member);
 
         // 3일 기준으로 갱신 가능 여부 체크
         boolean canRefresh = member.canRefreshChampionStats();
@@ -90,5 +88,14 @@ public class MyProfileResponse {
                 .build();
     }
 
+    /**
+     * 프로필용 챔피언 통계 조회 (솔랭+자유 통합 통계가 있는 챔피언만)
+     */
+    public static List<ChampionStatsResponse> getProfileChampionStats(Member member) {
+        return member.getMemberChampionList().stream()
+                .filter(memberChampion -> memberChampion.getGames() > 0) // 통합 통계가 있는 챔피언만
+                .map(ChampionStatsResponse::from)
+                .toList();
+    }
 
 }

@@ -57,9 +57,7 @@ public class OtherProfileResponse {
                 .map(memberGameStyle -> GameStyleResponse.of(memberGameStyle.getGameStyle()))
                 .toList();
 
-        List<ChampionStatsResponse> championStatsResponseList = targetMember.getMemberChampionList().stream()
-                .map(ChampionStatsResponse::from)
-                .toList();
+        List<ChampionStatsResponse> championStatsResponseList = MyProfileResponse.getProfileChampionStats(targetMember);
 
         // 3일 기준으로 갱신 가능 여부 체크
         boolean canRefresh = targetMember.canRefreshChampionStats();
