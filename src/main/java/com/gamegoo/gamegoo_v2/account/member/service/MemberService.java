@@ -130,16 +130,6 @@ public class MemberService {
     }
 
     /**
-     * Member 엔티티 리스트 조회
-     *
-     * @param memberIds
-     * @return
-     */
-    public List<Member> findAllMemberByIds(List<Long> memberIds) {
-        return memberRepository.findAllByIdIn(memberIds);
-    }
-
-    /**
      * Email로 회원 정보 조회
      *
      * @param email 사용자 ID
@@ -147,6 +137,18 @@ public class MemberService {
      */
     public Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    /**
+     * 소환사명, 태그로 회원 정보 조회
+     *
+     * @param gameName 소환사명
+     * @param tag      태그
+     * @return member
+     */
+    public Member findMemberByGameNameAndTag(String gameName, String tag) {
+        return memberRepository.findByGameNameAndTag(gameName, tag).orElseThrow(
+                () -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     /**
@@ -266,8 +268,8 @@ public class MemberService {
      * 임시 멤버 생성 및 저장
      *
      * @param gameName 게임 이름
-     * @param tag 태그
-     * @param tiers 티어 정보 리스트
+     * @param tag      태그
+     * @param tiers    티어 정보 리스트
      * @return 생성된 임시 멤버
      */
     @Transactional
@@ -319,8 +321,8 @@ public class MemberService {
      * 임시 멤버 조회 또는 생성
      *
      * @param gameName 게임 이름
-     * @param tag 태그
-     * @param tiers 티어 정보 리스트
+     * @param tag      태그
+     * @param tiers    티어 정보 리스트
      * @return 기존 또는 새로 생성된 임시 멤버
      */
     @Transactional

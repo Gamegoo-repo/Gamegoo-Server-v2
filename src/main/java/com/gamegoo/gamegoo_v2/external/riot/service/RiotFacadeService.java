@@ -52,7 +52,7 @@ public class RiotFacadeService {
     }
 
     @Transactional
-    public String join(RiotJoinRequest request) {
+    public Member join(RiotJoinRequest request) {
         // [Member] puuid 중복 확인
         memberService.checkDuplicateMemberByPuuid(request.getPuuid());
 
@@ -73,7 +73,7 @@ public class RiotFacadeService {
         // [Member] Member Champion DB 에서 매핑하기
         memberChampionService.saveMemberChampions(member, preferChampionStats);
 
-        return "RSO 회원가입이 완료되었습니다.";
+        return member;
     }
 
     /**
