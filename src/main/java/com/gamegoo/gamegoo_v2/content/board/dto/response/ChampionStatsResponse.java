@@ -1,8 +1,8 @@
 package com.gamegoo.gamegoo_v2.content.board.dto.response;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberChampion;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.game.domain.Champion;
-import com.gamegoo.gamegoo_v2.account.member.domain.MemberChampion;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -42,7 +42,7 @@ public class ChampionStatsResponse {
         Champion champion = memberChampion.getChampion();
         int wins = memberChampion.getWins();
         int games = memberChampion.getGames();
-        double winRate = games > 0 ? (double) wins / games : 0.0;
+        double winRate = games > 0 ? ((double) wins / games) * 100 : 0.0;
         return ChampionStatsResponse.builder()
                 .championId(champion.getId())
                 .championName(champion.getName())

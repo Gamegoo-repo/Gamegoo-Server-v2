@@ -14,7 +14,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +78,7 @@ public class BoardByIdResponseForMember {
                         .championName(mc.getChampion().getName())
                         .wins(mc.getWins())
                         .games(mc.getGames())
-                        .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
+                        .winRate(mc.getGames() > 0 ? ((double) mc.getWins() / mc.getGames()) * 100 : 0)
                         .csPerMinute(mc.getCsPerMinute())
                         .averageCs(mc.getGames() > 0 ? (double) mc.getTotalCs() / mc.getGames() : 0)
                         .kda(mc.getKDA())
