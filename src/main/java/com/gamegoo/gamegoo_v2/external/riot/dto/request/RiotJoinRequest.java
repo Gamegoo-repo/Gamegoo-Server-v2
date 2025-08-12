@@ -2,9 +2,11 @@ package com.gamegoo.gamegoo_v2.external.riot.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class RiotJoinRequest {
 
     @NotBlank(message = "puuid는 비워둘 수 없습니다.")
