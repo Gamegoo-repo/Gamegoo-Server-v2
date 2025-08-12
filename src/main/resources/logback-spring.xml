@@ -101,5 +101,15 @@
             <appender-ref ref="ASYNC_DISCORD"/>
         </root>
     </springProfile>
+    <!-- qa Profile에서의 로그 설정 -->
+    <springProfile name="qa">
+        <root level="INFO">
+            <!-- CONSOLE, FILE_INFO, FILE_ERROR 등록-->
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE_INFO"/>
+            <appender-ref ref="FILE_ERROR"/>
+            <appender-ref ref="ASYNC_DISCORD"/>
+        </root>
+    </springProfile>
 
 </configuration>
