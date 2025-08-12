@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - qa
-      - ci/399
   workflow_dispatch: # 수동 실행 가능
 
 jobs:
