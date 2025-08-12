@@ -93,6 +93,10 @@ logging:
   discord:
     webhook: ${DISCORD_SCHEDULER_WEBHOOK}
 
+cors:
+  allowed-origins:
+    - http://local.mydomain.com
+
 ---
 # 개발 환경
 server:
@@ -125,6 +129,11 @@ decorator:
     p6spy:
       enable-logging: false
 
+cors:
+  allowed-origins:
+    - https://dev.gamegoo.co.kr
+    - https://devsocket.gamegoo.co.kr
+
 ---
 # 운영 환경
 server:
@@ -152,3 +161,43 @@ decorator:
   datasource:
     p6spy:
       enable-logging: false
+
+cors:
+  allowed-origins:
+    - https://api.gamegoo.co.kr
+    - https://socket.gamegoo.co.kr
+    - https://www.gamegoo.co.kr
+
+---
+# QA 환경
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: qa
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  datasource:
+    url: jdbc:mysql://${QA_DB_HOST}:${RDS_PORT}/${QA_DB_SCHEMA_NAME}?useSSL=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${QA_DB_PASSWORD}
+
+logging:
+  discord:
+    webhook: ${DISCORD_MONITORING_WEBHOOK_URL_QA}
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+
+cors:
+  allowed-origins:
+    - https://qaapi.gamegoo.co.kr
+    - https://qasocket.gamegoo.co.kr
+    - https://test.gamegoo.co.kr
