@@ -63,7 +63,7 @@ public class BoardByIdResponse {
                         .championName(mc.getChampion().getName())
                         .wins(mc.getWins())
                         .games(mc.getGames())
-                        .winRate(mc.getGames() > 0 ? (double) mc.getWins() / mc.getGames() : 0)
+                        .winRate(mc.getGames() > 0 ? ((double) mc.getWins() / mc.getGames()) * 100 : 0)
                         .csPerMinute(mc.getCsPerMinute())
                         .averageCs(mc.getGames() > 0 ? (double) mc.getTotalCs() / mc.getGames() : 0)
                         .kda(mc.getKDA())
@@ -109,4 +109,5 @@ public class BoardByIdResponse {
                 .contents(board.getContent())
                 .build();
     }
+
 }
