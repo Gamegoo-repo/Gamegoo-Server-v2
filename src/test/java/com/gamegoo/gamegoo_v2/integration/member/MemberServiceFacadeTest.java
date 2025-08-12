@@ -176,7 +176,7 @@ class MemberServiceFacadeTest {
             assertThat(championResponse.getWins()).isEqualTo(memberChampion.getWins());
             assertThat(championResponse.getGames()).isEqualTo(memberChampion.getGames());
             assertThat(championResponse.getWinRate()).isEqualTo(
-                    memberChampion.getWins() / (double) memberChampion.getGames());
+                    (memberChampion.getWins() / (double) memberChampion.getGames()) * 100);
             assertThat(championResponse.getCsPerMinute()).isEqualTo(memberChampion.getCsPerMinute());
             assertThat(championResponse.getAverageCs()).isEqualTo(
                     memberChampion.getGames() > 0 ? (double) memberChampion.getTotalCs() / memberChampion.getGames()
@@ -251,7 +251,7 @@ class MemberServiceFacadeTest {
             assertThat(championResponse.getWins()).isEqualTo(memberChampion.getWins());
             assertThat(championResponse.getGames()).isEqualTo(memberChampion.getGames());
             assertThat(championResponse.getWinRate()).isEqualTo(
-                    memberChampion.getWins() / (double) memberChampion.getGames());
+                    (memberChampion.getWins() / (double) memberChampion.getGames()) * 100);
             assertThat(championResponse.getCsPerMinute()).isEqualTo(memberChampion.getCsPerMinute());
             assertThat(championResponse.getAverageCs()).isEqualTo(
                     memberChampion.getGames() > 0 ? (double) memberChampion.getTotalCs() / memberChampion.getGames()
@@ -436,12 +436,13 @@ class MemberServiceFacadeTest {
 
         // when & then
         com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException exception =
-            org.junit.jupiter.api.Assertions.assertThrows(
-                com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException.class,
-                () -> memberFacadeService.refreshChampionStats(member, null)
-            );
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException.class,
+                        () -> memberFacadeService.refreshChampionStats(member, null)
+                );
 
-        assertThat(exception.getErrorCode()).isEqualTo(com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAMPION_REFRESH_COOLDOWN);
+        assertThat(exception.getErrorCode()).isEqualTo(
+                com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAMPION_REFRESH_COOLDOWN);
         assertThat(exception.getDetailedMessage()).contains("전적 갱신은 3일마다 가능합니다");
     }
 
