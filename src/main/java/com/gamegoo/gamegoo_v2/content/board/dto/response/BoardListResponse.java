@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -101,7 +100,8 @@ public class BoardListResponse {
                 .winRate(winRate)
                 .bumpTime(board.getBumpTime())
                 .championStatsResponseList(championStatsResponseList)
-                .memberRecentStats(MemberRecentStatsResponse.fromGameMode(member.getMemberRecentStats(), board.getGameMode()))
+                .memberRecentStats(
+                        MemberRecentStatsResponse.fromGameMode(member.getMemberRecentStats(), board.getGameMode()))
                 .freeTier(member.getFreeTier())
                 .freeRank(member.getFreeRank())
                 .soloTier(member.getSoloTier())
@@ -122,7 +122,9 @@ public class BoardListResponse {
                                 .championName(mc.getChampion().getName())
                                 .wins(mc.getSoloWins())
                                 .games(mc.getSoloGames())
-                                .winRate(mc.getSoloGames() > 0 ? (double) mc.getSoloWins() / mc.getSoloGames() : 0)
+                                .winRate(
+                                        mc.getSoloGames() > 0 ?
+                                                ((double) mc.getSoloWins() / mc.getSoloGames()) * 100 : 0)
                                 .csPerMinute(mc.getSoloCsPerMinute())
                                 .averageCs(mc.getSoloGames() > 0 ? (double) mc.getSoloTotalCs() / mc.getSoloGames() : 0)
                                 .kda(mc.getSoloKDA())
@@ -135,7 +137,9 @@ public class BoardListResponse {
                                 .championName(mc.getChampion().getName())
                                 .wins(mc.getFreeWins())
                                 .games(mc.getFreeGames())
-                                .winRate(mc.getFreeGames() > 0 ? (double) mc.getFreeWins() / mc.getFreeGames() : 0)
+                                .winRate(
+                                        mc.getFreeGames() > 0 ?
+                                                ((double) mc.getFreeWins() / mc.getFreeGames()) * 100 : 0)
                                 .csPerMinute(mc.getFreeCsPerMinute())
                                 .averageCs(mc.getFreeGames() > 0 ? (double) mc.getFreeTotalCs() / mc.getFreeGames() : 0)
                                 .kda(mc.getFreeKDA())
@@ -148,7 +152,9 @@ public class BoardListResponse {
                                 .championName(mc.getChampion().getName())
                                 .wins(mc.getAramWins())
                                 .games(mc.getAramGames())
-                                .winRate(mc.getAramGames() > 0 ? (double) mc.getAramWins() / mc.getAramGames() : 0)
+                                .winRate(
+                                        mc.getAramGames() > 0 ?
+                                                ((double) mc.getAramWins() / mc.getAramGames()) * 100 : 0)
                                 .csPerMinute(mc.getAramCsPerMinute())
                                 .averageCs(mc.getAramGames() > 0 ? (double) mc.getAramTotalCs() / mc.getAramGames() : 0)
                                 .kda(mc.getAramKDA())
