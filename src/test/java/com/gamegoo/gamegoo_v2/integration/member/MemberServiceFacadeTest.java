@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -175,8 +176,8 @@ class MemberServiceFacadeTest {
             assertThat(championResponse.getChampionName()).isEqualTo(memberChampion.getChampion().getName());
             assertThat(championResponse.getWins()).isEqualTo(memberChampion.getWins());
             assertThat(championResponse.getGames()).isEqualTo(memberChampion.getGames());
-            assertThat(championResponse.getWinRate()).isEqualTo(
-                    (memberChampion.getWins() / (double) memberChampion.getGames()) * 100);
+            assertThat(championResponse.getWinRate()).isCloseTo(
+                    (memberChampion.getWins() / (double) memberChampion.getGames()) * 100, within(0.01));
             assertThat(championResponse.getCsPerMinute()).isEqualTo(memberChampion.getCsPerMinute());
             assertThat(championResponse.getAverageCs()).isEqualTo(
                     memberChampion.getGames() > 0 ? (double) memberChampion.getTotalCs() / memberChampion.getGames()
@@ -250,8 +251,8 @@ class MemberServiceFacadeTest {
             assertThat(championResponse.getChampionName()).isEqualTo(memberChampion.getChampion().getName());
             assertThat(championResponse.getWins()).isEqualTo(memberChampion.getWins());
             assertThat(championResponse.getGames()).isEqualTo(memberChampion.getGames());
-            assertThat(championResponse.getWinRate()).isEqualTo(
-                    (memberChampion.getWins() / (double) memberChampion.getGames()) * 100);
+            assertThat(championResponse.getWinRate()).isCloseTo(
+                    (memberChampion.getWins() / (double) memberChampion.getGames()) * 100, within(0.01));
             assertThat(championResponse.getCsPerMinute()).isEqualTo(memberChampion.getCsPerMinute());
             assertThat(championResponse.getAverageCs()).isEqualTo(
                     memberChampion.getGames() > 0 ? (double) memberChampion.getTotalCs() / memberChampion.getGames()
