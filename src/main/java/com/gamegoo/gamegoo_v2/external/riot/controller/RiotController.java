@@ -36,7 +36,8 @@ public class RiotController {
     @PostMapping("/join")
     @Operation(summary = "RSO 전용 회원가입 API", description = "API for RSO join")
     public ApiResponse<String> joinByRSO(@RequestBody @Valid RiotJoinRequest request) {
-        return ApiResponse.ok(riotFacadeService.join(request));
+        riotFacadeService.join(request);
+        return ApiResponse.ok("RSO 회원가입이 완료되었습니다.");
     }
 
     @GetMapping("/oauth/callback")
