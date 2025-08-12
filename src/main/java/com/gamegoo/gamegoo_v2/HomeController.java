@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2;
 
+import com.gamegoo.gamegoo_v2.account.auth.service.AuthFacadeService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.ChampionStatsRefreshService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 
     private final RiotFacadeService riotFacadeService;
+    private final AuthFacadeService authFacadeService;
     private final RiotAuthService riotAuthService;
     private final MemberService memberService;
     private final ChampionStatsRefreshService championStatsRefreshService;
@@ -49,7 +51,7 @@ public class HomeController {
     }
 
     @Operation(summary = "라이엇 계정 회원 가입")
-    @PostMapping("/join")
+    @PostMapping("/home/join")
     public ApiResponse<Object> joinTest(@RequestBody RiotUserInfo riotUserInfo) {
         String puuid = riotAuthService.getPuuid(riotUserInfo.getGamename(), riotUserInfo.getTag()); // puuid 조회
         RiotJoinRequest request = new RiotJoinRequest(puuid, true);
@@ -58,11 +60,25 @@ public class HomeController {
     }
 
     @Operation(summary = "챔피언 전적 통계 갱신")
-    @GetMapping("/refresh/stats/{memberId}")
+    @GetMapping("/home/refresh/stats/{memberId}")
     public ApiResponse<String> refreshStats(@PathVariable Long memberId) {
         Member member = memberService.findMemberById(memberId);
         championStatsRefreshService.refreshChampionStats(member);
         return ApiResponse.ok("UPDATED");
+    }
+
+    @Operation(summary = "소환사명과 태그로 해당 회원 id 조회")
+    @PostMapping("/home/getMemberId")
+    public ApiResponse<Long> getMemberId(@RequestBody RiotUserInfo riotUserInfo) {
+        Member member = memberService.findMemberByGameNameAndTag(riotUserInfo.getGamename(),
+                riotUserInfo.getTag());
+        return ApiResponse.ok(member.getId());
+    }
+
+    @GetMapping("/home/token/{memberId}")
+    @Operation(summary = "memberId로 access token 발급 API", description = "테스트용으로 access token을 발급받을 수 있는 API 입니다.")
+    public ApiResponse<String> getTestAccessToken(@PathVariable(name = "memberId") Long memberId) {
+        return ApiResponse.ok(authFacadeService.createTestAccessToken(memberId));
     }
 
     @Getter

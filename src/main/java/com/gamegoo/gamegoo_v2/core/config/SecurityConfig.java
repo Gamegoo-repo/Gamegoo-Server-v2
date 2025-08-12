@@ -100,8 +100,7 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/v3/api-docs/**").permitAll()
                 .requestMatchers("healthcheck").permitAll()
-                .requestMatchers("join").permitAll()
-                .requestMatchers("/refresh/stats/*").permitAll()
+                .requestMatchers("/home/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated());
 
