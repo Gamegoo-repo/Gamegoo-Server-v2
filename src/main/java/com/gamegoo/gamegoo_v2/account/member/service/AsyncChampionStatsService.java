@@ -2,10 +2,12 @@ package com.gamegoo.gamegoo_v2.account.member.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AsyncChampionStatsService {
@@ -26,6 +28,7 @@ public class AsyncChampionStatsService {
             Member member = memberService.findMemberById(memberId);
             championStatsRefreshService.refreshChampionStats(member);
         } catch (Exception e) {
+            log.warn("비동기 챔피언 통계 로직 실패: {}", memberId, e);
         }
     }
 }
