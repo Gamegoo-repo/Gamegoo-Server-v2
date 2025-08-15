@@ -445,7 +445,7 @@ public class MatchingFacadeServiceTest {
             // when // then
             assertThatThrownBy(() -> matchingFacadeService.matchingFound(matchingRecord.getMatchingUuid(),
                     targetMatchingRecord.getMatchingUuid()))
-                    .isInstanceOf(MemberException.class)
+                    .isInstanceOf(MatchingException.class)
                     .hasMessage(ErrorCode.TARGET_MEMBER_DEACTIVATED.getMessage());
         }
 
@@ -614,7 +614,7 @@ public class MatchingFacadeServiceTest {
             // when // then
             assertThatThrownBy(() -> matchingFacadeService.matchingSuccess(matchingRecord.getMatchingUuid(),
                     targetMatchingRecord.getMatchingUuid()))
-                    .isInstanceOf(MemberException.class)
+                    .isInstanceOf(MatchingException.class)
                     .hasMessage(ErrorCode.TARGET_MEMBER_DEACTIVATED.getMessage());
         }
 
