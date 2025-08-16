@@ -166,8 +166,8 @@ public class MatchingFacadeService {
         memberValidator.throwIfEqual(member, targetMember);
 
         // 탈퇴하지 않았는지 검증
-        memberValidator.throwIfBlind(member);
-        memberValidator.throwIfBlind(targetMember);
+        memberValidator.throwIfBlind(member, MatchingException.class, ErrorCode.INACTIVE_MEMBER);
+        memberValidator.throwIfBlind(targetMember, MatchingException.class, ErrorCode.TARGET_MEMBER_DEACTIVATED);
 
         // 서로의 차단 여부 검증
         validateBlockStatusWhenMatch(member, targetMember);
@@ -209,8 +209,8 @@ public class MatchingFacadeService {
         memberValidator.throwIfEqual(member, targetMember);
 
         // 탈퇴하지 않았는지 검증
-        memberValidator.throwIfBlind(member);
-        memberValidator.throwIfBlind(targetMember);
+        memberValidator.throwIfBlind(member, MatchingException.class, ErrorCode.INACTIVE_MEMBER);
+        memberValidator.throwIfBlind(targetMember, MatchingException.class, ErrorCode.TARGET_MEMBER_DEACTIVATED);
 
         // 서로의 차단 여부 검증
         validateBlockStatusWhenMatch(member, targetMember);
