@@ -3,8 +3,11 @@ package com.gamegoo.gamegoo_v2.external.riot.service;
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.auth.service.AuthService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
+import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
+import com.gamegoo.gamegoo_v2.core.exception.AuthException;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
@@ -21,6 +24,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.INACTIVE_MEMBER;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -35,6 +40,8 @@ public class RiotFacadeService {
     private final AuthService authService;
     private final JwtProvider jwtProvider;
     private final OAuthRedirectBuilder oAuthRedirectBuilder;
+    private final BanService banService;
+    private final MemberValidator memberValidator;
 
     @Value(value = "${spring.front_url}")
     private String frontUrl;
@@ -107,8 +114,16 @@ public class RiotFacadeService {
             return String.format("%s/riot/callback?puuid=%s&state=%s", frontUrl, encodedPuuid, encodedState);
         }
 
-        // 사용자가 있을 경우, 로그인 진행
+        // 사용자가 있을 경우
         Member member = memberList.get(0);
+
+        // 탈퇴한 사용자인지 확인하기
+        memberValidator.throwIfBlind(member, AuthException.class, INACTIVE_MEMBER);
+
+        // 제재 만료 확인 (만료된 제재 자동 해제)
+        banService.checkBanExpiry(member);
+
+        // 로그인 진행
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getRole());
         String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole());
 
