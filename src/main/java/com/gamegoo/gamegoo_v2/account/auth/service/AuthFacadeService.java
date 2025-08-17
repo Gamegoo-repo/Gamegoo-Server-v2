@@ -11,6 +11,7 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
+import com.gamegoo.gamegoo_v2.account.member.service.AsyncChampionStatsService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
@@ -44,6 +45,7 @@ public class AuthFacadeService {
     private final JwtProvider jwtProvider;
     private final PasswordService passwordService;
     private final BanService banService;
+    private final AsyncChampionStatsService asyncChampionStatsService;
 
     /**
      * 회원가입
@@ -69,6 +71,9 @@ public class AuthFacadeService {
 
         // [Member] Member Champion DB에서 매핑하기
         memberChampionService.saveMemberChampions(member, preferChampionStats);
+
+        // [Async] 비동기로 champion stats refresh 실행
+        asyncChampionStatsService.refreshChampionStatsAsync(member.getId());
 
         return "회원가입이 완료되었습니다.";
     }
