@@ -11,6 +11,7 @@ import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -61,6 +62,7 @@ public class HomeController {
 
     @Operation(summary = "챔피언 전적 통계 갱신")
     @GetMapping("/home/refresh/stats/{memberId}")
+    @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
     public ApiResponse<String> refreshStats(@PathVariable Long memberId) {
         Member member = memberService.findMemberById(memberId);
         championStatsRefreshService.refreshChampionStats(member);
@@ -77,6 +79,7 @@ public class HomeController {
 
     @GetMapping("/home/token/{memberId}")
     @Operation(summary = "memberId로 access token 발급 API", description = "테스트용으로 access token을 발급받을 수 있는 API 입니다.")
+    @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
     public ApiResponse<String> getTestAccessToken(@PathVariable(name = "memberId") Long memberId) {
         return ApiResponse.ok(authFacadeService.createTestAccessToken(memberId));
     }
