@@ -10,6 +10,7 @@ import com.gamegoo.gamegoo_v2.account.auth.service.AuthFacadeService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +30,7 @@ public class AuthController {
 
     @GetMapping("/token/{memberId}")
     @Operation(summary = "임시 access token 발급 API", description = "테스트용으로 access token을 발급받을 수 있는 API 입니다.")
+    @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
     public ApiResponse<String> getTestAccessToken(@PathVariable(name = "memberId") Long memberId) {
         return ApiResponse.ok(authFacadeService.createTestAccessToken(memberId));
     }
