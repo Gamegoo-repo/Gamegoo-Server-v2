@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.social.friend.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
+import com.gamegoo.gamegoo_v2.external.socket.SocketService;
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
 import com.gamegoo.gamegoo_v2.social.friend.domain.FriendRequest;
 import com.gamegoo.gamegoo_v2.social.friend.dto.DeleteFriendResponse;
@@ -22,6 +23,7 @@ public class FriendFacadeService {
 
     private final FriendService friendService;
     private final MemberService memberService;
+    private final SocketService socketService;
 
     /**
      * 친구 요청 전송 Facade 메소드
@@ -49,6 +51,9 @@ public class FriendFacadeService {
     public FriendRequestResponse acceptFriendRequest(Member member, Long targetMemberId) {
         Member targetMember = memberService.findMemberById(targetMemberId);
         FriendRequest friendRequest = friendService.acceptFriendRequest(member, targetMember);
+
+        // 친구 요청 수락으로 인한 서로의 온라인 여부 표시를 위해 socket API 호출
+        socketService.emitFriendOnlineEvent(member.getId(), targetMemberId);
 
         return FriendRequestResponse.of(friendRequest.getFromMember().getId(), "친구 요청 수락 성공");
     }
