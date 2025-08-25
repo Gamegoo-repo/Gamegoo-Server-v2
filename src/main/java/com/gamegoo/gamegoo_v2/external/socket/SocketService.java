@@ -25,6 +25,7 @@ public class SocketService {
 
     private static final String JOIN_CHATROOM_URL = "/socket/room/join";
     private static final String SYS_MESSAGE_URL = "/socket/sysmessage";
+    private static final String FRIEND_ONLINE_URL = "/internal/socket/friend/online/";
 
     /**
      * SOCKET 서버로 해당 회원의 socket을 room에 join 요청하는 API 전송
@@ -82,6 +83,33 @@ public class SocketService {
             }
         } catch (Exception e) {
             log.error("Error occurred while sendSystemMessage method", e);
+            throw new SocketException(ErrorCode.SOCKET_API_RESPONSE_ERROR);
+        }
+    }
+
+    /**
+     * SOCKET 서버로 member와 targetMember의 socket에 friend-online event emit을 요청하는 API 전송
+     *
+     * @param memberId       회원 id
+     * @param targetMemberId 상대 회원 id
+     */
+    public void emitFriendOnlineEvent(Long memberId, Long targetMemberId) {
+        String url = SOCKET_SERVER_URL + FRIEND_ONLINE_URL + memberId.toString();
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("targetMemberId", targetMemberId);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, requestBody, String.class);
+
+            log.info("response of emitFriendOnlineEvent: {}", response.getStatusCode());
+            if (!response.getStatusCode().equals(HttpStatus.OK)) {
+                log.error("emitFriendOnlineEvent API call FAIL: {}", response.getBody());
+                throw new SocketException(ErrorCode.SOCKET_API_RESPONSE_ERROR);
+            } else {
+                log.info("emitFriendOnlineEvent API call SUCCESS: {}", response.getBody());
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while emitFriendOnlineEvent method", e);
             throw new SocketException(ErrorCode.SOCKET_API_RESPONSE_ERROR);
         }
     }
