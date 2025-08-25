@@ -45,7 +45,7 @@ public enum ErrorCode {
     TARGET_MEMBER_DEACTIVATED(FORBIDDEN, "MEMBER_402", "대상 회원이 탈퇴했습니다."),
     MEMBER_ALREADY_EXISTS(BAD_REQUEST, "MEMBER_403", "이미 존재하는 사용자입니다."),
     INVALID_PASSWORD(BAD_REQUEST, "MEMBER_404", "비밀번호가 틀렸습니다"),
-    CHAMPION_REFRESH_COOLDOWN(BAD_REQUEST, "MEMBER_405", "전적 갱신은 3일마다 가능합니다."),
+    CHAMPION_REFRESH_COOLDOWN(BAD_REQUEST, "MEMBER_405", "전적 갱신은 하루마다 가능합니다."),
 
     /**
      * 이메일 관련 에러
