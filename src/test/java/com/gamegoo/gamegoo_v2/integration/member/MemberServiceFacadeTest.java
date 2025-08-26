@@ -444,7 +444,7 @@ class MemberServiceFacadeTest {
 
         assertThat(exception.getErrorCode()).isEqualTo(
                 com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAMPION_REFRESH_COOLDOWN);
-        assertThat(exception.getDetailedMessage()).contains("전적 갱신은 3일마다 가능합니다");
+        assertThat(exception.getDetailedMessage()).contains("전적 갱신은 24시간마다 가능합니다");
     }
 
     private Member createForGeneralMember(String email, String gameName) {
