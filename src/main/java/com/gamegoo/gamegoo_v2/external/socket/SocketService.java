@@ -25,7 +25,7 @@ public class SocketService {
 
     private static final String JOIN_CHATROOM_URL = "/socket/room/join";
     private static final String SYS_MESSAGE_URL = "/socket/sysmessage";
-    private static final String FRIEND_ONLINE_URL = "/internal/socket/friend/online/";
+    private static final String FRIEND_ONLINE_URL = "/socket/friend/online/";
 
     /**
      * SOCKET 서버로 해당 회원의 socket을 room에 join 요청하는 API 전송
