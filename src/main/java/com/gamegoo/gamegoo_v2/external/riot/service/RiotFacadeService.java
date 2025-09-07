@@ -88,19 +88,23 @@ public class RiotFacadeService {
      *
      * @param code  토큰 발급용 코드
      * @param state 프론트 리다이렉트용 state
+     * @param redirectUrl 리다이렉트할 URL (없으면 기본 frontUrl 사용)
      * @return 리다리렉트 주소
      */
     @Transactional
-    public String processOAuthCallback(String code, String state) {
+    public String processOAuthCallback(String code, String state, String redirectUrl) {
         // 1. 토큰 교환
         RiotAuthTokenResponse riotAuthTokenResponse = riotOAuthService.exchangeCodeForTokens(code);
 
         // 2. id_token 파싱 → Riot 사용자 정보 추출
         RiotAccountIdResponse summonerInfo = riotOAuthService.getSummonerInfo(riotAuthTokenResponse.getAccessToken());
 
+        // 리다이렉트 URL 결정 (파라미터로 받은 것이 있으면 사용, 없으면 기본값)
+        String targetUrl = (redirectUrl != null && !redirectUrl.isEmpty()) ? redirectUrl : frontUrl;
+
         // 만약 사용자 정보가 null 일 경우 롤과 연동되지 않은 사용자
         if (summonerInfo == null) {
-            return String.format("%s/riot/callback?error=signup_disabled", frontUrl);
+            return String.format("%s?error=signup_disabled", targetUrl);
         }
 
         // 3. DB에서 사용자 존재 여부 확인
@@ -111,7 +115,7 @@ public class RiotFacadeService {
             String encodedState = URLEncoder.encode(state, StandardCharsets.UTF_8);
             String encodedPuuid = URLEncoder.encode(summonerInfo.getPuuid(), StandardCharsets.UTF_8);
 
-            return String.format("%s/riot/callback?puuid=%s&state=%s", frontUrl, encodedPuuid, encodedState);
+            return String.format("%s?puuid=%s&state=%s", targetUrl, encodedPuuid, encodedState);
         }
 
         // 사용자가 있을 경우
@@ -130,7 +134,7 @@ public class RiotFacadeService {
         // refresh token DB에 저장
         authService.updateRefreshToken(member, refreshToken);
 
-        return oAuthRedirectBuilder.buildRedirectUrl(member, state, frontUrl, accessToken, refreshToken);
+        return oAuthRedirectBuilder.buildRedirectUrl(member, state, targetUrl, accessToken, refreshToken);
     }
 
 }
