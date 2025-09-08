@@ -43,9 +43,10 @@ public class RiotController {
     @GetMapping("/oauth/callback")
     @Operation(summary = "Riot OAuth 인증 코드 콜백 처리")
     public ResponseEntity<Void> handleRSOCallback(@RequestParam("code") String code,
-                                                  @RequestParam(required = false) String state) {
+                                                  @RequestParam(required = false) String state,
+                                                  @RequestParam(required = false) String redirect_url) {
         return ResponseEntity.status(HttpStatus.FOUND)
-                .header("Location", riotFacadeService.processOAuthCallback(code, state))
+                .header("Location", riotFacadeService.processOAuthCallback(code, state, redirect_url))
                 .build();
     }
 
