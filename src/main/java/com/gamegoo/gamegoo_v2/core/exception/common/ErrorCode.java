@@ -73,6 +73,8 @@ public enum ErrorCode {
     RIOT_NOT_FOUND(NOT_FOUND, "RIOT_402", "해당 Riot 계정이 존재하지 않습니다."),
     RIOT_ACCOUNT_CONFLICT(CONFLICT, "RIOT_403", "해당 Riot 계정은 이미 다른 이메일과 연동되어있습니다."),
     RIOT_SUMMONER_NOT_FOUND(NOT_FOUND, "RIOT_404", "해당 Riot 계정은 league of legend에서 소환사를 생성하지 않았습니다"),
+    RSO_NO_STATE(NOT_FOUND, "RIOT_405", "state가 없습니다."),
+    STATE_WRONG_DECODE(BAD_REQUEST, "RIOT_406", "state decoding 중 에러가 발생했습니다."),
 
     /**
      * 매칭 관련 에러
