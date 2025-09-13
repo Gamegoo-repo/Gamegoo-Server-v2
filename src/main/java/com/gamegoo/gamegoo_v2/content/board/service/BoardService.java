@@ -93,8 +93,8 @@ public class BoardService {
     public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike,
                                   Pageable pageable) {
         // Position.ANY인 경우 null로 처리하여 필터 조건 무시
-        List<Position> mainPList = (mainP == Position.ANY) ? null : List.of(mainP);
-        List<Position> subPList = (subP == Position.ANY) ? null : List.of(subP);
+        List<Position> mainPList = (mainP == null || mainP == Position.ANY) ? null : List.of(mainP);
+        List<Position> subPList = (subP == null || subP == Position.ANY) ? null : List.of(subP);
 
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
                 gameMode, tier, mainPList, subPList, mike, pageable);
