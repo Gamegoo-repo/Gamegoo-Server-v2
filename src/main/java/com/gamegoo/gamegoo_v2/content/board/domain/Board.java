@@ -86,7 +86,7 @@ public class Board extends BaseDateTimeEntity {
 
     private LocalDateTime bumpTime;
 
-    @Formula("GREATEST(COALESCE(bump_time, created_at), created_at)")
+    @Formula("COALESCE(bump_time, created_at)")
     private LocalDateTime activityTime;
 
 
