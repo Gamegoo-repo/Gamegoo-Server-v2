@@ -108,7 +108,7 @@ public class RiotFacadeService {
 
         // 사용자가 아예 없을 경우, 회원가입 요청
         if (memberList.isEmpty()) {
-            return oAuthRedirectBuilder.buildJoinRedirectUrl(targetUrl, summonerInfo.getPuuid(), targetUrl);
+            return oAuthRedirectBuilder.buildJoinRedirectUrl(targetUrl, state, summonerInfo.getPuuid());
         }
 
         // 사용자가 있을 경우
