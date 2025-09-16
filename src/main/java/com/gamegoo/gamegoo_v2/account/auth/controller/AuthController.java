@@ -1,10 +1,7 @@
 package com.gamegoo.gamegoo_v2.account.auth.controller;
 
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
-import com.gamegoo.gamegoo_v2.account.auth.dto.request.JoinRequest;
-import com.gamegoo.gamegoo_v2.account.auth.dto.request.LoginRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RefreshTokenRequest;
-import com.gamegoo.gamegoo_v2.account.auth.dto.response.LoginResponse;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
 import com.gamegoo.gamegoo_v2.account.auth.service.AuthFacadeService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
@@ -35,22 +32,10 @@ public class AuthController {
         return ApiResponse.ok(authFacadeService.createTestAccessToken(memberId));
     }
 
-    @PostMapping("/join")
-    @Operation(summary = "회원가입", description = "회원가입 API입니다.")
-    public ApiResponse<String> join(@Valid @RequestBody JoinRequest request) {
-        return ApiResponse.ok(authFacadeService.join(request));
-    }
-
     @PostMapping("/logout")
     @Operation(summary = "logout API 입니다.", description = "API for logout")
     public ApiResponse<String> logout(@AuthMember Member member) {
         return ApiResponse.ok(authFacadeService.logout(member));
-    }
-
-    @PostMapping("/login")
-    @Operation(summary = "로그인", description = "로그인 API입니다.")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ApiResponse.ok(authFacadeService.login(request));
     }
 
     @PostMapping("/refresh")

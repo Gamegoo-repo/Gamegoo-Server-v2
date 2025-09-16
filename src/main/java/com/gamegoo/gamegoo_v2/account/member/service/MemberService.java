@@ -1,21 +1,17 @@
 package com.gamegoo.gamegoo_v2.account.member.service;
 
 import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
-import com.gamegoo.gamegoo_v2.account.auth.dto.request.JoinRequest;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
-import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
-import com.gamegoo.gamegoo_v2.utils.PasswordUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -30,62 +26,9 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final MemberRecentStatsRepository memberRecentStatsRepository;
 
     @PersistenceContext
     EntityManager em;
-
-    @Transactional
-    public Member createMemberGeneral(JoinRequest request, List<TierDetails> tiers) {
-
-        // 기본 값 설정
-        Tier soloTier = Tier.UNRANKED;
-        int soloRank = 0;
-        double soloWinRate = 0.0;
-        int soloGameCount = 0;
-
-        Tier freeTier = Tier.UNRANKED;
-        int freeRank = 0;
-        double freeWinRate = 0.0;
-        int freeGameCount = 0;
-
-        // 티어 정보 설정
-        for (TierDetails tierDetail : tiers) {
-            if (tierDetail.getGameMode() == GameMode.SOLO) {
-                soloTier = tierDetail.getTier();
-                soloRank = tierDetail.getRank();
-                soloWinRate = tierDetail.getWinrate();
-                soloGameCount = tierDetail.getGameCount();
-            } else if (tierDetail.getGameMode() == GameMode.FREE) {
-                freeTier = tierDetail.getTier();
-                freeRank = tierDetail.getRank();
-                freeWinRate = tierDetail.getWinrate();
-                freeGameCount = tierDetail.getGameCount();
-            }
-        }
-
-        // Member 생성
-        Member member = Member.createForGeneral(
-                request.getEmail(),
-                PasswordUtil.encodePassword(request.getPassword()),
-                LoginType.GENERAL,
-                request.getGameName(),
-                request.getTag(),
-                soloTier, soloRank, soloWinRate,
-                freeTier, freeRank, freeWinRate,
-                soloGameCount, freeGameCount, true
-        );
-
-        memberRepository.save(member);
-        
-        // MemberRecentStats 빈 껍데기 생성
-        MemberRecentStats memberRecentStats = MemberRecentStats.builder()
-                .member(member)
-                .build();
-        memberRecentStatsRepository.save(memberRecentStats);
-        
-        return member;
-    }
 
     @Transactional
     public Member createMemberRiot(RiotJoinRequest request, String gameName, String tag, List<TierDetails> tiers) {
@@ -127,7 +70,6 @@ public class MemberService {
         memberRepository.save(member);
         return member;
     }
-
 
     /**
      * 회원 정보 조회
