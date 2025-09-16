@@ -2,7 +2,7 @@ package com.gamegoo.gamegoo_v2.account.auth.controller;
 
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.JoinRequest;
-import com.gamegoo.gamegoo_v2.account.auth.dto.request.LoginRequest;
+import com.gamegoo.gamegoo_v2.account.auth.dto.request.LoginRequestQA;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RefreshTokenRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.LoginResponse;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
@@ -49,7 +49,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인 API입니다.")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequestQA request) {
         return ApiResponse.ok(authFacadeService.login(request));
     }
 

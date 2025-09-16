@@ -2,16 +2,16 @@ package com.gamegoo.gamegoo_v2.account.auth.service;
 
 import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.JoinRequest;
-import com.gamegoo.gamegoo_v2.account.auth.dto.request.LoginRequest;
+import com.gamegoo.gamegoo_v2.account.auth.dto.request.LoginRequestQA;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RefreshTokenRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.LoginResponse;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.service.AsyncChampionStatsService;
 import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
-import com.gamegoo.gamegoo_v2.account.member.service.AsyncChampionStatsService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
@@ -84,12 +84,12 @@ public class AuthFacadeService {
      * @param request 이메일,비밀번호
      * @return 사용자 정보
      */
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequestQA request) {
         // email 검증
         Member member = memberService.findMemberByEmail(request.getEmail());
 
         // password 검증
-        passwordService.verifyPassword(member, request.getPassword());
+        passwordService.verifyRawPassword(member, request.getPassword());
 
         // 해당 사용자의 정보를 가진 jwt 토큰 발급
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getRole());
@@ -109,6 +109,7 @@ public class AuthFacadeService {
 
         return LoginResponse.of(member, accessToken, refreshToken, banMessage);
     }
+
 
     /**
      * 로그아웃
