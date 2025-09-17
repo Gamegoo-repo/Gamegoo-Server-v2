@@ -92,22 +92,9 @@ public class BoardService {
      */
     public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike,
                                   Pageable pageable) {
-        List<Position> mainPList = new ArrayList<>();
-        List<Position> subPList = new ArrayList<>();
-
-        // 메인 포지션 처리
-        if (mainP == Position.ANY) {
-            mainPList = Arrays.asList(Position.values());
-        } else {
-            mainPList.add(mainP);
-        }
-
-        // 부 포지션 처리
-        if (subP == Position.ANY) {
-            subPList = Arrays.asList(Position.values());
-        } else {
-            subPList.add(subP);
-        }
+        // Position.ANY인 경우 null로 처리하여 필터 조건 무시
+        List<Position> mainPList = (mainP == null || mainP == Position.ANY) ? null : List.of(mainP);
+        List<Position> subPList = (subP == null || subP == Position.ANY) ? null : List.of(subP);
 
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
                 gameMode, tier, mainPList, subPList, mike, pageable);
@@ -117,22 +104,9 @@ public class BoardService {
      * 게시글 목록 조회 (페이징 처리)
      */
     public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike, int pageIdx) {
-        List<Position> mainPList = new ArrayList<>();
-        List<Position> subPList = new ArrayList<>();
-
-        // 메인 포지션 처리
-        if (mainP == Position.ANY) {
-            mainPList = Arrays.asList(Position.values());
-        } else {
-            mainPList.add(mainP);
-        }
-
-        // 부 포지션 처리
-        if (subP == Position.ANY) {
-            subPList = Arrays.asList(Position.values());
-        } else {
-            subPList.add(subP);
-        }
+        // Position.ANY인 경우 null로 처리하여 필터 조건 무시
+        List<Position> mainPList = (mainP == Position.ANY) ? null : List.of(mainP);
+        List<Position> subPList = (subP == Position.ANY) ? null : List.of(subP);
 
         Pageable pageable = PageRequest.of(pageIdx - 1, 20, Sort.by("activityTime").descending());
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
@@ -314,22 +288,9 @@ public class BoardService {
             Position subP) {
         Pageable pageable = PageRequest.of(0, PAGE_SIZE);
 
-        // 페이지 기반과 동일하게 null이면 ANY로 대체
-        if (mainP == null) mainP = Position.ANY;
-        if (subP == null) subP = Position.ANY;
-
-        List<Position> mainPList = new ArrayList<>();
-        List<Position> subPList = new ArrayList<>();
-        if (mainP == Position.ANY) {
-            mainPList = Arrays.asList(Position.values());
-        } else {
-            mainPList.add(mainP);
-        }
-        if (subP == Position.ANY) {
-            subPList = Arrays.asList(Position.values());
-        } else {
-            subPList.add(subP);
-        }
+        // null이나 Position.ANY인 경우 필터 조건 무시 (null로 처리)
+        List<Position> mainPList = (mainP == null || mainP == Position.ANY) ? null : List.of(mainP);
+        List<Position> subPList = (subP == null || subP == Position.ANY) ? null : List.of(subP);
 
         return boardRepository.findAllBoardsWithCursor(cursor, cursorId, gameMode, tier, mainPList, subPList, pageable);
     }
