@@ -6,7 +6,10 @@ import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
+import com.gamegoo.gamegoo_v2.account.member.service.AsyncChampionStatsService;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import com.gamegoo.gamegoo_v2.core.exception.AuthException;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.domain.RSOState;
@@ -41,6 +44,7 @@ public class RiotFacadeService {
     private final OAuthRedirectBuilder oAuthRedirectBuilder;
     private final BanService banService;
     private final MemberValidator memberValidator;
+    private final AsyncChampionStatsService asyncChampionStatsService;
 
     /**
      * 사용가능한 riot 계정인지 검증
@@ -75,6 +79,14 @@ public class RiotFacadeService {
 
         // [Member] Member Champion DB 에서 매핑하기
         memberChampionService.saveMemberChampions(member, preferChampionStats);
+
+        // [Async] 트랜잭션 커밋 후 비동기로 champion stats refresh 실행
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                asyncChampionStatsService.refreshChampionStatsAsync(member.getId());
+            }
+        });
 
         return member;
     }
