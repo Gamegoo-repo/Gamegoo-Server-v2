@@ -72,8 +72,13 @@ public class AuthFacadeService {
         // [Member] Member Champion DB에서 매핑하기
         memberChampionService.saveMemberChampions(member, preferChampionStats);
 
-        // [Async] 비동기로 champion stats refresh 실행
-        asyncChampionStatsService.refreshChampionStatsAsync(member.getId());
+        // [Async] 비동기로 champion stats refresh 실행 (예외 발생 시도 메인 플로우 보호)
+        try {
+            asyncChampionStatsService.refreshChampionStatsAsync(member.getId());
+        } catch (Exception e) {
+            // 비동기 작업 실패가 메인 플로우에 영향을 주지 않도록 로그만 기록
+            // 로그 출력 생략 (주요 플로우 방해 안 하기 위해)
+        }
 
         return "회원가입이 완료되었습니다.";
     }
