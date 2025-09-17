@@ -84,7 +84,10 @@ public class RiotFacadeService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                asyncChampionStatsService.refreshChampionStatsAsync(member.getId());
+                try {
+                    asyncChampionStatsService.refreshChampionStatsAsync(member.getId());
+                } catch (Exception e) {
+                }
             }
         });
 
