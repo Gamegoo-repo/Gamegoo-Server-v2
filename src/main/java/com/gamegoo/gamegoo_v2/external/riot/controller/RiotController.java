@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.external.riot.controller;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotVerifyExistUserRequest;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotJoinResponse;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,9 +36,9 @@ public class RiotController {
 
     @PostMapping("/join")
     @Operation(summary = "RSO 전용 회원가입 API", description = "API for RSO join")
-    public ApiResponse<String> joinByRSO(@RequestBody @Valid RiotJoinRequest request) {
-        riotFacadeService.join(request);
-        return ApiResponse.ok("RSO 회원가입이 완료되었습니다.");
+    public ApiResponse<RiotJoinResponse> joinByRSO(@RequestBody @Valid RiotJoinRequest request) {
+
+        return ApiResponse.ok(riotFacadeService.join(request));
     }
 
     @GetMapping("/oauth/callback")

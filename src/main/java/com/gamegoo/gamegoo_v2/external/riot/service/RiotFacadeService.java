@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.account.member.service.AsyncChampionStatsService;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotJoinResponse;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import com.gamegoo.gamegoo_v2.core.exception.AuthException;
@@ -59,7 +60,7 @@ public class RiotFacadeService {
     }
 
     @Transactional
-    public Member join(RiotJoinRequest request) {
+    public RiotJoinResponse join(RiotJoinRequest request) {
         // [Member] puuid 중복 확인
         memberService.checkDuplicateMemberByPuuid(request.getPuuid());
 
@@ -93,7 +94,14 @@ public class RiotFacadeService {
             }
         });
 
-        return member;
+        // 해당 사용자의 정보를 가진 jwt 토큰 발급
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getRole());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole());
+
+        // DB에 저장
+        authService.updateRefreshToken(member, refreshToken);
+
+        return RiotJoinResponse.of(member, accessToken, refreshToken);
     }
 
     /**
@@ -144,7 +152,16 @@ public class RiotFacadeService {
         // refresh token DB에 저장
         authService.updateRefreshToken(member, refreshToken);
 
-        return oAuthRedirectBuilder.buildLoginRedirectUrl(member, state, targetUrl, accessToken, refreshToken);
+        // 제재 만료 확인 (만료된 제재 자동 해제)
+        banService.checkBanExpiry(member);
+
+        // 제재 메시지 생성
+        String banMessage = null;
+        if (member.isBanned()) {
+            banMessage = banService.getBanReasonMessage(member.getBanType());
+        }
+        return oAuthRedirectBuilder.buildLoginRedirectUrl(member, state, targetUrl, accessToken, refreshToken,
+                banMessage);
     }
 
 }
