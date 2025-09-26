@@ -29,7 +29,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "(:mainPList IS NULL OR b.mainP IN :mainPList) AND " +
             "(:subPList IS NULL OR b.subP IN :subPList) AND " +
             "(:mike IS NULL OR b.mike = :mike) " +
-            "ORDER BY GREATEST(COALESCE(b.bumpTime, b.createdAt), b.createdAt) DESC")
+            "ORDER BY COALESCE(b.bumpTime, b.createdAt) DESC")
     Page<Board> findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
             @Param("gameMode") GameMode gameMode,
             @Param("tier") Tier tier,
@@ -47,8 +47,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("SELECT b FROM Board b " +
            "WHERE b.member.id = :memberId " +
            "AND b.deleted = false " +
-           "AND (:activityTime IS NULL OR GREATEST(COALESCE(b.bumpTime, b.createdAt), b.createdAt) < :activityTime) " +
-           "ORDER BY GREATEST(COALESCE(b.bumpTime, b.createdAt), b.createdAt) DESC")
+           "AND (:activityTime IS NULL OR COALESCE(b.bumpTime, b.createdAt) < :activityTime) " +
+           "ORDER BY COALESCE(b.bumpTime, b.createdAt) DESC")
     Slice<Board> findByMemberIdAndActivityTimeLessThan(
             @Param("memberId") Long memberId,
             @Param("activityTime") LocalDateTime activityTime,
@@ -58,14 +58,14 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
            "WHERE b.deleted = false " +
            "AND (" +
            "  :activityTime IS NULL " +
-           "  OR GREATEST(COALESCE(b.bumpTime, b.createdAt), b.createdAt) < :activityTime " +
-           "  OR (GREATEST(COALESCE(b.bumpTime, b.createdAt), b.createdAt) = :activityTime AND b.id < :cursorId)" +
+           "  OR COALESCE(b.bumpTime, b.createdAt) < :activityTime " +
+           "  OR (COALESCE(b.bumpTime, b.createdAt) = :activityTime AND b.id < :cursorId)" +
            ") " +
            "AND (:gameMode IS NULL OR b.gameMode = :gameMode) " +
            "AND (:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m.freeTier ELSE m.soloTier END) = :tier) " +
            "AND (:mainPList IS NULL OR b.mainP IN :mainPList) " +
            "AND (:subPList IS NULL OR b.subP IN :subPList) " +
-           "ORDER BY GREATEST(COALESCE(b.bumpTime, b.createdAt), b.createdAt) DESC, b.id DESC")
+           "ORDER BY COALESCE(b.bumpTime, b.createdAt) DESC, b.id DESC")
     Slice<Board> findAllBoardsWithCursor(
             @Param("activityTime") LocalDateTime activityTime,
             @Param("cursorId") Long cursorId,
