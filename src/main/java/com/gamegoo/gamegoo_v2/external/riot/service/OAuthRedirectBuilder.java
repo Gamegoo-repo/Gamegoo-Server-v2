@@ -18,11 +18,17 @@ public class OAuthRedirectBuilder {
         String encodedAccessToken = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
         String encodedRefreshToken = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8);
         String encodedBanType = URLEncoder.encode(String.valueOf(member.getBanType()), StandardCharsets.UTF_8);
-        String encodedBanExpireAt = URLEncoder.encode(String.valueOf(member.getBanExpireAt()), StandardCharsets.UTF_8);
+        String encodedBanExpireAt = "";
+        if (member.getBanExpireAt() != null) {
+            URLEncoder.encode(String.valueOf(member.getBanExpireAt()), StandardCharsets.UTF_8);
+        }
+
+
         String encodedBanMessage = "";
         if (banMessage != null) {
             encodedBanMessage = URLEncoder.encode(banMessage, StandardCharsets.UTF_8);
         }
+
         String encodedIsBanned = URLEncoder.encode(String.valueOf(member.isBanned()), StandardCharsets.UTF_8);
 
         return String.format(

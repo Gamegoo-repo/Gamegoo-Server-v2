@@ -8,12 +8,12 @@ import lombok.Getter;
 @Builder
 public class RiotJoinResponse {
 
-    Long id;
-    String name;
-    String tag;
-    int profileImage;
-    String accessToken;
-    String refreshToken;
+    private final Long id;
+    private final String name;
+    private final String tag;
+    private final int profileImage;
+    private final String accessToken;
+    private final String refreshToken;
 
     public static RiotJoinResponse of(Member member, String accessToken, String refreshToken) {
         return RiotJoinResponse.builder()
