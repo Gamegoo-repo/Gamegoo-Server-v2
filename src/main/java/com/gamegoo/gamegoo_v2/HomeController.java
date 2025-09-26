@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2;
 
 import com.gamegoo.gamegoo_v2.account.auth.service.AuthFacadeService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.account.member.service.ChampionStatsRefreshService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
@@ -31,6 +32,7 @@ public class HomeController {
     private final AuthFacadeService authFacadeService;
     private final RiotAuthService riotAuthService;
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final ChampionStatsRefreshService championStatsRefreshService;
 
     @Operation(summary = "홈 엔드포인트", description = "API 서비스 상태를 확인합니다.")
@@ -56,7 +58,8 @@ public class HomeController {
     public ApiResponse<Object> joinTest(@RequestBody RiotUserInfo riotUserInfo) {
         String puuid = riotAuthService.getPuuid(riotUserInfo.getGamename(), riotUserInfo.getTag()); // puuid 조회
         RiotJoinRequest request = new RiotJoinRequest(puuid, true);
-        Member member = riotFacadeService.join(request);// 회원 가입
+        riotFacadeService.join(request);// 회원 가입
+        Member member = memberRepository.findByPuuid(puuid).get(0);
         return ApiResponse.ok(new JoinTestResponse(member.getId(), puuid));
     }
 
