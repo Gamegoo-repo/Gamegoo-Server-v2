@@ -44,9 +44,7 @@ class AuthFacadeServiceTest {
     private Member member;
 
     private static final String EMAIL = "test@gmail.com";
-    private static final String NOTFOUND_EMAIL = "notfound@gmail.com";
     private static final String PASSWORD = "password";
-    private static final String INVALID_PASSWORD = "invalidpassword";
     private static final String GAMENAME = "test1";
     private static final String INVALID_REFRESH_TOKEN = "invalidrefreshtoken";
 
