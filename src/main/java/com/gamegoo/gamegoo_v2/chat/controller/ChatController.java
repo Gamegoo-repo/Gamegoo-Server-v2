@@ -8,6 +8,8 @@ import com.gamegoo.gamegoo_v2.chat.dto.response.EnterChatroomResponse;
 import com.gamegoo.gamegoo_v2.chat.service.ChatFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.core.common.annotation.ValidCursor;
+import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +39,14 @@ public class ChatController {
                     "대상 회원과의 채팅방이 존재하지 않는 경우, 채팅방을 새로 생성해 해당 채팅방의 uuid, 상대 회원 정보 등을 반환합니다.")
     @Parameter(name = "memberId", description = "채팅방을 시작할 대상 회원의 id 입니다.")
     @GetMapping("/chat/start/member/{memberId}")
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode._BAD_REQUEST,
+            ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED,
+            ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET,
+            ErrorCode.CHAT_START_FAILED_TARGET_DEACTIVATED,
+            ErrorCode.CHATROOM_ACCESS_DENIED
+    })
     public ApiResponse<EnterChatroomResponse> startChatroomByMemberId(
             @PathVariable(name = "memberId") Long targetMemberId,
             @AuthMember Member member) {
@@ -49,6 +59,16 @@ public class ChatController {
                     "대상 회원과의 채팅방이 존재하지 않는 경우, 채팅방을 새로 생성해 해당 채팅방의 uuid, 상대 회원 정보 등을 리턴합니다.")
     @Parameter(name = "boardId", description = "말 걸어보기 버튼을 누른 게시글의 id 입니다.")
     @GetMapping("/chat/start/board/{boardId}")
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_BANNED_FROM_CHATTING,
+            ErrorCode.BOARD_NOT_FOUND,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode._BAD_REQUEST,
+            ErrorCode.CHAT_START_FAILED_TARGET_DEACTIVATED,
+            ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET,
+            ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED,
+            ErrorCode.CHATROOM_ACCESS_DENIED
+    })
     public ApiResponse<EnterChatroomResponse> startChatroomByBoardId(@PathVariable(name = "boardId") Long boardId,
                                                                      @AuthMember Member member) {
         return ApiResponse.ok(chatFacadeService.startChatroomByBoardId(member, boardId));
@@ -57,6 +77,13 @@ public class ChatController {
     @Operation(summary = "채팅방 입장 API",
             description = "특정 채팅방에 입장하는 API 입니다. 상대 회원 정보와 채팅 메시지 내역 등을 리턴합니다.")
     @GetMapping("/chat/{chatroomUuid}/enter")
+    @ApiErrorCodes({
+            ErrorCode.CHATROOM_NOT_FOUND,
+            ErrorCode.CHATROOM_ACCESS_DENIED,
+            ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED,
+            ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET,
+            ErrorCode.CHAT_START_FAILED_TARGET_DEACTIVATED
+    })
     public ApiResponse<EnterChatroomResponse> enterChatroom(@PathVariable(name = "chatroomUuid") String chatroomUuid,
                                                             @AuthMember Member member) {
         return ApiResponse.ok(chatFacadeService.enterChatroomByUuid(member, chatroomUuid));
@@ -68,6 +95,10 @@ public class ChatController {
                     "cursor 파라미터를 보내지 않으면, 해당 채팅방의 가장 최근 메시지 내역을 조회합니다.")
     @GetMapping("/chat/{chatroomUuid}/messages")
     @Parameter(name = "cursor", description = "페이징을 위한 커서, 13자리 timestamp integer를 보내주세요. (UTC 기준)")
+    @ApiErrorCodes({
+            ErrorCode.CHATROOM_NOT_FOUND,
+            ErrorCode.CHATROOM_ACCESS_DENIED
+    })
     public ApiResponse<ChatMessageListResponse> getChatMessages(
             @PathVariable(name = "chatroomUuid") String chatroomUuid,
             @ValidCursor @RequestParam(name = "cursor", required = false) Long cursor,
@@ -84,6 +115,12 @@ public class ChatController {
     @Operation(summary = "채팅 메시지 읽음 처리 API", description = "특정 채팅방의 메시지를 읽음 처리하는 API 입니다.")
     @PatchMapping("/chat/{chatroomUuid}/read")
     @Parameter(name = "timestamp", description = "특정 메시지를 읽음 처리하는 경우, 그 메시지의 timestamp를 함께 보내주세요.")
+    @ApiErrorCodes({
+            ErrorCode.CHATROOM_NOT_FOUND,
+            ErrorCode.CHATROOM_ACCESS_DENIED,
+            ErrorCode.CHAT_READ_FAILED_NOT_ENTERED_CHATROOM,
+            ErrorCode.CHAT_MESSAGE_NOT_FOUND
+    })
     public ApiResponse<String> readChatMessage(
             @PathVariable(name = "chatroomUuid") String chatroomUuid,
             @RequestParam(name = "timestamp", required = false) Long timestamp,
@@ -93,6 +130,10 @@ public class ChatController {
 
     @Operation(summary = "채팅방 나가기 API", description = "채팅방 나가기 API 입니다.")
     @PatchMapping("/chat/{chatroomUuid}/exit")
+    @ApiErrorCodes({
+            ErrorCode.CHATROOM_NOT_FOUND,
+            ErrorCode.CHATROOM_ACCESS_DENIED
+    })
     public ApiResponse<Object> exitChatroom(@PathVariable(name = "chatroomUuid") String chatroomUuid,
                                             @AuthMember Member member) {
         return ApiResponse.ok(chatFacadeService.exitChatroom(member, chatroomUuid));

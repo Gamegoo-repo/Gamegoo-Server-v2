@@ -4,6 +4,8 @@ import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.account.email.dto.EmailCodeRequest;
 import com.gamegoo.gamegoo_v2.account.email.dto.EmailRequest;
 import com.gamegoo.gamegoo_v2.account.email.service.EmailFacadeService;
+import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,6 +27,12 @@ public class EmailController {
 
     @PostMapping("/send/join")
     @Operation(summary = "회원가입용 이메일 인증코드 전송 API 입니다. 중복확인 포함", description = "API for sending email for join")
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_ALREADY_EXISTS,
+            ErrorCode.EMAIL_LIMIT_EXCEEDED,
+            ErrorCode.EMAIL_CONTENT_LOAD_FAIL,
+            ErrorCode.EMAIL_SEND_FAIL
+    })
     public ApiResponse<String> sendEmailWithCheckDuplication(
             @Valid @RequestBody EmailRequest request) {
         return ApiResponse.ok(emailFacadeService.sendEmailVerificationCodeCheckDuplication(request));
@@ -32,12 +40,23 @@ public class EmailController {
 
     @PostMapping("/send/pwd")
     @Operation(summary = "비밀번호 찾기용 이메일 인증코드 전송 API 입니다.", description = "API for sending email for finding password")
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.EMAIL_LIMIT_EXCEEDED,
+            ErrorCode.EMAIL_CONTENT_LOAD_FAIL,
+            ErrorCode.EMAIL_SEND_FAIL
+    })
     public ApiResponse<String> sendEmail(@Valid @RequestBody EmailRequest request) {
         return ApiResponse.ok(emailFacadeService.sendEmailVerificationCodeCheckExistence(request));
     }
 
     @PostMapping("/verify")
     @Operation(summary = "이메일 인증코드 검증 API 입니다.", description = "API for verifying email")
+    @ApiErrorCodes({
+        ErrorCode.EMAIL_RECORD_NOT_FOUND,
+        ErrorCode.INVALID_VERIFICATION_CODE,
+        ErrorCode.EMAIL_VERIFICATION_TIME_EXCEED
+    })
     public ApiResponse<String> verifyEmail(@Valid @RequestBody EmailCodeRequest request) {
         return ApiResponse.ok(emailFacadeService.verifyEmailCode(request));
     }

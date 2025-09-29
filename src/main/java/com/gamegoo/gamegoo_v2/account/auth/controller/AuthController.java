@@ -6,6 +6,8 @@ import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
 import com.gamegoo.gamegoo_v2.account.auth.service.AuthFacadeService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -28,6 +30,7 @@ public class AuthController {
     @GetMapping("/token/{memberId}")
     @Operation(summary = "임시 access token 발급 API", description = "테스트용으로 access token을 발급받을 수 있는 API 입니다.")
     @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
+    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<String> getTestAccessToken(@PathVariable(name = "memberId") Long memberId) {
         return ApiResponse.ok(authFacadeService.createTestAccessToken(memberId));
     }
@@ -40,12 +43,22 @@ public class AuthController {
 
     @PostMapping("/refresh")
     @Operation(summary = "refresh   토큰을 통한 access, refresh 토큰 재발급 API 입니다.", description = "API for Refresh Token")
+    @ApiErrorCodes({
+            ErrorCode.INVALID_REFRESH_TOKEN,
+            ErrorCode.INVALID_SIGNATURE,
+            ErrorCode.MALFORMED_TOKEN,
+            ErrorCode.EXPIRED_JWT_EXCEPTION,
+            ErrorCode.UNSUPPORTED_TOKEN,
+            ErrorCode.INVALID_CLAIMS,
+            ErrorCode.MEMBER_NOT_FOUND
+    })
     public ApiResponse<RefreshTokenResponse> updateToken(@Valid @RequestBody RefreshTokenRequest request) {
         return ApiResponse.ok(authFacadeService.updateToken(request));
     }
 
     @DeleteMapping
     @Operation(summary = "탈퇴 API입니다.", description = "API for Blinding Member")
+    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<String> blindMember(@AuthMember Member member) {
         return ApiResponse.ok(authFacadeService.blindMember(member));
     }
