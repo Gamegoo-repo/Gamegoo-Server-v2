@@ -108,11 +108,10 @@ public class OpenApiConfig {
                 .description("비즈니스 에러 코드")
                 .example("COMMON400"));
 
-        Schema<Object> dataSchema = new Schema<>();
-        dataSchema.setType("object");
-        dataSchema.setNullable(true);
-        dataSchema.setDescription("응답 데이터 (에러 시 null)");
-        errorResponseSchema.addProperties("data", dataSchema);
+        errorResponseSchema.addProperties("data", new Schema<>()
+                .type("object")
+                .nullable(true)
+                .description("응답 데이터 (에러 시 null)"));
 
         components.addSchemas(SwaggerErrorResponseConfig.ERROR_RESPONSE_SCHEMA_NAME, errorResponseSchema);
     }
