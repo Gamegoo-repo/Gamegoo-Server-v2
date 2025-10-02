@@ -1,6 +1,8 @@
 package com.gamegoo.gamegoo_v2.social.friend.controller;
 
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +25,8 @@ public class FriendInternalController {
     @Operation(summary = "모든 친구 id 조회 API", description = "해당 회원의 모든 친구 id 목록을 조회하는 API 입니다. " +
             "정렬 기능 없음, socket서버용 API입니다.")
     @GetMapping(value = "/{memberId}/friend/ids")
-    public ApiResponse<List<Long>> getFriendIds(@PathVariable(name = "memberId") Long memberId) {
+    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
+   public ApiResponse<List<Long>> getFriendIds(@PathVariable(name = "memberId") Long memberId) {
         return ApiResponse.ok(friendFacadeService.getFriendIdList(memberId));
     }
 

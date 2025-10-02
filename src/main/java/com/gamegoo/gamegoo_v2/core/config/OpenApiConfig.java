@@ -11,9 +11,13 @@ import com.gamegoo.gamegoo_v2.content.report.domain.ReportType;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
+import com.gamegoo.gamegoo_v2.core.config.swagger.SwaggerErrorResponseConfig;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.media.IntegerSchema;
+import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,6 +51,8 @@ public class OpenApiConfig {
 
             // ReportType은 특별 처리 (ID 기반)
             addReportTypeSchema(components);
+
+            addErrorResponseSchema(components);
         };
     }
 
@@ -74,12 +80,39 @@ public class OpenApiConfig {
         Schema<Integer> reportTypeSchema = new Schema<Integer>()
                 .type("integer")
                 .description("신고 유형 (1=스팸, 2=불법정보, 3=성희롱, 4=욕설/혐오, 5=개인정보노출, 6=불쾌한표현)");
-        
+
         List<Integer> enumValues = Arrays.stream(ReportType.values())
                 .map(ReportType::getId)
                 .toList();
-        
+
         reportTypeSchema.setEnum(enumValues);
         components.addSchemas("ReportType", reportTypeSchema);
+    }
+
+    private void addErrorResponseSchema(Components components) {
+        if (components.getSchemas() != null
+                && components.getSchemas().containsKey(SwaggerErrorResponseConfig.ERROR_RESPONSE_SCHEMA_NAME)) {
+            return;
+        }
+
+        ObjectSchema errorResponseSchema = new ObjectSchema();
+        errorResponseSchema.setDescription("공통 에러 응답 포맷");
+
+        errorResponseSchema.addProperties("status", new IntegerSchema()
+                .description("HTTP 상태 코드")
+                .example(400));
+        errorResponseSchema.addProperties("message", new StringSchema()
+                .description("에러 메시지")
+                .example("잘못된 요청입니다."));
+        errorResponseSchema.addProperties("code", new StringSchema()
+                .description("비즈니스 에러 코드")
+                .example("COMMON400"));
+
+        errorResponseSchema.addProperties("data", new Schema<>()
+                .type("object")
+                .nullable(true)
+                .description("응답 데이터 (에러 시 null)"));
+
+        components.addSchemas(SwaggerErrorResponseConfig.ERROR_RESPONSE_SCHEMA_NAME, errorResponseSchema);
     }
 }
