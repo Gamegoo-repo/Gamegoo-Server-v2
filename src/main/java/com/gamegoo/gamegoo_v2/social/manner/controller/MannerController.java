@@ -3,6 +3,8 @@ package com.gamegoo.gamegoo_v2.social.manner.controller;
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerInsertRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.request.MannerUpdateRequest;
 import com.gamegoo.gamegoo_v2.social.manner.dto.response.MannerInsertResponse;
@@ -35,6 +37,13 @@ public class MannerController {
     @Operation(summary = "매너 평가 등록 API", description = "매너 평가를 등록하는 API 입니다.")
     @Parameter(name = "memberId", description = "매너 평가를 등록할 대상 회원의 id 입니다.")
     @PostMapping("/positive/{memberId}")
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode._BAD_REQUEST,
+            ErrorCode.TARGET_MEMBER_DEACTIVATED,
+            ErrorCode.MANNER_KEYWORD_INVALID,
+            ErrorCode.MANNER_RATING_EXISTS
+    })
     public ApiResponse<MannerInsertResponse> addPositiveMannerRating(
             @PathVariable(name = "memberId") Long targetMemberId,
             @Valid @RequestBody MannerInsertRequest request,
@@ -45,6 +54,13 @@ public class MannerController {
     @Operation(summary = "비매너 평가 등록 API", description = "비매너 평가를 등록하는 API 입니다.")
     @Parameter(name = "memberId", description = "비매너 평가를 등록할 대상 회원의 id 입니다.")
     @PostMapping("/negative/{memberId}")
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode._BAD_REQUEST,
+            ErrorCode.TARGET_MEMBER_DEACTIVATED,
+            ErrorCode.MANNER_KEYWORD_INVALID,
+            ErrorCode.MANNER_RATING_EXISTS
+    })
     public ApiResponse<MannerInsertResponse> addNegativeMannerRating(
             @PathVariable(name = "memberId") Long targetMemberId,
             @Valid @RequestBody MannerInsertRequest request,
@@ -55,6 +71,12 @@ public class MannerController {
     @Operation(summary = "매너/비매너 평가 수정 API", description = "매너/비매너 평가를 수정하는 API 입니다.")
     @Parameter(name = "mannerId", description = "수정하고자 하는 매너/비매너 평가 id 입니다.")
     @PutMapping("/{mannerId}")
+    @ApiErrorCodes({
+            ErrorCode.MANNER_RATING_NOT_FOUND,
+            ErrorCode.MANNER_RATING_ACCESS_DENIED,
+            ErrorCode.MANNER_KEYWORD_INVALID,
+            ErrorCode.TARGET_MEMBER_DEACTIVATED
+    })
     public ApiResponse<MannerUpdateResponse> updateMannerRating(
             @PathVariable(name = "mannerId") Long mannerId,
             @Valid @RequestBody MannerUpdateRequest request,
@@ -65,6 +87,7 @@ public class MannerController {
     @Operation(summary = "특정 회원에 대한 나의 매너 평가 조회 API", description = "특정 회원에 대해 내가 실시한 매너 평가를 조회하는 API 입니다.")
     @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
     @GetMapping("/positive/{memberId}")
+    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<MannerRatingResponse> getPositiveMannerRatingInfo(
             @PathVariable(name = "memberId") Long targetMemberId,
             @AuthMember Member member) {
@@ -74,6 +97,7 @@ public class MannerController {
     @Operation(summary = "특정 회원에 대한 나의 비매너 평가 조회 API", description = "특정 회원에 대해 내가 실시한 비매너 평가를 조회하는 API 입니다.")
     @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
     @GetMapping("/negative/{memberId}")
+    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<MannerRatingResponse> getNegativeMannerRatingInfo(
             @PathVariable(name = "memberId") Long targetMemberId,
             @AuthMember Member member) {
@@ -83,6 +107,7 @@ public class MannerController {
     @Operation(summary = "특정 회원의 매너 레벨 정보 조회 API", description = "특정 회원의 매너 레벨 정보를 조회하는 API 입니다.")
     @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
     @GetMapping("/level/{memberId}")
+    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<MannerResponse> getMannerLevelInfo(@PathVariable(name = "memberId") Long memberId) {
         return ApiResponse.ok(mannerFacadeService.getMannerLevelInfo(memberId));
     }
@@ -90,6 +115,7 @@ public class MannerController {
     @Operation(summary = "특정 회원의 매너 키워드 정보 조회 API", description = "특정 회원의 매너 키워드 정보를 조회하는 API 입니다.")
     @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
     @GetMapping("/keyword/{memberId}")
+    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<MannerKeywordListResponse> getMannerKeywordInfo(@PathVariable(name = "memberId") Long memberId) {
         return ApiResponse.ok(mannerFacadeService.getMannerKeywordInfo(memberId));
     }

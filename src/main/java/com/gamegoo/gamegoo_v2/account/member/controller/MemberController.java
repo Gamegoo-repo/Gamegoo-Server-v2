@@ -11,6 +11,8 @@ import com.gamegoo.gamegoo_v2.account.member.dto.response.MyProfileResponse;
 import com.gamegoo.gamegoo_v2.account.member.dto.response.OtherProfileResponse;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -70,6 +72,7 @@ public class MemberController {
 
     @Operation(summary = "gamestyle 추가 및 수정 API 입니다.", description = "API for Gamestyle addition and modification ")
     @PutMapping("/gamestyle")
+    @ApiErrorCodes({ErrorCode.GAMESTYLE_NOT_FOUND})
     public ApiResponse<String> addGameStyle(@Valid @RequestBody GameStyleRequest request,
                                             @AuthMember Member member) {
         return ApiResponse.ok(memberFacadeService.setGameStyle(member, request));
@@ -77,6 +80,16 @@ public class MemberController {
 
     @Operation(summary = "챔피언 통계 새로고침 API 입니다.", description = "API for refreshing champion statistics")
     @PutMapping("/champion-stats/refresh")
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.CHAMPION_REFRESH_COOLDOWN,
+            ErrorCode.RIOT_INVALID_API_KEY,
+            ErrorCode.RIOT_NOT_FOUND,
+            ErrorCode.RIOT_API_ERROR,
+            ErrorCode.RIOT_SERVER_ERROR,
+            ErrorCode.RIOT_NETWORK_ERROR,
+            ErrorCode.RIOT_UNKNOWN_ERROR
+    })
     public ApiResponse<MyProfileResponse> refreshChampionStats(
             @AuthMember Member member,
             @RequestParam(value = "memberId", required = false) Long targetMemberId) {
@@ -85,6 +98,7 @@ public class MemberController {
 
     @Operation(summary = "어드민 권한 부여 API (개발용)", description = "개발용 어드민 권한 부여 API")
     @PatchMapping("/admin/grant/{memberId}")
+    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<String> grantAdminRole(@PathVariable Long memberId) {
 
         return ApiResponse.ok(memberFacadeService.updateMemberRole(memberId, Role.ADMIN));
@@ -92,6 +106,7 @@ public class MemberController {
 
     @Operation(summary = "일반 사용자 권한으로 변경 API (개발용)", description = "어드민 권한을 일반 사용자로 변경하는 API")
     @PatchMapping("/admin/revoke/{memberId}")
+    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<String> revokeAdminRole(@PathVariable Long memberId) {
         return ApiResponse.ok(memberFacadeService.updateMemberRole(memberId, Role.MEMBER));
     }

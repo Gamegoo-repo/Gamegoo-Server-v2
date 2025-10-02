@@ -1,6 +1,8 @@
 package com.gamegoo.gamegoo_v2.matching.controller;
 
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.dto.request.InitializingMatchingRequest;
 import com.gamegoo.gamegoo_v2.matching.dto.response.MatchingFoundResponse;
@@ -31,6 +33,11 @@ public class MatchingController {
 
     @Operation(summary = "매칭 우선순위 계산 및 기록 저장 API", description = "API for calculating and recording matching")
     @PostMapping("/matching/priority/{memberId}")
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.MEMBER_BANNED_FROM_MATCHING,
+            ErrorCode.GAMESTYLE_NOT_FOUND
+    })
     public ApiResponse<PriorityListResponse> InitializeMatching(@PathVariable(name = "memberId") Long memberId,
                                                                 @RequestBody @Valid InitializingMatchingRequest request) {
         return ApiResponse.ok(matchingFacadeService.calculatePriorityAndRecording(memberId, request));
@@ -38,6 +45,7 @@ public class MatchingController {
 
     @Operation(summary = "내 매칭 status 변경", description = "API for updating my matching status")
     @PatchMapping("/matching/status/{matchingUuid}/{status}")
+    @ApiErrorCodes({ErrorCode.MATCHING_NOT_FOUND})
     public ApiResponse<String> UpdateMatchingStatus(
             @PathVariable(name = "matchingUuid") String matchingUuid,
             @Parameter(description = "매칭 상태", schema = @Schema(ref = "#/components/schemas/MatchingStatus"))
@@ -48,6 +56,10 @@ public class MatchingController {
 
     @Operation(summary = "나와 상대방 매칭 status 변경", description = "API for updating both matching status")
     @PatchMapping("/matching/status/target/{matchingUuid}/{status}")
+    @ApiErrorCodes({
+            ErrorCode.MATCHING_NOT_FOUND,
+            ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND
+    })
     public ApiResponse<String> UpdateBothMatchingStatus(
             @PathVariable(name = "matchingUuid") String matchingUuid,
             @Parameter(description = "매칭 상태", schema = @Schema(ref = "#/components/schemas/MatchingStatus"))
@@ -58,6 +70,18 @@ public class MatchingController {
 
     @Operation(summary = "매칭 FOUND API", description = "API triggered when a match is found")
     @PatchMapping("/matching/found/{matchingUuid}/{targetMatchingUuid}")
+    @ApiErrorCodes({
+            ErrorCode.MATCHING_NOT_FOUND,
+            ErrorCode.MATCHING_FOUND_FAILED_BY_CONFLICT_MATCHINGUUID,
+            ErrorCode._BAD_REQUEST,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode.TARGET_MEMBER_DEACTIVATED,
+            ErrorCode.MATCHING_FOUND_FAILED_TARGET_IS_BLOCKED,
+            ErrorCode.MATCHING_FOUND_FAILED_BLOCKED_BY_TARGET,
+            ErrorCode.MATCHING_STATUS_NOT_ALLOWED,
+            ErrorCode.MATCHING_TARGET_UNAVAILABLE,
+            ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND
+    })
     public ApiResponse<MatchingFoundResponse> FindMatching(
             @PathVariable(name = "matchingUuid") String matchingUuid,
             @PathVariable(name = "targetMatchingUuid") String targetMatchingUuid
@@ -67,6 +91,18 @@ public class MatchingController {
 
     @Operation(summary = "매칭 SUCCESS API", description = "API triggered when a match is succeed")
     @PatchMapping("/matching/success/{matchingUuid}/{targetMatchingUuid}")
+    @ApiErrorCodes({
+            ErrorCode.MATCHING_NOT_FOUND,
+            ErrorCode._BAD_REQUEST,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode.TARGET_MEMBER_DEACTIVATED,
+            ErrorCode.MATCHING_FOUND_FAILED_TARGET_IS_BLOCKED,
+            ErrorCode.MATCHING_FOUND_FAILED_BLOCKED_BY_TARGET,
+            ErrorCode.MATCHING_STATUS_NOT_ALLOWED,
+            ErrorCode.MATCHING_TARGET_UNAVAILABLE,
+            ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND,
+            ErrorCode.CHATROOM_ACCESS_DENIED
+    })
     public ApiResponse<String> SuccessMatching(
             @PathVariable(name = "matchingUuid") String matchingUuid,
             @PathVariable(name = "targetMatchingUuid") String targetMatchingUuid
