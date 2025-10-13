@@ -13,14 +13,15 @@ import java.util.List;
 @Builder
 public class PositionRequest {
 
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "메인 포지션은 null일 수 없습니다.")
     private Position mainP;
 
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "서브 포지션은 null일 수 없습니다.")
     private Position subP;
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     @NotNull(message = "원하는 포지션은 null일 수 없습니다.")
     private List<Position> wantP;

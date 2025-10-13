@@ -17,24 +17,31 @@ import java.util.List;
 @Builder
 public class BoardInsertResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private long boardId;
     private Long memberId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer profileImage;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String gameName;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String tag;
-    @Schema(ref = "#/components/schemas/Tier")
+    @Schema(ref = "#/components/schemas/Tier", requiredMode = Schema.RequiredMode.REQUIRED)
     private Tier tier;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int rank;
-    @Schema(ref = "#/components/schemas/GameMode")
+    @Schema(ref = "#/components/schemas/GameMode", requiredMode = Schema.RequiredMode.REQUIRED)
     private GameMode gameMode;
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     private Position mainP;
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     private Position subP;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     private List<Position> wantP;
-    @Schema(ref = "#/components/schemas/Mike")
+    @Schema(ref = "#/components/schemas/Mike", requiredMode = Schema.RequiredMode.REQUIRED)
     private Mike mike;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Long> gameStyles;
     private String contents;
 
