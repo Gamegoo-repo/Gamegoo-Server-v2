@@ -12,9 +12,7 @@ public class ChatMessageResponse {
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long senderId;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String senderName;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer senderProfileImg;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String message;
