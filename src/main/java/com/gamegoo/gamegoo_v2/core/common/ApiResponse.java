@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.core.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -9,8 +10,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class ApiResponse<T> {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final int status;
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final String message;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

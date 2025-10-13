@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.social.friend.dto;
 
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,10 +9,15 @@ import lombok.Getter;
 @Builder
 public class FriendInfoResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long memberId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String name;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     int profileImg;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean isLiked;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean isBlind;
 
     public static FriendInfoResponse of(Friend friend) {

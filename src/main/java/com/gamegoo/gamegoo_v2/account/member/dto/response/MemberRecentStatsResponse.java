@@ -2,20 +2,30 @@ package com.gamegoo.gamegoo_v2.account.member.dto.response;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
 public class MemberRecentStatsResponse {
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int recTotalWins;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int recTotalLosses;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double recWinRate;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double recAvgKDA;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double recAvgKills;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double recAvgDeaths;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double recAvgAssists;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double recAvgCsPerMinute;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int recTotalCs;
 
     public static MemberRecentStatsResponse from(MemberRecentStats memberRecentStats) {
