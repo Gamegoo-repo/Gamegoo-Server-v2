@@ -43,6 +43,11 @@ public class NotificationController {
 
     @Operation(summary = "안읽은 알림 개수 조회 API", description = "해당 회원의 안읽은 알림의 개수를 조회하는 API 입니다.")
     @GetMapping("/unread/count")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER
+    })
     public ApiResponse<Integer> getUnreadNotificationCount(@AuthMember Member member) {
         return ApiResponse.ok(notificationFacadeService.countUnreadNotification(member));
     }
@@ -50,6 +55,12 @@ public class NotificationController {
     @Operation(summary = "알림 전체 목록 조회 API", description = "알림 전체보기 화면에서 알림 목록을 조회하는 API 입니다.")
     @Parameter(name = "page", description = "페이지 번호, 1 이상의 숫자를 입력해 주세요.")
     @GetMapping("/total")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<NotificationPageListResponse> getNotificationListByPage(
             @ValidPage @RequestParam(name = "page") Integer page, @AuthMember Member member) {
         return ApiResponse.ok(notificationFacadeService.getNotificationPageList(member, page));
@@ -59,6 +70,12 @@ public class NotificationController {
     @Parameter(name = "cursor", description = "페이징을 위한 커서, Long 타입 notificationId를 보내주세요. " +
             "보내지 않으면 가장 최근 알림 10개를 조회합니다.")
     @GetMapping
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<NotificationCursorListResponse> getNotificationListByCursor(
             @ValidCursor @RequestParam(name = "cursor", required = false) Long cursor,
             @AuthMember Member member) {

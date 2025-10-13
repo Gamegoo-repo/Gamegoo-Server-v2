@@ -83,6 +83,10 @@ public class ReportController {
                     /api/v2/report/list?reportedMemberKeyword=홍길동#KR1&reportTypes=1,4&startDate=2024-01-01T00:00:00&banTypes=WARNING&page=0&size=10
                     """)
     @GetMapping("/list")
+    @ApiErrorCodes({
+            ErrorCode._FORBIDDEN,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<ReportPageResponse> getReportList(
             @RequestParam(required = false) String reportedMemberKeyword,
             @RequestParam(required = false) String reporterKeyword,
