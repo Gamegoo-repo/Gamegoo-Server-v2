@@ -26,7 +26,7 @@ public class ReportListResponse {
     private String toMemberName;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String toMemberTag;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String content;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String reportType;

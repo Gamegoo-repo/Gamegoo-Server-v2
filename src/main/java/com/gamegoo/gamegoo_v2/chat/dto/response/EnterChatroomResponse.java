@@ -23,7 +23,7 @@ public class EnterChatroomResponse {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean blind;
     Long friendRequestMemberId;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     SystemFlagResponse system;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     ChatMessageListResponse chatMessageListResponse;
