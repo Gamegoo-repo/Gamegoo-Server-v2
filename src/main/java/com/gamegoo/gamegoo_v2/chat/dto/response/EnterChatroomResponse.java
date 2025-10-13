@@ -34,7 +34,6 @@ public class EnterChatroomResponse {
 
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         int flag;
-        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Long boardId;
 
         public static SystemFlagResponse of(int flag, Long boardId) {
