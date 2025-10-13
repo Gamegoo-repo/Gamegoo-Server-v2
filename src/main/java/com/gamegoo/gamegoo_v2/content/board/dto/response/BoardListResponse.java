@@ -56,7 +56,6 @@ public class BoardListResponse {
     private LocalDateTime bumpTime;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private List<ChampionStatsResponse> championStatsResponseList;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private MemberRecentStatsResponse memberRecentStats;
     @Schema(ref = "#/components/schemas/Tier", requiredMode = Schema.RequiredMode.REQUIRED)
     private Tier freeTier;
