@@ -38,12 +38,22 @@ public class MemberController {
 
     @Operation(summary = "내 프로필 조회 API 입니다. (jwt 토큰 O)", description = "API for looking up member with jwt")
     @GetMapping
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER
+    })
     public ApiResponse<MyProfileResponse> getMemberJWT(@AuthMember Member member) {
         return ApiResponse.ok(memberFacadeService.getMyProfile(member));
     }
 
     @Operation(summary = "다른 회원 프로필 조회 API 입니다. (jwt 토큰 O)", description = "API for looking up other member with jwt")
     @GetMapping("/other")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER
+    })
     public ApiResponse<OtherProfileResponse> getMember(@AuthMember Member member,
                                                        @RequestParam("id") Long targetMemberId) {
         return ApiResponse.ok(memberFacadeService.getOtherProfile(member, targetMemberId));
@@ -51,6 +61,12 @@ public class MemberController {
 
     @Operation(summary = "프로필 이미지 수정 API 입니다.", description = "API for Profile Image Modification")
     @PutMapping("/profileImage")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<String> modifyProfileImage(
             @Valid @RequestBody ProfileImageRequest request, @AuthMember Member member) {
         return ApiResponse.ok(memberFacadeService.setProfileImage(member, request));
@@ -58,6 +74,12 @@ public class MemberController {
 
     @Operation(summary = "마이크 여부 수정 API 입니다.", description = "API for isMike Modification")
     @PutMapping("/mike")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<String> modifyIsMike(
             @Valid @RequestBody IsMikeRequest request, @AuthMember Member member) {
         return ApiResponse.ok(memberFacadeService.setMike(member, request));
@@ -65,6 +87,12 @@ public class MemberController {
 
     @Operation(summary = "주/부/원하는 포지션 수정 API 입니다.", description = "API for Main/Sub/Want Position Modification")
     @PutMapping("/position")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<String> modifyPosition(
             @Valid @RequestBody PositionRequest request, @AuthMember Member member) {
         return ApiResponse.ok(memberFacadeService.setPosition(member, request));

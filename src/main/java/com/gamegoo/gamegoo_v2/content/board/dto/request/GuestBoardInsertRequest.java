@@ -10,17 +10,17 @@ import lombok.Getter;
 public class GuestBoardInsertRequest extends BoardInsertRequest {
 
     @NotBlank(message = "게임 닉네임은 필수입니다.")
-    @Schema(description = "게임 내 닉네임")
+    @Schema(description = "게임 내 닉네임", requiredMode = Schema.RequiredMode.REQUIRED)
     private String gameName;
 
     @NotBlank(message = "태그는 필수입니다.")
-    @Schema(description = "게임 태그")
+    @Schema(description = "게임 태그", requiredMode = Schema.RequiredMode.REQUIRED)
     private String tag;
 
     @NotBlank(message = "비밀번호는 필수입니다.")
     @Size(min = 4, max = 16, message = "비밀번호는 4-16자 이내로 입력해주세요.")
     @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?`~]*$", 
              message = "비밀번호는 영어, 숫자, 특수문자만 사용 가능합니다.")
-    @Schema(description = "4-16자의 비밀번호를 입력해주세요", example = "password123")
+    @Schema(description = "4-16자의 비밀번호를 입력해주세요", example = "password123", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
 }

@@ -40,12 +40,24 @@ public class PasswordController {
 
     @PutMapping("/change")
     @Operation(summary = "비밀번호 재설정 API 입니다. JWT O", description = "API for reseting password JWT O")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<String> resetPasswordWithJWT(@AuthMember Member member, @Valid @RequestBody PasswordResetRequest request) {
         return ApiResponse.ok(passwordFacadeService.changePassword(member, request));
     }
 
     @PostMapping("/check")
     @Operation(summary = "비밀번호 확인 API 입니다.", description = "API for checking password")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<PasswordCheckResponse> checkPassword(@AuthMember Member member, @Valid @RequestBody PasswordCheckRequest request) {
         return ApiResponse.ok(passwordFacadeService.checkPassword(member, request));
     }

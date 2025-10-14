@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.social.friend.dto;
 
 import com.gamegoo.gamegoo_v2.social.friend.domain.Friend;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +9,9 @@ import lombok.Getter;
 @Builder
 public class StarFriendResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long friendMemberId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String message;
 
     public static StarFriendResponse of(Friend friend) {

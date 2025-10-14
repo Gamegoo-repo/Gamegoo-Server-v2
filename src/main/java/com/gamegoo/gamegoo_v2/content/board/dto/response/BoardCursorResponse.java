@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.content.board.dto.response;
 
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
@@ -12,7 +13,9 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class BoardCursorResponse {
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final List<BoardListResponse> boards;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final boolean hasNext;
     private final LocalDateTime nextCursor;
     private Long cursorId;

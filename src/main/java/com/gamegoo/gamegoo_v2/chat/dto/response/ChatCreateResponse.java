@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.chat.dto.response;
 
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
 import com.gamegoo.gamegoo_v2.utils.DateTimeUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,11 +10,17 @@ import lombok.Getter;
 @Builder
 public class ChatCreateResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long senderId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String senderName;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     int senderProfileImg;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String message;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String createdAt;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     long timestamp;
 
     public static ChatCreateResponse of(Chat chat) {

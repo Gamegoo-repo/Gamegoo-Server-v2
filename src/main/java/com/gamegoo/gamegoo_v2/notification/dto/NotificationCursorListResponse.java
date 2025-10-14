@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.notification.dto;
 
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
@@ -11,8 +12,11 @@ import java.util.List;
 @Builder
 public class NotificationCursorListResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     List<NotificationResponse> notificationList;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     int listSize;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean hasNext;
     Long nextCursor;
 

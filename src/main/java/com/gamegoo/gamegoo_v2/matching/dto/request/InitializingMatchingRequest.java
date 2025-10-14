@@ -16,15 +16,15 @@ import java.util.List;
 @Builder
 public class InitializingMatchingRequest {
 
-    @Schema(ref = "#/components/schemas/GameMode")
+    @Schema(ref = "#/components/schemas/GameMode", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "gameMode 는 비워둘 수 없습니다.")
     GameMode gameMode;
 
-    @Schema(ref = "#/components/schemas/Mike")
+    @Schema(ref = "#/components/schemas/Mike", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "mike 는 비워둘 수 없습니다.")
     Mike mike;
 
-    @Schema(ref = "#/components/schemas/MatchingType")
+    @Schema(ref = "#/components/schemas/MatchingType", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "matchingType은 비워둘 수 없습니다.")
     MatchingType matchingType;
 

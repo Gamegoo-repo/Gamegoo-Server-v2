@@ -109,6 +109,7 @@ public class BoardController {
                     "서포터: SUP >"),
             @Parameter(name = "mike", description = "(선택) 마이크 여부를 선택해주세요.")
     })
+    @ApiErrorCodes({ErrorCode._BAD_REQUEST})
     public ApiResponse<BoardResponse> boardList(
             @ValidPage @RequestParam(name = "page") Integer page,
             @Parameter(description = "게임 모드", schema = @Schema(ref = "#/components/schemas/GameMode"))
@@ -174,6 +175,12 @@ public class BoardController {
 
     @GetMapping("/my")
     @Operation(summary = "내가 작성한 게시판 글 목록 조회 API", description = "내가 작성한 게시판 글을 조회하는 API 입니다. 페이지 당 10개의 게시물이 표시됩니다.")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<MyBoardResponse> getMyBoardList(@ValidPage @RequestParam(name = "page") Integer page,
                                                        @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.getMyBoardList(member, page));
@@ -182,6 +189,12 @@ public class BoardController {
     @GetMapping("/my/cursor")
     @Operation(summary = "내가 작성한 게시판 글 목록 조회 API/모바일", description = "모바일에서 내가 작성한 게시판 글을 조회하는 API 입니다.")
     @Parameter(name = "cursor", description = "페이징을 위한 커서, ISO 8601 형식의 LocalDateTime을 보내주세요. " + "보내지 않으면 가장 최근 게시물 10개를 조회합니다.")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER,
+            ErrorCode._BAD_REQUEST
+    })
     public ApiResponse<MyBoardCursorResponse> getMyBoardCursorList(
             @ValidCursor @RequestParam(name = "cursor", required = false) LocalDateTime cursor,
             @AuthMember Member member) {
@@ -220,6 +233,7 @@ public class BoardController {
         @Parameter(name = "position1", description = "(선택) 주 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: MID, 원딜: ADC, 서포터: SUP >"),
         @Parameter(name = "position2", description = "(선택) 부 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: MID, 원딜: ADC, 서포터: SUP >")
     })
+    @ApiErrorCodes({ErrorCode._BAD_REQUEST})
     public ResponseEntity<ApiResponse<BoardCursorResponse>> getBoardsWithCursor(
             @RequestParam(required = false) LocalDateTime cursor,
             @RequestParam(required = false) Long cursorId,

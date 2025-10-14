@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ReportProcessRequest {
     
-    @Schema(ref = "#/components/schemas/BanType")
+    @Schema(ref = "#/components/schemas/BanType", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "제재 유형은 필수입니다.")
     private BanType banType;
     
