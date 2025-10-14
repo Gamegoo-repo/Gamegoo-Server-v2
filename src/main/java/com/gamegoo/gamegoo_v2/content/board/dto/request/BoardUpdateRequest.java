@@ -16,23 +16,25 @@ import java.util.List;
 @Getter
 public class BoardUpdateRequest {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "boardProfileImage 값은 비워둘 수 없습니다.")
     @Min(value = 1, message = "프로필 이미지의 값은 1이상이어야 합니다.")
     @Max(value = 8, message = "프로필 이미지의 값은 8이하이어야 합니다.")
     Integer boardProfileImage;
 
-    @Schema(ref = "#/components/schemas/GameMode")
+    @Schema(ref = "#/components/schemas/GameMode", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "게임 모드는 필수 값입니다.")
     GameMode gameMode;
 
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "주 포지션은 필수 값입니다.")
     Position mainP;
 
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "부 포지션은 필수 값입니다.")
     Position subP;
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     @NotNull(message = "희망 포지션은 필수 값입니다.")
     @Size(min = 1, message = "최소 하나 이상의 희망 포지션을 선택해야 합니다.")
@@ -41,6 +43,7 @@ public class BoardUpdateRequest {
     @Schema(ref = "#/components/schemas/Mike")
     Mike mike;
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "게임 스타일 리스트는 필수 값입니다.")
     @Size(min = 1, max = 3, message = "게임 스타일 리스트는 1개 이상 3개 이하여야 합니다.")
     List<Long> gameStyles;

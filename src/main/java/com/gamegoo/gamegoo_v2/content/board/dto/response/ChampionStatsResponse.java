@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.content.board.dto.response;
 import com.gamegoo.gamegoo_v2.account.member.domain.MemberChampion;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.game.domain.Champion;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,16 +11,27 @@ import lombok.Getter;
 @Builder
 public class ChampionStatsResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private long championId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String championName;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double winRate;      // 승률
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int wins;            // 승 수
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int games;           // 판 수
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double csPerMinute;  // 분당 CS
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double averageCs;    // 평균 CS
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double kda;          // KDA
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double kills;        // 평균 킬
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double deaths;       // 평균 데스
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private double assists;      // 평균 어시스트
 
     public static ChampionStatsResponse from(ChampionStats stats, Champion champion) {
@@ -59,4 +71,3 @@ public class ChampionStatsResponse {
     }
 
 }
-

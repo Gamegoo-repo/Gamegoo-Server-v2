@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.content.report.dto.response;
 
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +9,9 @@ import lombok.Getter;
 @Builder
 public class ReportInsertResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long reportId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String message;
 
     public static ReportInsertResponse of(Report report) {

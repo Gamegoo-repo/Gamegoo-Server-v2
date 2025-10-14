@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.social.friend.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -7,7 +8,9 @@ import lombok.Getter;
 @Builder
 public class DeleteFriendResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long targetMemberId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String message;
 
     public static DeleteFriendResponse of(Long targetMemberId) {

@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.dto.response;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,11 +9,17 @@ import lombok.Getter;
 @Builder
 public class RiotJoinResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final Long id;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final String name;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final String tag;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final int profileImage;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final String accessToken;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final String refreshToken;
 
     public static RiotJoinResponse of(Member member, String accessToken, String refreshToken) {

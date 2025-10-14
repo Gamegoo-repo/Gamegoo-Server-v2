@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.notification.dto;
 
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,11 +11,16 @@ import java.time.LocalDateTime;
 @Builder
 public class NotificationResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long notificationId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     int notificationType;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String content;
     String pageUrl;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean read;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     LocalDateTime createdAt;
 
     public static NotificationResponse of(Notification notification) {

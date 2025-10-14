@@ -14,14 +14,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ReportProcessResponse {
-    
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private Long reportId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private Long targetMemberId;
-    @Schema(ref = "#/components/schemas/BanType")
+    @Schema(ref = "#/components/schemas/BanType", requiredMode = Schema.RequiredMode.REQUIRED)
     private BanType appliedBanType;
     private LocalDateTime banExpireAt;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String message;
-    
+
     public static ReportProcessResponse of(Long reportId, Long targetMemberId, BanType banType, LocalDateTime banExpireAt) {
         return ReportProcessResponse.builder()
                 .reportId(reportId)
