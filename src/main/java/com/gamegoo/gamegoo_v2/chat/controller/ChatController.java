@@ -108,6 +108,11 @@ public class ChatController {
 
     @Operation(summary = "안읽은 채팅방 uuid 목록 조회 API", description = "안읽은 메시지가 속한 채팅방의 uuid 목록을 조회하는 API 입니다.")
     @GetMapping("/chat/unread")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER
+    })
     public ApiResponse<List<String>> getUnreadChatroomUuid(@AuthMember Member member) {
         return ApiResponse.ok(chatFacadeService.getUnreadChatroomUuids(member));
     }
@@ -141,6 +146,11 @@ public class ChatController {
 
     @Operation(summary = "채팅방 목록 조회 API", description = "회원이 속한 채팅방 목록을 조회하는 API 입니다.")
     @GetMapping("/chatroom")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER
+    })
     public ApiResponse<ChatroomListResponse> getChatroom(@AuthMember Member member) {
         return ApiResponse.ok(chatFacadeService.getChatrooms(member));
     }

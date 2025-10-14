@@ -18,37 +18,51 @@ import java.util.List;
 @Getter
 public class OtherProfileResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long id;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer profileImg;
-    @Schema(ref = "#/components/schemas/Mike")
+    @Schema(ref = "#/components/schemas/Mike", requiredMode = Schema.RequiredMode.REQUIRED)
     Mike mike;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String gameName;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String tag;
-    @Schema(ref = "#/components/schemas/Tier")
+    @Schema(ref = "#/components/schemas/Tier", requiredMode = Schema.RequiredMode.REQUIRED)
     Tier soloTier;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer soloRank;
     Double soloWinrate;
-    @Schema(ref = "#/components/schemas/Tier")
+    @Schema(ref = "#/components/schemas/Tier", requiredMode = Schema.RequiredMode.REQUIRED)
     Tier freeTier;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer freeRank;
     Double freeWinrate;
     String updatedAt;
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     Position mainP;
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     Position subP;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     List<Position> wantP;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Boolean isAgree;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Boolean isBlind;
-    @Schema(ref = "#/components/schemas/LoginType")
+    @Schema(ref = "#/components/schemas/LoginType", requiredMode = Schema.RequiredMode.REQUIRED)
     LoginType loginType;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Boolean blocked; // 해당 회원을 차단했는지 여부
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Boolean friend; // 해당 회원과의 친구 여부
     Long friendRequestMemberId; // 해당 회원과의 친구 요청 상태
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     List<GameStyleResponse> gameStyleResponseList;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     List<ChampionStatsResponse> championStatsResponseList;
     MemberRecentStatsResponse memberRecentStats;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Boolean canRefresh;
 
     public static OtherProfileResponse of(Member targetMember, Boolean isFriend, Long friendRequestMemberId,

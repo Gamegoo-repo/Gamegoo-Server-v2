@@ -19,28 +19,38 @@ import java.util.List;
 @EqualsAndHashCode
 public class MatchingMemberInfoResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long memberId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String matchingUuid;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String gameName;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String tag;
-    @Schema(ref = "#/components/schemas/Tier")
+    @Schema(ref = "#/components/schemas/Tier", requiredMode = Schema.RequiredMode.REQUIRED)
     Tier soloTier;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer soloRank;
-    @Schema(ref = "#/components/schemas/Tier")
+    @Schema(ref = "#/components/schemas/Tier", requiredMode = Schema.RequiredMode.REQUIRED)
     Tier freeTier;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer freeRank;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer mannerLevel;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer profileImg;
-    @Schema(ref = "#/components/schemas/GameMode")
+    @Schema(ref = "#/components/schemas/GameMode", requiredMode = Schema.RequiredMode.REQUIRED)
     GameMode gameMode;
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     Position mainP;
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     Position subP;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     List<Position> wantP;
-    @Schema(ref = "#/components/schemas/Mike")
+    @Schema(ref = "#/components/schemas/Mike", requiredMode = Schema.RequiredMode.REQUIRED)
     Mike mike;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     List<GameStyleResponse> gameStyleResponseList;
 
     public static MatchingMemberInfoResponse of(Member member, String matchingUuid, GameMode gameMode) {

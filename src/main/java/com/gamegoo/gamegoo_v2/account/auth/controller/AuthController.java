@@ -37,6 +37,11 @@ public class AuthController {
 
     @PostMapping("/logout")
     @Operation(summary = "logout API 입니다.", description = "API for logout")
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER
+    })
     public ApiResponse<String> logout(@AuthMember Member member) {
         return ApiResponse.ok(authFacadeService.logout(member));
     }

@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.chat.dto.response;
 
 import com.gamegoo.gamegoo_v2.chat.domain.Chat;
 import com.gamegoo.gamegoo_v2.utils.DateTimeUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -9,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class SystemMessageResponse extends ChatMessageResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer systemType;
     Long boardId;
 

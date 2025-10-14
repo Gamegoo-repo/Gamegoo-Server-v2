@@ -2,6 +2,7 @@ package com.gamegoo.gamegoo_v2.content.report.dto.response;
 
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.domain.ReportType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,16 +13,26 @@ import java.util.stream.Collectors;
 @Builder
 public class ReportListResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private Long reportId;
     private Long fromMemberId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String fromMemberName;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String fromMemberTag;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private Long toMemberId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String toMemberName;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String toMemberTag;
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String content;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String reportType;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String path;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createdAt;
     private Long postId;
     private Boolean isPostDeleted;

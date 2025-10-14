@@ -20,33 +20,44 @@ import java.util.stream.Collectors;
 @Builder
 public class BoardByIdResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     long boardId;
     Long memberId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     LocalDateTime createdAt;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer profileImage;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String gameName;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String tag;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer mannerLevel;
-    @Schema(ref = "#/components/schemas/Tier")
+    @Schema(ref = "#/components/schemas/Tier", requiredMode = Schema.RequiredMode.REQUIRED)
     Tier soloTier;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     int soloRank;
-    @Schema(ref = "#/components/schemas/Tier")
+    @Schema(ref = "#/components/schemas/Tier", requiredMode = Schema.RequiredMode.REQUIRED)
     Tier freeTier;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     int freeRank;
-    @Schema(ref = "#/components/schemas/Mike")
+    @Schema(ref = "#/components/schemas/Mike", requiredMode = Schema.RequiredMode.REQUIRED)
     Mike mike;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     List<ChampionStatsResponse> championStatsResponseList;
     MemberRecentStatsResponse memberRecentStats;
-    @Schema(ref = "#/components/schemas/GameMode")
+    @Schema(ref = "#/components/schemas/GameMode", requiredMode = Schema.RequiredMode.REQUIRED)
     GameMode gameMode;
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     Position mainP;
-    @Schema(ref = "#/components/schemas/Position")
+    @Schema(ref = "#/components/schemas/Position", requiredMode = Schema.RequiredMode.REQUIRED)
     Position subP;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @ArraySchema(schema = @Schema(ref = "#/components/schemas/Position"))
     List<Position> wantP;
     Integer recentGameCount;
     Double winRate;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     List<Long> gameStyles;
     String contents;
 

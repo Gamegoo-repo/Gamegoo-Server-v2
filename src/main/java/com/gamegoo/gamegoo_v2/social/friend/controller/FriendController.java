@@ -122,6 +122,11 @@ public class FriendController {
 
     @Operation(summary = "친구 목록 조회 API", description = "해당 회원의 친구 목록을 조회하는 API 입니다. 이름 오름차순(한글-영문-숫자 순)으로 정렬해 제공합니다.")
     @GetMapping
+    @ApiErrorCodes({
+            ErrorCode.UNAUTHORIZED_EXCEPTION,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.INACTIVE_MEMBER
+    })
     public ApiResponse<FriendListResponse> getFriendList(@AuthMember Member member) {
         return ApiResponse.ok(friendFacadeService.getFriends(member));
     }

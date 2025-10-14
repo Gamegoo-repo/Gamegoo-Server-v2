@@ -14,17 +14,25 @@ import java.time.LocalDateTime;
 @Builder
 public class MyBoardListResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     long boardId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     long memberId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer profileImage;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String gameName;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String tag;
-    @Schema(ref = "#/components/schemas/Tier")
+    @Schema(ref = "#/components/schemas/Tier", requiredMode = Schema.RequiredMode.REQUIRED)
     Tier tier;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     int rank;
     String contents;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     LocalDateTime createdAt;
     LocalDateTime bumpTime;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Integer mannerLevel;
 
     public static MyBoardListResponse of(Board board) {

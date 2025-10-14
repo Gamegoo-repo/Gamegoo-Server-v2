@@ -19,6 +19,7 @@ import java.util.List;
 @Builder
 public class ReportRequest {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @ArraySchema(schema = @Schema(ref = "#/components/schemas/ReportType"))
     @NotDuplicated
     @NotEmpty(message = "신고 코드 리스트는 비워둘 수 없습니다.")
@@ -29,6 +30,7 @@ public class ReportRequest {
     @Length(max = 500, message = "contents는 500자 이내여야 합니다.")
     String contents;
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @Min(value = 1, message = "path code는 1 이상의 값이어야 합니다.")
     @Max(value = 3, message = "path code는 3 이하의 값이어야 합니다.")
     @NotNull(message = "path code는 필수 값 입니다.")

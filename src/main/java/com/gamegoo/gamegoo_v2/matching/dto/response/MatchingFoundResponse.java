@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.matching.dto.response;
 
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,7 +11,9 @@ import lombok.Getter;
 @EqualsAndHashCode
 public class MatchingFoundResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     MatchingMemberInfoResponse myMatchingInfo;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     MatchingMemberInfoResponse targetMatchingInfo;
 
     public static MatchingFoundResponse of(MatchingRecord matchingRecord, MatchingRecord targetMatchingRecord) {

@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.content.board.dto.response;
 
 import com.gamegoo.gamegoo_v2.content.board.domain.Board;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
@@ -12,9 +13,13 @@ import java.util.stream.Collectors;
 @Builder
 public class BoardResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private List<BoardListResponse> boards;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int totalPages;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private long totalElements;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int currentPage;
 
     public static BoardResponse of(Page<Board> boardPage) {

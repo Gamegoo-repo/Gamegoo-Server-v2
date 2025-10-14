@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.game.dto.response;
 
 import com.gamegoo.gamegoo_v2.game.domain.Champion;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +9,9 @@ import lombok.Getter;
 @Getter
 public class ChampionResponse {
 
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     Long championId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String championName;
     Double winRate;
     Integer games;

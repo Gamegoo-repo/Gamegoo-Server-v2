@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.social.manner.dto.response;
 
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerRating;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 public class MannerRatingResponse {
 
     Long mannerRatingId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     List<Long> mannerKeywordIdList;
 
     public static MannerRatingResponse of(Optional<MannerRating> mannerRating) {

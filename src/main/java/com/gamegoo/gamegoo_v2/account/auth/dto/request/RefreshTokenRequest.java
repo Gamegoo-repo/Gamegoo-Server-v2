@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.auth.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class RefreshTokenRequest {
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "refreshToken 값은 비워둘 수 없습니다.")
     String refreshToken;
 }

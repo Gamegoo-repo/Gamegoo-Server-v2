@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 public class IsMikeRequest {
 
-    @Schema(ref = "#/components/schemas/Mike")
+    @Schema(ref = "#/components/schemas/Mike", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "mike 값은 비워둘 수 없습니다.")
     Mike mike;
 
