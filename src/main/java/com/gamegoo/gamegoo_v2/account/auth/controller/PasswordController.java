@@ -8,6 +8,8 @@ import com.gamegoo.gamegoo_v2.account.auth.dto.response.PasswordCheckResponse;
 import com.gamegoo.gamegoo_v2.account.auth.service.PasswordFacadeService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,12 @@ public class PasswordController {
 
     @PostMapping("/reset")
     @Operation(summary = "비밀번호 재설정 API 입니다. JWT X", description = "API for reseting password JWT X")
+    @ApiErrorCodes({
+            ErrorCode.EMAIL_RECORD_NOT_FOUND,
+            ErrorCode.INVALID_VERIFICATION_CODE,
+            ErrorCode.EMAIL_VERIFICATION_TIME_EXCEED,
+            ErrorCode.MEMBER_NOT_FOUND
+    })
     public ApiResponse<String> resetPassword(@Valid @RequestBody PasswordResetWithVerifyRequest request) {
         return ApiResponse.ok(passwordFacadeService.changePasswordWithVerify(request));
     }

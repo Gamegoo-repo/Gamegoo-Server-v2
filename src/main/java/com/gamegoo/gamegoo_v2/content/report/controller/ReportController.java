@@ -13,6 +13,8 @@ import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportPageResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse;
 import com.gamegoo.gamegoo_v2.content.report.service.ReportFacadeService;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
+import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,6 +47,14 @@ public class ReportController {
     @Operation(summary = "신고 등록 API", description = "대상 회원에 대한 신고를 등록하는 API 입니다.")
     @Parameter(name = "memberId", description = "신고할 대상 회원의 id 입니다.")
     @PostMapping("/{memberId}")
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode._BAD_REQUEST,
+            ErrorCode.TARGET_MEMBER_DEACTIVATED,
+            ErrorCode.REPORT_ALREADY_EXISTS,
+            ErrorCode.BOARD_NOT_FOUND,
+            ErrorCode.REPORT_PATH_NOT_FOUND
+    })
     public ApiResponse<ReportInsertResponse> addReport(@PathVariable("memberId") Long targetMemberId,
                                                        @Valid @RequestBody ReportRequest request,
                                                        @AuthMember(required = false) Member member) {
@@ -132,6 +142,7 @@ public class ReportController {
                     """)
     @Parameter(name = "reportId", description = "처리할 신고의 ID입니다.")
     @PutMapping("/{reportId}/process")
+    @ApiErrorCodes({ErrorCode.REPORT_NOT_FOUND})
     public ApiResponse<ReportProcessResponse> processReport(@PathVariable("reportId") Long reportId,
                                                             @Valid @RequestBody ReportProcessRequest request) {
         return ApiResponse.ok(reportFacadeService.processReport(reportId, request));
@@ -151,6 +162,11 @@ public class ReportController {
                     """)
     @Parameter(name = "reportId", description = "삭제할 게시글과 연관된 신고의 ID입니다.")
     @DeleteMapping("/{reportId}/post")
+    @ApiErrorCodes({
+            ErrorCode.REPORT_NOT_FOUND,
+            ErrorCode.BOARD_NOT_FOUND,
+            ErrorCode.DELETE_BOARD_ACCESS_DENIED
+    })
     public ApiResponse<String> deleteReportedPost(@PathVariable("reportId") Long reportId) {
         return ApiResponse.ok(reportFacadeService.deleteReportedPost(reportId));
     }
