@@ -42,7 +42,6 @@ class BoardRepositoryTest extends RepositoryTestSupport {
                 .mike(mike)
                 .content("Test content")
                 .wantP(new ArrayList<>())
-                .boardProfileImage(1)
                 .build());
     }
 

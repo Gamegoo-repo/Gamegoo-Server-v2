@@ -105,7 +105,6 @@ class ChatFacadeServiceBanTest {
                 .wantP(java.util.List.of(com.gamegoo.gamegoo_v2.account.member.domain.Position.ANY))
                 .mike(com.gamegoo.gamegoo_v2.account.member.domain.Mike.AVAILABLE)
                 .content("test content")
-                .boardProfileImage(1)
                 .build();
         ReflectionTestUtils.setField(board, "id", 1L);
     }

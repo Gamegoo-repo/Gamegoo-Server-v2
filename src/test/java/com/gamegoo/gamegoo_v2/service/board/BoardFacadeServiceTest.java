@@ -132,8 +132,7 @@ class BoardFacadeServiceTest {
                 position2,
                 Arrays.asList(Position.TOP, Position.MID),
                 mike,
-                "test content",
-                1
+                "test content"
         );
         ReflectionTestUtils.setField(board, "id", 1L);
         return board;
@@ -188,8 +187,7 @@ class BoardFacadeServiceTest {
                 Position.JUNGLE,
                 Arrays.asList(Position.TOP, Position.MID),
                 Mike.AVAILABLE,
-                "test content",
-                1
+                "test content"
         );
         ReflectionTestUtils.setField(board, "id", 1L);
 
@@ -244,7 +242,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(board, "id", 1L);
@@ -303,7 +300,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(board, "id", 1L);
@@ -356,7 +352,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(board1, "id", 1L);
@@ -370,7 +365,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(board2, "id", 2L);
@@ -424,7 +418,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(midBoard, "id", 1L);
@@ -438,7 +431,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(supportBoard, "id", 2L);
@@ -492,7 +484,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(topBoard, "id", 1L);
@@ -506,7 +497,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(jungleBoard, "id", 2L);
@@ -560,7 +550,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(adcBoard, "id", 1L);
@@ -574,7 +563,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(supportBoard, "id", 2L);
@@ -628,7 +616,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(topBoard, "id", 1L);
@@ -642,7 +629,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(adcBoard, "id", 2L);
@@ -789,7 +775,6 @@ class BoardFacadeServiceTest {
             ReflectionTestUtils.setField(request, "wantP", Arrays.asList(Position.TOP, Position.MID));
             ReflectionTestUtils.setField(request, "mike", Mike.AVAILABLE);
             ReflectionTestUtils.setField(request, "contents", "게스트 게시글 내용");
-            ReflectionTestUtils.setField(request, "boardProfileImage", 1);
             ReflectionTestUtils.setField(request, "gameStyles", Arrays.asList(1L, 2L));
             return request;
         }
@@ -802,7 +787,6 @@ class BoardFacadeServiceTest {
             ReflectionTestUtils.setField(request, "wantP", Arrays.asList(Position.TOP, Position.MID));
             ReflectionTestUtils.setField(request, "mike", Mike.AVAILABLE);
             ReflectionTestUtils.setField(request, "contents", "게스트 게시글 내용");
-            ReflectionTestUtils.setField(request, "boardProfileImage", 1);
             ReflectionTestUtils.setField(request, "gameStyles", Arrays.asList(1L, 2L));
             ReflectionTestUtils.setField(request, "gameName", gameName);
             ReflectionTestUtils.setField(request, "tag", tag);
@@ -828,7 +812,7 @@ class BoardFacadeServiceTest {
 
             Board guestBoard = Board.createForGuest(
                     tmpMember, request.getGameMode(), request.getMainP(), request.getSubP(),
-                    request.getWantP(), request.getMike(), request.getContents(), 1, password
+                    request.getWantP(), request.getMike(), request.getContents(), password
             );
             ReflectionTestUtils.setField(guestBoard, "id", 1L);
 

@@ -16,12 +16,6 @@ import java.util.List;
 @Getter
 public class BoardInsertRequest {
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    @Min(value = 1, message = "프로필 이미지의 값은 1이상이어야 합니다.")
-    @Max(value = 8, message = "프로필 이미지의 값은 8이하이어야 합니다.")
-    @NotNull(message = "boardProfileImage 값은 비워둘 수 없습니다.")
-    Integer boardProfileImage;
-
     @Schema(ref = "#/components/schemas/GameMode", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "게임 모드는 필수 값입니다.")
     GameMode gameMode;

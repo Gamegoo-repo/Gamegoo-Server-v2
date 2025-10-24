@@ -65,9 +65,6 @@ public class Board extends BaseDateTimeEntity {
     private String content;
 
     @Column(nullable = false)
-    private int boardProfileImage;
-
-    @Column(nullable = false)
     private boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -92,7 +89,7 @@ public class Board extends BaseDateTimeEntity {
 
     public static Board create(Member member, GameMode gameMode, Position mainP, Position subP,
                                List<Position> wantP,
-                               Mike mike, String content, int boardProfileImage) {
+                               Mike mike, String content) {
         return Board.builder()
                 .member(member)
                 .isGuest(false)
@@ -102,12 +99,11 @@ public class Board extends BaseDateTimeEntity {
                 .wantP(wantP)
                 .mike(mike)
                 .content(content)
-                .boardProfileImage(boardProfileImage)
                 .build();
     }
 
     public static Board createForGuest(Member tmpMember, GameMode gameMode, Position mainP, Position subP,
-                                       List<Position> wantP, Mike mike, String content, int boardProfileImage, String guestPassword) {
+                                       List<Position> wantP, Mike mike, String content, String guestPassword) {
         return Board.builder()
                 .member(tmpMember)
                 .isGuest(true)
@@ -117,14 +113,13 @@ public class Board extends BaseDateTimeEntity {
                 .wantP(wantP)
                 .mike(mike)
                 .content(content)
-                .boardProfileImage(boardProfileImage)
                 .guestPassword(guestPassword)
                 .build();
     }
 
     @Builder
     private Board(GameMode gameMode, Position mainP, Position subP, List<Position> wantP, Mike mike,
-                  String content, int boardProfileImage, boolean deleted, Member member,
+                  String content, boolean deleted, Member member,
                   boolean isGuest, String guestPassword) {
         this.gameMode = gameMode;
         this.mainP = mainP;
@@ -132,7 +127,6 @@ public class Board extends BaseDateTimeEntity {
         this.wantP = wantP;
         this.mike = mike;
         this.content = content;
-        this.boardProfileImage = boardProfileImage;
         this.deleted = deleted;
         this.member = member;
         this.isGuest = isGuest;
@@ -150,7 +144,7 @@ public class Board extends BaseDateTimeEntity {
     }
 
     public void updateBoard(GameMode gameMode, Position mainP, Position subP, List<Position> wantP, Mike mike,
-                            String content, int boardProfileImage) {
+                            String content) {
         if (gameMode != null) {
             this.gameMode = gameMode;
         }
@@ -173,7 +167,6 @@ public class Board extends BaseDateTimeEntity {
             this.content = content;
         }
 
-        this.boardProfileImage = boardProfileImage;
     }
 
     public void setDeleted(boolean deleted) {

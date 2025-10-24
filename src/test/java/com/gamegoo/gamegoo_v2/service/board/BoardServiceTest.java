@@ -85,7 +85,7 @@ public class BoardServiceTest {
 
             for (int i = 0; i < 3; i++) {
                 Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
-                        Mike.AVAILABLE, "contents", 1);
+                        Mike.AVAILABLE, "contents");
                 boardRepository.save(board);
             }
 
@@ -109,7 +109,7 @@ public class BoardServiceTest {
             // given
             Member member = createMember("member@gmail.com", "member");
             Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
-                    Mike.AVAILABLE, "contents", 1);
+                    Mike.AVAILABLE, "contents");
             boardRepository.save(board);
 
             // when
@@ -126,7 +126,7 @@ public class BoardServiceTest {
             Member member1 = createMember("member1@gmail.com", "member1");
             Member member2 = createMember("member2@gmail.com", "member2");
             Board board = Board.create(member1, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
-                    Mike.AVAILABLE, "contents", 1);
+                    Mike.AVAILABLE, "contents");
             boardRepository.save(board);
 
             // when & then
@@ -141,7 +141,7 @@ public class BoardServiceTest {
             // given
             Member member = createMember("member@gmail.com", "member");
             Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
-                    Mike.AVAILABLE, "contents", 1);
+                    Mike.AVAILABLE, "contents");
             boardRepository.save(board);
             board.bump(LocalDateTime.now());
             boardRepository.save(board);
@@ -182,7 +182,7 @@ public class BoardServiceTest {
             // 게시글 5개 생성 (시간차를 두고)
             for (int i = 0; i < 5; i++) {
                 Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
-                        Mike.AVAILABLE, "contents " + i, 1);
+                        Mike.AVAILABLE, "contents " + i);
                 ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
                 if (i % 2 == 0) { // 일부 게시글만 bump
                     board.bump(baseTime.plusMinutes(i));
@@ -218,7 +218,7 @@ public class BoardServiceTest {
             // 게시글 15개 생성
             for (int i = 0; i < 15; i++) {
                 Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
-                        Mike.AVAILABLE, "contents " + i, 1);
+                        Mike.AVAILABLE, "contents " + i);
                 ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
                 if (i % 3 == 0) { // 일부 게시글만 bump
                     board.bump(baseTime.plusMinutes(i));
@@ -267,7 +267,7 @@ public class BoardServiceTest {
             // 게시글 5개 생성 (일부는 삭제 처리)
             for (int i = 0; i < 5; i++) {
                 Board board = Board.create(member, GameMode.ARAM, Position.ANY, Position.ANY, new ArrayList<>(),
-                        Mike.AVAILABLE, "contents " + i, 1);
+                        Mike.AVAILABLE, "contents " + i);
                 ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
                 if (i % 2 == 0) {
                     board.setDeleted(true);
@@ -303,7 +303,7 @@ public class BoardServiceTest {
             // 게시글 10개 생성
             for (int i = 0; i < 10; i++) {
                 Board board = Board.create(member, GameMode.SOLO, Position.TOP, Position.JUNGLE, new ArrayList<>(),
-                        Mike.AVAILABLE, "contents " + i, 1);
+                        Mike.AVAILABLE, "contents " + i);
                 ReflectionTestUtils.setField(board, "createdAt", baseTime.minusMinutes(i));
                 if (i % 2 == 0) {
                     board.bump(baseTime.plusMinutes(i));
@@ -339,7 +339,7 @@ public class BoardServiceTest {
             // 게시글 15개 생성 (모두 SOLO, TOP, JUNGLE, TIER.GOLD)
             for (int i = 0; i < 15; i++) {
                 Board board = Board.create(member, GameMode.SOLO, Position.TOP, Position.JUNGLE, new ArrayList<>(),
-                        Mike.AVAILABLE, "contents " + i, 1);
+                        Mike.AVAILABLE, "contents " + i);
                 LocalDateTime createdAt = baseTime.minusMinutes(i).minusSeconds(i);
                 ReflectionTestUtils.setField(board, "createdAt", createdAt);
                 if (i % 3 == 0) {
@@ -386,7 +386,7 @@ public class BoardServiceTest {
             // 게시글 15개 생성
             for (int i = 0; i < 15; i++) {
                 Board board = Board.create(member, GameMode.SOLO, Position.TOP, Position.JUNGLE, new ArrayList<>(),
-                        Mike.AVAILABLE, "contents " + i, 1);
+                        Mike.AVAILABLE, "contents " + i);
                 LocalDateTime createdAt = baseTime.minusMinutes(i).minusSeconds(i);
                 ReflectionTestUtils.setField(board, "createdAt", createdAt);
                 if (i % 3 == 0) {

@@ -47,9 +47,6 @@ public class BoardService {
                 throw new BoardException(ErrorCode.BOARD_CREATE_COOL_DOWN);
             }
         }
-        int boardProfileImage = (request.getBoardProfileImage() != null)
-                ? request.getBoardProfileImage()
-                : member.getProfileImage();
 
         Board board = Board.create(
                 member,
@@ -58,8 +55,7 @@ public class BoardService {
                 request.getSubP(),
                 request.getWantP(),
                 request.getMike(),
-                request.getContents(),
-                boardProfileImage
+                request.getContents()
         );
         return boardRepository.save(board);
     }
@@ -69,9 +65,6 @@ public class BoardService {
      */
     @Transactional
     public Board createAndSaveGuestBoard(BoardInsertRequest request, Member tmpMember, String password) {
-        int boardProfileImage = (request.getBoardProfileImage() != null)
-                ? request.getBoardProfileImage()
-                : tmpMember.getProfileImage();
 
         Board board = Board.createForGuest(
                 tmpMember,
@@ -81,7 +74,6 @@ public class BoardService {
                 request.getWantP(),
                 request.getMike(),
                 request.getContents(),
-                boardProfileImage,
                 password
         );
         return boardRepository.save(board);
@@ -141,8 +133,7 @@ public class BoardService {
                 request.getSubP(),
                 request.getWantP(),
                 request.getMike(),
-                request.getContents(),
-                request.getBoardProfileImage()
+                request.getContents()
         );
 
         return board;
@@ -249,8 +240,7 @@ public class BoardService {
                 request.getSubP(),
                 request.getWantP(),
                 request.getMike(),
-                request.getContents(),
-                request.getBoardProfileImage()
+                request.getContents()
         );
 
         return board;
