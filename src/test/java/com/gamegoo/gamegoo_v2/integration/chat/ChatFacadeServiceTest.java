@@ -1142,7 +1142,6 @@ class ChatFacadeServiceTest {
                 .wantP(List.of(Position.ADC))
                 .mike(Mike.AVAILABLE)
                 .content("content")
-                .boardProfileImage(1)
                 .build());
     }
 

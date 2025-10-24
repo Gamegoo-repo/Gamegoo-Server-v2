@@ -83,7 +83,6 @@ class BoardFacadeServiceBanTest {
                 .wantP(List.of(Position.ANY))
                 .mike(Mike.AVAILABLE)
                 .content("test content")
-                .boardProfileImage(1)
                 .build();
         ReflectionTestUtils.setField(board, "id", 1L);
     }
@@ -277,7 +276,6 @@ class BoardFacadeServiceBanTest {
                     .wantP(List.of(Position.ANY))
                     .mike(Mike.AVAILABLE)
                     .content("test content")
-                    .boardProfileImage(1)
                     .build();
             ReflectionTestUtils.setField(bumpedBoard, "id", 1L);
             ReflectionTestUtils.setField(bumpedBoard, "bumpTime", LocalDateTime.now());
@@ -359,7 +357,6 @@ class BoardFacadeServiceBanTest {
     // 헬퍼 메서드 - Request 생성
     private BoardInsertRequest createBoardInsertRequest() {
         BoardInsertRequest request = new BoardInsertRequest();
-        ReflectionTestUtils.setField(request, "boardProfileImage", 1);
         ReflectionTestUtils.setField(request, "gameMode", GameMode.SOLO);
         ReflectionTestUtils.setField(request, "mainP", Position.TOP);
         ReflectionTestUtils.setField(request, "subP", Position.JUNGLE);
@@ -372,7 +369,6 @@ class BoardFacadeServiceBanTest {
 
     private BoardUpdateRequest createBoardUpdateRequest() {
         BoardUpdateRequest request = new BoardUpdateRequest();
-        ReflectionTestUtils.setField(request, "boardProfileImage", 1);
         ReflectionTestUtils.setField(request, "gameMode", GameMode.SOLO);
         ReflectionTestUtils.setField(request, "mainP", Position.TOP);
         ReflectionTestUtils.setField(request, "subP", Position.JUNGLE);
