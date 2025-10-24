@@ -86,12 +86,14 @@ public class BoardService {
                                   Pageable pageable) {
         // Position.ANY인 경우 null로 처리하여 필터 조건 무시
         // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
-        List<Position> positionList = null;
+        List<Position> positions = new java.util.ArrayList<>();
         if (mainP != null && mainP != Position.ANY) {
-            positionList = List.of(mainP);
-        } else if (subP != null && subP != Position.ANY) {
-            positionList = List.of(subP);
+            positions.add(mainP);
         }
+        if (subP != null && subP != Position.ANY) {
+            positions.add(subP);
+        }
+        List<Position> positionList = positions.isEmpty() ? null : positions;
 
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
                 gameMode, tier, positionList, mike, pageable);
@@ -103,12 +105,14 @@ public class BoardService {
     public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike, int pageIdx) {
         // Position.ANY인 경우 null로 처리하여 필터 조건 무시
         // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
-        List<Position> positionList = null;
+        List<Position> positions = new java.util.ArrayList<>();
         if (mainP != Position.ANY) {
-            positionList = List.of(mainP);
-        } else if (subP != Position.ANY) {
-            positionList = List.of(subP);
+            positions.add(mainP);
         }
+        if (subP != Position.ANY) {
+            positions.add(subP);
+        }
+        List<Position> positionList = positions.isEmpty() ? null : positions;
 
         Pageable pageable = PageRequest.of(pageIdx - 1, 20, Sort.by("activityTime").descending());
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
@@ -290,12 +294,14 @@ public class BoardService {
 
         // null이나 Position.ANY인 경우 필터 조건 무시 (null로 처리)
         // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
-        List<Position> positionList = null;
+        List<Position> positions = new java.util.ArrayList<>();
         if (mainP != null && mainP != Position.ANY) {
-            positionList = List.of(mainP);
-        } else if (subP != null && subP != Position.ANY) {
-            positionList = List.of(subP);
+            positions.add(mainP);
         }
+        if (subP != null && subP != Position.ANY) {
+            positions.add(subP);
+        }
+        List<Position> positionList = positions.isEmpty() ? null : positions;
 
         return boardRepository.findAllBoardsWithCursor(cursor, cursorId, gameMode, tier, positionList, pageable);
     }
