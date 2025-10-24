@@ -26,21 +26,19 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "b.deleted = false AND " +
             "(:gameMode IS NULL OR b.gameMode = :gameMode) AND " +
             "(:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m.freeTier ELSE m.soloTier END) = :tier) AND " +
-            "(:mainPList IS NULL OR b.mainP IN :mainPList) AND " +
-            "(:subPList IS NULL OR b.subP IN :subPList) AND " +
+            "(:positionList IS NULL OR b.mainP IN :positionList OR b.subP IN :positionList) AND " +
             "(:mike IS NULL OR b.mike = :mike) " +
             "ORDER BY COALESCE(b.bumpTime, b.createdAt) DESC")
     Page<Board> findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
             @Param("gameMode") GameMode gameMode,
             @Param("tier") Tier tier,
-            @Param("mainPList") List<Position> mainPList,
-            @Param("subPList") List<Position> subPList,
+            @Param("positionList") List<Position> positionList,
             @Param("mike") Mike mike,
             Pageable pageable);
 
     Optional<Board> findByIdAndDeleted(Long boardId, boolean b);
 
-    Optional<Board> findTopByMemberIdOrderByCreatedAtDesc(Long memberId);
+    Optional<Board> findTopByMemberIdAndDeletedFalseOrderByCreatedAtDesc(Long memberId);
 
     Page<Board> findByMemberIdAndDeletedFalse(Long memberId, Pageable pageable);
 
@@ -63,16 +61,14 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
            ") " +
            "AND (:gameMode IS NULL OR b.gameMode = :gameMode) " +
            "AND (:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m.freeTier ELSE m.soloTier END) = :tier) " +
-           "AND (:mainPList IS NULL OR b.mainP IN :mainPList) " +
-           "AND (:subPList IS NULL OR b.subP IN :subPList) " +
+           "AND (:positionList IS NULL OR b.mainP IN :positionList OR b.subP IN :positionList) " +
            "ORDER BY COALESCE(b.bumpTime, b.createdAt) DESC, b.id DESC")
     Slice<Board> findAllBoardsWithCursor(
             @Param("activityTime") LocalDateTime activityTime,
             @Param("cursorId") Long cursorId,
             @Param("gameMode") GameMode gameMode,
             @Param("tier") Tier tier,
-            @Param("mainPList") List<Position> mainPList,
-            @Param("subPList") List<Position> subPList,
+            @Param("positionList") List<Position> positionList,
             Pageable pageable);
 
     @Modifying(clearAutomatically = true)

@@ -233,7 +233,6 @@ public class BoardControllerBanTest extends ControllerTestSupport {
     // 헬퍼 메서드
     private BoardInsertRequest createBoardInsertRequest() {
         BoardInsertRequest request = new BoardInsertRequest();
-        ReflectionTestUtils.setField(request, "boardProfileImage", 1);
         ReflectionTestUtils.setField(request, "gameMode", GameMode.SOLO);
         ReflectionTestUtils.setField(request, "mainP", Position.TOP);
         ReflectionTestUtils.setField(request, "subP", Position.JUNGLE);
@@ -246,7 +245,6 @@ public class BoardControllerBanTest extends ControllerTestSupport {
 
     private BoardUpdateRequest createBoardUpdateRequest() {
         BoardUpdateRequest request = new BoardUpdateRequest();
-        ReflectionTestUtils.setField(request, "boardProfileImage", 1);
         ReflectionTestUtils.setField(request, "gameMode", GameMode.SOLO);
         ReflectionTestUtils.setField(request, "mainP", Position.TOP);
         ReflectionTestUtils.setField(request, "subP", Position.JUNGLE);

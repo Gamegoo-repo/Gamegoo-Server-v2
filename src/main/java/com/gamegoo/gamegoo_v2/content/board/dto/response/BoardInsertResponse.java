@@ -79,7 +79,7 @@ public class BoardInsertResponse {
 
     public static BoardInsertResponse ofGuest(Board board) {
         Member tmpMember = board.getMember();
-        
+
         Tier tier;
         int rank;
         if (board.getGameMode() == GameMode.FREE) {
@@ -89,11 +89,11 @@ public class BoardInsertResponse {
             tier = tmpMember.getSoloTier();
             rank = tmpMember.getSoloRank();
         }
-        
+
         return BoardInsertResponse.builder()
                 .boardId(board.getId())
                 .memberId(null) // 게스트는 memberId null
-                .profileImage(board.getBoardProfileImage())
+                .profileImage(tmpMember.getProfileImage())
                 .gameName(tmpMember.getGameName())
                 .tag(tmpMember.getTag())
                 .tier(tier)

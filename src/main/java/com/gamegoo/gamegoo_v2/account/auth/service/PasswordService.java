@@ -47,4 +47,16 @@ public class PasswordService {
         }
     }
 
+    /**
+     * 비밀번호 원본 검증
+     *
+     * @param member
+     * @param rawPassword
+     */
+    public void verifyRawPassword(Member member, String rawPassword) {
+        if (!member.getPassword().equals(rawPassword)) {
+            throw new MemberException(ErrorCode.INVALID_PASSWORD);
+        }
+    }
+
 }

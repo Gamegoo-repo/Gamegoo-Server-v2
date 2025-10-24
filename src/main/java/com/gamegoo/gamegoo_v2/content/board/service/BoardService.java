@@ -19,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +37,7 @@ public class BoardService {
      */
     @Transactional
     public Board createAndSaveBoard(BoardInsertRequest request, Member member) {
-        Optional<Board> latestBoardOpt = boardRepository.findTopByMemberIdOrderByCreatedAtDesc(member.getId());
+        Optional<Board> latestBoardOpt = boardRepository.findTopByMemberIdAndDeletedFalseOrderByCreatedAtDesc(member.getId());
         if (latestBoardOpt.isPresent()) {
             Board latestBoard = latestBoardOpt.get();
             Duration diff = Duration.between(latestBoard.getCreatedAt(), LocalDateTime.now());
@@ -47,9 +45,6 @@ public class BoardService {
                 throw new BoardException(ErrorCode.BOARD_CREATE_COOL_DOWN);
             }
         }
-        int boardProfileImage = (request.getBoardProfileImage() != null)
-                ? request.getBoardProfileImage()
-                : member.getProfileImage();
 
         Board board = Board.create(
                 member,
@@ -58,8 +53,7 @@ public class BoardService {
                 request.getSubP(),
                 request.getWantP(),
                 request.getMike(),
-                request.getContents(),
-                boardProfileImage
+                request.getContents()
         );
         return boardRepository.save(board);
     }
@@ -69,9 +63,6 @@ public class BoardService {
      */
     @Transactional
     public Board createAndSaveGuestBoard(BoardInsertRequest request, Member tmpMember, String password) {
-        int boardProfileImage = (request.getBoardProfileImage() != null)
-                ? request.getBoardProfileImage()
-                : tmpMember.getProfileImage();
 
         Board board = Board.createForGuest(
                 tmpMember,
@@ -81,7 +72,6 @@ public class BoardService {
                 request.getWantP(),
                 request.getMike(),
                 request.getContents(),
-                boardProfileImage,
                 password
         );
         return boardRepository.save(board);
@@ -93,24 +83,39 @@ public class BoardService {
     public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike,
                                   Pageable pageable) {
         // Position.ANY인 경우 null로 처리하여 필터 조건 무시
-        List<Position> mainPList = (mainP == null || mainP == Position.ANY) ? null : List.of(mainP);
-        List<Position> subPList = (subP == null || subP == Position.ANY) ? null : List.of(subP);
+        // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
+        List<Position> positions = new java.util.ArrayList<>();
+        if (mainP != null && mainP != Position.ANY) {
+            positions.add(mainP);
+        }
+        if (subP != null && subP != Position.ANY) {
+            positions.add(subP);
+        }
+        List<Position> positionList = positions.isEmpty() ? null : positions;
 
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
-                gameMode, tier, mainPList, subPList, mike, pageable);
+                gameMode, tier, positionList, mike, pageable);
     }
 
     /**
      * 게시글 목록 조회 (페이징 처리)
      */
-    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike, int pageIdx) {
+    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike,
+                                               int pageIdx) {
         // Position.ANY인 경우 null로 처리하여 필터 조건 무시
-        List<Position> mainPList = (mainP == Position.ANY) ? null : List.of(mainP);
-        List<Position> subPList = (subP == Position.ANY) ? null : List.of(subP);
+        // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
+        List<Position> positions = new java.util.ArrayList<>();
+        if (mainP != Position.ANY) {
+            positions.add(mainP);
+        }
+        if (subP != Position.ANY) {
+            positions.add(subP);
+        }
+        List<Position> positionList = positions.isEmpty() ? null : positions;
 
         Pageable pageable = PageRequest.of(pageIdx - 1, 20, Sort.by("activityTime").descending());
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
-                gameMode, tier, mainPList, subPList, mike, pageable);
+                gameMode, tier, positionList, mike, pageable);
     }
 
     /**
@@ -141,8 +146,7 @@ public class BoardService {
                 request.getSubP(),
                 request.getWantP(),
                 request.getMike(),
-                request.getContents(),
-                request.getBoardProfileImage()
+                request.getContents()
         );
 
         return board;
@@ -191,6 +195,14 @@ public class BoardService {
     @Transactional
     public Board saveBoard(Board board) {
         return boardRepository.save(board);
+    }
+
+    /**
+     * 사용자의 최신 게시글 조회 (작성일 기준)
+     */
+    public Board findLatestBoardByMember(Long memberId) {
+        return boardRepository.findTopByMemberIdAndDeletedFalseOrderByCreatedAtDesc(memberId)
+                .orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     /**
@@ -249,8 +261,7 @@ public class BoardService {
                 request.getSubP(),
                 request.getWantP(),
                 request.getMike(),
-                request.getContents(),
-                request.getBoardProfileImage()
+                request.getContents()
         );
 
         return board;
@@ -289,10 +300,17 @@ public class BoardService {
         Pageable pageable = PageRequest.of(0, PAGE_SIZE);
 
         // null이나 Position.ANY인 경우 필터 조건 무시 (null로 처리)
-        List<Position> mainPList = (mainP == null || mainP == Position.ANY) ? null : List.of(mainP);
-        List<Position> subPList = (subP == null || subP == Position.ANY) ? null : List.of(subP);
+        // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
+        List<Position> positions = new java.util.ArrayList<>();
+        if (mainP != null && mainP != Position.ANY) {
+            positions.add(mainP);
+        }
+        if (subP != null && subP != Position.ANY) {
+            positions.add(subP);
+        }
+        List<Position> positionList = positions.isEmpty() ? null : positions;
 
-        return boardRepository.findAllBoardsWithCursor(cursor, cursorId, gameMode, tier, mainPList, subPList, pageable);
+        return boardRepository.findAllBoardsWithCursor(cursor, cursorId, gameMode, tier, positionList, pageable);
     }
 
 }
