@@ -28,6 +28,7 @@ import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
+import com.gamegoo.gamegoo_v2.core.common.validator.BanValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -89,6 +90,9 @@ class BoardFacadeServiceTest {
     @Mock
     private RiotRecordService riotRecordService;
 
+    @Mock
+    private BanValidator banValidator;
+
     @InjectMocks
     private BoardFacadeService boardFacadeService;
 
@@ -132,8 +136,7 @@ class BoardFacadeServiceTest {
                 position2,
                 Arrays.asList(Position.TOP, Position.MID),
                 mike,
-                "test content",
-                1
+                "test content"
         );
         ReflectionTestUtils.setField(board, "id", 1L);
         return board;
@@ -188,8 +191,7 @@ class BoardFacadeServiceTest {
                 Position.JUNGLE,
                 Arrays.asList(Position.TOP, Position.MID),
                 Mike.AVAILABLE,
-                "test content",
-                1
+                "test content"
         );
         ReflectionTestUtils.setField(board, "id", 1L);
 
@@ -244,7 +246,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(board, "id", 1L);
@@ -303,7 +304,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(board, "id", 1L);
@@ -356,7 +356,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(board1, "id", 1L);
@@ -370,7 +369,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(board2, "id", 2L);
@@ -424,7 +422,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(midBoard, "id", 1L);
@@ -438,7 +435,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(supportBoard, "id", 2L);
@@ -492,7 +488,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(topBoard, "id", 1L);
@@ -506,7 +501,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(jungleBoard, "id", 2L);
@@ -560,7 +554,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(adcBoard, "id", 1L);
@@ -574,7 +567,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(supportBoard, "id", 2L);
@@ -628,7 +620,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 1")
-                .boardProfileImage(1)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(topBoard, "id", 1L);
@@ -642,7 +633,6 @@ class BoardFacadeServiceTest {
                 .mike(mike)
                 .member(member)
                 .content("test content 2")
-                .boardProfileImage(2)
                 .deleted(false)
                 .build();
         ReflectionTestUtils.setField(adcBoard, "id", 2L);
@@ -789,7 +779,6 @@ class BoardFacadeServiceTest {
             ReflectionTestUtils.setField(request, "wantP", Arrays.asList(Position.TOP, Position.MID));
             ReflectionTestUtils.setField(request, "mike", Mike.AVAILABLE);
             ReflectionTestUtils.setField(request, "contents", "게스트 게시글 내용");
-            ReflectionTestUtils.setField(request, "boardProfileImage", 1);
             ReflectionTestUtils.setField(request, "gameStyles", Arrays.asList(1L, 2L));
             return request;
         }
@@ -802,7 +791,6 @@ class BoardFacadeServiceTest {
             ReflectionTestUtils.setField(request, "wantP", Arrays.asList(Position.TOP, Position.MID));
             ReflectionTestUtils.setField(request, "mike", Mike.AVAILABLE);
             ReflectionTestUtils.setField(request, "contents", "게스트 게시글 내용");
-            ReflectionTestUtils.setField(request, "boardProfileImage", 1);
             ReflectionTestUtils.setField(request, "gameStyles", Arrays.asList(1L, 2L));
             ReflectionTestUtils.setField(request, "gameName", gameName);
             ReflectionTestUtils.setField(request, "tag", tag);
@@ -828,7 +816,7 @@ class BoardFacadeServiceTest {
 
             Board guestBoard = Board.createForGuest(
                     tmpMember, request.getGameMode(), request.getMainP(), request.getSubP(),
-                    request.getWantP(), request.getMike(), request.getContents(), 1, password
+                    request.getWantP(), request.getMike(), request.getContents(), password
             );
             ReflectionTestUtils.setField(guestBoard, "id", 1L);
 
@@ -919,6 +907,73 @@ class BoardFacadeServiceTest {
             verify(profanityCheckService).validateProfanity(request.getContents());
             verify(boardService, never()).createAndSaveGuestBoard(any(), any(Member.class), anyString());
             verify(boardGameStyleService, never()).mapGameStylesToBoard(any(), any());
+        }
+    }
+
+    @Nested
+    @DisplayName("최신글 자동 끌올 테스트")
+    class BumpLatestBoardTest {
+
+        private Member member;
+        private Board latestBoard;
+
+        @BeforeEach
+        void setUp() {
+            member = createMember("test@test.com", "testUser");
+            latestBoard = createBoard(member, GameMode.SOLO, Position.TOP, Position.MID, Mike.AVAILABLE);
+            ReflectionTestUtils.setField(latestBoard, "id", 1L);
+        }
+
+        @Test
+        @DisplayName("최신글을 성공적으로 끌올한다")
+        void bumpLatestBoard_Success() {
+            // given
+            LocalDateTime bumpTime = LocalDateTime.now();
+            when(boardService.findLatestBoardByMember(member.getId())).thenReturn(latestBoard);
+            when(boardService.bumpBoard(latestBoard.getId(), member.getId())).thenReturn(latestBoard);
+            ReflectionTestUtils.setField(latestBoard, "bumpTime", bumpTime);
+
+            // when
+            var response = boardFacadeService.bumpLatestBoard(member);
+
+            // then
+            assertThat(response.getBoardId()).isEqualTo(1L);
+            assertThat(response.getBumpTime()).isEqualTo(bumpTime);
+            verify(boardService).findLatestBoardByMember(member.getId());
+            verify(boardService).bumpBoard(latestBoard.getId(), member.getId());
+        }
+
+        @Test
+        @DisplayName("작성한 게시글이 없으면 예외가 발생한다")
+        void bumpLatestBoard_NoBoardFound() {
+            // given
+            when(boardService.findLatestBoardByMember(member.getId()))
+                    .thenThrow(new BoardException(ErrorCode.BOARD_NOT_FOUND));
+
+            // when & then
+            assertThatThrownBy(() -> boardFacadeService.bumpLatestBoard(member))
+                    .isInstanceOf(BoardException.class)
+                    .hasFieldOrPropertyWithValue("code", ErrorCode.BOARD_NOT_FOUND.getCode());
+
+            verify(boardService).findLatestBoardByMember(member.getId());
+            verify(boardService, never()).bumpBoard(anyLong(), anyLong());
+        }
+
+        @Test
+        @DisplayName("5분 이내에 끌올하면 예외가 발생한다")
+        void bumpLatestBoard_TimeLimitError() {
+            // given
+            when(boardService.findLatestBoardByMember(member.getId())).thenReturn(latestBoard);
+            when(boardService.bumpBoard(latestBoard.getId(), member.getId()))
+                    .thenThrow(new BoardException(ErrorCode.BUMP_TIME_LIMIT));
+
+            // when & then
+            assertThatThrownBy(() -> boardFacadeService.bumpLatestBoard(member))
+                    .isInstanceOf(BoardException.class)
+                    .hasFieldOrPropertyWithValue("code", ErrorCode.BUMP_TIME_LIMIT.getCode());
+
+            verify(boardService).findLatestBoardByMember(member.getId());
+            verify(boardService).bumpBoard(latestBoard.getId(), member.getId());
         }
     }
 

@@ -207,7 +207,7 @@ public class BoardController {
      * 사용자가 "끌올" 버튼을 누르면 해당 게시글의 bumpTime이 업데이트되어 상단으로 노출됩니다.
      */
     @PostMapping("/{boardId}/bump")
-    @Operation(summary = "게시글 끌올 API", description = "게시글을 끌올하여 상단 노출시키는 API 입니다. 마지막 끌올 후 1시간 제한이 적용됩니다.")
+    @Operation(summary = "게시글 끌올 API", description = "게시글을 끌올하여 상단 노출시키는 API 입니다. 마지막 끌올 후 5분 제한이 적용됩니다.")
     @Parameter(name = "boardId", description = "끌올할 게시판 글 id 입니다.")
     @ApiErrorCodes({
             ErrorCode.MEMBER_BANNED_FROM_POSTING,
@@ -218,6 +218,25 @@ public class BoardController {
     public ApiResponse<BoardBumpResponse> bumpBoard(@PathVariable Long boardId,
                                                     @AuthMember Member member) {
         return ApiResponse.ok(boardFacadeService.bumpBoard(boardId, member));
+    }
+
+    /**
+     * 최신글 자동 끌올 API
+     * 사용자가 작성한 가장 최근 게시글을 자동으로 끌올합니다.
+     * boardId를 지정할 필요 없이 한 번의 호출로 끌올이 가능합니다.
+     */
+    @PostMapping("/my/latest/bump")
+    @Operation(
+        summary = "최신글 자동 끌올 API",
+        description = "사용자가 작성한 가장 최근 게시글을 자동으로 끌올하는 API 입니다. 마지막 끌올 후 5분 제한이 적용됩니다."
+    )
+    @ApiErrorCodes({
+            ErrorCode.MEMBER_BANNED_FROM_POSTING,
+            ErrorCode.BOARD_NOT_FOUND,
+            ErrorCode.BUMP_TIME_LIMIT
+    })
+    public ApiResponse<BoardBumpResponse> bumpLatestBoard(@AuthMember Member member) {
+        return ApiResponse.ok(boardFacadeService.bumpLatestBoard(member));
     }
 
     @GetMapping("/cursor")
@@ -272,7 +291,7 @@ public class BoardController {
             ErrorCode.GUEST_BOARD_ACCESS_DENIED,
             ErrorCode.INVALID_GUEST_PASSWORD
     })
-    public ApiResponse<String> deleteGuestBoard(@PathVariable Long boardId, 
+    public ApiResponse<String> deleteGuestBoard(@PathVariable Long boardId,
                                                @Valid @RequestBody GuestBoardDeleteRequest request) {
         boardFacadeService.deleteGuestBoard(boardId, request);
         return ApiResponse.ok("게시글을 삭제하였습니다.");

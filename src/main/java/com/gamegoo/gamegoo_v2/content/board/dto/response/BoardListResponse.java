@@ -39,8 +39,6 @@ public class BoardListResponse {
     private Mike mike;
     private String contents;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    private Integer boardProfileImage;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createdAt;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer profileImage;
@@ -103,7 +101,6 @@ public class BoardListResponse {
                 .wantP(board.getWantP())
                 .mike(board.getMike())
                 .contents(board.getContent())
-                .boardProfileImage(member.getProfileImage())
                 .createdAt(board.getCreatedAt())
                 .profileImage(member.getProfileImage())
                 .mannerLevel(member.getMannerLevel())
