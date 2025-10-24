@@ -157,8 +157,7 @@ class BoardRepositoryTest extends RepositoryTestSupport {
             Page<Board> result = boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
                     GameMode.SOLO,
                     Tier.GOLD,
-                    Arrays.asList(Position.TOP),
-                    Arrays.asList(Position.MID),
+                    Arrays.asList(Position.TOP),  // 주 포지션 또는 부 포지션이 TOP인 게시물
                     Mike.AVAILABLE,
                     PageRequest.of(0, 10)
             );
@@ -169,8 +168,8 @@ class BoardRepositoryTest extends RepositoryTestSupport {
                 .allSatisfy(board -> {
                     assertThat(board.getGameMode()).isEqualTo(GameMode.SOLO);
                     assertThat(board.getMember().getSoloTier()).isEqualTo(Tier.GOLD);
-                    assertThat(board.getMainP()).isEqualTo(Position.TOP);
-                    assertThat(board.getSubP()).isEqualTo(Position.MID);
+                    // 주 포지션 또는 부 포지션이 TOP이어야 함
+                    assertThat(board.getMainP() == Position.TOP || board.getSubP() == Position.TOP).isTrue();
                     assertThat(board.getMike()).isEqualTo(Mike.AVAILABLE);
                 });
         }
@@ -179,13 +178,12 @@ class BoardRepositoryTest extends RepositoryTestSupport {
         @DisplayName("여러 페이지에 걸친 게시글 조회")
         void findMultiplePages() {
             Position[] positions = {Position.TOP, Position.JUNGLE, Position.MID, Position.ADC, Position.SUP};
-            
+
             // when
             Page<Board> firstPage = boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
                     GameMode.SOLO,
                     null,
-                    Arrays.asList(positions),
-                    Arrays.asList(positions),
+                    Arrays.asList(positions),  // 주 포지션 또는 부 포지션이 이 중 하나인 게시물
                     null,
                     PageRequest.of(0, 10)
             );
@@ -193,8 +191,7 @@ class BoardRepositoryTest extends RepositoryTestSupport {
             Page<Board> secondPage = boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
                     GameMode.SOLO,
                     null,
-                    Arrays.asList(positions),
-                    Arrays.asList(positions),
+                    Arrays.asList(positions),  // 주 포지션 또는 부 포지션이 이 중 하나인 게시물
                     null,
                     PageRequest.of(1, 10)
             );
@@ -447,9 +444,8 @@ class BoardRepositoryTest extends RepositoryTestSupport {
             em.clear();
 
             Pageable pageable = PageRequest.of(0, 10);
-            List<Position> mainPList = List.of(Position.TOP);
-            List<Position> subPList = List.of(Position.MID);
-            Slice<Board> firstPage = boardRepository.findAllBoardsWithCursor(null, null, GameMode.SOLO, null, mainPList, subPList, pageable);
+            List<Position> positionList = List.of(Position.TOP);  // 주 포지션 또는 부 포지션이 TOP인 게시물
+            Slice<Board> firstPage = boardRepository.findAllBoardsWithCursor(null, null, GameMode.SOLO, null, positionList, pageable);
 
             // then
             assertThat(firstPage.getContent()).hasSize(10);
@@ -484,17 +480,16 @@ class BoardRepositoryTest extends RepositoryTestSupport {
             em.clear();
 
             Pageable pageable = PageRequest.of(0, 10);
-            List<Position> mainPList = List.of(Position.TOP);
-            List<Position> subPList = List.of(Position.MID);
+            List<Position> positionList = List.of(Position.TOP);  // 주 포지션 또는 부 포지션이 TOP인 게시물
             // 첫 페이지 조회
-            Slice<Board> firstPage = boardRepository.findAllBoardsWithCursor(null, null, GameMode.SOLO, null, mainPList, subPList, pageable);
+            Slice<Board> firstPage = boardRepository.findAllBoardsWithCursor(null, null, GameMode.SOLO, null, positionList, pageable);
             assertThat(firstPage.getContent()).hasSize(10);
             assertThat(firstPage.hasNext()).isTrue();
             // 두 번째 페이지 조회
             Board lastBoard = firstPage.getContent().get(firstPage.getContent().size() - 1);
             LocalDateTime cursorTime = lastBoard.getActivityTime();
             Long cursorId = lastBoard.getId();
-            Slice<Board> result = boardRepository.findAllBoardsWithCursor(cursorTime, cursorId, GameMode.SOLO, null, mainPList, subPList, pageable);
+            Slice<Board> result = boardRepository.findAllBoardsWithCursor(cursorTime, cursorId, GameMode.SOLO, null, positionList, pageable);
 
             // then
             assertThat(result.getContent()).hasSize(5);  // SOLO 게시물 중 남은 5개

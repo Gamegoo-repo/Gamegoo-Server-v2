@@ -85,11 +85,16 @@ public class BoardService {
     public Page<Board> findBoards(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike,
                                   Pageable pageable) {
         // Position.ANY인 경우 null로 처리하여 필터 조건 무시
-        List<Position> mainPList = (mainP == null || mainP == Position.ANY) ? null : List.of(mainP);
-        List<Position> subPList = (subP == null || subP == Position.ANY) ? null : List.of(subP);
+        // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
+        List<Position> positionList = null;
+        if (mainP != null && mainP != Position.ANY) {
+            positionList = List.of(mainP);
+        } else if (subP != null && subP != Position.ANY) {
+            positionList = List.of(subP);
+        }
 
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
-                gameMode, tier, mainPList, subPList, mike, pageable);
+                gameMode, tier, positionList, mike, pageable);
     }
 
     /**
@@ -97,12 +102,17 @@ public class BoardService {
      */
     public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike, int pageIdx) {
         // Position.ANY인 경우 null로 처리하여 필터 조건 무시
-        List<Position> mainPList = (mainP == Position.ANY) ? null : List.of(mainP);
-        List<Position> subPList = (subP == Position.ANY) ? null : List.of(subP);
+        // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
+        List<Position> positionList = null;
+        if (mainP != Position.ANY) {
+            positionList = List.of(mainP);
+        } else if (subP != Position.ANY) {
+            positionList = List.of(subP);
+        }
 
         Pageable pageable = PageRequest.of(pageIdx - 1, 20, Sort.by("activityTime").descending());
         return boardRepository.findByGameModeAndTierAndMainPInAndSubPInAndMikeAndDeletedFalse(
-                gameMode, tier, mainPList, subPList, mike, pageable);
+                gameMode, tier, positionList, mike, pageable);
     }
 
     /**
@@ -279,10 +289,15 @@ public class BoardService {
         Pageable pageable = PageRequest.of(0, PAGE_SIZE);
 
         // null이나 Position.ANY인 경우 필터 조건 무시 (null로 처리)
-        List<Position> mainPList = (mainP == null || mainP == Position.ANY) ? null : List.of(mainP);
-        List<Position> subPList = (subP == null || subP == Position.ANY) ? null : List.of(subP);
+        // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
+        List<Position> positionList = null;
+        if (mainP != null && mainP != Position.ANY) {
+            positionList = List.of(mainP);
+        } else if (subP != null && subP != Position.ANY) {
+            positionList = List.of(subP);
+        }
 
-        return boardRepository.findAllBoardsWithCursor(cursor, cursorId, gameMode, tier, mainPList, subPList, pageable);
+        return boardRepository.findAllBoardsWithCursor(cursor, cursorId, gameMode, tier, positionList, pageable);
     }
 
 }
