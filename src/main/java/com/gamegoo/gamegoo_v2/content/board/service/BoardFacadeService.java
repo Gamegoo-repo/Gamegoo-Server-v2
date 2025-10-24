@@ -85,16 +85,16 @@ public class BoardFacadeService {
         String puuid = riotAuthService.getPuuid(gameName, tag);
         List<TierDetails> tiers = null;
         RiotRecordService.Recent30GameStatsResponse recentStats = null;
-        
+
         if (puuid != null) {
             tiers = riotInfoService.getTierWinrateRank(puuid);
             recentStats = riotRecordService.getRecent30GameStats(gameName, puuid);
-            
+
         }
 
         // 임시 멤버 생성 또는 재사용
         Member tmpMember = memberService.getOrCreateTmpMember(gameName, tag, tiers);
-        
+
         // MemberChampion 처리 (임시 멤버에게 최신 챔피언 통계 추가/업데이트)
         if (puuid != null) {
             List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
@@ -102,7 +102,7 @@ public class BoardFacadeService {
                 memberChampionService.saveMemberChampions(tmpMember, preferChampionStats);
             }
         }
-        
+
         // MemberRecentStats 항상 최신 데이터로 업데이트
         MemberRecentStats existingStats = tmpMember.getMemberRecentStats();
         if (existingStats != null) {
@@ -276,7 +276,7 @@ public class BoardFacadeService {
     /**
      * 게시글 끌올(bump) 기능 (파사드)
      * 사용자가 "끌올" 버튼을 누르면 해당 게시글의 bumpTime을 업데이트합니다.
-     * 단, 마지막 끌올 후 1시간이 지나지 않았다면 예외를 발생시킵니다.
+     * 단, 마지막 끌올 후 5분이 지나지 않았다면 예외를 발생시킵니다.
      */
 
     @Transactional
@@ -285,6 +285,23 @@ public class BoardFacadeService {
         banValidator.throwIfBannedFromPosting(member);
 
         Board board = boardService.bumpBoard(boardId, member.getId());
+        return BoardBumpResponse.of(board.getId(), board.getBumpTime());
+    }
+
+    /**
+     * 최신글 자동 끌올 기능
+     * 사용자가 작성한 가장 최근 게시글을 자동으로 끌올합니다.
+     */
+    @Transactional
+    public BoardBumpResponse bumpLatestBoard(Member member) {
+        // 게시글 작성 제재 검증
+        banValidator.throwIfBannedFromPosting(member);
+
+        // 최신 게시글 조회
+        Board latestBoard = boardService.findLatestBoardByMember(member.getId());
+
+        // 끌올 처리
+        Board board = boardService.bumpBoard(latestBoard.getId(), member.getId());
         return BoardBumpResponse.of(board.getId(), board.getBumpTime());
     }
 

@@ -421,6 +421,76 @@ public class BoardServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("최신글 조회 테스트")
+    class FindLatestBoardTest {
+
+        @Test
+        @DisplayName("회원이 작성한 최신 게시글을 조회한다")
+        void findLatestBoardByMember_Success() {
+            // given
+            Member member = createMember("latest@test.com", "latestUser");
+
+            // 여러 게시글 생성 (시간 차이를 두고)
+            Board oldBoard = Board.create(member, GameMode.SOLO, Position.TOP, Position.JUNGLE,
+                    new ArrayList<>(), Mike.AVAILABLE, "old content");
+            ReflectionTestUtils.setField(oldBoard, "createdAt", LocalDateTime.now().minusHours(2));
+            boardRepository.save(oldBoard);
+
+            Board latestBoard = Board.create(member, GameMode.SOLO, Position.MID, Position.ADC,
+                    new ArrayList<>(), Mike.AVAILABLE, "latest content");
+            ReflectionTestUtils.setField(latestBoard, "createdAt", LocalDateTime.now());
+            boardRepository.save(latestBoard);
+
+            // when
+            Board result = boardService.findLatestBoardByMember(member.getId());
+
+            // then
+            assertThat(result.getId()).isEqualTo(latestBoard.getId());
+            assertThat(result.getContent()).isEqualTo("latest content");
+        }
+
+        @Test
+        @DisplayName("작성한 게시글이 없으면 예외가 발생한다")
+        void findLatestBoardByMember_NoBoardFound() {
+            // given
+            Member member = createMember("noboard@test.com", "noBoardUser");
+
+            // when & then
+            assertThatThrownBy(() -> boardService.findLatestBoardByMember(member.getId()))
+                    .isInstanceOf(BoardException.class)
+                    .hasFieldOrPropertyWithValue("code", ErrorCode.BOARD_NOT_FOUND.getCode());
+        }
+
+        @Test
+        @DisplayName("삭제된 게시글은 제외하고 최신글을 조회한다")
+        void findLatestBoardByMember_ExcludeDeletedBoards() {
+            // given
+            Member member = createMember("deleted@test.com", "deletedUser");
+
+            // 최신 게시글을 삭제 상태로 생성
+            Board deletedBoard = Board.create(member, GameMode.SOLO, Position.TOP, Position.JUNGLE,
+                    new ArrayList<>(), Mike.AVAILABLE, "deleted content");
+            ReflectionTestUtils.setField(deletedBoard, "createdAt", LocalDateTime.now());
+            deletedBoard.setDeleted(true);
+            boardRepository.save(deletedBoard);
+
+            // 이전 게시글 (삭제되지 않음)
+            Board activeBoard = Board.create(member, GameMode.SOLO, Position.MID, Position.ADC,
+                    new ArrayList<>(), Mike.AVAILABLE, "active content");
+            ReflectionTestUtils.setField(activeBoard, "createdAt", LocalDateTime.now().minusHours(1));
+            boardRepository.save(activeBoard);
+
+            // when
+            Board result = boardService.findLatestBoardByMember(member.getId());
+
+            // then
+            assertThat(result.getId()).isEqualTo(activeBoard.getId());
+            assertThat(result.getContent()).isEqualTo("active content");
+            assertThat(result.isDeleted()).isFalse();
+        }
+    }
+
     private Member createMember(String email, String gameName) {
         Member member = Member.builder()
                 .email(email)

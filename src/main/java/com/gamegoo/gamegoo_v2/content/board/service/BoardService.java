@@ -39,7 +39,7 @@ public class BoardService {
      */
     @Transactional
     public Board createAndSaveBoard(BoardInsertRequest request, Member member) {
-        Optional<Board> latestBoardOpt = boardRepository.findTopByMemberIdOrderByCreatedAtDesc(member.getId());
+        Optional<Board> latestBoardOpt = boardRepository.findTopByMemberIdAndDeletedFalseOrderByCreatedAtDesc(member.getId());
         if (latestBoardOpt.isPresent()) {
             Board latestBoard = latestBoardOpt.get();
             Duration diff = Duration.between(latestBoard.getCreatedAt(), LocalDateTime.now());
@@ -196,6 +196,14 @@ public class BoardService {
     @Transactional
     public Board saveBoard(Board board) {
         return boardRepository.save(board);
+    }
+
+    /**
+     * 사용자의 최신 게시글 조회 (작성일 기준)
+     */
+    public Board findLatestBoardByMember(Long memberId) {
+        return boardRepository.findTopByMemberIdAndDeletedFalseOrderByCreatedAtDesc(memberId)
+                .orElseThrow(() -> new BoardException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     /**
