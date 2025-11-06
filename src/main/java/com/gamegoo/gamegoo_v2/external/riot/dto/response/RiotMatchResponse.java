@@ -26,6 +26,8 @@ public class RiotMatchResponse {
         private int gameDuration;
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         private int queueId;
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        private long gameCreation; // 게임 시작 시각 (Unix timestamp in milliseconds)
 
     }
 

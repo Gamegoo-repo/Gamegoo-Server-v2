@@ -10,6 +10,7 @@ import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChampionStatsRefreshService {
 
     private final RiotAuthService riotAuthService;
@@ -36,15 +38,26 @@ public class ChampionStatsRefreshService {
 
         String gameName = freshMember.getGameName();
         String tag = freshMember.getTag();
-        String puuid = freshMember.getPuuid() != null ? freshMember.getPuuid() : riotAuthService.getPuuid(gameName, tag);
+
+        log.info("[전적 갱신 시작] memberId: {}, gameName: {}, tag: {}, DB PUUID: {}",
+                 freshMember.getId(), gameName, tag, freshMember.getPuuid());
 
         try {
-            // 먼저 새로운 데이터 조회
+            // 먼저 gameName + tag로 최신 PUUID 조회
+            String puuid = riotAuthService.getPuuid(gameName, tag);
+            log.info("[전적 갱신] 최신 PUUID 조회: {}", puuid);
+
+            // 계정 정보 조회
             var accountInfo = riotAuthService.getAccountByPuuid(puuid);
-            
-            // 최적화된 한 번의 API 호출로 모든 모드 통계 조회
-            var allModeStats = riotRecordService.getAllModeStatsOptimized(gameName, puuid);
-            
+
+            // ===== 증분 업데이트 적용 =====
+            // 1. 신규 매치만 Riot API 호출 및 DB 저장 (최적화!)
+            int newMatchCount = riotRecordService.fetchAndSaveNewMatches(freshMember, gameName, puuid);
+
+            // 2. DB에서 최근 30개 매치 기반 통계 계산 (Riot API 호출 없음!)
+            var allModeStats = riotRecordService.getAllModeStatsFromDB(freshMember);
+            // =============================
+
             // 프로필용 통합 데이터 (솔로+자유만)
             var recStats = allModeStats.getCombinedStats();
             List<ChampionStats> preferChampionStats = allModeStats.getCombinedChampionStats().values().stream()

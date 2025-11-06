@@ -1,7 +1,10 @@
 package com.gamegoo.gamegoo_v2.external.riot.service;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
+import com.gamegoo.gamegoo_v2.external.riot.domain.GameMatch;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotMatchResponse;
+import com.gamegoo.gamegoo_v2.external.riot.repository.GameMatchRepository;
 import com.gamegoo.gamegoo_v2.utils.ChampionIdStore;
 import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import lombok.Getter;
 import lombok.Builder;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +37,7 @@ public class RiotRecordService {
 
     private final RestTemplate restTemplate;
     private final RiotApiHelper riotApiHelper;
+    private final GameMatchRepository gameMatchRepository;
 
     @Value("${spring.riot.api.key}")
     private String riotAPIKey;
@@ -42,7 +49,7 @@ public class RiotRecordService {
 
     private static final int INITIAL_MATCH_COUNT = 30;
     private static final int MAX_CHAMPIONS_REQUIRED = 4;
-    
+
     // 큐 ID 상수
     private static final int QUEUE_ID_SOLO_RANK = 420;
     private static final int QUEUE_ID_FREE_RANK = 440;
@@ -168,9 +175,11 @@ public class RiotRecordService {
      */
     private List<String> fetchMatchIds(String puuid, int start, int count) {
         String url = String.format(MATCH_IDS_URL_TEMPLATE, puuid, start, count, riotAPIKey);
+        log.info("[Riot API 호출] fetchMatchIds - puuid: {}, start: {}, count: {}", puuid, start, count);
         try {
             // Riot API로부터 매칭 ID 리스트 가져오기
             String[] matchIds = restTemplate.getForObject(url, String[].class);
+            log.info("[Riot API 응답] fetchMatchIds - 조회된 매치 수: {}", matchIds != null ? matchIds.length : 0);
             return Arrays.asList(Objects.requireNonNull(matchIds));
         } catch (Exception e) {
             riotApiHelper.handleApiError(e);
@@ -187,6 +196,7 @@ public class RiotRecordService {
      */
     private Optional<ChampionStats> fetchChampionStatsFromMatch(String matchId, String gameName) {
         String url = String.format(MATCH_INFO_URL_TEMPLATE, matchId, riotAPIKey);
+        log.info("[Riot API 호출] fetchChampionStatsFromMatch - matchId: {}", matchId);
 
         try {
             // Riot API로부터 매칭 정보를 가져오기
@@ -338,7 +348,7 @@ public class RiotRecordService {
     public static class AllModeStatsResponse {
         private Recent30GameStatsResponse combinedStats;  // 프로필용 (솔로+자유)
         private Recent30GameStatsResponse soloStats;      // 솔로 전용
-        private Recent30GameStatsResponse freeStats;      // 자유 전용  
+        private Recent30GameStatsResponse freeStats;      // 자유 전용
         private Recent30GameStatsResponse aramStats;      // 칼바람 전용
         private Map<Long, ChampionStats> combinedChampionStats;  // 프로필용 챔피언 통계
         private Map<Long, ChampionStats> soloChampionStats;      // 솔로 챔피언 통계
@@ -354,7 +364,7 @@ public class RiotRecordService {
                 .orElseGet(Collections::emptyList);
 
         AllModeStatsCollector collector = new AllModeStatsCollector();
-        
+
         // 한 번의 루프로 모든 매치 데이터 처리
         for (String matchId : matchIds) {
             Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, gameName);
@@ -384,7 +394,7 @@ public class RiotRecordService {
 
         public void processChampionStats(ChampionStats stats) {
             int queueId = stats.getQueueId();
-            
+
             // 챔피언 통계 업데이트
             if (ChampionIdStore.contains(stats.getChampionId())) {
                 updateChampionStatsByMode(stats, queueId);
@@ -401,7 +411,7 @@ public class RiotRecordService {
                 case QUEUE_ID_FREE_RANK -> freeChampionStats.merge(stats.getChampionId(), stats, this::mergeChampionStats);
                 case QUEUE_ID_ARAM -> aramChampionStats.merge(stats.getChampionId(), stats, this::mergeChampionStats);
             }
-            
+
             // 프로필용 통합 챔피언 통계 (솔로+자유만)
             if (queueId == QUEUE_ID_SOLO_RANK || queueId == QUEUE_ID_FREE_RANK) {
                 combinedChampionStats.merge(stats.getChampionId(), stats, this::mergeChampionStats);
@@ -442,13 +452,13 @@ public class RiotRecordService {
         }
 
         public AllModeStatsResponse buildResponse() {
-            Recent30GameStatsResponse combinedStats = buildStatsResponse(totalWins[0], totalLosses[0], 
+            Recent30GameStatsResponse combinedStats = buildStatsResponse(totalWins[0], totalLosses[0],
                     totalKills[0], totalDeaths[0], totalAssists[0], totalCs[0], totalCsPerMinute[0], totalGames[0]);
-            Recent30GameStatsResponse soloStats = buildStatsResponse(totalWins[1], totalLosses[1], 
+            Recent30GameStatsResponse soloStats = buildStatsResponse(totalWins[1], totalLosses[1],
                     totalKills[1], totalDeaths[1], totalAssists[1], totalCs[1], totalCsPerMinute[1], totalGames[1]);
-            Recent30GameStatsResponse freeStats = buildStatsResponse(totalWins[2], totalLosses[2], 
+            Recent30GameStatsResponse freeStats = buildStatsResponse(totalWins[2], totalLosses[2],
                     totalKills[2], totalDeaths[2], totalAssists[2], totalCs[2], totalCsPerMinute[2], totalGames[2]);
-            Recent30GameStatsResponse aramStats = buildStatsResponse(totalWins[3], totalLosses[3], 
+            Recent30GameStatsResponse aramStats = buildStatsResponse(totalWins[3], totalLosses[3],
                     totalKills[3], totalDeaths[3], totalAssists[3], totalCs[3], totalCsPerMinute[3], totalGames[3]);
 
             return AllModeStatsResponse.builder()
@@ -464,13 +474,13 @@ public class RiotRecordService {
         }
     }
 
-    private Recent30GameStatsResponse buildStatsResponse(int totalWins, int totalLosses, int totalKills, 
-                                                        int totalDeaths, int totalAssists, int totalCs, 
+    private Recent30GameStatsResponse buildStatsResponse(int totalWins, int totalLosses, int totalKills,
+                                                        int totalDeaths, int totalAssists, int totalCs,
                                                         double totalCsPerMinute, int totalGames) {
         double recWinRate = totalGames > 0 ? (double) totalWins / totalGames * 100 : 0.0;
         double recAvgKDA = totalGames > 0 ? (double) (totalKills + totalAssists) / Math.max(1, totalDeaths) : 0.0;
         double recAvgCsPerMinute = totalGames > 0 ? totalCsPerMinute / totalGames : 0.0;
-        
+
         return Recent30GameStatsResponse.builder()
                 .recTotalWins(totalWins)
                 .recTotalLosses(totalLosses)
@@ -482,6 +492,192 @@ public class RiotRecordService {
                 .recAvgCsPerMinute(recAvgCsPerMinute)
                 .recTotalCs((totalWins + totalLosses) > 0 ? totalCs / (totalWins + totalLosses) : 0)
                 .build();
+    }
+
+    // ===========================
+    // 증분 업데이트 (DB 캐싱) 로직
+    // ===========================
+
+    /**
+     * 신규 매치만 Riot API 호출 및 DB 저장 (증분 업데이트)
+     *
+     * <p>핵심 최적화 로직:</p>
+     * <ol>
+     *   <li>Riot API로 최신 30개 matchId 조회</li>
+     *   <li>matchId를 순회하며 DB에 이미 있는지 확인</li>
+     *   <li>이미 있으면 BREAK (이후 매치는 모두 저장되어 있음)</li>
+     *   <li>없으면 Riot API 호출 → GameMatch 엔티티 생성 → DB 저장</li>
+     * </ol>
+     *
+     * <p>성능 개선 효과:</p>
+     * <ul>
+     *   <li>일반 사용자 (하루 5게임): 30번 → 5번 API 호출 (83% 감소)</li>
+     *   <li>활동적 사용자 (하루 10게임): 30번 → 10번 API 호출 (66% 감소)</li>
+     * </ul>
+     *
+     * @param member   사용자
+     * @param gameName 게임 닉네임
+     * @param puuid    Riot PUUID
+     * @return 저장된 신규 매치 개수
+     */
+    @Transactional
+    public int fetchAndSaveNewMatches(Member member, String gameName, String puuid) {
+        // 1. Riot API로 최신 30개 matchId 조회
+        List<String> matchIds = Optional.ofNullable(fetchMatchIds(puuid, 0, INITIAL_MATCH_COUNT))
+                .orElseGet(Collections::emptyList);
+
+        int savedCount = 0;
+
+        // 2. matchId를 순회하며 증분 업데이트
+        for (String matchId : matchIds) {
+            // 2-1. DB에 이미 저장된 매치인지 확인
+            if (gameMatchRepository.existsByMemberAndMatchId(member, matchId)) {
+                // ✅ 이미 저장되어 있음 → 이후 매치도 모두 저장되어 있음 → BREAK
+                log.info("[증분 업데이트] matchId={} 이미 저장되어 있음. API 호출 중단. 총 {}개 신규 매치 저장됨", matchId, savedCount);
+                break;
+            }
+
+            // 2-2. 신규 매치 → Riot API 호출하여 상세 정보 조회
+            Optional<GameMatchData> matchDataOpt = fetchGameMatchData(matchId, gameName);
+            if (matchDataOpt.isEmpty()) {
+                log.warn("[증분 업데이트] matchId={} 조회 실패. 스킵", matchId);
+                continue;
+            }
+
+            // 2-3. GameMatch 엔티티 생성 및 저장
+            GameMatchData matchData = matchDataOpt.get();
+            GameMatch gameMatch = GameMatch.builder()
+                    .member(member)
+                    .matchId(matchId)
+                    .puuid(puuid)
+                    .gameName(gameName)
+                    .championId(matchData.championId)
+                    .queueId(matchData.queueId)
+                    .kills(matchData.kills)
+                    .deaths(matchData.deaths)
+                    .assists(matchData.assists)
+                    .totalMinionsKilled(matchData.totalMinionsKilled)
+                    .win(matchData.win)
+                    .gameDuration(matchData.gameDuration)
+                    .gameStartedAt(matchData.gameStartedAt)
+                    .build();
+
+            try {
+                gameMatchRepository.save(gameMatch);
+                savedCount++;
+                log.debug("[증분 업데이트] matchId={} 저장 완료", matchId);
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                // 동시 요청으로 다른 스레드가 이미 저장한 경우 (UNIQUE 제약 위반)
+                log.info("[증분 업데이트] matchId={} 이미 다른 요청에서 저장됨. 스킵", matchId);
+                // 중복 저장 실패는 무시하고 계속 진행
+            }
+        }
+
+        log.info("[증분 업데이트] 총 {}개의 신규 매치 저장됨", savedCount);
+        return savedCount;
+    }
+
+    /**
+     * GameMatch 데이터를 담는 내부 DTO
+     */
+    @Getter
+    @Builder
+    private static class GameMatchData {
+        private Long championId;
+        private Integer queueId;
+        private Integer kills;
+        private Integer deaths;
+        private Integer assists;
+        private Integer totalMinionsKilled;
+        private Boolean win;
+        private Integer gameDuration;
+        private LocalDateTime gameStartedAt;
+    }
+
+    /**
+     * Riot API로 단일 매치의 상세 정보 조회 (GameMatch 저장용)
+     *
+     * @param matchId  매치 ID
+     * @param gameName 게임 닉네임
+     * @return GameMatch 데이터
+     */
+    private Optional<GameMatchData> fetchGameMatchData(String matchId, String gameName) {
+        String url = String.format(MATCH_INFO_URL_TEMPLATE, matchId, riotAPIKey);
+        log.info("[Riot API 호출] fetchGameMatchData - matchId: {} (증분 업데이트)", matchId);
+
+        try {
+            RiotMatchResponse response = restTemplate.getForObject(url, RiotMatchResponse.class);
+            if (response == null || response.getInfo() == null || response.getInfo().getParticipants() == null) {
+                return Optional.empty();
+            }
+
+            int queueId = response.getInfo().getQueueId();
+            // 솔로 랭크, 자유 랭크, 칼바람만 저장
+            if (queueId != QUEUE_ID_SOLO_RANK && queueId != QUEUE_ID_FREE_RANK && queueId != QUEUE_ID_ARAM) {
+                return Optional.empty();
+            }
+
+            int gameDuration = response.getInfo().getGameDuration();
+            if (gameDuration <= 0) {
+                gameDuration = 1800; // 기본값 30분
+            }
+
+            // 게임 시작 시각 변환 (Unix timestamp → LocalDateTime)
+            long gameCreation = response.getInfo().getGameCreation();
+            LocalDateTime gameStartedAt = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(gameCreation),
+                    ZoneId.systemDefault()
+            );
+
+            final int finalGameDuration = gameDuration;
+
+            return response.getInfo().getParticipants().stream()
+                    .filter(participant -> gameName.equals(participant.getRiotIdGameName()))
+                    .findFirst()
+                    .map(participant -> {
+                        int totalCs = Math.max(0, participant.getTotalMinionsKilled() + participant.getNeutralMinionsKilled());
+                        return GameMatchData.builder()
+                                .championId(participant.getChampionId())
+                                .queueId(queueId)
+                                .kills(participant.getKills())
+                                .deaths(participant.getDeaths())
+                                .assists(participant.getAssists())
+                                .totalMinionsKilled(totalCs)
+                                .win(participant.isWin())
+                                .gameDuration(finalGameDuration)
+                                .gameStartedAt(gameStartedAt)
+                                .build();
+                    });
+
+        } catch (Exception e) {
+            riotApiHelper.handleApiError(e);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * DB에서 최근 30개 매치 조회 후 모든 모드별 통계 계산
+     *
+     * <p>기존 getAllModeStatsOptimized와 동일한 응답 형식</p>
+     * <p>단, Riot API 대신 DB 조회 사용</p>
+     *
+     * @param member 사용자
+     * @return 모든 모드별 통계
+     */
+    public AllModeStatsResponse getAllModeStatsFromDB(Member member) {
+        // 1. DB에서 최근 30개 매치 조회
+        List<GameMatch> recentMatches = gameMatchRepository.findTop30ByMemberOrderByGameStartedAtDesc(member);
+
+        // 2. GameMatch → ChampionStats 변환
+        List<ChampionStats> championStatsList = recentMatches.stream()
+                .map(GameMatch::toChampionStats)
+                .collect(Collectors.toList());
+
+        // 3. 기존 collector 로직 재사용
+        AllModeStatsCollector collector = new AllModeStatsCollector();
+        championStatsList.forEach(collector::processChampionStats);
+
+        return collector.buildResponse();
     }
 
 }
