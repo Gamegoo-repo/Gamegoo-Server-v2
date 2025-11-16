@@ -8,7 +8,9 @@ import com.gamegoo.gamegoo_v2.account.email.domain.EmailVerifyRecord;
 import com.gamegoo.gamegoo_v2.account.email.repository.EmailVerifyRecordRepository;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.utils.PasswordUtil;
 import org.junit.jupiter.api.AfterEach;
@@ -18,11 +20,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 class PasswordFacadeServiceTest {
 
     @Autowired
@@ -30,6 +34,9 @@ class PasswordFacadeServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private MemberRecentStatsRepository memberRecentStatsRepository;
 
     @Autowired
     private EmailVerifyRecordRepository emailVerifyRecordRepository;
@@ -51,11 +58,6 @@ class PasswordFacadeServiceTest {
         createEmailVerifyRecord(EMAIL, VERIFY_CODE);
     }
 
-    @AfterEach
-    void tearDown() {
-        memberRepository.deleteAllInBatch();
-        emailVerifyRecordRepository.deleteAllInBatch();
-    }
 
     @DisplayName("jwt 토큰 없을때 비밀번호 변경 성공")
     @Test
@@ -131,7 +133,7 @@ class PasswordFacadeServiceTest {
     }
 
     private Member createMember(String email, String gameName, String password) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password(password)
                 .profileImage(1)
@@ -147,7 +149,17 @@ class PasswordFacadeServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
-                .build());
+                .build();
+
+        memberRepository.save(member);
+
+        // MemberRecentStats 빈 껍데기 생성 (optional = false 제약 조건 만족)
+        MemberRecentStats memberRecentStats = MemberRecentStats.builder()
+                .member(member)
+                .build();
+        memberRecentStatsRepository.save(memberRecentStats);
+
+        return member;
     }
 
     private void createEmailVerifyRecord(String email, String verifyCode) {

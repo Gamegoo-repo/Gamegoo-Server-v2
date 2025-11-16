@@ -3,9 +3,11 @@ package com.gamegoo.gamegoo_v2.account.member.service;
 import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Mike;
 import com.gamegoo.gamegoo_v2.account.member.domain.Position;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
@@ -26,6 +28,7 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final MemberRecentStatsRepository memberRecentStatsRepository;
 
     @PersistenceContext
     EntityManager em;
@@ -68,6 +71,13 @@ public class MemberService {
         );
 
         memberRepository.save(member);
+
+        // MemberRecentStats 빈 껍데기 생성 (optional = false 제약 조건 만족)
+        MemberRecentStats memberRecentStats = MemberRecentStats.builder()
+                .member(member)
+                .build();
+        memberRecentStatsRepository.save(memberRecentStats);
+
         return member;
     }
 
