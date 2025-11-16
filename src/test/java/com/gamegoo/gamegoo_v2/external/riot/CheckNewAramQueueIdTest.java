@@ -2,19 +2,21 @@ package com.gamegoo.gamegoo_v2.external.riot;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * 장진형#KR1 계정의 최근 게임에서 새로운 칼바람 모드의 queueId를 확인하는 테스트
  */
 public class CheckNewAramQueueIdTest {
 
-    // 환경변수에서 API 키 읽기
-    private final String riotAPIKey = System.getenv("RIOT_API") != null ?
-            System.getenv("RIOT_API") : "RGAPI-c6fe3faa-8427-41e7-913c-e43799393e40";
+    // 환경변수에서 API 키 읽기 (필수)
+    private final String riotAPIKey = System.getenv("RIOT_API");
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -22,6 +24,14 @@ public class CheckNewAramQueueIdTest {
     private static final String ACCOUNT_BY_RIOT_ID_URL = "https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s?api_key=%s";
     private static final String MATCH_IDS_URL = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?start=%s&count=%s&api_key=%s";
     private static final String MATCH_INFO_URL = "https://asia.api.riotgames.com/lol/match/v5/matches/%s?api_key=%s";
+
+    @BeforeEach
+    public void setUp() {
+        // RIOT_API 환경변수가 설정되어 있지 않으면 테스트 스킵
+        assumeTrue(riotAPIKey != null && !riotAPIKey.isEmpty(),
+                "RIOT_API 환경변수가 설정되지 않아 테스트를 스킵합니다. " +
+                "테스트를 실행하려면 'export RIOT_API=your-api-key'를 설정하세요.");
+    }
 
     @Test
     public void checkNewAramQueueId() throws Exception {

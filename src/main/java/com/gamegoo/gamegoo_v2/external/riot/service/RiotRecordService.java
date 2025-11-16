@@ -626,7 +626,7 @@ public class RiotRecordService {
             long gameCreation = response.getInfo().getGameCreation();
             LocalDateTime gameStartedAt = LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(gameCreation),
-                    ZoneId.systemDefault()
+                    ZoneId.of("UTC")
             );
 
             final int finalGameDuration = gameDuration;
