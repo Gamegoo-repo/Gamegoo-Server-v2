@@ -37,6 +37,8 @@ public class RiotMatchResponse {
     public static class ParticipantDTO {
 
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        private String puuid;
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         private String riotIdGameName;
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         private String gameMode;

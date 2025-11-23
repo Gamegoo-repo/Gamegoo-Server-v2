@@ -122,7 +122,7 @@ public class RiotRecordService {
                 .orElseGet(Collections::emptyList);
 
         for (String matchId : matchIds) {
-            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, gameName);
+            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, puuid);
             championStatsOpt.ifPresent(stats -> {
                 if (ChampionIdStore.contains(stats.getChampionId())) {
                     championStatsMap.merge(stats.getChampionId(), stats, (oldStats, newStats) -> {
@@ -151,7 +151,7 @@ public class RiotRecordService {
                 .orElseGet(Collections::emptyList);
 
         for (String matchId : matchIds) {
-            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, gameName);
+            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, puuid);
             championStatsOpt.ifPresent(stats -> {
                 // 특정 큐 ID의 게임만 포함
                 if (stats.getQueueId() == targetQueueId && ChampionIdStore.contains(stats.getChampionId())) {
@@ -191,10 +191,10 @@ public class RiotRecordService {
      * Riot API를 호출하여 매칭 ID로부터 특정 사용자의 챔피언 ID를 가져오는 메서드
      *
      * @param matchId  매칭 ID
-     * @param gameName 소환사명
+     * @param puuid    사용자의 Riot PUUID
      * @return 챔피언 ID
      */
-    private Optional<ChampionStats> fetchChampionStatsFromMatch(String matchId, String gameName) {
+    private Optional<ChampionStats> fetchChampionStatsFromMatch(String matchId, String puuid) {
         String url = String.format(MATCH_INFO_URL_TEMPLATE, matchId, riotAPIKey);
         log.info("[Riot API 호출] fetchChampionStatsFromMatch - matchId: {}", matchId);
 
@@ -220,7 +220,7 @@ public class RiotRecordService {
             final int finalGameDuration = gameDuration;
 
             return response.getInfo().getParticipants().stream()
-                    .filter(participant -> gameName.equals(participant.getRiotIdGameName()))
+                    .filter(participant -> puuid.equals(participant.getPuuid()))
                     .findFirst()
                     .map(participant -> {
                         ChampionStats stats = new ChampionStats(participant.getChampionId(), participant.isWin());
@@ -256,7 +256,7 @@ public class RiotRecordService {
         int totalGames = 0;
 
         for (String matchId : matchIds) {
-            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, gameName);
+            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, puuid);
             if (championStatsOpt.isPresent()) {
                 ChampionStats stats = championStatsOpt.get();
                 // 특정 큐 ID의 게임만 포함
@@ -305,7 +305,7 @@ public class RiotRecordService {
         int totalGames = 0;
 
         for (String matchId : matchIds) {
-            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, gameName);
+            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, puuid);
             if (championStatsOpt.isPresent()) {
                 ChampionStats stats = championStatsOpt.get();
                 // 프로필용: 솔로와 자유만 포함, 칼바람 제외
@@ -367,7 +367,7 @@ public class RiotRecordService {
 
         // 한 번의 루프로 모든 매치 데이터 처리
         for (String matchId : matchIds) {
-            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, gameName);
+            Optional<ChampionStats> championStatsOpt = fetchChampionStatsFromMatch(matchId, puuid);
             championStatsOpt.ifPresent(collector::processChampionStats);
         }
 
@@ -538,7 +538,7 @@ public class RiotRecordService {
             }
 
             // 2-2. 신규 매치 → Riot API 호출하여 상세 정보 조회
-            Optional<GameMatchData> matchDataOpt = fetchGameMatchData(matchId, gameName);
+            Optional<GameMatchData> matchDataOpt = fetchGameMatchData(matchId, puuid);
             if (matchDataOpt.isEmpty()) {
                 log.warn("[증분 업데이트] matchId={} 조회 실패. 스킵", matchId);
                 continue;
@@ -598,10 +598,10 @@ public class RiotRecordService {
      * Riot API로 단일 매치의 상세 정보 조회 (GameMatch 저장용)
      *
      * @param matchId  매치 ID
-     * @param gameName 게임 닉네임
+     * @param puuid    사용자의 Riot PUUID
      * @return GameMatch 데이터
      */
-    private Optional<GameMatchData> fetchGameMatchData(String matchId, String gameName) {
+    private Optional<GameMatchData> fetchGameMatchData(String matchId, String puuid) {
         String url = String.format(MATCH_INFO_URL_TEMPLATE, matchId, riotAPIKey);
         log.info("[Riot API 호출] fetchGameMatchData - matchId: {} (증분 업데이트)", matchId);
 
@@ -632,7 +632,7 @@ public class RiotRecordService {
             final int finalGameDuration = gameDuration;
 
             return response.getInfo().getParticipants().stream()
-                    .filter(participant -> gameName.equals(participant.getRiotIdGameName()))
+                    .filter(participant -> puuid.equals(participant.getPuuid()))
                     .findFirst()
                     .map(participant -> {
                         int totalCs = Math.max(0, participant.getTotalMinionsKilled() + participant.getNeutralMinionsKilled());

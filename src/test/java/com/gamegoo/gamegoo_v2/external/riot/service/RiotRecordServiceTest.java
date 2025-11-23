@@ -51,6 +51,7 @@ class RiotRecordServiceTest {
 
         // 매치 상세 정보 응답 (한 번만 반환)
         RiotMatchResponse.ParticipantDTO participant = RiotMatchResponse.ParticipantDTO.builder()
+                .puuid(puuid)
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(true)
@@ -101,6 +102,7 @@ class RiotRecordServiceTest {
                 .thenReturn(new String[]{});
 
         RiotMatchResponse.ParticipantDTO participant = RiotMatchResponse.ParticipantDTO.builder()
+                .puuid(puuid)
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(true)
@@ -152,6 +154,7 @@ class RiotRecordServiceTest {
 
         // 첫 번째 게임
         RiotMatchResponse.ParticipantDTO participant1 = RiotMatchResponse.ParticipantDTO.builder()
+                .puuid(puuid)
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(true)
@@ -174,6 +177,7 @@ class RiotRecordServiceTest {
 
         // 두 번째 게임
         RiotMatchResponse.ParticipantDTO participant2 = RiotMatchResponse.ParticipantDTO.builder()
+                .puuid(puuid)
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(true)
@@ -298,6 +302,7 @@ class RiotRecordServiceTest {
 
     private RiotMatchResponse.ParticipantDTO createParticipant(String gameName, int kills, int deaths, int assists, boolean win) {
         return RiotMatchResponse.ParticipantDTO.builder()
+                .puuid("test-puuid")
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(win)
