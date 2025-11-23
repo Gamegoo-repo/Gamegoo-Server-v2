@@ -41,7 +41,7 @@ springdoc:
 jwt:
   secret: ${JWT_SECRET}
   access_expiration_time: 600000 # 10분 (10 * 60 * 1000 밀리초)
-  refresh_expiration_day: 5 # 2주
+  refresh_expiration_day: 5 # 5일
 
 socket:
   server:
