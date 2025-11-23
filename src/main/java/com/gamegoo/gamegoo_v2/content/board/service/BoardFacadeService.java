@@ -10,6 +10,7 @@ import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.Recent30GameStatsResponse;
 import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
@@ -84,11 +85,11 @@ public class BoardFacadeService {
         // 라이엇 API 호출하여 puuid 및 티어 정보 가져오기
         String puuid = riotAuthService.getPuuid(gameName, tag);
         List<TierDetails> tiers = null;
-        RiotRecordService.Recent30GameStatsResponse recentStats = null;
+        Recent30GameStatsResponse recentStats = null;
 
         if (puuid != null) {
             tiers = riotInfoService.getTierWinrateRank(puuid);
-            recentStats = riotRecordService.getRecent30GameStats(gameName, puuid);
+            recentStats = riotRecordService.getRecent30GameStats(puuid);
 
         }
 
@@ -97,7 +98,7 @@ public class BoardFacadeService {
 
         // MemberChampion 처리 (임시 멤버에게 최신 챔피언 통계 추가/업데이트)
         if (puuid != null) {
-            List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
+            List<ChampionStats> preferChampionStats = riotRecordService.getPreferChampionfromMatch(puuid);
             if (preferChampionStats != null && !preferChampionStats.isEmpty()) {
                 memberChampionService.saveMemberChampions(tmpMember, preferChampionStats);
             }

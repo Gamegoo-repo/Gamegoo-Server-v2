@@ -2,7 +2,7 @@ package com.gamegoo.gamegoo_v2.external.riot.service;
 
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotMatchResponse;
-import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService.Recent30GameStatsResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.Recent30GameStatsResponse;
 import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -76,7 +76,7 @@ class RiotRecordServiceTest {
                 .thenReturn(matchResponse);
 
         // when
-        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
+        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(puuid);
 
         // then
         assertThat(result).isNotEmpty();
@@ -127,7 +127,7 @@ class RiotRecordServiceTest {
                 .thenReturn(matchResponse);
 
         // when
-        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
+        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(puuid);
 
         // then
         assertThat(result).isNotEmpty();
@@ -203,7 +203,7 @@ class RiotRecordServiceTest {
                 .thenReturn(match2);
 
         // when
-        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
+        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(puuid);
 
         // then
         assertThat(result).isNotEmpty();
@@ -245,7 +245,7 @@ class RiotRecordServiceTest {
                 .thenReturn(match3);
 
         // when
-        Recent30GameStatsResponse result = riotRecordService.getRecent30GameStats(gameName, puuid);
+        Recent30GameStatsResponse result = riotRecordService.getRecent30GameStats(puuid);
 
         // then
         assertThat(result).isNotNull();
@@ -288,7 +288,7 @@ class RiotRecordServiceTest {
                 .thenReturn(match2);
 
         // when
-        Recent30GameStatsResponse result = riotRecordService.getRecent30GameStats(gameName, puuid);
+        Recent30GameStatsResponse result = riotRecordService.getRecent30GameStats(puuid);
 
         // then
         assertThat(result).isNotNull();

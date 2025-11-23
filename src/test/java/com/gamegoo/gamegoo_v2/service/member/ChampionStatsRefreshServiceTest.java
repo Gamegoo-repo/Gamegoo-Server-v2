@@ -10,6 +10,8 @@ import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotPuuidGameNameResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.Recent30GameStatsResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.AllModeStatsResponse;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotAuthService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotInfoService;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService;
@@ -67,8 +69,8 @@ class ChampionStatsRefreshServiceTest {
     private Member testMemberWithPuuid;
     private Member testMemberWithoutPuuid;
     private List<ChampionStats> mockChampionStats;
-    private RiotRecordService.Recent30GameStatsResponse mockRecentStats;
-    private RiotRecordService.AllModeStatsResponse mockAllModeStats;
+    private Recent30GameStatsResponse mockRecentStats;
+    private AllModeStatsResponse mockAllModeStats;
     private MemberRecentStats mockMemberRecentStats;
     private List<TierDetails> mockTierDetails;
     private RiotPuuidGameNameResponse mockAccountInfo;
@@ -96,7 +98,7 @@ class ChampionStatsRefreshServiceTest {
         );
 
         // Mock Recent30GameStatsResponse
-        mockRecentStats = RiotRecordService.Recent30GameStatsResponse.builder()
+        mockRecentStats = Recent30GameStatsResponse.builder()
                 .recTotalWins(18)
                 .recTotalLosses(12)
                 .recWinRate(60.0)
@@ -146,7 +148,7 @@ class ChampionStatsRefreshServiceTest {
             soloChampionStats.put(stats.getChampionId(), stats);
         });
 
-        mockAllModeStats = RiotRecordService.AllModeStatsResponse.builder()
+        mockAllModeStats = AllModeStatsResponse.builder()
                 .combinedStats(mockRecentStats)
                 .soloStats(mockRecentStats)
                 .freeStats(mockRecentStats)
@@ -184,11 +186,10 @@ class ChampionStatsRefreshServiceTest {
         // Then
         verify(memberService).findMemberById(1L);
         verify(riotAuthService).getPuuid("TestUser", "KR1"); // 항상 최신 PUUID 조회
-        verify(riotAuthService).getAccountByPuuid("test-puuid-123");
         verify(riotRecordService).fetchAndSaveNewMatches(testMemberWithPuuid, "TestUser", "test-puuid-123");
         verify(riotRecordService).getAllModeStatsFromDB(testMemberWithPuuid); // DB 기반 조회
         verify(riotInfoService).getTierWinrateRank("test-puuid-123");
-        verify(testMemberWithPuuid).updateRiotBasicInfo("UpdatedGameName", "UpdatedTag");
+        verify(testMemberWithPuuid).updateRiotBasicInfo("TestUser", "KR1");
         verify(testMemberWithPuuid).updateRiotStats(mockTierDetails);
         verify(memberChampionRepository).deleteByMember(testMemberWithPuuid);
         verify(memberChampionService).saveMemberChampions(eq(testMemberWithPuuid), anyList());
@@ -224,11 +225,10 @@ class ChampionStatsRefreshServiceTest {
         // Then
         verify(memberService).findMemberById(2L);
         verify(riotAuthService).getPuuid("TestUser2", "KR1");
-        verify(riotAuthService).getAccountByPuuid("fetched-puuid-123");
         verify(riotRecordService).fetchAndSaveNewMatches(testMemberWithoutPuuid, "TestUser2", "fetched-puuid-123");
         verify(riotRecordService).getAllModeStatsFromDB(testMemberWithoutPuuid);
         verify(riotInfoService).getTierWinrateRank("fetched-puuid-123");
-        verify(testMemberWithoutPuuid).updateRiotBasicInfo("UpdatedGameName", "UpdatedTag");
+        verify(testMemberWithoutPuuid).updateRiotBasicInfo("TestUser2", "KR1");
         verify(testMemberWithoutPuuid).updateRiotStats(mockTierDetails);
         verify(memberChampionRepository).deleteByMember(testMemberWithoutPuuid);
         verify(memberChampionService).saveMemberChampions(eq(testMemberWithoutPuuid), anyList());
@@ -264,11 +264,10 @@ class ChampionStatsRefreshServiceTest {
         // Then
         verify(memberService).findMemberById(1L);
         verify(riotAuthService).getPuuid("TestUser", "KR1");
-        verify(riotAuthService).getAccountByPuuid("test-puuid-123");
         verify(riotRecordService).fetchAndSaveNewMatches(testMemberWithPuuid, "TestUser", "test-puuid-123");
         verify(riotRecordService).getAllModeStatsFromDB(testMemberWithPuuid);
         verify(riotInfoService).getTierWinrateRank("test-puuid-123");
-        verify(testMemberWithPuuid).updateRiotBasicInfo("UpdatedGameName", "UpdatedTag");
+        verify(testMemberWithPuuid).updateRiotBasicInfo("TestUser", "KR1");
         verify(testMemberWithPuuid).updateRiotStats(mockTierDetails);
         verify(memberChampionRepository).deleteByMember(testMemberWithPuuid);
         verify(memberChampionService).saveMemberChampions(eq(testMemberWithPuuid), anyList());

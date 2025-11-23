@@ -1,5 +1,7 @@
 package com.gamegoo.gamegoo_v2.external.riot.domain;
 
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotMatchResponse;
+
 /**
  * 챔피언별 승/패 통계를 저장하는 클래스
  */
@@ -30,6 +32,27 @@ public class ChampionStats {
         this.kills = 0;
         this.deaths = 0;
         this.assists = 0;
+    }
+
+    /**
+     * RiotMatchResponse.ParticipantDTO로부터 ChampionStats 생성
+     *
+     * @param participant Riot API 응답의 참가자 정보
+     * @param queueId     큐 ID
+     * @param gameDuration 게임 시간(초)
+     * @return ChampionStats 객체
+     */
+    public static ChampionStats from(RiotMatchResponse.ParticipantDTO participant,
+                                      int queueId, int gameDuration) {
+        ChampionStats stats = new ChampionStats(participant.getChampionId(), participant.isWin());
+        stats.setGameTime(gameDuration);
+        stats.setQueueId(queueId);
+        int totalCs = Math.max(0, participant.getTotalMinionsKilled() + participant.getNeutralMinionsKilled());
+        stats.setTotalMinionsKilled(totalCs);
+        stats.setKills(participant.getKills());
+        stats.setDeaths(participant.getDeaths());
+        stats.setAssists(participant.getAssists());
+        return stats;
     }
 
     /**

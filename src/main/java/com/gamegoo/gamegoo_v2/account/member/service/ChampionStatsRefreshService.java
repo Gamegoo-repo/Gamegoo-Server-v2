@@ -43,20 +43,14 @@ public class ChampionStatsRefreshService {
                  freshMember.getId(), gameName, tag, freshMember.getPuuid());
 
         try {
-            // 먼저 gameName + tag로 최신 PUUID 조회
+            // gameName + tag로 최신 PUUID 조회
             String puuid = riotAuthService.getPuuid(gameName, tag);
-            log.info("[전적 갱신] 최신 PUUID 조회: {}", puuid);
 
-            // 계정 정보 조회
-            var accountInfo = riotAuthService.getAccountByPuuid(puuid);
+            // 1. 신규 매치만 Riot API 호출 및 DB 저장
+            riotRecordService.fetchAndSaveNewMatches(freshMember, gameName, puuid);
 
-            // ===== 증분 업데이트 적용 =====
-            // 1. 신규 매치만 Riot API 호출 및 DB 저장 (최적화!)
-            int newMatchCount = riotRecordService.fetchAndSaveNewMatches(freshMember, gameName, puuid);
-
-            // 2. DB에서 최근 30개 매치 기반 통계 계산 (Riot API 호출 없음!)
+            // 2. DB에서 최근 30개 매치 기반 통계 계산
             var allModeStats = riotRecordService.getAllModeStatsFromDB(freshMember);
-            // =============================
 
             // 프로필용 통합 데이터 (솔로+자유만)
             var recStats = allModeStats.getCombinedStats();
@@ -65,44 +59,44 @@ public class ChampionStatsRefreshService {
                     .sorted(Comparator.comparingInt(ChampionStats::getGames).reversed())
                     .limit(4)
                     .collect(Collectors.toList());
-            
+
             // 모드별 분리 데이터 (게시판용)
             var soloRecStats = allModeStats.getSoloStats();
             var freeRecStats = allModeStats.getFreeStats();
             var aramRecStats = allModeStats.getAramStats();
-            
+
             List<ChampionStats> soloChampionStats = allModeStats.getSoloChampionStats().values().stream()
                     .filter(stats -> stats.getGames() > 0)
                     .sorted(Comparator.comparingInt(ChampionStats::getGames).reversed())
                     .limit(4)
                     .collect(Collectors.toList());
-            
+
             List<ChampionStats> freeChampionStats = allModeStats.getFreeChampionStats().values().stream()
                     .filter(stats -> stats.getGames() > 0)
                     .sorted(Comparator.comparingInt(ChampionStats::getGames).reversed())
                     .limit(4)
                     .collect(Collectors.toList());
-            
+
             List<ChampionStats> aramChampionStats = allModeStats.getAramChampionStats().values().stream()
                     .filter(stats -> stats.getGames() > 0)
                     .sorted(Comparator.comparingInt(ChampionStats::getGames).reversed())
                     .limit(4)
                     .collect(Collectors.toList());
-            
+
             List<TierDetails> tierWinrateRank = riotInfoService.getTierWinrateRank(puuid);
 
             // API 호출이 성공한 경우에만 기존 데이터 삭제 후 새로 저장
             memberChampionRepository.deleteByMember(freshMember);
-            
+
             // 1. 먼저 프로필용 통합 챔피언 통계 저장 (솔랭+자유 플레이한 챔피언만)
             memberChampionService.saveMemberChampions(freshMember, preferChampionStats);
-            
+
             // 2. 그 다음 모든 모드별 챔피언들을 저장하고 모드별 통계 추가
             memberChampionService.saveMemberChampionsByMode(freshMember, soloChampionStats, freeChampionStats, aramChampionStats);
-            
-            freshMember.updateRiotBasicInfo(accountInfo.getGameName(), accountInfo.getTagLine());
+
+            freshMember.updateRiotBasicInfo(gameName, tag);
             freshMember.updateRiotStats(tierWinrateRank);
-            
+
             // 칼바람 승률 업데이트
             freshMember.updateAramWinRate(aramRecStats.getRecWinRate());
 
@@ -112,7 +106,7 @@ public class ChampionStatsRefreshService {
             // 최근 30게임 통계 계산 및 저장
             MemberRecentStats memberRecentStats = memberRecentStatsRepository.findById(memberId)
                     .orElse(MemberRecentStats.builder().member(freshMember).build());
-            
+
             // 기존 통합 통계 업데이트 (프로필용)
             memberRecentStats.update(
                     recStats.getRecTotalWins(),
@@ -125,7 +119,7 @@ public class ChampionStatsRefreshService {
                     recStats.getRecAvgCsPerMinute(),
                     recStats.getRecTotalCs()
             );
-            
+
             // 모드별 통계 업데이트 (게시판용)
             memberRecentStats.updateSoloStats(
                     soloRecStats.getRecTotalWins(),
@@ -138,7 +132,7 @@ public class ChampionStatsRefreshService {
                     soloRecStats.getRecAvgCsPerMinute(),
                     soloRecStats.getRecTotalCs()
             );
-            
+
             memberRecentStats.updateFreeStats(
                     freeRecStats.getRecTotalWins(),
                     freeRecStats.getRecTotalLosses(),
@@ -150,7 +144,7 @@ public class ChampionStatsRefreshService {
                     freeRecStats.getRecAvgCsPerMinute(),
                     freeRecStats.getRecTotalCs()
             );
-            
+
             memberRecentStats.updateAramStats(
                     aramRecStats.getRecTotalWins(),
                     aramRecStats.getRecTotalLosses(),
@@ -162,7 +156,7 @@ public class ChampionStatsRefreshService {
                     aramRecStats.getRecAvgCsPerMinute(),
                     aramRecStats.getRecTotalCs()
             );
-            
+
             memberRecentStatsRepository.save(memberRecentStats);
         } catch (Exception e) {
             // API 호출 실패 시 예외 던지기
