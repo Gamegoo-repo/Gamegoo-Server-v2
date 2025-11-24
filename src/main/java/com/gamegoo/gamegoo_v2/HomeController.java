@@ -85,7 +85,7 @@ public class HomeController {
     })
     public ApiResponse<String> refreshStats(@PathVariable Long memberId) {
         Member member = memberService.findMemberById(memberId);
-        championStatsRefreshService.refreshChampionStats(member);
+        championStatsRefreshService.refreshChampionStats(memberId);
         return ApiResponse.ok("UPDATED");
     }
 

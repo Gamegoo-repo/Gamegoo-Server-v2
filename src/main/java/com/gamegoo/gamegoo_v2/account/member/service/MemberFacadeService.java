@@ -127,12 +127,11 @@ public class MemberFacadeService {
      */
     @Transactional
     public MyProfileResponse refreshChampionStats(Member requestMember, Long targetMemberId) {
-        Member targetMember = (targetMemberId != null)
-                ? memberService.findMemberById(targetMemberId)
-                : requestMember;
+        Long actualTargetId = (targetMemberId != null) ? targetMemberId : requestMember.getId();
+        Member targetMember = memberService.findMemberById(actualTargetId);
 
         validateCanRefresh(targetMember);
-        championStatsRefreshService.refreshChampionStats(targetMember);
+        championStatsRefreshService.refreshChampionStats(actualTargetId);
         return MyProfileResponse.of(targetMember);
     }
 

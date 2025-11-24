@@ -384,4 +384,8 @@ public class Member extends BaseDateTimeEntity {
     public void updateAramWinRate(double aramWinRate) {
         this.aramWinRate = aramWinRate;
     }
+
+    public void updatePuuid(String puuid){
+        this.puuid = puuid;
+    }
 }

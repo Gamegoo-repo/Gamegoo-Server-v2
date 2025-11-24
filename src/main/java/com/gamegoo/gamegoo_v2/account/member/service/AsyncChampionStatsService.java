@@ -25,8 +25,7 @@ public class AsyncChampionStatsService {
     @Transactional
     public void refreshChampionStatsAsync(Long memberId) {
         try {
-            Member member = memberService.findMemberById(memberId);
-            championStatsRefreshService.refreshChampionStats(member);
+            championStatsRefreshService.refreshChampionStats(memberId);
         } catch (RuntimeException e) {
             log.warn("비동기 챔피언 통계 갱신에 실패했습니다. memberId: {}", memberId, e);
         }
