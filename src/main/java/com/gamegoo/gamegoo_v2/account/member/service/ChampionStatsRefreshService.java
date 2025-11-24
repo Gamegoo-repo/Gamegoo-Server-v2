@@ -44,6 +44,9 @@ public class ChampionStatsRefreshService {
             String puuid = freshMember.getPuuid();
             if (puuid == null) {
                 puuid = riotAuthService.getPuuid(gameName, tag);
+                if(puuid == null){
+                    return;
+                }
                 freshMember.updatePuuid(puuid);
             }
 
