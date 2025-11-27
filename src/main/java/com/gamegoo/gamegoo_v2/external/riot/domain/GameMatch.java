@@ -21,20 +21,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Riot API로부터 가져온 개별 매치 데이터를 저장하는 엔티티
- *
- * <p>주요 목적:</p>
- * <ul>
- *   <li>Riot API 호출 횟수 최소화 (증분 업데이트)</li>
- *   <li>이미 저장된 매치는 재조회하지 않음</li>
- *   <li>최근 30개 매치 기반 통계 계산</li>
- * </ul>
- *
- * <p>제약 조건:</p>
- * <ul>
- *   <li>유니크 제약: (member_id, match_id) - 중복 저장 방지</li>
- *   <li>인덱스: (member_id, game_started_at DESC) - 최근 매치 빠른 조회</li>
- * </ul>
+ * Riot API 매치 데이터 캐싱 엔티티
+ * 증분 업데이트 및 통계 계산에 사용
  */
 @Entity
 @Getter
