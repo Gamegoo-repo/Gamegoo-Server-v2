@@ -138,7 +138,6 @@ public class ChampionStats {
      *
      * @return 분당 CS
      */
-
     public double getCsPerMinute() {
         if (gameTime > 0) {
             return totalMinionsKilled / (gameTime / 60.0);

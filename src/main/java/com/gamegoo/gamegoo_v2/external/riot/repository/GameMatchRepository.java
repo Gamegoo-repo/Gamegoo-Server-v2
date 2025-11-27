@@ -6,9 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-/**
- * GameMatch 엔티티에 대한 Repository
- */
 public interface GameMatchRepository extends JpaRepository<GameMatch, Long> {
 
     /**

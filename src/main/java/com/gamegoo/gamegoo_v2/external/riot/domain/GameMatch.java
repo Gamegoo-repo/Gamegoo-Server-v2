@@ -20,10 +20,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * Riot API 매치 데이터 캐싱 엔티티
- * 증분 업데이트 및 통계 계산에 사용
- */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,34 +45,19 @@ public class GameMatch extends BaseDateTimeEntity {
     @Column(name = "game_match_id")
     private Long id;
 
-    /**
-     * 매치를 플레이한 사용자
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    /**
-     * Riot API의 매치 고유 ID (예: "KR_1234567890")
-     */
     @Column(name = "match_id", nullable = false, length = 50)
     private String matchId;
 
-    /**
-     * 사용자의 Riot PUUID
-     */
     @Column(nullable = false, length = 200)
     private String puuid;
 
-    /**
-     * 사용자의 게임 닉네임 (Riot ID Game Name)
-     */
     @Column(name = "game_name", nullable = false, length = 50)
     private String gameName;
 
-    /**
-     * 플레이한 챔피언 ID
-     */
     @Column(name = "champion_id", nullable = false)
     private Long championId;
 
@@ -86,46 +67,24 @@ public class GameMatch extends BaseDateTimeEntity {
     @Column(name = "queue_id", nullable = false)
     private Integer queueId;
 
-    /**
-     * 킬 수
-     */
     @Column(nullable = false)
     private Integer kills;
 
-    /**
-     * 데스 수
-     */
     @Column(nullable = false)
     private Integer deaths;
 
-    /**
-     * 어시스트 수
-     */
     @Column(nullable = false)
     private Integer assists;
 
-    /**
-     * 총 CS (미니언 + 정글 몹)
-     */
     @Column(name = "total_minions_killed", nullable = false)
     private Integer totalMinionsKilled;
 
-    /**
-     * 승리 여부
-     */
     @Column(nullable = false)
     private Boolean win;
 
-    /**
-     * 게임 시간 (초 단위)
-     */
     @Column(name = "game_duration", nullable = false)
     private Integer gameDuration;
 
-    /**
-     * 게임이 시작된 시각 (Riot API 기준)
-     * - 최근 30개 매치를 조회할 때 이 필드로 정렬
-     */
     @Column(name = "game_started_at", nullable = false)
     private LocalDateTime gameStartedAt;
 
