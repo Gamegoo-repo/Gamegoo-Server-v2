@@ -7,11 +7,9 @@ import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberChampionService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.account.member.service.AsyncChampionStatsService;
-import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotJoinResponse;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import com.gamegoo.gamegoo_v2.core.exception.AuthException;
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.domain.RSOState;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
@@ -26,8 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.INACTIVE_MEMBER;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +40,6 @@ public class RiotFacadeService {
     private final JwtProvider jwtProvider;
     private final OAuthRedirectBuilder oAuthRedirectBuilder;
     private final BanService banService;
-    private final MemberValidator memberValidator;
     private final AsyncChampionStatsService asyncChampionStatsService;
 
     /**
@@ -113,15 +108,22 @@ public class RiotFacadeService {
      */
     @Transactional
     public String processOAuthCallback(String code, String state) {
-        // 토큰 교환
-        RiotAuthTokenResponse riotAuthTokenResponse = riotOAuthService.exchangeCodeForTokens(code);
-
-        // id_token 파싱 → Riot 사용자 정보 추출
-        RiotAccountIdResponse summonerInfo = riotOAuthService.getSummonerInfo(riotAuthTokenResponse.getAccessToken());
-
         // 리다이렉트 URL 결정
         RSOState decodedRSOState = StateUtil.decodeRSOState(state);
         String targetUrl = decodedRSOState.getRedirect();
+
+        RiotAuthTokenResponse riotAuthTokenResponse;
+        RiotAccountIdResponse summonerInfo;
+
+        try {
+            // 토큰 교환
+            riotAuthTokenResponse = riotOAuthService.exchangeCodeForTokens(code);
+
+            // id_token 파싱 → Riot 사용자 정보 추출
+            summonerInfo = riotOAuthService.getSummonerInfo(riotAuthTokenResponse.getAccessToken());
+        } catch (Exception e) {
+            return String.format("%s?error=riot_api_error", targetUrl);
+        }
 
         // 만약 사용자 정보가 null 일 경우 롤과 연동되지 않은 사용자
         if (summonerInfo == null) {
@@ -140,10 +142,9 @@ public class RiotFacadeService {
         Member member = memberList.get(0);
 
         // 탈퇴한 사용자인지 확인하기
-        memberValidator.throwIfBlind(member, AuthException.class, INACTIVE_MEMBER);
-
-        // 제재 만료 확인 (만료된 제재 자동 해제)
-        banService.checkBanExpiry(member);
+        if (member.getBlind()) {
+            return String.format("%s?error=member_isBlind", targetUrl);
+        }
 
         // 로그인 진행
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getRole());
@@ -152,7 +153,7 @@ public class RiotFacadeService {
         // refresh token DB에 저장
         authService.updateRefreshToken(member, refreshToken);
 
-        // 제재 만료 확인 (만료된 제재 자동 해제)
+        // 만료된 제재 자동 해제
         banService.checkBanExpiry(member);
 
         // 제재 메시지 생성
@@ -160,6 +161,7 @@ public class RiotFacadeService {
         if (member.isBanned()) {
             banMessage = banService.getBanReasonMessage(member.getBanType());
         }
+
         return oAuthRedirectBuilder.buildLoginRedirectUrl(member, state, targetUrl, accessToken, refreshToken,
                 banMessage);
     }
