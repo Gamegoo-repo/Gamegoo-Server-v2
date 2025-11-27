@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.account.member.domain;
 
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.Recent30GameStatsResponse;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -128,6 +129,62 @@ public class MemberRecentStats {
         this.aramRecAvgAssists = avgAssists;
         this.aramRecAvgCsPerMinute = avgCsPerMinute;
         this.aramRecTotalCs = totalCs;
+    }
+
+    public void updateFrom(Recent30GameStatsResponse stats) {
+        this.update(
+                stats.getRecTotalWins(),
+                stats.getRecTotalLosses(),
+                stats.getRecWinRate(),
+                stats.getRecAvgKDA(),
+                stats.getRecAvgKills(),
+                stats.getRecAvgDeaths(),
+                stats.getRecAvgAssists(),
+                stats.getRecAvgCsPerMinute(),
+                stats.getRecTotalCs()
+        );
+    }
+
+    public void updateSoloStatsFrom(Recent30GameStatsResponse stats) {
+        this.updateSoloStats(
+                stats.getRecTotalWins(),
+                stats.getRecTotalLosses(),
+                stats.getRecWinRate(),
+                stats.getRecAvgKDA(),
+                stats.getRecAvgKills(),
+                stats.getRecAvgDeaths(),
+                stats.getRecAvgAssists(),
+                stats.getRecAvgCsPerMinute(),
+                stats.getRecTotalCs()
+        );
+    }
+
+    public void updateFreeStatsFrom(Recent30GameStatsResponse stats) {
+        this.updateFreeStats(
+                stats.getRecTotalWins(),
+                stats.getRecTotalLosses(),
+                stats.getRecWinRate(),
+                stats.getRecAvgKDA(),
+                stats.getRecAvgKills(),
+                stats.getRecAvgDeaths(),
+                stats.getRecAvgAssists(),
+                stats.getRecAvgCsPerMinute(),
+                stats.getRecTotalCs()
+        );
+    }
+
+    public void updateAramStatsFrom(Recent30GameStatsResponse stats) {
+        this.updateAramStats(
+                stats.getRecTotalWins(),
+                stats.getRecTotalLosses(),
+                stats.getRecWinRate(),
+                stats.getRecAvgKDA(),
+                stats.getRecAvgKills(),
+                stats.getRecAvgDeaths(),
+                stats.getRecAvgAssists(),
+                stats.getRecAvgCsPerMinute(),
+                stats.getRecTotalCs()
+        );
     }
 
 }

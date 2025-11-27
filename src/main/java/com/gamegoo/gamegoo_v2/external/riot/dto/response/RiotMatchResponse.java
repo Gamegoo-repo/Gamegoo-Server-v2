@@ -26,6 +26,8 @@ public class RiotMatchResponse {
         private int gameDuration;
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         private int queueId;
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        private long gameCreation; 
 
     }
 
@@ -34,6 +36,8 @@ public class RiotMatchResponse {
     @AllArgsConstructor
     public static class ParticipantDTO {
 
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        private String puuid;
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         private String riotIdGameName;
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

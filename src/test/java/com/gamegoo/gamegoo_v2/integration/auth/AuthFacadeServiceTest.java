@@ -8,7 +8,9 @@ import com.gamegoo.gamegoo_v2.account.auth.repository.RefreshTokenRepository;
 import com.gamegoo.gamegoo_v2.account.auth.service.AuthFacadeService;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
+import com.gamegoo.gamegoo_v2.account.member.repository.MemberRecentStatsRepository;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
 import com.gamegoo.gamegoo_v2.core.exception.JwtAuthException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -30,6 +33,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 class AuthFacadeServiceTest {
 
     @Autowired
@@ -37,6 +41,9 @@ class AuthFacadeServiceTest {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private MemberRecentStatsRepository memberRecentStatsRepository;
 
     @Autowired
     private JwtProvider jwtProvider;
@@ -57,11 +64,6 @@ class AuthFacadeServiceTest {
         member = createMember(EMAIL, GAMENAME, PasswordUtil.encodePassword(PASSWORD));
     }
 
-    @AfterEach
-    void tearDown() {
-        refreshTokenRepository.deleteAllInBatch();
-        memberRepository.deleteAllInBatch();
-    }
 
     @Nested
     @DisplayName("리프레시 토큰 테스트")
@@ -200,7 +202,7 @@ class AuthFacadeServiceTest {
     }
 
     private Member createMember(String email, String gameName, String password) {
-        return memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .email(email)
                 .password(password)
                 .profileImage(1)
@@ -216,7 +218,17 @@ class AuthFacadeServiceTest {
                 .freeWinRate(0.0)
                 .freeGameCount(0)
                 .isAgree(true)
-                .build());
+                .build();
+
+        memberRepository.save(member);
+
+        // MemberRecentStats 빈 껍데기 생성 (optional = false 제약 조건 만족)
+        MemberRecentStats memberRecentStats = MemberRecentStats.builder()
+                .member(member)
+                .build();
+        memberRecentStatsRepository.save(memberRecentStats);
+
+        return member;
     }
 
     private static void checkExpirationTime(Long tokenExpirationTime) {

@@ -823,9 +823,9 @@ class BoardFacadeServiceTest {
             // when
             when(riotAuthService.getPuuid(gameName, tag)).thenReturn("test-puuid");
             when(riotInfoService.getTierWinrateRank("test-puuid")).thenReturn(null);
-            when(riotRecordService.getRecent30GameStats(gameName, "test-puuid")).thenReturn(null);
+            when(riotRecordService.getRecent30GameStats("test-puuid")).thenReturn(null);
             when(memberService.getOrCreateTmpMember(eq(gameName), eq(tag), any())).thenReturn(tmpMember);
-            when(riotRecordService.getPreferChampionfromMatch(gameName, "test-puuid")).thenReturn(null);
+            when(riotRecordService.getPreferChampionfromMatch("test-puuid")).thenReturn(null);
             doNothing().when(profanityCheckService).validateProfanity(request.getContents());
             when(boardService.createAndSaveGuestBoard(request, tmpMember, password)).thenReturn(guestBoard);
             doNothing().when(boardGameStyleService).mapGameStylesToBoard(guestBoard, request.getGameStyles());
@@ -856,7 +856,7 @@ class BoardFacadeServiceTest {
             // when
             when(riotAuthService.getPuuid(gameName, tag)).thenReturn("test-puuid");
             when(riotInfoService.getTierWinrateRank("test-puuid")).thenReturn(null);
-            when(riotRecordService.getRecent30GameStats(gameName, "test-puuid")).thenReturn(null);
+            when(riotRecordService.getRecent30GameStats("test-puuid")).thenReturn(null);
             when(memberService.getOrCreateTmpMember(eq(gameName), eq(tag), any()))
                     .thenThrow(new BoardException(ErrorCode.MEMBER_ALREADY_EXISTS));
 
@@ -891,9 +891,9 @@ class BoardFacadeServiceTest {
             // when
             when(riotAuthService.getPuuid(gameName, tag)).thenReturn("test-puuid");
             when(riotInfoService.getTierWinrateRank("test-puuid")).thenReturn(null);
-            when(riotRecordService.getRecent30GameStats(gameName, "test-puuid")).thenReturn(null);
+            when(riotRecordService.getRecent30GameStats("test-puuid")).thenReturn(null);
             when(memberService.getOrCreateTmpMember(eq(gameName), eq(tag), any())).thenReturn(tmpMember);
-            when(riotRecordService.getPreferChampionfromMatch(gameName, "test-puuid")).thenReturn(null);
+            when(riotRecordService.getPreferChampionfromMatch("test-puuid")).thenReturn(null);
             doThrow(new BoardException(ErrorCode.BOARD_FORBIDDEN_WORD))
                     .when(profanityCheckService).validateProfanity(request.getContents());
 

@@ -2,7 +2,7 @@ package com.gamegoo.gamegoo_v2.external.riot.service;
 
 import com.gamegoo.gamegoo_v2.external.riot.domain.ChampionStats;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotMatchResponse;
-import com.gamegoo.gamegoo_v2.external.riot.service.RiotRecordService.Recent30GameStatsResponse;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.Recent30GameStatsResponse;
 import com.gamegoo.gamegoo_v2.utils.RiotApiHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,6 +51,7 @@ class RiotRecordServiceTest {
 
         // 매치 상세 정보 응답 (한 번만 반환)
         RiotMatchResponse.ParticipantDTO participant = RiotMatchResponse.ParticipantDTO.builder()
+                .puuid(puuid)
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(true)
@@ -75,7 +76,7 @@ class RiotRecordServiceTest {
                 .thenReturn(matchResponse);
 
         // when
-        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
+        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(puuid);
 
         // then
         assertThat(result).isNotEmpty();
@@ -101,6 +102,7 @@ class RiotRecordServiceTest {
                 .thenReturn(new String[]{});
 
         RiotMatchResponse.ParticipantDTO participant = RiotMatchResponse.ParticipantDTO.builder()
+                .puuid(puuid)
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(true)
@@ -125,7 +127,7 @@ class RiotRecordServiceTest {
                 .thenReturn(matchResponse);
 
         // when
-        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
+        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(puuid);
 
         // then
         assertThat(result).isNotEmpty();
@@ -152,6 +154,7 @@ class RiotRecordServiceTest {
 
         // 첫 번째 게임
         RiotMatchResponse.ParticipantDTO participant1 = RiotMatchResponse.ParticipantDTO.builder()
+                .puuid(puuid)
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(true)
@@ -174,6 +177,7 @@ class RiotRecordServiceTest {
 
         // 두 번째 게임
         RiotMatchResponse.ParticipantDTO participant2 = RiotMatchResponse.ParticipantDTO.builder()
+                .puuid(puuid)
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(true)
@@ -199,7 +203,7 @@ class RiotRecordServiceTest {
                 .thenReturn(match2);
 
         // when
-        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(gameName, puuid);
+        List<ChampionStats> result = riotRecordService.getPreferChampionfromMatch(puuid);
 
         // then
         assertThat(result).isNotEmpty();
@@ -241,7 +245,7 @@ class RiotRecordServiceTest {
                 .thenReturn(match3);
 
         // when
-        Recent30GameStatsResponse result = riotRecordService.getRecent30GameStats(gameName, puuid);
+        Recent30GameStatsResponse result = riotRecordService.getRecent30GameStats(puuid);
 
         // then
         assertThat(result).isNotNull();
@@ -284,7 +288,7 @@ class RiotRecordServiceTest {
                 .thenReturn(match2);
 
         // when
-        Recent30GameStatsResponse result = riotRecordService.getRecent30GameStats(gameName, puuid);
+        Recent30GameStatsResponse result = riotRecordService.getRecent30GameStats(puuid);
 
         // then
         assertThat(result).isNotNull();
@@ -298,6 +302,7 @@ class RiotRecordServiceTest {
 
     private RiotMatchResponse.ParticipantDTO createParticipant(String gameName, int kills, int deaths, int assists, boolean win) {
         return RiotMatchResponse.ParticipantDTO.builder()
+                .puuid("test-puuid")
                 .riotIdGameName(gameName)
                 .championId(1L)
                 .win(win)
