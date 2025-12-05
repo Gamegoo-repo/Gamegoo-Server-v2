@@ -1,10 +1,11 @@
-package com.gamegoo.gamegoo_v2.matching.repository;
+package com.gamegoo.gamegoo_v2.repository.matching;
 
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingRecord;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingStatus;
 import com.gamegoo.gamegoo_v2.matching.domain.MatchingType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.matching.repository.MatchingRecordRepository;
 import com.gamegoo.gamegoo_v2.repository.RepositoryTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
