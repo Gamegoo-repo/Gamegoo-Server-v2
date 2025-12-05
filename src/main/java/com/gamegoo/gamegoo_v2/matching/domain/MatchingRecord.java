@@ -18,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -151,6 +152,11 @@ public class MatchingRecord extends BaseDateTimeEntity {
     // status 변경
     public void updateStatus(MatchingStatus status) {
         this.status = status;
+    }
+
+    // 테스트용 createAt 수정
+    public void updateCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     // targetMember 설정

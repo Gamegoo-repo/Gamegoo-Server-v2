@@ -101,7 +101,7 @@ public class MatchingService {
      * @return 대기 중인 매칭 리스트
      */
     public List<MatchingRecord> getPendingMatchingRecords(GameMode gameMode, Long memberId) {
-        return matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now().minusMinutes(5), gameMode,
+        return matchingRecordRepository.findValidMatchingRecords(LocalDateTime.now(), gameMode,
                 memberId);
     }
 
@@ -186,7 +186,6 @@ public class MatchingService {
      *
      * @param senderMatchingUuid   sender의 MatchingUuid
      * @param receiverMatchingUuid receiver의 MatchingUuid
-     * @return
      */
     public void validateSenderAndReceiverMatchingUuid(String senderMatchingUuid, String receiverMatchingUuid) {
         if (senderMatchingUuid.equals(receiverMatchingUuid)) {
