@@ -154,11 +154,6 @@ public class MatchingRecord extends BaseDateTimeEntity {
         this.status = status;
     }
 
-    // 테스트용 createAt 수정
-    public void updateCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     // targetMember 설정
     public void updateTargetMatchingRecord(MatchingRecord targetMatchingRecord) {
         this.targetMatchingRecord = targetMatchingRecord;
