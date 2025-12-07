@@ -23,7 +23,6 @@ public class OAuthRedirectBuilder {
             URLEncoder.encode(String.valueOf(member.getBanExpireAt()), StandardCharsets.UTF_8);
         }
 
-
         String encodedBanMessage = "";
         if (banMessage != null) {
             encodedBanMessage = URLEncoder.encode(banMessage, StandardCharsets.UTF_8);

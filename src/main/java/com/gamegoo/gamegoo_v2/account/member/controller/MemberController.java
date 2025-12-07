@@ -128,7 +128,6 @@ public class MemberController {
     @PatchMapping("/admin/grant/{memberId}")
     @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<String> grantAdminRole(@PathVariable Long memberId) {
-
         return ApiResponse.ok(memberFacadeService.updateMemberRole(memberId, Role.ADMIN));
     }
 
@@ -138,5 +137,6 @@ public class MemberController {
     public ApiResponse<String> revokeAdminRole(@PathVariable Long memberId) {
         return ApiResponse.ok(memberFacadeService.updateMemberRole(memberId, Role.MEMBER));
     }
+
 
 }

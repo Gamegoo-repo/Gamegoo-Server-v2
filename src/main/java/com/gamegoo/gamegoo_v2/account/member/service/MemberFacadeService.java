@@ -19,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -149,7 +147,7 @@ public class MemberFacadeService {
      * 개발용으로 어드민 권한을 부여하거나 해제할 때 사용됩니다.
      *
      * @param memberId 대상 회원 ID
-     * @param role 변경할 역할
+     * @param role     변경할 역할
      * @return 성공 메시지
      */
     @Transactional
