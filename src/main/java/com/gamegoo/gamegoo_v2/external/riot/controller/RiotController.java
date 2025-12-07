@@ -5,6 +5,7 @@ import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotVerifyExistUserRequest;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotJoinResponse;
 import com.gamegoo.gamegoo_v2.external.riot.service.RiotFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,9 +55,8 @@ public class RiotController {
             ErrorCode.RIOT_NETWORK_ERROR,
             ErrorCode.RIOT_UNKNOWN_ERROR
     })
-    public ApiResponse<String> joinByRSO(@RequestBody @Valid RiotJoinRequest request) {
-        riotFacadeService.join(request);
-        return ApiResponse.ok("RSO 회원가입이 완료되었습니다.");
+    public ApiResponse<RiotJoinResponse> joinByRSO(@RequestBody @Valid RiotJoinRequest request) {
+        return ApiResponse.ok(riotFacadeService.join(request));
     }
 
     @GetMapping("/oauth/callback")
