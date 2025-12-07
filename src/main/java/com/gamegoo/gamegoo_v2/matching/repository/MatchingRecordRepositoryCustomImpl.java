@@ -28,20 +28,21 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
     /**
      * 생성 시간 내 만들어진 매칭 기록 조회
      *
-     * @param createdAt 생성 시간
-     * @param gameMode  게임 모드
-     * @param memberId  사용자 id
+     * @param gameMode 게임 모드
+     * @param memberId 사용자 id
      * @return 매칭 기록
      */
     @Override
-    public List<MatchingRecord> findValidMatchingRecords(LocalDateTime createdAt, GameMode gameMode, Long memberId) {
-        // 서브 쿼리에서 쓸 별칭
+    public List<MatchingRecord> findValidMatchingRecords(LocalDateTime baseTime, GameMode gameMode, Long memberId) {
         QMatchingRecord sub = new QMatchingRecord("sub");
+
+        // baseTime 기준으로 5분 전 계산
+        LocalDateTime fiveMinutesAgo = baseTime.minusMinutes(5);
 
         return queryFactory
                 .selectFrom(matchingRecord)
                 .where(
-                        matchingRecord.createdAt.gt(createdAt),
+                        matchingRecord.createdAt.goe(fiveMinutesAgo),
                         matchingRecord.status.eq(MatchingStatus.PENDING),
                         matchingRecord.gameMode.eq(gameMode),
                         matchingRecord.member.id.ne(memberId),
@@ -53,14 +54,13 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
                                         .select(sub.createdAt.max())
                                         .from(sub)
                                         .where(
-                                                sub.createdAt.gt(createdAt),
+                                                sub.createdAt.goe(fiveMinutesAgo),
                                                 sub.status.eq(MatchingStatus.PENDING),
                                                 sub.gameMode.eq(gameMode),
                                                 sub.member.id.eq(matchingRecord.member.id)
                                         )
                         )
                 )
-                // memberId 오름차순, createdAt 내림차순
                 .orderBy(matchingRecord.member.id.asc(), matchingRecord.createdAt.desc())
                 .fetch();
     }
