@@ -3,6 +3,7 @@ package com.gamegoo.gamegoo_v2.account.auth.service;
 import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RefreshTokenRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
+import com.gamegoo.gamegoo_v2.account.auth.dto.response.RejoinResponse;
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RejoinRequest;
@@ -10,9 +11,8 @@ import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
-import com.gamegoo.gamegoo_v2.core.exception.MemberException;
+import com.gamegoo.gamegoo_v2.core.exception.AuthException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotJoinResponse;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
 import lombok.RequiredArgsConstructor;
@@ -104,22 +104,27 @@ public class AuthFacadeService {
     }
 
     @Transactional
-    public RiotJoinResponse rejoinMember(RejoinRequest request) {
+    public RejoinResponse rejoinMember(RejoinRequest request) {
         // 실제 있는 사용자인지 검증
         List<Member> memberByPuuid = memberService.findMemberByPuuid(request.getPuuid());
         if (memberByPuuid.isEmpty()) {
-            throw new MemberException(ErrorCode.MEMBER_NOT_FOUND);
+            throw new AuthException(ErrorCode.MEMBER_NOT_FOUND);
         }
 
         Member member = memberByPuuid.get(0);
+        // 탈퇴한 사용자인지 검증
+        if (!member.getBlind()) {
+            throw new AuthException(ErrorCode.ACTIVE_MEMBER);
+        }
 
         // 제재 있는지 검증
         // 만료된 제재 자동 해제
         banService.checkBanExpiry(member);
 
-        // TODO: 제재가 있을 경우 탈퇴 후 재가입 불가능 (?)
+        // 제재 메시지 생성
+        String banMessage = null;
         if (member.isBanned()) {
-            throw new MemberException(ErrorCode.MEMBER_BANNED);
+            banMessage = banService.getBanReasonMessage(member.getBanType());
         }
 
         // 탈퇴 해제
@@ -132,7 +137,7 @@ public class AuthFacadeService {
         // refresh token DB에 저장
         authService.updateRefreshToken(member, refreshToken);
 
-        return RiotJoinResponse.of(member, accessToken, refreshToken);
+        return RejoinResponse.of(member, accessToken, refreshToken, banMessage);
     }
 
 }

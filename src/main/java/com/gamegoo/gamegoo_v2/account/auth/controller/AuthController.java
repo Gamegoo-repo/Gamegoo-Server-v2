@@ -3,13 +3,13 @@ package com.gamegoo.gamegoo_v2.account.auth.controller;
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RefreshTokenRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
+import com.gamegoo.gamegoo_v2.account.auth.dto.response.RejoinResponse;
 import com.gamegoo.gamegoo_v2.account.auth.service.AuthFacadeService;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RejoinRequest;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotJoinResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -73,10 +73,9 @@ public class AuthController {
     @Operation(summary = "탈퇴했던 사용자 재가입 API입니다.", description = "Rejoin API for blind member")
     @PostMapping("/rejoin")
     @ApiErrorCodes({
-            ErrorCode.MEMBER_BANNED,
             ErrorCode.MEMBER_NOT_FOUND
     })
-    public ApiResponse<RiotJoinResponse> rejoinMember(@RequestBody RejoinRequest rejoinRequest) {
+    public ApiResponse<RejoinResponse> rejoinMember(@RequestBody RejoinRequest rejoinRequest) {
         return ApiResponse.ok(authFacadeService.rejoinMember(rejoinRequest));
     }
 
