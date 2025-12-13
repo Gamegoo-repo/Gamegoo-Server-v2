@@ -314,8 +314,9 @@ public class BoardFacadeService {
             GameMode gameMode,
             Tier tier,
             Position position1,
-            Position position2) {
-        Slice<Board> boardSlice = boardService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2);
+            Position position2,
+            Mike mike) {
+        Slice<Board> boardSlice = boardService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2, mike);
         return BoardCursorResponse.of(boardSlice);
     }
 

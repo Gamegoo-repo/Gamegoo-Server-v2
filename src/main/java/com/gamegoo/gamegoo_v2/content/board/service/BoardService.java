@@ -296,7 +296,8 @@ public class BoardService {
             GameMode gameMode,
             Tier tier,
             Position mainP,
-            Position subP) {
+            Position subP,
+            Mike mike) {
         Pageable pageable = PageRequest.of(0, PAGE_SIZE);
 
         // null이나 Position.ANY인 경우 필터 조건 무시 (null로 처리)
@@ -310,7 +311,7 @@ public class BoardService {
         }
         List<Position> positionList = positions.isEmpty() ? null : positions;
 
-        return boardRepository.findAllBoardsWithCursor(cursor, cursorId, gameMode, tier, positionList, pageable);
+        return boardRepository.findAllBoardsWithCursor(cursor, cursorId, gameMode, tier, positionList, mike, pageable);
     }
 
 }

@@ -312,7 +312,7 @@ public class BoardServiceTest {
             }
 
             // when
-            var result = boardService.getAllBoardsWithCursor(null, null, null, null, null, null);
+            var result = boardService.getAllBoardsWithCursor(null, null, null, null, null, null, null);
 
             // then
             assertThat(result.getContent()).hasSize(10);
@@ -350,7 +350,7 @@ public class BoardServiceTest {
 
             // 첫 페이지 조회
             Slice<Board> firstPage = boardService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.GOLD,
-                    Position.TOP, Position.JUNGLE);
+                    Position.TOP, Position.JUNGLE, null);
             assertThat(firstPage.getContent()).hasSize(10);
             assertThat(firstPage.hasNext()).isTrue();
 
@@ -360,7 +360,7 @@ public class BoardServiceTest {
                     lastBoard.getCreatedAt();
             Long lastId = lastBoard.getId();
             Slice<Board> secondPage = boardService.getAllBoardsWithCursor(lastActivityTime, lastId, GameMode.SOLO,
-                    Tier.GOLD, Position.TOP, Position.JUNGLE);
+                    Tier.GOLD, Position.TOP, Position.JUNGLE, null);
 
             // then
             assertThat(secondPage.getContent()).hasSize(5);
@@ -397,7 +397,7 @@ public class BoardServiceTest {
 
             // when - 첫 페이지 조회
             Slice<Board> firstPage = boardService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.IRON,
-                    Position.TOP, Position.JUNGLE);
+                    Position.TOP, Position.JUNGLE, null);
 
             // nextCursor, cursorId 추출
             Board lastBoard = firstPage.getContent().get(firstPage.getContent().size() - 1);
@@ -407,7 +407,7 @@ public class BoardServiceTest {
 
             // when - 두 번째 페이지 조회
             Slice<Board> secondPage = boardService.getAllBoardsWithCursor(nextCursor, nextCursorId, GameMode.SOLO,
-                    Tier.IRON, Position.TOP, Position.JUNGLE);
+                    Tier.IRON, Position.TOP, Position.JUNGLE, null);
 
             // then
             assertThat(secondPage.getContent()).allSatisfy(board -> {
