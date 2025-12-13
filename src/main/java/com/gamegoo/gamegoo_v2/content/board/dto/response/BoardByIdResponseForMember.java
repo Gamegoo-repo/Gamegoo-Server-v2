@@ -99,6 +99,9 @@ public class BoardByIdResponseForMember {
                         .deaths(mc.getGames() > 0 ? (double) mc.getDeaths() / mc.getGames() : 0)
                         .assists(mc.getGames() > 0 ? (double) mc.getAssists() / mc.getGames() : 0)
                         .build())
+                .filter(response -> response.getGames() > 0)
+                .sorted((c1, c2) -> Integer.compare(c2.getGames(), c1.getGames()))
+                .limit(4)
                 .collect(Collectors.toList());
 
         Integer recentGameCount;
