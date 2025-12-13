@@ -250,7 +250,8 @@ public class BoardController {
         @Parameter(name = "gameMode", description = "(선택) 게임 모드를 입력해주세요. < 빠른대전: FAST, 솔로랭크: SOLO, 자유랭크: FREE, 칼바람 나락: ARAM >"),
         @Parameter(name = "tier", description = "(선택) 티어를 선택해주세요."),
         @Parameter(name = "position1", description = "(선택) 주 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: MID, 원딜: ADC, 서포터: SUP >"),
-        @Parameter(name = "position2", description = "(선택) 부 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: MID, 원딜: ADC, 서포터: SUP >")
+        @Parameter(name = "position2", description = "(선택) 부 포지션을 입력해주세요. < 전체: ANY, 탑: TOP, 정글: JUNGLE, 미드: MID, 원딜: ADC, 서포터: SUP >"),
+        @Parameter(name = "mike", description = "(선택) 마이크 여부를 선택해주세요.")
     })
     @ApiErrorCodes({ErrorCode._BAD_REQUEST})
     public ResponseEntity<ApiResponse<BoardCursorResponse>> getBoardsWithCursor(
@@ -263,8 +264,11 @@ public class BoardController {
             @Parameter(description = "주 포지션", schema = @Schema(ref = "#/components/schemas/Position"))
             @RequestParam(required = false) Position position1,
             @Parameter(description = "부 포지션", schema = @Schema(ref = "#/components/schemas/Position"))
-            @RequestParam(required = false) Position position2) {
-        BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2);
+            @RequestParam(required = false) Position position2,
+            @Parameter(description = "마이크 사용 여부", schema = @Schema(ref = "#/components/schemas/Mike"))
+            @RequestParam(required = false) Mike mike
+            ) {
+        BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2, mike);
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 

@@ -674,11 +674,11 @@ class BoardFacadeServiceTest {
             }
 
             when(boardService.getAllBoardsWithCursor(
-                eq(null), eq(null), eq(null), eq(null), eq(null), eq(null)
+                eq(null), eq(null), eq(null), eq(null), eq(null), eq(null), eq(null)
             )).thenReturn(new SliceImpl<>(boards, PageRequest.of(0, 10), false));
 
             // when
-            BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(null, null, null, null, null, null);
+            BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(null, null, null, null, null, null, null);
 
             // then
             assertThat(response.getBoards()).hasSize(10);
@@ -708,11 +708,11 @@ class BoardFacadeServiceTest {
             }
 
             when(boardService.getAllBoardsWithCursor(
-                eq(null), eq(null), eq(GameMode.SOLO), eq(Tier.GOLD), eq(Position.TOP), eq(Position.JUNGLE)
+                eq(null), eq(null), eq(GameMode.SOLO), eq(Tier.GOLD), eq(Position.TOP), eq(Position.JUNGLE), eq(null)
             )).thenReturn(new SliceImpl<>(boards.subList(0, 10), PageRequest.of(0, 10), true));
 
             // 첫 페이지 조회
-            BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE);
+            BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(null, null, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE, null);
             assertThat(response.getBoards()).hasSize(10);
             assertThat(response.isHasNext()).isTrue();
 
@@ -721,9 +721,9 @@ class BoardFacadeServiceTest {
             LocalDateTime lastActivityTime = lastBoard.getBumpTime() != null ? lastBoard.getBumpTime() : lastBoard.getCreatedAt();
             Long lastId = lastBoard.getId();
             when(boardService.getAllBoardsWithCursor(
-                eq(lastActivityTime), eq(lastId), eq(GameMode.SOLO), eq(Tier.GOLD), eq(Position.TOP), eq(Position.JUNGLE)
+                eq(lastActivityTime), eq(lastId), eq(GameMode.SOLO), eq(Tier.GOLD), eq(Position.TOP), eq(Position.JUNGLE), eq(null)
             )).thenReturn(new SliceImpl<>(boards.subList(10, 15), PageRequest.of(0, 10), false));
-            BoardCursorResponse response2 = boardFacadeService.getAllBoardsWithCursor(lastActivityTime, lastId, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE);
+            BoardCursorResponse response2 = boardFacadeService.getAllBoardsWithCursor(lastActivityTime, lastId, GameMode.SOLO, Tier.GOLD, Position.TOP, Position.JUNGLE, null);
 
             // then
             assertThat(response2.getBoards()).hasSize(5);
