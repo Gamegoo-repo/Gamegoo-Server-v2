@@ -445,7 +445,7 @@ class BoardRepositoryTest extends RepositoryTestSupport {
 
             Pageable pageable = PageRequest.of(0, 10);
             List<Position> positionList = List.of(Position.TOP);  // 주 포지션 또는 부 포지션이 TOP인 게시물
-            Slice<Board> firstPage = boardRepository.findAllBoardsWithCursor(null, null, GameMode.SOLO, null, positionList, pageable);
+            Slice<Board> firstPage = boardRepository.findAllBoardsWithCursor(null, null, GameMode.SOLO, null, positionList, null, pageable);
 
             // then
             assertThat(firstPage.getContent()).hasSize(10);
@@ -482,14 +482,14 @@ class BoardRepositoryTest extends RepositoryTestSupport {
             Pageable pageable = PageRequest.of(0, 10);
             List<Position> positionList = List.of(Position.TOP);  // 주 포지션 또는 부 포지션이 TOP인 게시물
             // 첫 페이지 조회
-            Slice<Board> firstPage = boardRepository.findAllBoardsWithCursor(null, null, GameMode.SOLO, null, positionList, pageable);
+            Slice<Board> firstPage = boardRepository.findAllBoardsWithCursor(null, null, GameMode.SOLO, null, positionList, null, pageable);
             assertThat(firstPage.getContent()).hasSize(10);
             assertThat(firstPage.hasNext()).isTrue();
             // 두 번째 페이지 조회
             Board lastBoard = firstPage.getContent().get(firstPage.getContent().size() - 1);
             LocalDateTime cursorTime = lastBoard.getActivityTime();
             Long cursorId = lastBoard.getId();
-            Slice<Board> result = boardRepository.findAllBoardsWithCursor(cursorTime, cursorId, GameMode.SOLO, null, positionList, pageable);
+            Slice<Board> result = boardRepository.findAllBoardsWithCursor(cursorTime, cursorId, GameMode.SOLO, null, positionList, null, pageable);
 
             // then
             assertThat(result.getContent()).hasSize(5);  // SOLO 게시물 중 남은 5개

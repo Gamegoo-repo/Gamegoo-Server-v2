@@ -62,6 +62,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
            "AND (:gameMode IS NULL OR b.gameMode = :gameMode) " +
            "AND (:tier IS NULL OR (CASE WHEN b.gameMode = com.gamegoo.gamegoo_v2.matching.domain.GameMode.FREE THEN m.freeTier ELSE m.soloTier END) = :tier) " +
            "AND (:positionList IS NULL OR b.mainP IN :positionList OR b.subP IN :positionList) " +
+           "AND (:mike IS NULL OR b.mike = :mike) " +
            "ORDER BY COALESCE(b.bumpTime, b.createdAt) DESC, b.id DESC")
     Slice<Board> findAllBoardsWithCursor(
             @Param("activityTime") LocalDateTime activityTime,
@@ -69,6 +70,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             @Param("gameMode") GameMode gameMode,
             @Param("tier") Tier tier,
             @Param("positionList") List<Position> positionList,
+            @Param("mike") Mike mike,
             Pageable pageable);
 
     @Modifying(clearAutomatically = true)
