@@ -37,4 +37,25 @@ public class BlockRepositoryCustomImpl implements BlockRepositoryCustom {
                 ));
     }
 
+    @Override
+    public Map<Long, Boolean>
+    hasBlockedTargetMembersBatch(List<Long> targetMemberIds, Long memberId){
+        Set<Long> blockedSet = new HashSet<>(
+                queryFactory
+                        .select(block.blockedMember.id)
+                        .from(block)
+                        .where(
+                                block.blockerMember.id.eq(memberId),
+                                block.blockedMember.id.in(targetMemberIds),
+                                block.deleted.eq(false)
+                        )
+                        .fetch()
+        );
+        return targetMemberIds.stream()
+                .collect(Collectors.toMap(
+                        targetId -> targetId,
+                        blockedSet::contains
+                ));
+    }
+
 }

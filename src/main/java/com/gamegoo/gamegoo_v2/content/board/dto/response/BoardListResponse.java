@@ -63,8 +63,9 @@ public class BoardListResponse {
     private Tier soloTier;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int soloRank;
+    private Boolean isBlocked;
 
-    public static BoardListResponse of(Board board) {
+    public static BoardListResponse of(Board board, Boolean isBlocked) {
         Member member = board.getMember();
 
         // 모든 게시글은 임시 멤버든 정식 멤버든 항상 Member를 가짐
@@ -116,6 +117,7 @@ public class BoardListResponse {
                 .freeRank(member.getFreeRank())
                 .soloTier(member.getSoloTier())
                 .soloRank(member.getSoloRank())
+                .isBlocked(isBlocked)
                 .build();
     }
 

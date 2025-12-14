@@ -34,7 +34,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -167,16 +170,26 @@ public class BoardFacadeService {
     /**
      * 게시판 글 목록 조회 (파사드)
      */
-    public BoardResponse getBoardList(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike, int pageIdx) {
+    public BoardResponse getBoardList(Long memberId, GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike, int pageIdx) {
         if (mainP == null) {
             mainP = Position.ANY;
         }
         if (subP == null) {
             subP = Position.ANY;
         }
+        Member member = memberId != null ? memberService.findMemberById(memberId) : null;
 
         Page<Board> boardPage = boardService.getBoardsWithPagination(gameMode, tier, mainP, subP, mike, pageIdx);
-        return BoardResponse.of(boardPage);
+
+        Map<Long, Boolean> blockedMap = Collections.emptyMap();
+        if(member != null && !boardPage.getContent().isEmpty()){
+            List<Long> memberIds = boardPage.getContent().stream()
+                    .map(board -> board.getMember().getId())
+                    .distinct()
+                    .collect(Collectors.toList());
+            blockedMap = blockService.hasBlockedTargetMembersBatch(member, memberIds);
+        }
+        return BoardResponse.of(boardPage, blockedMap);
     }
 
     /**
@@ -315,9 +328,20 @@ public class BoardFacadeService {
             Tier tier,
             Position position1,
             Position position2,
-            Mike mike) {
+            Mike mike,
+            Long memberId) {
+
+        Member member = memberId != null ? memberService.findMemberById(memberId) : null;
         Slice<Board> boardSlice = boardService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2, mike);
-        return BoardCursorResponse.of(boardSlice);
+        Map<Long, Boolean> blockedMap = Collections.emptyMap();
+        if(member != null && !boardSlice.getContent().isEmpty()){
+            List<Long> memberIds = boardSlice.getContent().stream()
+                    .map(board -> board.getMember().getId())
+                    .distinct()
+                    .collect(Collectors.toList());
+            blockedMap = blockService.hasBlockedTargetMembersBatch(member, memberIds);
+        }
+        return BoardCursorResponse.of(boardSlice, blockedMap);
     }
 
 }

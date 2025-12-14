@@ -23,14 +23,10 @@ security:
         pattern: /api/v2/email/verify # 이메일 인증코드 검증
       - method: POST
         pattern: /api/v2/riot/verify # riot 계정 검증
-      - method: GET
-        pattern: /api/v2/posts/list # 게시글 목록 조회
       - method: POST
         pattern: /api/v2/posts/guest # 비회원 게시물 등록
       - method: GET
         pattern: /api/v2/posts/list/* # 비회원용 특정 게시글 조회
-      - method: GET
-        pattern: /api/v2/posts/cursor # 커서 기반 조회
       - method: GET
         pattern: /api/v2/manner/keyword/* # 매너 키워드 정보 조회
       - method: GET

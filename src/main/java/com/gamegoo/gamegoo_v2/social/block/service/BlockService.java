@@ -113,7 +113,7 @@ public class BlockService {
     }
 
     /**
-     * memer가 targetMember를 차단했는지 여부를 반환하는 메소드
+     * member가 targetMember를 차단했는지 여부를 반환하는 메소드
      *
      * @param member       회원
      * @param targetMember 상대 회원
@@ -132,6 +132,17 @@ public class BlockService {
      */
     public Map<Long, Boolean> isBlockedByTargetMembersBatch(Member member, List<Long> targetMemberIds) {
         return blockRepository.isBlockedByTargetMembersBatch(targetMemberIds, member.getId());
+    }
+
+    /**
+     * 회원이 상대 회원들을 차단했는지 여부 조회
+     *
+     * @param member
+     * @param targetMemberIds 상대 회원 id list
+     * @return Map<상대 회원 id, 회원이 해당 상대를 차단했는지 여부>
+     */
+    public Map<Long, Boolean> hasBlockedTargetMembersBatch(Member member, List<Long> targetMemberIds){
+        return blockRepository.hasBlockedTargetMembersBatch(targetMemberIds, member.getId());
     }
 
     /**
