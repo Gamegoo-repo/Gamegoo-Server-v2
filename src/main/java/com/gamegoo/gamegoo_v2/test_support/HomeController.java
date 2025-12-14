@@ -91,14 +91,14 @@ public class HomeController {
     }
 
     @Operation(summary = "소환사명과 태그로 해당 회원 id 조회")
-    @PostMapping("/home/getMemberId")
+    @PostMapping("/home/memberId")
     @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
     public ApiResponse<Long> getMemberId(@RequestBody RiotUserInfo riotUserInfo) {
         Member member = memberService.findMemberByGameNameAndTag(riotUserInfo.getGamename(), riotUserInfo.getTag());
         return ApiResponse.ok(member.getId());
     }
 
-    @GetMapping("/home/token/{memberId}")
+    @GetMapping("/home/tokens/{memberId}")
     @Operation(summary = "memberId로 access,refresh token 발급 API", description = "테스트용으로 access, refresh token을 발급받을 수" +
             " 있는 API 입니다.")
     @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
