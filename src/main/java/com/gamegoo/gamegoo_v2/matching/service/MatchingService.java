@@ -155,6 +155,9 @@ public class MatchingService {
      */
     @Transactional
     public void setMatchingStatus(MatchingStatus matchingStatus, MatchingRecord matchingRecord) {
+        if (matchingRecord.getStatus() == MatchingStatus.SUCCESS) {
+            throw new MatchingException(ErrorCode.MATCHING_STATUS_NOT_ALLOWED);
+        }
         matchingRecord.updateStatus(matchingStatus);
     }
 

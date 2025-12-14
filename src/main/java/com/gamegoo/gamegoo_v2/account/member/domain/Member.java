@@ -213,7 +213,8 @@ public class Member extends BaseDateTimeEntity {
 
     // 임시 멤버 전용
     public static Member createForTmp(String gameName, String tag, Tier soloTier, int soloRank, double soloWinRate,
-                                      Tier freeTier, int freeRank, double freeWinRate, int soloGameCount, int freeGameCount) {
+                                      Tier freeTier, int freeRank, double freeWinRate, int soloGameCount,
+                                      int freeGameCount) {
         // 임시 멤버 랜덤 프로필 사진 설정
         int randomProfileImage = ThreadLocalRandom.current().nextInt(1, 9);
 
@@ -300,10 +301,6 @@ public class Member extends BaseDateTimeEntity {
         this.wantP = wantPositions;
     }
 
-    public void deactiveMember() {
-        this.blind = true;
-    }
-
     public void applyBan(BanType banType, LocalDateTime banExpireAt) {
         this.banType = banType;
         this.banExpireAt = banExpireAt;
@@ -384,4 +381,5 @@ public class Member extends BaseDateTimeEntity {
     public void updateAramWinRate(double aramWinRate) {
         this.aramWinRate = aramWinRate;
     }
+
 }

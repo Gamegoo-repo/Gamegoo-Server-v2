@@ -45,7 +45,10 @@ public class MatchingController {
 
     @Operation(summary = "내 매칭 status 변경", description = "API for updating my matching status")
     @PatchMapping("/matching/status/{matchingUuid}/{status}")
-    @ApiErrorCodes({ErrorCode.MATCHING_NOT_FOUND})
+    @ApiErrorCodes({
+            ErrorCode.MATCHING_NOT_FOUND,
+            ErrorCode.MATCHING_STATUS_NOT_ALLOWED
+    })
     public ApiResponse<String> UpdateMatchingStatus(
             @PathVariable(name = "matchingUuid") String matchingUuid,
             @Parameter(description = "매칭 상태", schema = @Schema(ref = "#/components/schemas/MatchingStatus"))
@@ -58,7 +61,8 @@ public class MatchingController {
     @PatchMapping("/matching/status/target/{matchingUuid}/{status}")
     @ApiErrorCodes({
             ErrorCode.MATCHING_NOT_FOUND,
-            ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND
+            ErrorCode.TARGET_MATCHING_MEMBER_NOT_FOUND,
+            ErrorCode.MATCHING_STATUS_NOT_ALLOWED
     })
     public ApiResponse<String> UpdateBothMatchingStatus(
             @PathVariable(name = "matchingUuid") String matchingUuid,
