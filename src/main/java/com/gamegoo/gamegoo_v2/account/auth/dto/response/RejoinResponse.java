@@ -32,7 +32,7 @@ public class RejoinResponse {
 
     private final BanType banType;
     private final String banMessage;
-    private LocalDateTime banExpireAt;
+    private final LocalDateTime banExpireAt;
 
     public static RejoinResponse of(Member member, String accessToken, String refreshToken, String banMessage) {
         return RejoinResponse.builder()
