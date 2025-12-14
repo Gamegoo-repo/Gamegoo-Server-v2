@@ -15,6 +15,7 @@ import com.gamegoo.gamegoo_v2.core.exception.AuthException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
+import com.gamegoo.gamegoo_v2.test_support.dto.TokensResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +74,12 @@ public class AuthFacadeService {
         return RefreshTokenResponse.of(memberId, accessToken, refreshToken);
     }
 
+    /**
+     * 회원 탈퇴 처리
+     *
+     * @param member 탈퇴할 회원
+     * @return
+     */
     public String blindMember(Member member) {
         // Member 테이블에서 blind 처리
         memberService.deactivateMember(member);
@@ -98,11 +105,42 @@ public class AuthFacadeService {
         return "탈퇴처리가 완료되었습니다";
     }
 
+    /**
+     * 테스트용 access token 발급
+     *
+     * @param memberId
+     * @return
+     */
     public String createTestAccessToken(Long memberId) {
         Member member = memberService.findMemberById(memberId);
         return jwtProvider.createAccessToken(member.getId(), member.getRole());
     }
 
+    /**
+     * 테스트용 access, refresh token 발급
+     *
+     * @param memberId
+     * @return TokensResponse
+     */
+    public TokensResponse createTestAccessTokenAndRefreshTokens(Long memberId) {
+        // jwt 토큰 재발급
+        String accessToken = jwtProvider.createAccessToken(memberId, Role.MEMBER);
+        String refreshToken = jwtProvider.createRefreshToken(memberId, Role.MEMBER);
+
+        // memberId로 member 엔티티 조회
+        Member member = memberService.findMemberById(memberId);
+
+        // refreshToken 저장
+        authService.updateRefreshToken(member, refreshToken);
+        return TokensResponse.of(accessToken, refreshToken);
+    }
+
+    /**
+     * 탈퇴한 회원 재가입
+     *
+     * @param request 재가입 요청
+     * @return
+     */
     @Transactional
     public RejoinResponse rejoinMember(RejoinRequest request) {
         // 실제 있는 사용자인지 검증
