@@ -123,10 +123,7 @@ public class BoardController {
             @RequestParam(required = false) Position subP,
             @Parameter(description = "마이크 사용 여부", schema = @Schema(ref = "#/components/schemas/Mike"))
             @RequestParam(required = false) Mike mike) {
-        Long memberId = null;
-        if(member != null){
-            memberId = member.getId();
-        }
+        Long memberId = member != null ? member.getId() : null;
 
         return ApiResponse.ok(boardFacadeService.getBoardList(memberId,gameMode, tier, mainP, subP, mike, page));
 
