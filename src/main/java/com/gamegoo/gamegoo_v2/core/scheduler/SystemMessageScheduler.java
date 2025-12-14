@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Profile({"prod", "dev"})
+@Profile({"prod", "dev", "qa"})
 @Slf4j
 @Component
 @RequiredArgsConstructor
