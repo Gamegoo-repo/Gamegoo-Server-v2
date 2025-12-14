@@ -22,7 +22,7 @@ public class SystemMessageScheduler {
     private final MatchingRecordRepository matchingRecordRepository;
     private final MannerMessageHandler mannerMessageHandler;
 
-    private static final Long MANNER_MESSAGE_TIME = 30 * 60L; // 30 * 60초
+    private static final Long MANNER_MESSAGE_TIME = 2 * 60L; // 2 * 60초
 
     @Scheduled(fixedRate = 60 * 1000) // 60초 주기로 실행
     public void mannerSystemMessageRun() {
