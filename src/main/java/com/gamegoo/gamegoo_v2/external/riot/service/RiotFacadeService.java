@@ -120,11 +120,12 @@ public class RiotFacadeService {
         }
 
         // DB에서 사용자 존재 여부 확인
-        List<Member> memberList = memberService.findMemberByPuuid(summonerInfo.getPuuid());
+        String puuid = summonerInfo.getPuuid();
+        List<Member> memberList = memberService.findMemberByPuuid(puuid);
 
         // 사용자가 아예 없을 경우, 회원가입 요청
         if (memberList.isEmpty()) {
-            return oAuthRedirectBuilder.buildJoinRedirectUrl(targetUrl, state, summonerInfo.getPuuid());
+            return oAuthRedirectBuilder.buildJoinRedirectUrl(targetUrl, state, puuid);
         }
 
         // 사용자가 있을 경우
@@ -132,7 +133,7 @@ public class RiotFacadeService {
 
         // 탈퇴한 사용자인지 확인하기
         if (member.getBlind()) {
-            return String.format("%s?error=member_isBlind", targetUrl);
+            return String.format("%s?error=member_isBlind&puuid=%s", targetUrl, puuid);
         }
 
         // 로그인 진행

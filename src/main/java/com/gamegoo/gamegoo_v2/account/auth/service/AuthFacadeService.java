@@ -3,16 +3,24 @@ package com.gamegoo.gamegoo_v2.account.auth.service;
 import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RefreshTokenRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
+import com.gamegoo.gamegoo_v2.account.auth.dto.response.RejoinResponse;
 import com.gamegoo.gamegoo_v2.account.auth.jwt.JwtProvider;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.account.auth.dto.request.RejoinRequest;
+import com.gamegoo.gamegoo_v2.account.member.service.BanService;
 import com.gamegoo.gamegoo_v2.account.member.service.MemberService;
 import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
+import com.gamegoo.gamegoo_v2.core.exception.AuthException;
+import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
+import com.gamegoo.gamegoo_v2.test_support.dto.TokensResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +34,7 @@ public class AuthFacadeService {
     private final BoardService boardService;
     private final AuthService authService;
     private final JwtProvider jwtProvider;
+    private final BanService banService;
 
     /**
      * 로그아웃
@@ -65,6 +74,12 @@ public class AuthFacadeService {
         return RefreshTokenResponse.of(memberId, accessToken, refreshToken);
     }
 
+    /**
+     * 회원 탈퇴 처리
+     *
+     * @param member 탈퇴할 회원
+     * @return
+     */
     public String blindMember(Member member) {
         // Member 테이블에서 blind 처리
         memberService.deactivateMember(member);
@@ -90,9 +105,80 @@ public class AuthFacadeService {
         return "탈퇴처리가 완료되었습니다";
     }
 
+    /**
+     * 테스트용 access token 발급
+     *
+     * @param memberId
+     * @return
+     */
     public String createTestAccessToken(Long memberId) {
         Member member = memberService.findMemberById(memberId);
         return jwtProvider.createAccessToken(member.getId(), member.getRole());
+    }
+
+    /**
+     * 테스트용 access, refresh token 발급
+     *
+     * @param memberId
+     * @return TokensResponse
+     */
+    public TokensResponse createTestAccessTokenAndRefreshTokens(Long memberId) {
+        // jwt 토큰 재발급
+        String accessToken = jwtProvider.createAccessToken(memberId, Role.MEMBER);
+        String refreshToken = jwtProvider.createRefreshToken(memberId, Role.MEMBER);
+
+        // memberId로 member 엔티티 조회
+        Member member = memberService.findMemberById(memberId);
+
+        // refreshToken 저장
+        authService.updateRefreshToken(member, refreshToken);
+        return TokensResponse.of(accessToken, refreshToken);
+    }
+
+    /**
+     * 탈퇴한 회원 재가입
+     *
+     * @param request 재가입 요청
+     * @return
+     */
+    @Transactional
+    public RejoinResponse rejoinMember(RejoinRequest request) {
+        // 실제 있는 사용자인지 검증
+        List<Member> memberByPuuid = memberService.findMemberByPuuid(request.getPuuid());
+        if (memberByPuuid.isEmpty()) {
+            throw new AuthException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        if (memberByPuuid.size() > 1) {
+            throw new AuthException(ErrorCode.DULPLICATED_MEMBER);
+        }
+
+        Member member = memberByPuuid.get(0);
+        // 탈퇴한 사용자인지 검증
+        if (!member.getBlind()) {
+            throw new AuthException(ErrorCode.ACTIVE_MEMBER);
+        }
+
+        // 제재 있는지 검증
+        // 만료된 제재 자동 해제
+        banService.checkBanExpiry(member);
+
+        // 제재 메시지 생성
+        String banMessage = null;
+        if (member.isBanned()) {
+            banMessage = banService.getBanReasonMessage(member.getBanType());
+        }
+
+        // 탈퇴 해제
+        memberService.activateMember(member);
+
+        // 로그인 진행
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getRole());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole());
+
+        // refresh token DB에 저장
+        authService.updateRefreshToken(member, refreshToken);
+
+        return RejoinResponse.of(member, accessToken, refreshToken, banMessage);
     }
 
 }

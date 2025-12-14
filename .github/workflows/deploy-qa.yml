@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - qa
+  pull_request:
+    types: [ closed ]
+    branches:
+      - develop
   workflow_dispatch: # 수동 실행 가능
 
 jobs:
@@ -19,7 +23,7 @@ jobs:
       GMAIL_PWD: ${{ secrets.GMAIL_PWD }}
       RIOT_API: ${{ secrets.RIOT_API }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-      SOCKET_SERVER_URL: ${{ secrets.SOCKET_SERVER_URL }}
+      SOCKET_SERVER_URL: ${{ secrets.QA_SOCKET_SERVER_URL }}
       FRONT_URL: ${{ secrets.FRONT_URL }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
@@ -92,7 +96,7 @@ jobs:
             -e QA_DB_PASSWORD=${{ secrets.QA_DB_PASSWORD }} \
             -e GMAIL_PWD=${{ secrets.GMAIL_PWD }} \
             -e RIOT_API=${{ secrets.RIOT_API }} \
-            -e SOCKET_SERVER_URL=${{ secrets.SOCKET_SERVER_URL }} \
+            -e SOCKET_SERVER_URL=${{ secrets.QA_SOCKET_SERVER_URL }} \
             -e FRONT_URL=${{ secrets.FRONT_URL }} \
             -e CLIENT_ID=${{ secrets.CLIENT_ID }} \
             -e CLIENT_SECRET=${{ secrets.CLIENT_SECRET }} \
