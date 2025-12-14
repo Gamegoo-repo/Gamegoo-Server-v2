@@ -110,6 +110,9 @@ public class AuthFacadeService {
         if (memberByPuuid.isEmpty()) {
             throw new AuthException(ErrorCode.MEMBER_NOT_FOUND);
         }
+        if (memberByPuuid.size() > 1) {
+            throw new AuthException(ErrorCode.DULPLICATED_MEMBER);
+        }
 
         Member member = memberByPuuid.get(0);
         // 탈퇴한 사용자인지 검증

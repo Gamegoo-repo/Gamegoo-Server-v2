@@ -73,7 +73,9 @@ public class AuthController {
     @Operation(summary = "탈퇴했던 사용자 재가입 API입니다.", description = "Rejoin API for blind member")
     @PostMapping("/rejoin")
     @ApiErrorCodes({
-            ErrorCode.MEMBER_NOT_FOUND
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.ACTIVE_MEMBER,
+            ErrorCode.DULPLICATED_MEMBER
     })
     public ApiResponse<RejoinResponse> rejoinMember(@RequestBody RejoinRequest rejoinRequest) {
         return ApiResponse.ok(authFacadeService.rejoinMember(rejoinRequest));

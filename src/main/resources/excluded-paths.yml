@@ -42,4 +42,6 @@ security:
         pattern: /api/v2/posts/guest/* # 비회원 게시글 수정
       - method: DELETE
         pattern: /api/v2/posts/guest/* # 비회원 게시글 삭제
+      - method: POST
+        pattern: /api/v2/auth/rejoin # 재가입
 
