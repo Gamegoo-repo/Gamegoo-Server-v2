@@ -10,4 +10,4 @@ public enum BanType {
     BAN_2W,    // 2주 제한
     BAN_1M,    // 한달 제한
     PERMANENT  // 영구 제한
-} 
+}

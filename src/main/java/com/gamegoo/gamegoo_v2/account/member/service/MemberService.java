@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,9 +27,6 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-
-    @PersistenceContext
-    EntityManager em;
 
     @Transactional
     public Member createMemberRiot(RiotJoinRequest request, String gameName, String tag, List<TierDetails> tiers) {
@@ -195,14 +193,23 @@ public class MemberService {
     }
 
     /**
-     * Member blind 처리
+     * Member 탈퇴 처리
      *
      * @param member 회원
      */
     @Transactional
     public void deactivateMember(Member member) {
-        member.deactiveMember();
-        em.flush();
+        member.updateBlind(true);
+    }
+
+    /**
+     * Member 재가입 처리
+     *
+     * @param member 회원
+     */
+    @Transactional
+    public void activateMember(Member member) {
+        member.updateBlind(false);
     }
 
     /**
@@ -291,6 +298,16 @@ public class MemberService {
                     }
                 })
                 .orElseGet(() -> createTmpMember(gameName, tag, tiers)); // 없으면 새로 생성
+    }
+
+    /**
+     * 사용자의 updated_at 얻기
+     *
+     * @param member 사용자
+     * @return 최종 수정된 updated_at
+     */
+    public LocalDateTime getMemberUpdatedAt(Member member) {
+        return member.getUpdatedAt();
     }
 
 }

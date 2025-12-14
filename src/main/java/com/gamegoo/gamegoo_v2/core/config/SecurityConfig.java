@@ -89,7 +89,8 @@ public class SecurityConfig {
                         "/api/v2/auth/token/**",
                         "/api/v2/auth/join",
                         "/api/v2/auth/login",
-                        "/api/v2/auth/refresh").permitAll()
+                        "/api/v2/auth/refresh",
+                        "/api/v2/auth/rejoin").permitAll()
                 .requestMatchers(
                         "/api/v2/email/send/**",
                         "/api/v2/email/verify").permitAll()

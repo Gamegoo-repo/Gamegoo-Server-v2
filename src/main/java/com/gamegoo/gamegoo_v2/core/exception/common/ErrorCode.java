@@ -37,6 +37,8 @@ public enum ErrorCode {
     UNAUTHORIZED_EXCEPTION(UNAUTHORIZED, "AUTH_410", "로그인 후 이용가능합니다. 토큰을 입력해 주세요"),
     MEMBER_EXTRACTION_FAILED(NOT_FOUND, "AUTH_411", "회원 정보를 추출할 수 없습니다."),
     INACTIVE_MEMBER(NOT_FOUND, "AUTH_412", "탈퇴한 사용자 입니다."),
+    ACTIVE_MEMBER(BAD_REQUEST, "AUTH_413", "탈퇴하지 않은 사용자입니다."),
+    DULPLICATED_MEMBER(BAD_REQUEST, "AUTH_414", "중복된 사용자입니다. 서버 관리자에게 문의하세요."),
 
     /**
      * 회원 관련 에러
