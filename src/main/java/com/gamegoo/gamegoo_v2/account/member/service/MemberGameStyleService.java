@@ -47,8 +47,13 @@ public class MemberGameStyleService {
      * @return request의 GamestyleList
      */
     private List<GameStyle> findRequestGameStyle(List<Long> gameStyleIdList) {
+        if (gameStyleIdList == null || gameStyleIdList.isEmpty()) {
+            return List.of();
+        }
+
         return gameStyleIdList.stream()
-                .map(id -> gameStyleRepository.findById(id).orElseThrow(() -> new MemberException(ErrorCode.GAMESTYLE_NOT_FOUND)))
+                .map(id -> gameStyleRepository.findById(id)
+                        .orElseThrow(() -> new MemberException(ErrorCode.GAMESTYLE_NOT_FOUND)))
                 .toList();
     }
 
