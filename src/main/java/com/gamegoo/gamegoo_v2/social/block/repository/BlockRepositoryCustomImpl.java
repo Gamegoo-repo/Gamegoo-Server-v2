@@ -38,8 +38,7 @@ public class BlockRepositoryCustomImpl implements BlockRepositoryCustom {
     }
 
     @Override
-    public Map<Long, Boolean>
-    hasBlockedTargetMembersBatch(List<Long> targetMemberIds, Long memberId){
+    public Map<Long, Boolean> hasBlockedTargetMembersBatch(List<Long> targetMemberIds, Long memberId){
         Set<Long> blockedSet = new HashSet<>(
                 queryFactory
                         .select(block.blockedMember.id)
