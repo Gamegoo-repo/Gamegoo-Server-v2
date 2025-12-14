@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Profile({"prod", "dev"})
+@Profile({"prod", "dev", "qa"})
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -29,6 +29,9 @@ public class SystemMessageScheduler {
         LocalDateTime updatedTime = LocalDateTime.now().minusSeconds(MANNER_MESSAGE_TIME);
         List<MatchingRecord> list = matchingRecordRepository
                 .findByMannerMessageSentAndUpdatedAtBefore(MannerMessageStatus.NOT_SENT, updatedTime);
+        //log.info("-- mannerSystemMessageRun --");
+        //log.info(list.toString());
+        //log.info("list size: {}", list.size());
 
         for (MatchingRecord record : list) {
             try {
