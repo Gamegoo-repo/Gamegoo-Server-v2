@@ -167,6 +167,7 @@ cors:
     - https://api.gamegoo.co.kr
     - https://socket.gamegoo.co.kr
     - https://www.gamegoo.co.kr
+    - https://admin.gamegoo.co.kr
 
 ---
 # QA 환경
@@ -201,3 +202,4 @@ cors:
     - https://qaapi.gamegoo.co.kr
     - https://qasocket.gamegoo.co.kr
     - https://test.gamegoo.co.kr
+    - https://admin.gamegoo.co.kr
