@@ -7,6 +7,7 @@ import lombok.Getter;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -22,14 +23,18 @@ public class BoardResponse {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private int currentPage;
 
-    public static BoardResponse of(Page<Board> boardPage) {
+    public static BoardResponse of(Page<Board> boardPage, Map<Long, Boolean> blockedMap) {
         // 전체 페이지/개수 추출
         int totalCount = (int) boardPage.getTotalElements();
         int totalPage = (boardPage.getTotalPages() == 0) ? 1 : boardPage.getTotalPages();
 
         // Board -> BoardListResponse 변환
         List<BoardListResponse> boardList = boardPage.getContent().stream()
-                .map(BoardListResponse::of)
+                .map(board -> {
+                    Long memberId = board.getMember().getId();
+                    Boolean isBlocked = blockedMap.get(memberId);
+                    return BoardListResponse.of(board, isBlocked);
+                })
                 .collect(Collectors.toList());
 
         // DTO 생성

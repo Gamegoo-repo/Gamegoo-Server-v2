@@ -8,6 +8,7 @@ import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -20,9 +21,13 @@ public class BoardCursorResponse {
     private final LocalDateTime nextCursor;
     private Long cursorId;
 
-    public static BoardCursorResponse of(Slice<Board> boardSlice) {
+    public static BoardCursorResponse of(Slice<Board> boardSlice, Map<Long, Boolean> blockedMap) {
         List<BoardListResponse> boards = boardSlice.getContent().stream()
-                .map(BoardListResponse::of)
+                .map(board -> {
+                    Long memberId = board.getMember().getId();
+                    Boolean isBlocked = blockedMap.get(memberId);
+                    return BoardListResponse.of(board, isBlocked);
+                })
                 .collect(Collectors.toList());
         Long cursorId = null;
         LocalDateTime nextCursor = null;
@@ -38,4 +43,4 @@ public class BoardCursorResponse {
                 .nextCursor(nextCursor)
                 .build();
     }
-} 
+}
