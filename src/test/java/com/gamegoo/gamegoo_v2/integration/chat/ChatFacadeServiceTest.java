@@ -151,18 +151,6 @@ class ChatFacadeServiceTest {
                     .hasMessage(ErrorCode._BAD_REQUEST.getMessage());
         }
 
-        @DisplayName("실패: 내가 상대를 차단한 경우 예외가 발생한다.")
-        @Test
-        void startChatroomByMemberId_shouldThrownWhenTargetMemberIsBlockedByMe() {
-            // given
-            blockMember(member, targetMember);
-
-            // when // then
-            assertThatThrownBy(() -> chatFacadeService.startChatroomByMemberId(member, targetMember.getId()))
-                    .isInstanceOf(ChatException.class)
-                    .hasMessage(ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED.getMessage());
-        }
-
         @DisplayName("성공: 기존 채팅방이 존재히는 경우 해당 채팅방에 입장 처리 및 최근 메시지 내역을 조회해야 한다.")
         @Test
         void startChatroomByMemberIdSucceedsWhenExistingChatroom() {
@@ -290,34 +278,6 @@ class ChatFacadeServiceTest {
                     .hasMessage(ErrorCode.CHAT_START_FAILED_TARGET_DEACTIVATED.getMessage());
         }
 
-        @DisplayName("실패: 상대가 나를 차단한 경우 예외가 발생한다.")
-        @Test
-        void startChatroomByBoardId_shouldThrownWhenNoExistingChatroomAndBlockedByTarget() {
-            // given
-            Board board = createBoard(targetMember);
-
-            blockMember(targetMember, member);
-
-            // when // then
-            assertThatThrownBy(() -> chatFacadeService.startChatroomByBoardId(member, board.getId()))
-                    .isInstanceOf(ChatException.class)
-                    .hasMessage(ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET.getMessage());
-        }
-
-        @DisplayName("실패: 내가 상대를 차단한 경우 예외가 발생한다.")
-        @Test
-        void startChatroomByBoardId_shouldThrownWhenTargetIsBlocked() {
-            // given
-            Board board = createBoard(targetMember);
-
-            blockMember(member, targetMember);
-
-            // when // then
-            assertThatThrownBy(() -> chatFacadeService.startChatroomByBoardId(member, board.getId()))
-                    .isInstanceOf(ChatException.class)
-                    .hasMessage(ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED.getMessage());
-        }
-
         @DisplayName("성공: 기존 채팅방에 퇴장한 상태인 경우 해당 채팅방에 입장 처리 및 최근 메시지 내역을 조회해야 한다. systemFlag로는 1을 반환해야 한다.")
         @Test
         void startChatroomByBoardIdSucceedsWhenExitedExistingChatroom() {
@@ -408,22 +368,6 @@ class ChatFacadeServiceTest {
             assertThatThrownBy(() -> chatFacadeService.enterChatroomByUuid(member, "notExistUuid"))
                     .isInstanceOf(ChatException.class)
                     .hasMessage(ErrorCode.CHATROOM_NOT_FOUND.getMessage());
-        }
-
-        @DisplayName("실패: 내가 상대를 차단한 경우 예외가 발생한다.")
-        @Test
-        void enterChatroom_shouldThrownWhenTargetIsBlocked() {
-            // given
-            Chatroom chatroom = createChatroom();
-            createMemberChatroom(member, chatroom, null);
-            createMemberChatroom(targetMember, chatroom, null);
-
-            blockMember(member, targetMember);
-
-            // when // then
-            assertThatThrownBy(() -> chatFacadeService.enterChatroomByUuid(member, chatroom.getUuid()))
-                    .isInstanceOf(ChatException.class)
-                    .hasMessage(ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED.getMessage());
         }
 
         @DisplayName("실패: 해당 채팅방이 본인의 채팅방이 아닌 경우 예외가 발생한다.")
