@@ -23,8 +23,6 @@ import com.gamegoo.gamegoo_v2.core.common.validator.ChatValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.ChatException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
-import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -41,7 +39,6 @@ import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAT_ADD_FA
 import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAT_ADD_FAILED_TARGET_IS_BLOCKED;
 import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET;
 import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAT_START_FAILED_TARGET_DEACTIVATED;
-import static com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode.CHAT_START_FAILED_TARGET_IS_BLOCKED;
 
 @Service
 @RequiredArgsConstructor
@@ -59,8 +56,7 @@ public class ChatFacadeService {
     private final ChatValidator chatValidator;
 
     private final ChatResponseFactory chatResponseFactory;
-    private final FriendService friendService;
-    private final BlockService blockService;
+
 
     /**
      * 대상 회원과 채팅 시작 Facade 메소드
@@ -75,9 +71,6 @@ public class ChatFacadeService {
         // 대상 회원 검증
         Member targetMember = memberService.findMemberById(targetMemberId);
         memberValidator.throwIfEqual(member, targetMember);
-
-        // 내가 상대 회원을 차단하지 않았는지 검증
-        blockValidator.throwIfBlocked(member, targetMember, ChatException.class, CHAT_START_FAILED_TARGET_IS_BLOCKED);
 
         Chatroom chatroom;
 
@@ -134,12 +127,6 @@ public class ChatFacadeService {
         // 상대가 탈퇴하지 않았는지 검증
         memberValidator.throwIfBlind(targetMember, ChatException.class, CHAT_START_FAILED_TARGET_DEACTIVATED);
 
-        // 상대가 나를 차단하지 않았는지 검증
-        blockValidator.throwIfBlocked(targetMember, member, ChatException.class, CHAT_START_FAILED_BLOCKED_BY_TARGET);
-
-        // 내가 상대 회원을 차단하지 않았는지 검증
-        blockValidator.throwIfBlocked(member, targetMember, ChatException.class, CHAT_START_FAILED_TARGET_IS_BLOCKED);
-
         Chatroom chatroom = chatQueryService.findExistingChatroom(member, targetMember)
                 .orElseGet(() -> chatCommandService.createChatroom(member, targetMember));
 
@@ -171,9 +158,7 @@ public class ChatFacadeService {
         // 해당 채팅방이 회원의 것이 맞는지 검증
         chatValidator.validateMemberChatroom(member.getId(), chatroom.getId());
 
-        // 내가 상대 회원을 차단하지 않았는지 검증
         Member targetMember = chatQueryService.getChatroomTargetMember(member, chatroom);
-        blockValidator.throwIfBlocked(member, targetMember, ChatException.class, CHAT_START_FAILED_TARGET_IS_BLOCKED);
 
         // 최근 메시지 내역 조회
         Slice<Chat> chatSlice = chatQueryService.getRecentChatSlice(member, chatroom);

@@ -21,6 +21,8 @@ public class EnterChatroomResponse {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean blocked;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    boolean blockedByTarget;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean blind;
     Long friendRequestMemberId;
     @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
