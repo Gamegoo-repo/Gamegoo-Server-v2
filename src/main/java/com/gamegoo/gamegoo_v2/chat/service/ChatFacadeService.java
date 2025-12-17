@@ -374,11 +374,8 @@ public class ChatFacadeService {
                 .map(chatroomSummaryDTO -> {
                     Long targetMemberId = chatroomSummaryDTO.getTargetMemberId();
                     boolean friend = chatroomTargetMap.get(targetMemberId).getIsFriend() == 1;
-                    boolean blocked = chatroomTargetMap.get(targetMemberId).getIsBlocked() == 1;
-                    Long friendRequestMemberId = chatroomTargetMap.get(targetMemberId).getFriendRequestMemberId();
-                    
-                    return chatResponseFactory.toChatroomResponse(friend, blocked, friendRequestMemberId,
-                            chatroomSummaryDTO);
+
+                    return chatResponseFactory.toChatroomResponse(friend, chatroomSummaryDTO);
                 }).toList();
 
         return chatResponseFactory.toChatroomListResponse(chatroomResponses);

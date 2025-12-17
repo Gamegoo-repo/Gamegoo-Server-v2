@@ -101,13 +101,6 @@ public class ChatResponseFactory {
                 .build();
     }
 
-    public ChatroomListResponse toChatroomListResponse() {
-        return ChatroomListResponse.builder()
-                .chatroomResponseList(new ArrayList<>())
-                .listSize(0)
-                .build();
-    }
-
     public ChatroomListResponse toChatroomListResponse(List<ChatroomResponse> chatroomResponseList) {
         return ChatroomListResponse.builder()
                 .chatroomResponseList(chatroomResponseList)
@@ -115,40 +108,8 @@ public class ChatResponseFactory {
                 .build();
     }
 
-    public ChatroomResponse toChatroomResponse(Member targetMember, boolean isFriend, boolean isBlocked,
-                                               Long friendRequestMemberId,
-                                               ChatroomSummaryDTO chatroomSummaryDTO) {
-        String gameName = targetMember.getBlind()
-                ? "(탈퇴한 사용자)"
-                : targetMember.getGameName();
 
-        String lastMsgAt = null;
-
-        if (chatroomSummaryDTO.getLastChatAt() != null) {
-            lastMsgAt = DateTimeUtil.toKSTString(chatroomSummaryDTO.getLastChatAt());
-        }
-
-        return ChatroomResponse.builder()
-                .chatroomId(chatroomSummaryDTO.getChatroomId())
-                .uuid(chatroomSummaryDTO.getChatroomUuid())
-                .targetMemberId(targetMember.getId())
-                .targetMemberImg(targetMember.getProfileImage())
-                .targetMemberName(gameName)
-                .friend(isFriend)
-                .blocked(isBlocked)
-                .blind(targetMember.getBlind())
-                .friendRequestMemberId(friendRequestMemberId)
-                .lastMsg(chatroomSummaryDTO.getLastChat())
-                .lastMsgAt(lastMsgAt)
-                .notReadMsgCnt(chatroomSummaryDTO.getUnreadCnt())
-                .lastMsgTimestamp(chatroomSummaryDTO.getLastChatTimestamp())
-                .build();
-    }
-
-
-    public ChatroomResponse toChatroomResponse(boolean isFriend, boolean isBlocked,
-                                               Long friendRequestMemberId,
-                                               ChatroomSummaryDTO chatroomSummaryDTO) {
+    public ChatroomResponse toChatroomResponse(boolean isFriend, ChatroomSummaryDTO chatroomSummaryDTO) {
         String gameName = chatroomSummaryDTO.getBlind()
                 ? "(탈퇴한 사용자)"
                 : chatroomSummaryDTO.getTargetMemberName();
@@ -166,9 +127,7 @@ public class ChatResponseFactory {
                 .targetMemberImg(chatroomSummaryDTO.getTargetMemberImg())
                 .targetMemberName(gameName)
                 .friend(isFriend)
-                .blocked(isBlocked)
                 .blind(chatroomSummaryDTO.getBlind())
-                .friendRequestMemberId(friendRequestMemberId)
                 .lastMsg(chatroomSummaryDTO.getLastChat())
                 .lastMsgAt(lastMsgAt)
                 .notReadMsgCnt(chatroomSummaryDTO.getUnreadCnt())

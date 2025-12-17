@@ -21,10 +21,7 @@ public class ChatroomResponse {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean friend;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    boolean blocked;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean blind;
-    Long friendRequestMemberId;
     String lastMsg;
     String lastMsgAt;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
