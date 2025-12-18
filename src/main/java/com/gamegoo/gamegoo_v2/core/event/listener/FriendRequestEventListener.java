@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.core.event.AcceptFriendRequestEvent;
 import com.gamegoo.gamegoo_v2.core.event.RejectFriendRequestEvent;
 import com.gamegoo.gamegoo_v2.core.event.SendFriendRequestEvent;
 import com.gamegoo.gamegoo_v2.notification.service.NotificationService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -27,6 +28,7 @@ public class FriendRequestEventListener {
      * @param event event
      */
     @Async
+    @Transactional
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleSendFriendRequestEvent(SendFriendRequestEvent event) {
         try {
