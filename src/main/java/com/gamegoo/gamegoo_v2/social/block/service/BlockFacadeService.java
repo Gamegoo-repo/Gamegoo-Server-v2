@@ -33,9 +33,7 @@ public class BlockFacadeService {
 
         // 회원 차단 처리
         Block block = blockService.blockMember(member, targetMember);
-
-        // 차단 대상 회원과의 채팅방이 존재하는 경우, 해당 채팅방 퇴장 처리
-
+        
         // 차단 대상 회원과 친구관계인 경우, 친구 관계 끊기
         friendService.removeFriendshipIfPresent(member, targetMember);
 

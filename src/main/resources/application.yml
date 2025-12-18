@@ -48,7 +48,7 @@ socket:
     url: ${SOCKET_SERVER_URL}
 
 email:
-  report_email_to: report@gamegoo.co.kr
+  report_email_to: gamegoo0707@gmail.com
   report_email_template_path: templates/new-report.html
 
 logging:
@@ -167,6 +167,7 @@ cors:
     - https://api.gamegoo.co.kr
     - https://socket.gamegoo.co.kr
     - https://www.gamegoo.co.kr
+    - https://admin.gamegoo.co.kr
 
 ---
 # QA 환경

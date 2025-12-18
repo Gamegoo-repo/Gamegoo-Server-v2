@@ -111,6 +111,7 @@ public class BoardController {
     })
     @ApiErrorCodes({ErrorCode._BAD_REQUEST})
     public ApiResponse<BoardResponse> boardList(
+            @AuthMember(required = false) Member member,
             @ValidPage @RequestParam(name = "page") Integer page,
             @Parameter(description = "게임 모드", schema = @Schema(ref = "#/components/schemas/GameMode"))
             @RequestParam(required = false) GameMode gameMode,
@@ -122,8 +123,9 @@ public class BoardController {
             @RequestParam(required = false) Position subP,
             @Parameter(description = "마이크 사용 여부", schema = @Schema(ref = "#/components/schemas/Mike"))
             @RequestParam(required = false) Mike mike) {
+        Long memberId = member != null ? member.getId() : null;
 
-        return ApiResponse.ok(boardFacadeService.getBoardList(gameMode, tier, mainP, subP, mike, page));
+        return ApiResponse.ok(boardFacadeService.getBoardList(memberId,gameMode, tier, mainP, subP, mike, page));
 
 
     }
@@ -255,6 +257,7 @@ public class BoardController {
     })
     @ApiErrorCodes({ErrorCode._BAD_REQUEST})
     public ResponseEntity<ApiResponse<BoardCursorResponse>> getBoardsWithCursor(
+            @AuthMember(required = false) Member member,
             @RequestParam(required = false) LocalDateTime cursor,
             @RequestParam(required = false) Long cursorId,
             @Parameter(description = "게임 모드", schema = @Schema(ref = "#/components/schemas/GameMode"))
@@ -268,7 +271,8 @@ public class BoardController {
             @Parameter(description = "마이크 사용 여부", schema = @Schema(ref = "#/components/schemas/Mike"))
             @RequestParam(required = false) Mike mike
             ) {
-        BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2, mike);
+        Long memberId = member != null ? member.getId() : null;
+        BoardCursorResponse response = boardFacadeService.getAllBoardsWithCursor(cursor, cursorId, gameMode, tier, position1, position2, mike, memberId);
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 

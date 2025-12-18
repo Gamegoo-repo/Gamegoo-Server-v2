@@ -20,8 +20,6 @@ import com.gamegoo.gamegoo_v2.core.common.validator.ChatValidator;
 import com.gamegoo.gamegoo_v2.core.common.validator.MemberValidator;
 import com.gamegoo.gamegoo_v2.core.exception.MemberException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-import com.gamegoo.gamegoo_v2.social.block.service.BlockService;
-import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -235,6 +233,7 @@ class ChatFacadeServiceBanTest {
             verify(chatQueryService).getChatroomByUuid(anyString());
             verify(chatCommandService).createMemberChat(any(), any(), anyString());
         }
+
     }
 
     @Nested
@@ -263,7 +262,8 @@ class ChatFacadeServiceBanTest {
         @DisplayName("제재되지 않은 사용자는 게시판 말걸어보기를 정상적으로 할 수 있다")
         void normal_user_can_start_chat_from_board() {
             // given
-            com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom memberChatroom = com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom.builder()
+            com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom memberChatroom =
+                    com.gamegoo.gamegoo_v2.chat.domain.MemberChatroom.builder()
                     .member(normalMember)
                     .chatroom(chatroom)
                     .lastJoinDate(java.time.LocalDateTime.now())
@@ -275,12 +275,13 @@ class ChatFacadeServiceBanTest {
             when(memberService.findMemberById(anyLong())).thenReturn(normalMember);
             doNothing().when(memberValidator).throwIfEqual(any(), any());
             doNothing().when(memberValidator).throwIfBlind(any(), any(), any());
-            doNothing().when(blockValidator).throwIfBlocked(any(), any(), any(), any());
+            //doNothing().when(blockValidator).throwIfBlocked(any(), any(), any(), any());
             when(chatQueryService.findExistingChatroom(any(), any())).thenReturn(java.util.Optional.of(chatroom));
             when(chatCommandService.enterExistingChatroom(any(), any(), any())).thenReturn(memberChatroom);
             when(chatQueryService.getRecentChatSlice(any(), any())).thenReturn(null);
             when(chatResponseFactory.toChatMessageListResponse(any())).thenReturn(null);
-            when(chatResponseFactory.toEnterChatroomResponse(any(), any(), anyString(), anyInt(), anyLong(), any())).thenReturn(null);
+            when(chatResponseFactory.toEnterChatroomResponse(any(), any(), anyString(), anyInt(), anyLong(),
+                    any())).thenReturn(null);
 
             // when
             chatFacadeService.startChatroomByBoardId(normalMember, 1L);
@@ -309,6 +310,7 @@ class ChatFacadeServiceBanTest {
             verify(memberValidator, never()).throwIfEqual(any(), any());
             verify(blockValidator, never()).throwIfBlocked(any(), any(), any(), any());
         }
+
     }
 
     // 헬퍼 메서드
@@ -339,4 +341,5 @@ class ChatFacadeServiceBanTest {
 
         return member;
     }
+
 }
