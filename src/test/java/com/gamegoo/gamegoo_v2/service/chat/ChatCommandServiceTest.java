@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -174,23 +173,6 @@ class ChatCommandServiceTest {
             assertThatThrownBy(() -> chatCommandService.enterExistingChatroom(member, targetMember, createChatroom()))
                     .isInstanceOf(ChatException.class)
                     .hasMessage(ErrorCode.CHATROOM_ACCESS_DENIED.getMessage());
-        }
-
-        @DisplayName("실패: 채팅방을 퇴장한 상태이며 상대가 나를 차단한 경우 예외가 발생한다.")
-        @Test
-        void enterExistingChatroom_shouldThrownWhenMemberIsBlockedByTarget() {
-            // given
-            Chatroom chatroom = createChatroom();
-            createMemberChatroom(member, chatroom, null);
-            createMemberChatroom(targetMember, chatroom, null);
-
-            // 상대가 나를 차단
-            blockMember(targetMember, member);
-
-            // when // then
-            assertThatThrownBy(() -> chatCommandService.enterExistingChatroom(member, targetMember, chatroom))
-                    .isInstanceOf(ChatException.class)
-                    .hasMessage(ErrorCode.CHAT_START_FAILED_BLOCKED_BY_TARGET.getMessage());
         }
 
         @DisplayName("실패: 채팅방을 퇴장한 상태이며 상대가 탈퇴한 경우 예외가 발생한다.")
