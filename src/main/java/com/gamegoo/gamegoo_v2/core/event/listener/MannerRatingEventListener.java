@@ -9,10 +9,10 @@ import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
 import com.gamegoo.gamegoo_v2.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
@@ -23,8 +23,7 @@ public class MannerRatingEventListener {
     private final MemberService memberService;
 
     @Async
-    @Transactional
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleMannerRatingInsertEvent(MannerRatingInsertEvent event) {
         try {
             Member member = memberService.findMemberById(event.getMemberId());
@@ -37,8 +36,7 @@ public class MannerRatingEventListener {
     }
 
     @Async
-    @Transactional
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleMannerLevelUpEvent(MannerLevelUpEvent event) {
         try {
             Member member = memberService.findMemberById(event.getMemberId());
@@ -52,8 +50,7 @@ public class MannerRatingEventListener {
     }
 
     @Async
-    @Transactional
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlerMannerLevelDownEvent(MannerLevelDownEvent event) {
         try {
             Member member = memberService.findMemberById(event.getMemberId());
