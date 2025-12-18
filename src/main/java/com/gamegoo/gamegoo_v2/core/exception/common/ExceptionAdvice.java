@@ -6,6 +6,7 @@ import com.gamegoo.gamegoo_v2.core.exception.ChampionRefreshCooldownException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -14,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -27,6 +29,12 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionAdvice {
+
+    @ExceptionHandler(ClientAbortException.class)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void ignoreClientAbort(ClientAbortException e) {
+        log.debug("Client aborted connection: {}", e.getMessage());
+    }
 
     // 커스텀 에러
     @ExceptionHandler(GlobalException.class)
