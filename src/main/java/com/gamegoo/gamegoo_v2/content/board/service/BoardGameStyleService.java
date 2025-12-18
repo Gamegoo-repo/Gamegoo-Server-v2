@@ -31,6 +31,10 @@ public class BoardGameStyleService {
      */
     @Transactional
     public void mapGameStylesToBoard(Board board, List<Long> gameStyleIds) {
+        if (gameStyleIds == null || gameStyleIds.isEmpty()) {
+            return;
+        }
+
         List<BoardGameStyle> boardGameStyles = gameStyleIds.stream()
                 .map(this::findGameStyle)
                 .map(gameStyle -> BoardGameStyle.create(gameStyle, board))
