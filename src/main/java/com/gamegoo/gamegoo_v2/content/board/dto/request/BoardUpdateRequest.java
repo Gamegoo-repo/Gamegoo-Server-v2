@@ -37,9 +37,8 @@ public class BoardUpdateRequest {
     @Schema(ref = "#/components/schemas/Mike")
     Mike mike;
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "게임 스타일 리스트는 필수 값입니다.")
-    @Size(min = 1, max = 3, message = "게임 스타일 리스트는 1개 이상 3개 이하여야 합니다.")
+    @Schema(description = "게임 스타일 리스트 (선택, 최대 3개)")
+    @Size(max = 3, message = "게임 스타일 리스트는 최대 3개까지 선택 가능합니다.")
     List<Long> gameStyles;
 
     @Schema(description = "게시글 내용 (선택)")
