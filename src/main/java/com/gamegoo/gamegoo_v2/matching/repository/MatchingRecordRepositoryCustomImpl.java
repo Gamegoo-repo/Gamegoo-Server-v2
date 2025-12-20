@@ -129,11 +129,10 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
      * FREE 모드 - 자유 랭크 제한 검증
      */
     private BooleanExpression validateFreeRankFilter() {
-        return matchingRecord.tier.in(Tier.IRON, Tier.BRONZE, Tier.SILVER, Tier.GOLD)
+        return matchingRecord.tier.in(Tier.UNRANKED, Tier.IRON, Tier.BRONZE, Tier.SILVER, Tier.GOLD)
                 .and(matchingRecord.tier.notIn(Tier.EMERALD, Tier.DIAMOND, Tier.MASTER, Tier.GRANDMASTER,
                         Tier.CHALLENGER));
     }
-
 
     /**
      * 매칭 유효성 검사 서브쿼리
@@ -172,18 +171,34 @@ public class MatchingRecordRepositoryCustomImpl implements MatchingRecordReposit
      * 개인 랭크 제한 검증 (SOLO 모드 전용)
      */
     private BooleanExpression validateSoloRankRange(EnumPath<Tier> tierPath) {
-        return tierPath.eq(Tier.IRON).or(tierPath.eq(Tier.BRONZE)).and(matchingRecord.tier.in(Tier.IRON,
-                        Tier.BRONZE, Tier.SILVER))
-                .or(tierPath.eq(Tier.SILVER).and(matchingRecord.tier.in(Tier.IRON, Tier.BRONZE, Tier.SILVER,
-                        Tier.GOLD)))
-                .or(tierPath.eq(Tier.GOLD).and(matchingRecord.tier.in(Tier.SILVER, Tier.GOLD, Tier.PLATINUM)))
-                .or(tierPath.eq(Tier.PLATINUM).and(matchingRecord.tier.in(Tier.GOLD, Tier.PLATINUM, Tier.EMERALD)))
-                .or(tierPath.eq(Tier.EMERALD).and(matchingRecord.tier.in(Tier.PLATINUM, Tier.EMERALD,
-                        Tier.DIAMOND)))
-                .or(tierPath.eq(Tier.DIAMOND).and(matchingRecord.tier.in(Tier.EMERALD, Tier.DIAMOND)))
-                .or(tierPath.eq(Tier.MASTER).and(matchingRecord.tier.in(Tier.MASTER, Tier.GRANDMASTER)))
-                .or(tierPath.eq(Tier.GRANDMASTER).and(matchingRecord.tier.in(Tier.MASTER, Tier.GRANDMASTER)));
-    }
 
+        // UNRANKED ↔ UNRANKED 전용 매칭
+        BooleanExpression unrankedOnly =
+                tierPath.eq(Tier.UNRANKED)
+                        .and(matchingRecord.tier.eq(Tier.UNRANKED));
+
+        // 기존 랭크 매칭 규칙 (UNRANKED 제외)
+        BooleanExpression rankedRange =
+                tierPath.eq(Tier.IRON)
+                        .or(tierPath.eq(Tier.BRONZE))
+                        .and(matchingRecord.tier.in(Tier.IRON, Tier.BRONZE, Tier.SILVER))
+                        .or(tierPath.eq(Tier.SILVER)
+                                .and(matchingRecord.tier.in(Tier.IRON, Tier.BRONZE, Tier.SILVER, Tier.GOLD)))
+                        .or(tierPath.eq(Tier.GOLD)
+                                .and(matchingRecord.tier.in(Tier.SILVER, Tier.GOLD, Tier.PLATINUM)))
+                        .or(tierPath.eq(Tier.PLATINUM)
+                                .and(matchingRecord.tier.in(Tier.GOLD, Tier.PLATINUM, Tier.EMERALD)))
+                        .or(tierPath.eq(Tier.EMERALD)
+                                .and(matchingRecord.tier.in(Tier.PLATINUM, Tier.EMERALD, Tier.DIAMOND)))
+                        .or(tierPath.eq(Tier.DIAMOND)
+                                .and(matchingRecord.tier.in(Tier.EMERALD, Tier.DIAMOND)))
+                        .or(tierPath.eq(Tier.MASTER)
+                                .and(matchingRecord.tier.in(Tier.MASTER, Tier.GRANDMASTER)))
+                        .or(tierPath.eq(Tier.GRANDMASTER)
+                                .and(matchingRecord.tier.in(Tier.MASTER, Tier.GRANDMASTER)));
+
+        // UNRANKED 전용 OR 기존 랭크 규칙
+        return unrankedOnly.or(rankedRange);
+    }
 
 }
