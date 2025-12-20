@@ -1,19 +1,18 @@
 package com.gamegoo.gamegoo_v2.notification.service;
 
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
-
+import com.gamegoo.gamegoo_v2.core.event.SocketNewNotificationEvent;
 import com.gamegoo.gamegoo_v2.core.exception.NotificationException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
-
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationType;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
-
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -31,6 +30,7 @@ public class NotificationService {
     private final NotificationTypeRepository notificationTypeRepository;
     private final NotificationRepository notificationRepository;
     private final MannerKeywordRepository mannerKeywordRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     private static final String PLACEHOLDER = "n";
     private final static int PAGE_SIZE = 10;
@@ -48,7 +48,13 @@ public class NotificationService {
         validateMember(sourceMember);
 
         NotificationType notificationType = findNotificationType(NotificationTypeTitle.FRIEND_REQUEST_SEND);
-        return saveNotification(notificationType, notificationType.getContent(), member, sourceMember);
+        Notification notification = saveNotification(notificationType, notificationType.getContent(), member,
+                sourceMember);
+
+        // 새 알림 소켓 event 생성
+        eventPublisher.publishEvent(new SocketNewNotificationEvent(member.getId()));
+
+        return notification;
     }
 
     /**
@@ -64,7 +70,13 @@ public class NotificationService {
         validateMember(sourceMember);
 
         NotificationType notificationType = findNotificationType(NotificationTypeTitle.FRIEND_REQUEST_RECEIVED);
-        return saveNotification(notificationType, notificationType.getContent(), member, sourceMember);
+        Notification notification = saveNotification(notificationType, notificationType.getContent(), member,
+                sourceMember);
+
+        // 새 알림 소켓 event 생성
+        eventPublisher.publishEvent(new SocketNewNotificationEvent(member.getId()));
+
+        return notification;
     }
 
     /**
@@ -80,7 +92,13 @@ public class NotificationService {
         validateMember(sourceMember);
 
         NotificationType notificationType = findNotificationType(NotificationTypeTitle.FRIEND_REQUEST_ACCEPTED);
-        return saveNotification(notificationType, notificationType.getContent(), member, sourceMember);
+        Notification notification = saveNotification(notificationType, notificationType.getContent(), member,
+                sourceMember);
+
+        // 새 알림 소켓 event 생성
+        eventPublisher.publishEvent(new SocketNewNotificationEvent(member.getId()));
+
+        return notification;
     }
 
     /**
@@ -96,7 +114,13 @@ public class NotificationService {
         validateMember(sourceMember);
 
         NotificationType notificationType = findNotificationType(NotificationTypeTitle.FRIEND_REQUEST_REJECTED);
-        return saveNotification(notificationType, notificationType.getContent(), member, sourceMember);
+        Notification notification = saveNotification(notificationType, notificationType.getContent(), member,
+                sourceMember);
+
+        // 새 알림 소켓 event 생성
+        eventPublisher.publishEvent(new SocketNewNotificationEvent(member.getId()));
+
+        return notification;
     }
 
     /**
@@ -114,7 +138,12 @@ public class NotificationService {
 
         NotificationType notificationType = findNotificationType(notificationTypeTitle);
         String notificationContent = notificationType.getContent().replace(PLACEHOLDER, Integer.toString(mannerLevel));
-        return saveNotification(notificationType, notificationContent, member, null);
+        Notification notification = saveNotification(notificationType, notificationContent, member, null);
+
+        // 새 알림 소켓 event 생성
+        eventPublisher.publishEvent(new SocketNewNotificationEvent(member.getId()));
+
+        return notification;
     }
 
     /**
@@ -141,53 +170,70 @@ public class NotificationService {
 
         String notificationContent = notificationType.getContent().replace(PLACEHOLDER, mannerKeywordString);
 
-        return saveNotification(notificationType, notificationContent, member, null);
+        Notification notification = saveNotification(notificationType, notificationContent, member, null);
+
+        // 새 알림 소켓 event 생성
+        eventPublisher.publishEvent(new SocketNewNotificationEvent(member.getId()));
+
+        return notification;
     }
 
     /**
      * 신고 처리 결과 알림 생성 메소드 (신고자)
      *
-     * @param reporter        신고자
-     * @param reportReason    신고 사유
-     * @param banDescription  제재 설명
+     * @param reporter       신고자
+     * @param reportReason   신고 사유
+     * @param banDescription 제재 설명
      * @return Notification
      */
     @Transactional
-    public Notification createReportProcessedNotificationForReporter(Member reporter, String reportReason, String banDescription) {
+    public Notification createReportProcessedNotificationForReporter(Member reporter, String reportReason,
+                                                                     String banDescription) {
         validateMember(reporter);
 
         NotificationType notificationType = findNotificationType(NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
 
         String notificationContent = String.format(
-            "신고 사유: %s\n처리 결과: %s",
-            reportReason,
-            banDescription
+                "신고 사유: %s\n처리 결과: %s",
+                reportReason,
+                banDescription
         );
 
-        return saveNotification(notificationType, notificationContent, reporter, null);
+        Notification notification = saveNotification(notificationType, notificationContent, reporter, null);
+
+        // 새 알림 소켓 event 생성
+        eventPublisher.publishEvent(new SocketNewNotificationEvent(reporter.getId()));
+
+        return notification;
     }
 
     /**
      * 신고 처리 결과 알림 생성 메소드 (신고 당한 자)
      *
-     * @param reported        신고 당한 회원
-     * @param reportReason    신고 사유
-     * @param banDescription  제재 설명
+     * @param reported       신고 당한 회원
+     * @param reportReason   신고 사유
+     * @param banDescription 제재 설명
      * @return Notification
      */
     @Transactional
-    public Notification createReportProcessedNotificationForReported(Member reported, String reportReason, String banDescription) {
+    public Notification createReportProcessedNotificationForReported(Member reported, String reportReason,
+                                                                     String banDescription) {
         validateMember(reported);
 
         NotificationType notificationType = findNotificationType(NotificationTypeTitle.REPORT_PROCESSED_REPORTED);
 
         String notificationContent = String.format(
-            "제한 사유: %s\n제한 기간: %s",
-            reportReason,
-            banDescription
+                "제한 사유: %s\n제한 기간: %s",
+                reportReason,
+                banDescription
         );
 
-        return saveNotification(notificationType, notificationContent, reported, null);
+        Notification notification = saveNotification(notificationType, notificationContent, reported, null);
+
+        // 새 알림 소켓 event 생성
+        eventPublisher.publishEvent(new SocketNewNotificationEvent(reported.getId()));
+
+        return notification;
     }
 
     /**
