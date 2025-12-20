@@ -83,17 +83,28 @@ public class MatchingFacadeService {
         }
 
         // 차단 여부 확인
-        Map<Long, Boolean> blockedStatusMap = blockService.isBlockedByTargetMembersBatch(member, targetMemberIds);
+        Map<Long, Boolean> blockedStatusMapForMember =
+                blockService.isBlockedByTargetMembersBatch(member, targetMemberIds);
 
-        // 차단되지 않은 사용자만 필터링
+        Map<Long, Boolean> blockedStatusMapForTargetMember =
+                blockService.hasBlockedTargetMembersBatch(member, targetMemberIds);
+
+// 둘 중 한 명이라도 차단한 사용자만 필터링
         List<MatchingRecord> filteredPendingMatchingRecords = new ArrayList<>();
+
         for (MatchingRecord record : pendingMatchingRecords) {
             Long targetMemberId = record.getMember().getId();
-            if (!blockedStatusMap.getOrDefault(targetMemberId, false)) {
+
+            boolean blockedByTarget =
+                    blockedStatusMapForMember.getOrDefault(targetMemberId, false);
+
+            boolean blockedByMe =
+                    blockedStatusMapForTargetMember.getOrDefault(targetMemberId, false);
+
+            if (blockedByTarget || blockedByMe) {
                 filteredPendingMatchingRecords.add(record);
             }
         }
-
         // myPriorityList, otherPriorityList 조회
         return matchingService.calculatePriorityList(matchingRecord, filteredPendingMatchingRecords);
     }
