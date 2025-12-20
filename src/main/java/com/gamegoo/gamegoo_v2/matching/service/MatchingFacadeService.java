@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -73,26 +72,36 @@ public class MatchingFacadeService {
                 request.getGameMode());
 
         // 현재 대기 중인 사용자 조회
-        List<MatchingRecord> pendingMatchingRecords = matchingService.getPendingMatchingRecords(request.getGameMode()
-                , memberId);
+        List<MatchingRecord> pendingMatchingRecords =
+                matchingService.getPendingMatchingRecords(request.getGameMode(), memberId);
 
-        // 차단당한 사용자 제외
-        List<Long> targetMemberIds = new ArrayList<>();
-        for (MatchingRecord record : pendingMatchingRecords) {
-            targetMemberIds.add(record.getMember().getId());
-        }
+        // target member id 목록 추출
+        List<Long> targetMemberIds = pendingMatchingRecords.stream()
+                .map(record -> record.getMember().getId())
+                .toList();
 
-        // 차단 여부 확인
-        Map<Long, Boolean> blockedStatusMap = blockService.isBlockedByTargetMembersBatch(member, targetMemberIds);
+        // 차단 여부 batch 조회
+        Map<Long, Boolean> blockedByTargetMap =
+                blockService.isBlockedByTargetMembersBatch(member, targetMemberIds);
 
-        // 차단되지 않은 사용자만 필터링
-        List<MatchingRecord> filteredPendingMatchingRecords = new ArrayList<>();
-        for (MatchingRecord record : pendingMatchingRecords) {
-            Long targetMemberId = record.getMember().getId();
-            if (!blockedStatusMap.getOrDefault(targetMemberId, false)) {
-                filteredPendingMatchingRecords.add(record);
-            }
-        }
+        Map<Long, Boolean> hasBlockedTargetMap =
+                blockService.hasBlockedTargetMembersBatch(member, targetMemberIds);
+
+        // 서로 차단하지 않은 경우만 필터링
+        List<MatchingRecord> filteredPendingMatchingRecords =
+                pendingMatchingRecords.stream()
+                        .filter(record -> {
+                            Long targetId = record.getMember().getId();
+
+                            boolean blockedByTarget =
+                                    blockedByTargetMap.getOrDefault(targetId, false);
+
+                            boolean hasBlockedTarget =
+                                    hasBlockedTargetMap.getOrDefault(targetId, false);
+
+                            return !blockedByTarget && !hasBlockedTarget;
+                        })
+                        .toList();
 
         // myPriorityList, otherPriorityList 조회
         return matchingService.calculatePriorityList(matchingRecord, filteredPendingMatchingRecords);
