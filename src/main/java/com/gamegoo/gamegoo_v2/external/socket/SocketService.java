@@ -26,6 +26,7 @@ public class SocketService {
     private static final String JOIN_CHATROOM_URL = "/socket/room/join";
     private static final String SYS_MESSAGE_URL = "/socket/sysmessage";
     private static final String FRIEND_ONLINE_URL = "/socket/friend/online/";
+    private static final String NEW_NOTIFICATION_URL = "/socket/newnotification/";
 
     /**
      * SOCKET 서버로 해당 회원의 socket을 room에 join 요청하는 API 전송
@@ -111,6 +112,28 @@ public class SocketService {
         } catch (Exception e) {
             log.error("Error occurred while emitFriendOnlineEvent method", e);
             throw new SocketException(ErrorCode.SOCKET_API_RESPONSE_ERROR);
+        }
+    }
+
+    /**
+     * SOCKET 서버로 member의 socket에 new-notification event emit을 요청하는 API 전송
+     *
+     * @param memberId
+     */
+    public void emitNewNotification(Long memberId) {
+        String url = SOCKET_SERVER_URL + NEW_NOTIFICATION_URL + memberId.toString();
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, null, String.class);
+
+            log.info("response of emitNewNotification: {}", response.getStatusCode());
+            if (!response.getStatusCode().equals(HttpStatus.OK)) {
+                log.error("emitNewNotification API call FAIL: {}", response.getBody());
+                throw new SocketException(ErrorCode.SOCKET_API_RESPONSE_ERROR);
+            } else {
+                log.info("emitNewNotification API call SUCCESS: {}", response.getBody());
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while emitNewNotification method", e);
         }
     }
 
