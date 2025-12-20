@@ -4,12 +4,12 @@ import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.Tier;
 import com.gamegoo.gamegoo_v2.account.member.repository.MemberRepository;
+import com.gamegoo.gamegoo_v2.core.exception.NotificationException;
 import com.gamegoo.gamegoo_v2.notification.domain.Notification;
 import com.gamegoo.gamegoo_v2.notification.domain.NotificationTypeTitle;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationRepository;
 import com.gamegoo.gamegoo_v2.notification.repository.NotificationTypeRepository;
 import com.gamegoo.gamegoo_v2.notification.service.NotificationService;
-import com.gamegoo.gamegoo_v2.core.exception.NotificationException;
 import com.gamegoo.gamegoo_v2.social.manner.domain.MannerKeyword;
 import com.gamegoo.gamegoo_v2.social.manner.repository.MannerKeywordRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -78,7 +78,7 @@ class NotificationServiceTest {
         assertThat(notification.getMember().getId()).isEqualTo(member.getId());
         assertThat(notification.getSourceMember().getId()).isEqualTo(sourceMember.getId());
 
-        assertThat(member.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
     }
 
     @DisplayName("친구 요청 받음 알림 생성 성공")
@@ -97,7 +97,7 @@ class NotificationServiceTest {
         assertThat(notification.getMember().getId()).isEqualTo(sourceMember.getId());
         assertThat(notification.getSourceMember().getId()).isEqualTo(member.getId());
 
-        assertThat(sourceMember.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(sourceMember.getId())).isEqualTo(1);
     }
 
     @DisplayName("친구 요청 수락 알림 생성 성공")
@@ -116,7 +116,7 @@ class NotificationServiceTest {
         assertThat(notification.getMember().getId()).isEqualTo(targetMember.getId());
         assertThat(notification.getSourceMember().getId()).isEqualTo(member.getId());
 
-        assertThat(targetMember.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(targetMember.getId())).isEqualTo(1);
     }
 
     @DisplayName("친구 요청 거절 알림 생성 성공")
@@ -135,7 +135,7 @@ class NotificationServiceTest {
         assertThat(notification.getMember().getId()).isEqualTo(targetMember.getId());
         assertThat(notification.getSourceMember().getId()).isEqualTo(member.getId());
 
-        assertThat(targetMember.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(targetMember.getId())).isEqualTo(1);
     }
 
     @DisplayName("매너 레벨 상승 알림 생성 성공")
@@ -155,7 +155,7 @@ class NotificationServiceTest {
         assertThat(notification.getSourceMember()).isNull();
         assertThat(notification.getContent()).isEqualTo("매너레벨이 2단계로 올라갔어요!");
 
-        assertThat(member.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
     }
 
     @DisplayName("매너 레벨 하락 알림 생성 성공")
@@ -175,7 +175,7 @@ class NotificationServiceTest {
         assertThat(notification.getSourceMember()).isNull();
         assertThat(notification.getContent()).isEqualTo("매너레벨이 1단계로 떨어졌어요.");
 
-        assertThat(member.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
     }
 
     @DisplayName("매너 평가 등록 알림 생성 성공: 키워드가 여러개인 경우")
@@ -199,7 +199,7 @@ class NotificationServiceTest {
         assertThat(notification.getSourceMember()).isNull();
         assertThat(notification.getContent()).isEqualTo("지난 매칭에서 캐리했어요 외 2개의 키워드를 받았어요. 자세한 내용은 내 평가에서 확인하세요!");
 
-        assertThat(member.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
     }
 
     @DisplayName("매너 평가 등록 알림 생성 성공: 키워드가 1개인 경우")
@@ -221,7 +221,7 @@ class NotificationServiceTest {
         assertThat(notification.getSourceMember()).isNull();
         assertThat(notification.getContent()).isEqualTo("지난 매칭에서 캐리했어요 키워드를 받았어요. 자세한 내용은 내 평가에서 확인하세요!");
 
-        assertThat(member.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
     }
 
     @DisplayName("신고 처리 결과 알림 생성 성공: 신고자용")
@@ -236,13 +236,14 @@ class NotificationServiceTest {
                 member, reportReason, banDescription);
 
         // then
-        assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
+        assertThat(notification.getNotificationType().getTitle()).isEqualTo(
+                NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
         assertThat(notification.isRead()).isFalse();
         assertThat(notification.getMember().getId()).isEqualTo(member.getId());
         assertThat(notification.getSourceMember()).isNull();
         assertThat(notification.getContent()).isEqualTo("신고 사유: 스팸 홍보/도배글\n처리 결과: 1일 정지");
 
-        assertThat(member.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
     }
 
     @DisplayName("신고 처리 결과 알림 생성 성공: 신고당한 자용")
@@ -257,13 +258,14 @@ class NotificationServiceTest {
                 member, reportReason, banDescription);
 
         // then
-        assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.REPORT_PROCESSED_REPORTED);
+        assertThat(notification.getNotificationType().getTitle()).isEqualTo(
+                NotificationTypeTitle.REPORT_PROCESSED_REPORTED);
         assertThat(notification.isRead()).isFalse();
         assertThat(notification.getMember().getId()).isEqualTo(member.getId());
         assertThat(notification.getSourceMember()).isNull();
         assertThat(notification.getContent()).isEqualTo("제한 사유: 욕설/ 혐오/ 차별적 표현\n제한 기간: 경고");
 
-        assertThat(member.getNotificationList()).hasSize(1);
+        assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
     }
 
     @Nested
@@ -308,9 +310,10 @@ class NotificationServiceTest {
                     member, reportReason, banDescription);
 
             // then
-            assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
+            assertThat(notification.getNotificationType().getTitle()).isEqualTo(
+                    NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
             assertThat(notification.getContent()).isEqualTo("신고 사유: \n처리 결과: ");
-            assertThat(member.getNotificationList()).hasSize(1);
+            assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
         }
 
         @DisplayName("성공: 긴 문자열 파라미터로 알림 생성")
@@ -325,10 +328,11 @@ class NotificationServiceTest {
                     member, reportReason, banDescription);
 
             // then
-            assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
+            assertThat(notification.getNotificationType().getTitle()).isEqualTo(
+                    NotificationTypeTitle.REPORT_PROCESSED_REPORTER);
             assertThat(notification.getContent()).contains(reportReason);
             assertThat(notification.getContent()).contains(banDescription);
-            assertThat(member.getNotificationList()).hasSize(1);
+            assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
         }
 
         @DisplayName("성공: 특수 문자가 포함된 파라미터로 알림 생성")
@@ -343,11 +347,13 @@ class NotificationServiceTest {
                     member, reportReason, banDescription);
 
             // then
-            assertThat(notification.getNotificationType().getTitle()).isEqualTo(NotificationTypeTitle.REPORT_PROCESSED_REPORTED);
+            assertThat(notification.getNotificationType().getTitle()).isEqualTo(
+                    NotificationTypeTitle.REPORT_PROCESSED_REPORTED);
             assertThat(notification.getContent()).contains(reportReason);
             assertThat(notification.getContent()).contains(banDescription);
-            assertThat(member.getNotificationList()).hasSize(1);
+            assertThat(notificationRepository.countByMemberId(member.getId())).isEqualTo(1);
         }
+
     }
 
     private Member createMember(String email, String gameName) {

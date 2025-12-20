@@ -274,12 +274,7 @@ public class NotificationService {
      * @return 안읽은 알림 개수
      */
     public int countUnreadNotification(Member member) {
-        long count = member.getNotificationList()
-                .stream()
-                .filter(notification -> !notification.isRead())
-                .count();
-
-        return Long.valueOf(count).intValue();
+        return notificationRepository.countByMemberIdAndIsReadFalse(member.getId());
     }
 
     /**

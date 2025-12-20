@@ -1,7 +1,7 @@
 package com.gamegoo.gamegoo_v2.notification.domain;
 
-import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
+import com.gamegoo.gamegoo_v2.core.common.BaseDateTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -44,7 +44,7 @@ public class Notification extends BaseDateTimeEntity {
     private NotificationType notificationType;
 
     public static Notification create(Member member, Member sourceMember, NotificationType notificationType,
-            String content) {
+                                      String content) {
         Notification notification = Notification.builder()
                 .sourceMember(sourceMember)
                 .notificationType(notificationType)
@@ -56,7 +56,7 @@ public class Notification extends BaseDateTimeEntity {
 
     @Builder
     private Notification(String content, boolean isRead, Member sourceMember, Member member,
-            NotificationType notificationType) {
+                         NotificationType notificationType) {
         this.content = content;
         this.isRead = isRead;
         this.sourceMember = sourceMember;
@@ -69,7 +69,7 @@ public class Notification extends BaseDateTimeEntity {
             this.member.getNotificationList().remove(this);
         }
         this.member = member;
-        member.getNotificationList().add(this);
+        //member.getNotificationList().add(this); // AFTER_COMMIT 이벤트에서 notification을 생성하므로 양방향 연관관계 설정x
     }
 
     public void updateIsRead(boolean isRead) {
