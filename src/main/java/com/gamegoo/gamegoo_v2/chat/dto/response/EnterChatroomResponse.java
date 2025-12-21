@@ -15,6 +15,8 @@ public class EnterChatroomResponse {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String gameName;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    String tag;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     int memberProfileImg;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean friend;
