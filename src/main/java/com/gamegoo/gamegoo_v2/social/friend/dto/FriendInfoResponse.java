@@ -14,6 +14,8 @@ public class FriendInfoResponse {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String name;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    String tag;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     int profileImg;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean isLiked;
@@ -26,6 +28,7 @@ public class FriendInfoResponse {
                 .memberId(friend.getToMember().getId())
                 .profileImg(friend.getToMember().getProfileImage())
                 .name(name)
+                .tag(friend.getToMember().getTag())
                 .isLiked(friend.isLiked())
                 .isBlind(friend.getToMember().getBlind())
                 .build();
