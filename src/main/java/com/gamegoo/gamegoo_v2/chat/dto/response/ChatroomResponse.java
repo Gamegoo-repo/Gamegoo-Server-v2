@@ -19,6 +19,8 @@ public class ChatroomResponse {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String targetMemberName;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    String tag;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean friend;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     boolean blind;

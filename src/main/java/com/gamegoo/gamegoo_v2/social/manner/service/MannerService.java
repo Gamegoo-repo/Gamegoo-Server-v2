@@ -80,7 +80,7 @@ public class MannerService {
         mannerRatingKeywordRepository.saveAll(mannerRatingKeywordList);
 
         // 매너평가 등록됨 알림 생성
-        eventPublisher.publishEvent(new MannerRatingInsertEvent(member.getId(), mannerKeywordIdList));
+        eventPublisher.publishEvent(new MannerRatingInsertEvent(targetMember.getId(), mannerKeywordIdList));
 
         return mannerRating;
     }

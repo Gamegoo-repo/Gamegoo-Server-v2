@@ -25,6 +25,7 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, Long>, Chatr
                 MIN(m_other.member_id) AS targetMemberId,
                 m_other.game_name AS targetMemberName,
                 m_other.profile_image AS targetMemberImg,
+                m_other.tag AS tag,
                 m_other.blind AS blind
             FROM chatroom cr
             JOIN member_chatroom mc
