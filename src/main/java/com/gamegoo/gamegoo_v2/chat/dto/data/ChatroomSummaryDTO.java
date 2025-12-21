@@ -22,6 +22,8 @@ public interface ChatroomSummaryDTO {
 
     Integer getTargetMemberImg();
 
+    String getTag();
+
     Boolean getBlind();
 
 }
