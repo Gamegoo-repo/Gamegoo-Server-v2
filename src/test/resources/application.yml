@@ -38,7 +38,7 @@ batch_size:
 jwt:
   secret: "secretjwttestjwtsecretsecretjwttestjwtsecretsecretjwttestjwtsecretsecretjwttestjwtsecretsecretjwttestjwtsecret"
   access_expiration_time: 600000 # 10분 (10 * 60 * 1000 밀리초)
-  refresh_expiration_day: 14 # 2주
+  refresh_expiration_time: 432000000 # 2주
 
 socket:
   server:
