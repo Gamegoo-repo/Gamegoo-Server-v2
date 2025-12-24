@@ -38,11 +38,6 @@ springdoc:
     operations-sorter: alpha      # alpha: 알파벳 순 태그 정렬, method: HTTP Method 순 정렬
     enabled: true
 
-jwt:
-  secret: ${JWT_SECRET}
-  access_expiration_time: 86400000 # 24*60분 (24 * 60 * 60 * 1000 밀리초)
-  refresh_expiration_day: 5 # 5일
-
 socket:
   server:
     url: ${SOCKET_SERVER_URL}
@@ -93,6 +88,11 @@ logging:
   discord:
     webhook: ${DISCORD_SCHEDULER_WEBHOOK}
 
+jwt:
+  secret: ${JWT_SECRET}
+  access_expiration_time: 86400000 # 24*60분 (24 * 60 * 60 * 1000 밀리초)
+  refresh_expiration_time: 432000000 # 5일 (5 * 86400000)
+
 cors:
   allowed-origins:
     - http://local.mydomain.com
@@ -129,6 +129,11 @@ decorator:
     p6spy:
       enable-logging: false
 
+jwt:
+  secret: ${JWT_SECRET}
+  access_expiration_time: 60000 # 1분 (60 * 1000 밀리초)
+  refresh_expiration_time: 432000000 # 5일 (5 * 86400000)
+
 cors:
   allowed-origins:
     - https://dev.gamegoo.co.kr
@@ -161,6 +166,11 @@ decorator:
   datasource:
     p6spy:
       enable-logging: false
+
+jwt:
+  secret: ${JWT_SECRET}
+  access_expiration_time: 600000 # 10분 (10 * 60 * 1000 밀리초)
+  refresh_expiration_time: 432000000 # 5일 (5 * 86400000)
 
 cors:
   allowed-origins:
@@ -197,6 +207,11 @@ decorator:
   datasource:
     p6spy:
       enable-logging: false
+
+jwt:
+  secret: ${JWT_SECRET}
+  access_expiration_time: 60000 # 1분 (60 * 1000 밀리초)
+  refresh_expiration_time: 1800000 # 30분 (30 * 60 * 1000)
 
 cors:
   allowed-origins:

@@ -24,8 +24,8 @@ public class JwtProvider {
     private final SecretKey key;
     private final long accessTokenExpTime;
 
-    @Value("${jwt.refresh_expiration_day}")
-    private long refreshExpireDay;
+    @Value("${jwt.refresh_expiration_time}")
+    private long refreshExpireTimeInMillis;
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
@@ -55,9 +55,6 @@ public class JwtProvider {
      * @return
      */
     public String createRefreshToken(Long memberId, Role role) {
-        // refreshExpireDay를 밀리초 단위로 변환
-        long refreshExpireTimeInMillis = refreshExpireDay * 24 * 60 * 60 * 1000;
-
         return createToken(memberId, role, refreshExpireTimeInMillis);
     }
 
