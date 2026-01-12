@@ -206,13 +206,12 @@ public class AuthFacadeService {
         // gameName과 tag로 Member 조회
         Member member = memberService.findMemberByGameNameAndTag(gameName, tag);
 
-        // role이 ADMIN인지 검증
-        if (member.getRole() != Role.ADMIN) {
-            throw new AuthException(ErrorCode.NOT_ADMIN);
-        }
-
-        // 입력된 비밀번호와 환경변수 비밀번호 비교
-        if (!adminCommonPassword.equals(request.getPassword())) {
+        // role이 ADMIN인지와 비밀번호가 일치하는지 함께 검증하여 사용자 열거 및 타이밍 공격 방지
+        boolean passwordMatches = java.security.MessageDigest.isEqual(
+                adminCommonPassword.getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                request.getPassword().getBytes(java.nio.charset.StandardCharsets.UTF_8)
+        );
+        if (member.getRole() != Role.ADMIN || !passwordMatches) {
             throw new AuthException(ErrorCode.INVALID_PASSWORD);
         }
 

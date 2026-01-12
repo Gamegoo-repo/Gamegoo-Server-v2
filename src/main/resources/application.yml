@@ -143,10 +143,6 @@ jwt:
   access_expiration_time: 60000 # 1분 (60 * 1000 밀리초)
   refresh_expiration_time: 432000000 # 5일 (5 * 86400000)
 
-admin:
-  common:
-    password: ${ADMIN_COMMON_PASSWORD}
-
 cors:
   allowed-origins:
     - https://dev.gamegoo.co.kr
@@ -184,10 +180,6 @@ jwt:
   secret: ${JWT_SECRET}
   access_expiration_time: 600000 # 10분 (10 * 60 * 1000 밀리초)
   refresh_expiration_time: 432000000 # 5일 (5 * 86400000)
-
-admin:
-  common:
-    password: ${ADMIN_COMMON_PASSWORD}
 
 cors:
   allowed-origins:
@@ -229,10 +221,6 @@ jwt:
   secret: ${JWT_SECRET}
   access_expiration_time: 60000 # 1분 (60 * 1000 밀리초)
   refresh_expiration_time: 1800000 # 30분 (30 * 60 * 1000)
-
-admin:
-  common:
-    password: ${ADMIN_COMMON_PASSWORD}
 
 cors:
   allowed-origins:

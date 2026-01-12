@@ -2,11 +2,15 @@ package com.gamegoo.gamegoo_v2.account.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AdminLoginRequest {
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "관리자 계정 (gameName#tag 형식)", example = "admin#ADM")
