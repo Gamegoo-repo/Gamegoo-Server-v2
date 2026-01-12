@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.account.auth.service;
 
 import com.gamegoo.gamegoo_v2.account.auth.domain.Role;
+import com.gamegoo.gamegoo_v2.account.auth.dto.request.AdminLoginRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RefreshTokenRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RejoinResponse;
@@ -13,10 +14,12 @@ import com.gamegoo.gamegoo_v2.chat.service.ChatCommandService;
 import com.gamegoo.gamegoo_v2.content.board.service.BoardService;
 import com.gamegoo.gamegoo_v2.core.exception.AuthException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotJoinResponse;
 import com.gamegoo.gamegoo_v2.social.friend.service.FriendService;
 import com.gamegoo.gamegoo_v2.social.manner.service.MannerService;
 import com.gamegoo.gamegoo_v2.test_support.dto.TokensResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,9 @@ public class AuthFacadeService {
     private final AuthService authService;
     private final JwtProvider jwtProvider;
     private final BanService banService;
+
+    @Value("${admin.common.password}")
+    private String adminCommonPassword;
 
     /**
      * 로그아웃
@@ -179,6 +185,45 @@ public class AuthFacadeService {
         authService.updateRefreshToken(member, refreshToken);
 
         return RejoinResponse.of(member, accessToken, refreshToken, banMessage);
+    }
+
+    /**
+     * 관리자 로그인
+     *
+     * @param request 관리자 로그인 요청 (account, password)
+     * @return RiotJoinResponse
+     */
+    public RiotJoinResponse adminLogin(AdminLoginRequest request) {
+        // account를 #으로 파싱하여 gameName과 tag 추출
+        String[] accountParts = request.getAccount().split("#");
+        if (accountParts.length != 2) {
+            throw new AuthException(ErrorCode.INVALID_ADMIN_ACCOUNT_FORMAT);
+        }
+
+        String gameName = accountParts[0];
+        String tag = accountParts[1];
+
+        // gameName과 tag로 Member 조회
+        Member member = memberService.findMemberByGameNameAndTag(gameName, tag);
+
+        // role이 ADMIN인지 검증
+        if (member.getRole() != Role.ADMIN) {
+            throw new AuthException(ErrorCode.NOT_ADMIN);
+        }
+
+        // 입력된 비밀번호와 환경변수 비밀번호 비교
+        if (!adminCommonPassword.equals(request.getPassword())) {
+            throw new AuthException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // JWT 토큰 발급
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getRole());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole());
+
+        // refresh token DB에 저장
+        authService.updateRefreshToken(member, refreshToken);
+
+        return RiotJoinResponse.of(member, accessToken, refreshToken);
     }
 
 }

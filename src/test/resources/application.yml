@@ -31,6 +31,11 @@ spring:
     client-id: id
     client-secret: secret
 
+# 관리자 설정
+admin:
+  common:
+    password: test_admin_password
+
 # batch size 설정
 batch_size:
   manner_rank: 30

@@ -1,6 +1,7 @@
 package com.gamegoo.gamegoo_v2.account.auth.controller;
 
 import com.gamegoo.gamegoo_v2.account.auth.annotation.AuthMember;
+import com.gamegoo.gamegoo_v2.account.auth.dto.request.AdminLoginRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.request.RefreshTokenRequest;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RefreshTokenResponse;
 import com.gamegoo.gamegoo_v2.account.auth.dto.response.RejoinResponse;
@@ -10,6 +11,7 @@ import com.gamegoo.gamegoo_v2.account.auth.dto.request.RejoinRequest;
 import com.gamegoo.gamegoo_v2.core.common.ApiResponse;
 import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
+import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotJoinResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -79,6 +81,18 @@ public class AuthController {
     })
     public ApiResponse<RejoinResponse> rejoinMember(@RequestBody RejoinRequest rejoinRequest) {
         return ApiResponse.ok(authFacadeService.rejoinMember(rejoinRequest));
+    }
+
+    @Operation(summary = "관리자 로그인 API", description = "gameName#tag 형식의 계정과 비밀번호를 통한 로그인 방식입니다")
+    @PostMapping("/admin/login")
+    @ApiErrorCodes({
+            ErrorCode.INVALID_ADMIN_ACCOUNT_FORMAT,
+            ErrorCode.MEMBER_NOT_FOUND,
+            ErrorCode.NOT_ADMIN,
+            ErrorCode.INVALID_PASSWORD
+    })
+    public ApiResponse<RiotJoinResponse> adminLogin(@Valid @RequestBody AdminLoginRequest request) {
+        return ApiResponse.ok(authFacadeService.adminLogin(request));
     }
 
 }

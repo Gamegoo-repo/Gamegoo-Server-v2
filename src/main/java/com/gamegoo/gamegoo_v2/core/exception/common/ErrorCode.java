@@ -39,6 +39,8 @@ public enum ErrorCode {
     INACTIVE_MEMBER(NOT_FOUND, "AUTH_412", "탈퇴한 사용자 입니다."),
     ACTIVE_MEMBER(BAD_REQUEST, "AUTH_413", "탈퇴하지 않은 사용자입니다."),
     DULPLICATED_MEMBER(BAD_REQUEST, "AUTH_414", "중복된 사용자입니다. 서버 관리자에게 문의하세요."),
+    NOT_ADMIN(FORBIDDEN, "AUTH_415", "관리자가 아닙니다."),
+    INVALID_ADMIN_ACCOUNT_FORMAT(BAD_REQUEST, "AUTH_416", "계정 형식이 올바르지 않습니다. gameName#tag 형식으로 입력해주세요."),
 
     /**
      * 회원 관련 에러
