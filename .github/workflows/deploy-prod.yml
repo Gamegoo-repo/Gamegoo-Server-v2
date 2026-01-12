@@ -29,6 +29,7 @@ jobs:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       RSO_REDIRECT_URI: ${{ secrets.PROD_RSO_REDIRECT_URI }}
+      ADMIN_COMMON_PASSWORD: ${{ secrets.ADMIN_COMMON_PASSWORD }}
 
     steps:
       # 1. GitHub Repository 파일 불러오기
@@ -104,6 +105,7 @@ jobs:
             -e RSO_REDIRECT_URI=${{ secrets.PROD_RSO_REDIRECT_URI }} \
             -e DISCORD_MONITORING_WEBHOOK_URL_PROD=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL_PROD }} \
             -e DISCORD_SCHEDULER_WEBHOOK=${{ secrets.DISCORD_SCHEDULER_WEBHOOK }} \
+            -e ADMIN_COMMON_PASSWORD=${{ secrets.ADMIN_COMMON_PASSWORD }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-prod:${{ github.sha }}
 
       # 8. 기존 Docker 이미지 삭제
