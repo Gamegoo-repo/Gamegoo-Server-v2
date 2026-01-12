@@ -25,6 +25,7 @@ jobs:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       RSO_REDIRECT_URI: ${{ secrets.DEV_RSO_REDIRECT_URI }}
+      ADMIN_COMMON_PASSWORD: ${{ secrets.ADMIN_COMMON_PASSWORD }}
 
     steps:
       # 1. GitHub Repository 파일 불러오기
@@ -102,6 +103,7 @@ jobs:
             -e RSO_REDIRECT_URI=${{ secrets.DEV_RSO_REDIRECT_URI }} \
             -e DISCORD_MONITORING_WEBHOOK_URL_DEV=${{ secrets.DISCORD_MONITORING_WEBHOOK_URL_DEV }} \
             -e DISCORD_SCHEDULER_WEBHOOK=${{ secrets.DISCORD_SCHEDULER_WEBHOOK }} \
+            -e ADMIN_COMMON_PASSWORD=${{ secrets.ADMIN_COMMON_PASSWORD }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }}
 
       # 실패 시 디스코드에 알림 보내기
