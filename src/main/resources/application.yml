@@ -147,6 +147,7 @@ cors:
   allowed-origins:
     - https://dev.gamegoo.co.kr
     - https://devsocket.gamegoo.co.kr
+    - https://admin.gamegoo.co.kr
 
 ---
 # 운영 환경
