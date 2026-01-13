@@ -87,27 +87,26 @@ public class AuthFacadeService {
      * @return
      */
     public String blindMember(Member member) {
-        // Member 테이블에서 blind 처리
-        memberService.deactivateMember(member);
+            // 해당 회원이 속한 모든 채팅방에서 퇴장 처리
+            chatCommandService.exitAllChatroom(member);
 
-        // 해당 회원이 속한 모든 채팅방에서 퇴장 처리
-        chatCommandService.exitAllChatroom(member);
+            // 해당 회원이 보낸 모든 친구 요청 취소 처리
+            friendService.cancelAllFriendRequestsByFromMember(member);
 
-        // 해당 회원이 보낸 모든 친구 요청 취소 처리
-        friendService.cancelAllFriendRequestsByFromMember(member);
+            // 해당 회원이 받은 모든 친구 요청 취소 처리
+            friendService.cancelAllFriendRequestsByToMember(member);
 
-        // 해당 회원이 받은 모든 친구 요청 취소 처리
-        friendService.cancelAllFriendRequestsByToMember(member);
+            // 게시판 글 삭제 처리
+            boardService.deleteAllBoardByMember(member);
 
-        // 게시판 글 삭제 처리
-        boardService.deleteAllBoardByMember(member);
+            // 매너, 비매너 평가 기록 삭제 처리
+            mannerService.deleteAllMannerRatingsByMember(member);
 
-        // 매너, 비매너 평가 기록 삭제 처리
-        mannerService.deleteAllMannerRatingsByMember(member);
+            // refresh Token 삭제하기
+            authService.deleteRefreshToken(member);
 
-        // refresh Token 삭제하기
-        authService.deleteRefreshToken(member);
-
+            // Member 테이블에서 blind 처리
+            memberService.deactivateMember(member);
         return "탈퇴처리가 완료되었습니다";
     }
 
