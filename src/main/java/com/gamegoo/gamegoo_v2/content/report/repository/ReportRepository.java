@@ -10,4 +10,6 @@ public interface ReportRepository extends JpaRepository<Report, Long>, ReportRep
     boolean existsByFromMemberIdAndToMemberIdAndCreatedAtBetween(Long fromMemberId, Long toMemberId,
                                                                  LocalDateTime startOfDay, LocalDateTime endOfDay);
 
+    long countByToMemberId(Long toMemberId);
+
 }
