@@ -25,23 +25,33 @@ class ReportPageResponseTest {
         // given
         Member fromMember = createMember("reporter@test.com", "신고자", "KR1");
         Member toMember = createMember("reported@test.com", "피신고자", "KR2");
-        
+
         Report report1 = Report.create(fromMember, toMember, "신고 내용1", ReportPath.CHAT, null);
         Report report2 = Report.create(fromMember, toMember, "신고 내용2", ReportPath.BOARD, null);
-        
+
         List<Report> reports = List.of(report1, report2);
         Pageable pageable = PageRequest.of(0, 10);
         Page<Report> reportPage = new PageImpl<>(reports, pageable, 25);
 
         // when
-        ReportPageResponse response = ReportPageResponse.of(reportPage);
+        List<ReportListResponse> reportList = reportPage.getContent().stream()
+                .map(report -> ReportListResponse.of(report, 5L))
+                .toList();
+
+        int totalPage = (reportPage.getTotalPages() == 0) ? 1 : reportPage.getTotalPages();
+        ReportPageResponse response = ReportPageResponse.builder()
+                .reports(reportList)
+                .totalPages(totalPage)
+                .totalElements(reportPage.getTotalElements())
+                .currentPage(reportPage.getNumber())
+                .build();
 
         // then
         assertThat(response.getReports()).hasSize(2);
         assertThat(response.getTotalPages()).isEqualTo(3); // 25 / 10 = 3 pages
         assertThat(response.getTotalElements()).isEqualTo(25);
         assertThat(response.getCurrentPage()).isEqualTo(0);
-        
+
         // 첫 번째 신고 검증
         ReportListResponse firstReport = response.getReports().get(0);
         assertThat(firstReport.getFromMemberName()).isEqualTo("신고자");
@@ -50,6 +60,7 @@ class ReportPageResponseTest {
         assertThat(firstReport.getToMemberTag()).isEqualTo("KR2");
         assertThat(firstReport.getContent()).isEqualTo("신고 내용1");
         assertThat(firstReport.getPath()).isEqualTo("CHAT");
+        assertThat(firstReport.getReportCount()).isEqualTo(5L);
     }
 
     @Test
@@ -61,7 +72,17 @@ class ReportPageResponseTest {
         Page<Report> emptyPage = new PageImpl<>(reports, pageable, 0);
 
         // when
-        ReportPageResponse response = ReportPageResponse.of(emptyPage);
+        List<ReportListResponse> reportList = emptyPage.getContent().stream()
+                .map(report -> ReportListResponse.of(report, 0L))
+                .toList();
+
+        int totalPage = (emptyPage.getTotalPages() == 0) ? 1 : emptyPage.getTotalPages();
+        ReportPageResponse response = ReportPageResponse.builder()
+                .reports(reportList)
+                .totalPages(totalPage)
+                .totalElements(emptyPage.getTotalElements())
+                .currentPage(emptyPage.getNumber())
+                .build();
 
         // then
         assertThat(response.getReports()).isEmpty();
@@ -76,15 +97,25 @@ class ReportPageResponseTest {
         // given
         Member fromMember = createMember("reporter@test.com", "신고자", "KR1");
         Member toMember = createMember("reported@test.com", "피신고자", "KR2");
-        
+
         Report report = Report.create(fromMember, toMember, "신고 내용", ReportPath.PROFILE, null);
         List<Report> reports = List.of(report);
-        
+
         Pageable pageable = PageRequest.of(2, 10); // 3번째 페이지
         Page<Report> reportPage = new PageImpl<>(reports, pageable, 21); // 총 21개 데이터
 
         // when
-        ReportPageResponse response = ReportPageResponse.of(reportPage);
+        List<ReportListResponse> reportList = reportPage.getContent().stream()
+                .map(report1 -> ReportListResponse.of(report1, 3L))
+                .toList();
+
+        int totalPage = (reportPage.getTotalPages() == 0) ? 1 : reportPage.getTotalPages();
+        ReportPageResponse response = ReportPageResponse.builder()
+                .reports(reportList)
+                .totalPages(totalPage)
+                .totalElements(reportPage.getTotalElements())
+                .currentPage(reportPage.getNumber())
+                .build();
 
         // then
         assertThat(response.getReports()).hasSize(1);

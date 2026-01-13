@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.content.report.dto.response;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
 import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.domain.ReportType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,8 +37,14 @@ public class ReportListResponse {
     private LocalDateTime createdAt;
     private Long postId;
     private Boolean isPostDeleted;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "피신고자 제재 상태")
+    private BanType toMemberBanType;
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, description = "피신고자 제재 만료일")
+    private LocalDateTime toMemberBanExpireAt;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "피신고자가 받은 전체 신고 누적 횟수")
+    private Long reportCount;
 
-    public static ReportListResponse of(Report report) {
+    public static ReportListResponse of(Report report, Long reportCount) {
         Long postId = null;
         Boolean isPostDeleted = null;
         if (report.getSourceBoard() != null) {
@@ -72,6 +79,9 @@ public class ReportListResponse {
                 .createdAt(report.getCreatedAt())
                 .postId(postId)
                 .isPostDeleted(isPostDeleted)
+                .toMemberBanType(report.getToMember().getBanType())
+                .toMemberBanExpireAt(report.getToMember().getBanExpireAt())
+                .reportCount(reportCount)
                 .build();
     }
 
