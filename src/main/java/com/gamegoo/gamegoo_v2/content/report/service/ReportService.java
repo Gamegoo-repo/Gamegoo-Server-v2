@@ -141,4 +141,14 @@ public class ReportService {
         return reportRepository.searchReports(request, pageable);
     }
 
+    /**
+     * 특정 회원이 받은 신고 누적 횟수 조회
+     *
+     * @param memberId 회원 ID
+     * @return 누적 신고 횟수
+     */
+    public long getReportCountByMemberId(Long memberId) {
+        return reportRepository.countByToMemberId(memberId);
+    }
+
 }

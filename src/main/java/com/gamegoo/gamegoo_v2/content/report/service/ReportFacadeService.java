@@ -11,16 +11,19 @@ import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportPageResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse;
 import com.gamegoo.gamegoo_v2.core.exception.ReportException;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +70,23 @@ public class ReportFacadeService {
      */
     public ReportPageResponse searchReports(ReportSearchRequest request,
                                             org.springframework.data.domain.Pageable pageable) {
-        return ReportPageResponse.of(reportService.searchReports(request, pageable));
+        Page<Report> reportPage = reportService.searchReports(request, pageable);
+
+        // 각 신고에 대해 reportCount를 조회하여 ReportListResponse 생성
+        List<ReportListResponse> reportList = reportPage.getContent().stream()
+                .map(report -> {
+                    Long reportCount = reportService.getReportCountByMemberId(report.getToMember().getId());
+                    return ReportListResponse.of(report, reportCount);
+                })
+                .toList();
+
+        int totalPage = (reportPage.getTotalPages() == 0) ? 1 : reportPage.getTotalPages();
+        return ReportPageResponse.builder()
+                .reports(reportList)
+                .totalPages(totalPage)
+                .totalElements(reportPage.getTotalElements())
+                .currentPage(reportPage.getNumber())
+                .build();
     }
 
     /**
