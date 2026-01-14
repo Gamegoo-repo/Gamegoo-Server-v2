@@ -12,8 +12,6 @@ import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.external.riot.dto.TierDetails;
 import com.gamegoo.gamegoo_v2.external.riot.dto.request.RiotJoinRequest;
 import com.gamegoo.gamegoo_v2.matching.domain.GameMode;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -200,6 +198,7 @@ public class MemberService {
     @Transactional
     public void deactivateMember(Member member) {
         member.updateBlind(true);
+        memberRepository.save(member);
     }
 
     /**
@@ -210,6 +209,7 @@ public class MemberService {
     @Transactional
     public void activateMember(Member member) {
         member.updateBlind(false);
+        memberRepository.save(member);
     }
 
     /**
