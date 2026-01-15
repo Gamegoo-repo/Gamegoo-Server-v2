@@ -34,6 +34,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -385,9 +387,10 @@ class FriendRequestFacadeServiceTest {
                 .isAgree(true)
                 .build();
 
-        memberRecentStatsRepository.save(MemberRecentStats.builder()
+        MemberRecentStats stats = MemberRecentStats.builder()
                 .member(member)
-                .build());
+                .build();
+        member.setMemberRecentStats(stats);
 
         return memberRepository.save(member);
     }
