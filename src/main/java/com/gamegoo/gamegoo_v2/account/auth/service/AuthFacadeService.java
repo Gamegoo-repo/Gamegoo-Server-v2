@@ -87,9 +87,6 @@ public class AuthFacadeService {
      * @return
      */
     public String blindMember(Member member) {
-        // Member 테이블에서 blind 처리
-        memberService.deactivateMember(member);
-
         // 해당 회원이 속한 모든 채팅방에서 퇴장 처리
         chatCommandService.exitAllChatroom(member);
 
@@ -108,6 +105,8 @@ public class AuthFacadeService {
         // refresh Token 삭제하기
         authService.deleteRefreshToken(member);
 
+        // Member 테이블에서 blind 처리
+        memberService.deactivateMember(member);
         return "탈퇴처리가 완료되었습니다";
     }
 
