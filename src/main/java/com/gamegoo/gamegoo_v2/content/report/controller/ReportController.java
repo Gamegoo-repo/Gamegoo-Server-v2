@@ -8,6 +8,7 @@ import com.gamegoo.gamegoo_v2.content.report.domain.ReportSortOrder;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.BanReleaseResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportPageResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportProcessResponse;
@@ -173,6 +174,31 @@ public class ReportController {
     })
     public ApiResponse<String> deleteReportedPost(@PathVariable("reportId") Long reportId) {
         return ApiResponse.ok(reportFacadeService.deleteReportedPost(reportId));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "회원 정지 해제 (관리자 전용)",
+            description = """
+                    관리자가 회원의 정지를 해제하는 API입니다.
+
+                    정지 상태인 회원의 banType을 NONE으로 변경하고,
+                    banExpireAt을 null로 초기화합니다.
+
+                    **Response:**
+                    - memberId: 정지 해제된 회원 ID
+                    - gameName: 회원의 게임 이름
+                    - tag: 회원의 태그
+                    - previousBanType: 해제 전 정지 유형
+                    - message: "정지가 해제되었습니다."
+                    """)
+    @Parameter(name = "memberId", description = "정지 해제할 회원의 ID입니다.")
+    @PutMapping("/member/{memberId}/unban")
+    @ApiErrorCodes({
+            ErrorCode._FORBIDDEN,
+            ErrorCode.MEMBER_NOT_FOUND
+    })
+    public ApiResponse<BanReleaseResponse> releaseMemberBan(@PathVariable("memberId") Long memberId) {
+        return ApiResponse.ok(reportFacadeService.releaseMemberBan(memberId));
     }
 
 }
