@@ -111,17 +111,6 @@ public class AuthFacadeService {
     }
 
     /**
-     * 테스트용 access token 발급
-     *
-     * @param memberId
-     * @return
-     */
-    public String createTestAccessToken(Long memberId) {
-        Member member = memberService.findMemberById(memberId);
-        return jwtProvider.createAccessToken(member.getId(), member.getRole());
-    }
-
-    /**
      * 테스트용 access, refresh token 발급
      *
      * @param memberId

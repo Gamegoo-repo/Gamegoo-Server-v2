@@ -13,12 +13,9 @@ import com.gamegoo.gamegoo_v2.core.config.swagger.ApiErrorCodes;
 import com.gamegoo.gamegoo_v2.core.exception.common.ErrorCode;
 import com.gamegoo.gamegoo_v2.external.riot.dto.response.RiotJoinResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,14 +28,6 @@ public class AuthController {
 
     private final AuthFacadeService authFacadeService;
 
-    @GetMapping("/token/{memberId}")
-    @Operation(summary = "임시 access token 발급 API", description = "테스트용으로 access token을 발급받을 수 있는 API 입니다.")
-    @Parameter(name = "memberId", description = "대상 회원의 id 입니다.")
-    @ApiErrorCodes({ErrorCode.MEMBER_NOT_FOUND})
-    public ApiResponse<String> getTestAccessToken(@PathVariable(name = "memberId") Long memberId) {
-        return ApiResponse.ok(authFacadeService.createTestAccessToken(memberId));
-    }
-
     @PostMapping("/logout")
     @Operation(summary = "logout API 입니다.", description = "API for logout")
     @ApiErrorCodes({
@@ -50,6 +39,7 @@ public class AuthController {
         return ApiResponse.ok(authFacadeService.logout(member));
     }
 
+    // TODO: refresh token 재발급 cookie로 변경하기
     @PostMapping("/refresh")
     @Operation(summary = "refresh   토큰을 통한 access, refresh 토큰 재발급 API 입니다.", description = "API for Refresh Token")
     @ApiErrorCodes({
