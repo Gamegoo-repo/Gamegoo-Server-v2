@@ -47,6 +47,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Install cloudflared
+        run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+            -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
       - name: Gradle Build (DEV)
         run: ./gradlew clean build -x test
 
