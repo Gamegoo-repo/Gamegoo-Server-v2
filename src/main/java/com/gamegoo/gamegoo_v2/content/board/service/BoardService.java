@@ -19,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,7 +100,8 @@ public class BoardService {
     /**
      * 게시글 목록 조회 (페이징 처리)
      */
-    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike, int pageIdx) {
+    public Page<Board> getBoardsWithPagination(GameMode gameMode, Tier tier, Position mainP, Position subP, Mike mike,
+                                               int pageIdx) {
         // Position.ANY인 경우 null로 처리하여 필터 조건 무시
         // mainP 또는 subP 중 하나라도 지정되면 해당 포지션 필터 적용 (주 포지션 OR 부 포지션)
         List<Position> positions = new java.util.ArrayList<>();
