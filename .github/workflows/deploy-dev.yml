@@ -47,6 +47,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Gradle Build (DEV)
+        run: ./gradlew clean build -x test
+
       # 4. Docker 확장 기능 추가
       - name: Docker 확장 기능 추가
         uses: docker/setup-buildx-action@v3
