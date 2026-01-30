@@ -1,5 +1,6 @@
 package com.gamegoo.gamegoo_v2.integration.report;
 
+import com.gamegoo.gamegoo_v2.account.member.domain.BanType;
 import com.gamegoo.gamegoo_v2.account.member.domain.LoginType;
 import com.gamegoo.gamegoo_v2.account.member.domain.Member;
 import com.gamegoo.gamegoo_v2.account.member.domain.MemberRecentStats;
@@ -14,6 +15,7 @@ import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.domain.ReportPath;
 import com.gamegoo.gamegoo_v2.content.report.domain.ReportTypeMapping;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.BanReleaseResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.repository.ReportRepository;
 import com.gamegoo.gamegoo_v2.content.report.repository.ReportTypeMappingRepository;
@@ -467,6 +469,62 @@ class ReportFacadeServiceTest {
             assertThatThrownBy(() -> reportFacadeService.deleteReportedPost(999L))
                     .isInstanceOf(ReportException.class)
                     .hasMessage(ErrorCode.REPORT_NOT_FOUND.getMessage());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("회원 정지 해제")
+    class ReleaseMemberBanTest {
+
+        @DisplayName("성공: 정지된 회원의 정지를 해제한다")
+        @Test
+        void releaseMemberBan_Success() {
+            // given
+            targetMember.applyBan(BanType.BAN_1D, java.time.LocalDateTime.now().plusDays(1));
+            memberRepository.save(targetMember);
+
+            // when
+            BanReleaseResponse response = reportFacadeService.releaseMemberBan(targetMember.getId());
+
+            // then
+            assertThat(response.getMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getGameName()).isEqualTo(targetMember.getGameName());
+            assertThat(response.getTag()).isEqualTo(targetMember.getTag());
+            assertThat(response.getPreviousBanType()).isEqualTo(BanType.BAN_1D);
+            assertThat(response.getMessage()).isEqualTo("정지가 해제되었습니다.");
+
+            // 회원 정지 상태 확인
+            Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
+            assertThat(updatedMember.getBanType()).isEqualTo(BanType.NONE);
+            assertThat(updatedMember.getBanExpireAt()).isNull();
+        }
+
+        @DisplayName("성공: 정지되지 않은 회원에 대해서도 동작한다")
+        @Test
+        void releaseMemberBan_SuccessForNonBannedMember() {
+            // given - targetMember는 기본적으로 BanType.NONE 상태
+
+            // when
+            BanReleaseResponse response = reportFacadeService.releaseMemberBan(targetMember.getId());
+
+            // then
+            assertThat(response.getMemberId()).isEqualTo(targetMember.getId());
+            assertThat(response.getPreviousBanType()).isEqualTo(BanType.NONE);
+            assertThat(response.getMessage()).isEqualTo("정지가 해제되었습니다.");
+
+            // 회원 정지 상태 확인
+            Member updatedMember = memberRepository.findById(targetMember.getId()).orElseThrow();
+            assertThat(updatedMember.getBanType()).isEqualTo(BanType.NONE);
+        }
+
+        @DisplayName("실패: 존재하지 않는 회원 ID")
+        @Test
+        void releaseMemberBan_NotFoundMember() {
+            // when // then
+            assertThatThrownBy(() -> reportFacadeService.releaseMemberBan(999L))
+                    .isInstanceOf(MemberException.class)
+                    .hasMessage(ErrorCode.MEMBER_NOT_FOUND.getMessage());
         }
 
     }

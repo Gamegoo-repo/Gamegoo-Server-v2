@@ -10,6 +10,7 @@ import com.gamegoo.gamegoo_v2.content.report.domain.Report;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportProcessRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportRequest;
 import com.gamegoo.gamegoo_v2.content.report.dto.request.ReportSearchRequest;
+import com.gamegoo.gamegoo_v2.content.report.dto.response.BanReleaseResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportInsertResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportListResponse;
 import com.gamegoo.gamegoo_v2.content.report.dto.response.ReportPageResponse;
@@ -148,6 +149,22 @@ public class ReportFacadeService {
         }
 
         return "삭제할 게시글이 존재하지 않습니다";
+    }
+
+    /**
+     * 회원 정지 해제 facade 메소드 (관리자용)
+     *
+     * @param memberId 정지 해제할 회원 ID
+     * @return BanReleaseResponse
+     */
+    @Transactional
+    public BanReleaseResponse releaseMemberBan(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+        BanType previousBanType = member.getBanType();
+
+        banService.releaseBan(member);
+
+        return BanReleaseResponse.of(member, previousBanType);
     }
 
 }
