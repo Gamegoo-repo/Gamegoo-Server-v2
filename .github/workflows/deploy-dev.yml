@@ -81,7 +81,7 @@ jobs:
           DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/gamegoo-api-v2-dev:${{ github.sha }}
         run: |
           ssh -o StrictHostKeyChecking=no \
-              -o ProxyCommand="cloudflared access ssh --hostname ssh.gamegoo.co.kr" \
+              -o ProxyCommand="cloudflared access ssh --hostname ssh.gamegoo.co.kr" --url ssh://localhost:22" \
               macmini@ssh.gamegoo.co.kr << 'EOF'
             docker pull $DOCKER_IMAGE
             docker rm -f gamegoo-api-v2-dev || true
